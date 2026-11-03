@@ -11,12 +11,13 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.util.Tuple;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -143,43 +144,46 @@ public class TileEntityDecorationController extends BlockEntity implements IBlue
     public void readSchematicDataFromNBT(CompoundTag compound)
     {
         IBlueprintDataProviderBE.super.readSchematicDataFromNBT(compound);
-        final CompoundTag blueprintDataProvider = compound.getCompound(TAG_BLUEPRINTDATA);
+        final CompoundTag blueprintDataProvider = compound.getCompoundOrEmpty(TAG_BLUEPRINTDATA);
 
-        this.packName = blueprintDataProvider.getString(TAG_PACK);
-        this.schematicPath = blueprintDataProvider.getString(TAG_PATH);
+        this.packName = blueprintDataProvider.getStringOr(TAG_PACK, "");
+        this.schematicPath = blueprintDataProvider.getStringOr(TAG_PATH, "");
     }
 
     @Override
-    public void loadAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void loadAdditional(final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
-        IBlueprintDataProviderBE.super.readSchematicDataFromNBT(compound);
-        if (compound.contains(TAG_ROTATION_MIRROR, Tag.TAG_BYTE))
+        super.loadAdditional(input);
+        final CompoundTag schematic = new CompoundTag();
+        input.read(TAG_BLUEPRINTDATA, CompoundTag.CODEC).ifPresent(tag -> schematic.put(TAG_BLUEPRINTDATA, tag));
+        IBlueprintDataProviderBE.super.readSchematicDataFromNBT(schematic);
+        if (input.keySet().contains(TAG_ROTATION_MIRROR))
         {
-            this.rotationMirror = RotationMirror.values()[compound.getByte(TAG_ROTATION_MIRROR)];
+            this.rotationMirror = RotationMirror.values()[input.getByteOr(TAG_ROTATION_MIRROR, (byte) 0)];
         }
         else
         {
             // TODO: remove this later (data break introduced in 1.20.4) because of blueprint data
-            this.rotationMirror = RotationMirror.of(Rotation.values()[compound.getInt(TAG_ROTATION)], compound.getBoolean(TAG_MIRROR) ? Mirror.FRONT_BACK : Mirror.NONE);
+            this.rotationMirror = RotationMirror.of(Rotation.values()[input.getIntOr(TAG_ROTATION, 0)], input.getBooleanOr(TAG_MIRROR, false) ? Mirror.FRONT_BACK : Mirror.NONE);
         }
 
         // inexplicably IBlueprintDataProviderBE does not load the pack/path even though it saved them
-        this.packName = compound.getCompound(TAG_BLUEPRINTDATA).getString(TAG_PACK);
-        this.schematicPath = compound.getCompound(TAG_BLUEPRINTDATA).getString(TAG_PATH);
+        final CompoundTag blueprintChild = schematic.getCompoundOrEmpty(TAG_BLUEPRINTDATA);
+        this.packName = blueprintChild.getStringOr(TAG_PACK, "");
+        this.schematicPath = blueprintChild.getStringOr(TAG_PATH, "");
 
         // the rest of this is backwards compat code that can be removed at some point (maybe even now)
-        if(compound.contains(TAG_PATH) && StringUtils.isEmpty(this.schematicName))
+        if (input.keySet().contains(TAG_PATH) && StringUtils.isEmpty(this.schematicName))
         {
-            this.schematicPath = compound.getString(TAG_PATH);
+            this.schematicPath = input.getStringOr(TAG_PATH, "");
         }
-        if(compound.contains(TAG_PACK) && StringUtils.isEmpty(this.packName))
+        if (input.keySet().contains(TAG_PACK) && StringUtils.isEmpty(this.packName))
         {
-            this.packName = compound.getString(TAG_PACK);
+            this.packName = input.getStringOr(TAG_PACK, "");
         }
-        if(compound.contains(TAG_NAME) && StringUtils.isEmpty(this.schematicName))
+        if (input.keySet().contains(TAG_NAME) && StringUtils.isEmpty(this.schematicName))
         {
-            this.schematicName = compound.getString(TAG_NAME);
+            this.schematicName = input.getStringOr(TAG_NAME, "");
             if (this.schematicPath == null || this.schematicPath.isEmpty())
             {
                 //Setup for recovery
@@ -196,11 +200,13 @@ public class TileEntityDecorationController extends BlockEntity implements IBlue
     }
 
     @Override
-    public void saveAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void saveAdditional(final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
-        writeSchematicDataToNBT(compound);
-        compound.putByte(TAG_ROTATION_MIRROR, (byte) this.rotationMirror.ordinal());
+        super.saveAdditional(output);
+        final CompoundTag schematic = new CompoundTag();
+        writeSchematicDataToNBT(schematic);
+        output.store(schematic);
+        output.putByte(TAG_ROTATION_MIRROR, (byte) this.rotationMirror.ordinal());
     }
 
     @Nullable
@@ -232,14 +238,13 @@ public class TileEntityDecorationController extends BlockEntity implements IBlue
     @Override
     public CompoundTag getUpdateTag(@NotNull final HolderLookup.Provider provider)
     {
-        return this.saveWithId(provider);
+        return this.saveWithoutMetadata(provider);
     }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket packet, @NotNull final HolderLookup.Provider provider)
+    public void onDataPacket(final Connection net, final ValueInput input)
     {
-        final CompoundTag compound = packet.getTag();
-        this.loadAdditional(compound, provider);
+        this.loadAdditional(input);
     }
 
     @Override

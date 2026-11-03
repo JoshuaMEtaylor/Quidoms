@@ -1,23 +1,24 @@
 package com.minecolonies.api.tileentities;
 
 import com.minecolonies.api.util.WorldUtil;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import static com.minecolonies.api.util.constant.Constants.TAG_STRING;
 import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_CONTENT;
 
 public class AbstractTileEntityNamedGrave extends BlockEntity
@@ -25,7 +26,7 @@ public class AbstractTileEntityNamedGrave extends BlockEntity
     /**
      * The position it faces.
      */
-    public static final DirectionProperty FACING       = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     /**
      * The text displayed on the name plate
@@ -50,33 +51,27 @@ public class AbstractTileEntityNamedGrave extends BlockEntity
     }
 
     @Override
-    public void loadAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void loadAdditional(final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
+        super.loadAdditional(input);
 
         textLines.clear();
-        if (compound.contains(TAG_CONTENT))
+        for (final String line : input.listOrEmpty(TAG_CONTENT, Codec.STRING))
         {
-            final ListTag lines = compound.getList(TAG_CONTENT, TAG_STRING);
-            for (int i = 0; i < lines.size(); i++)
-            {
-                final String line = lines.getString(i);
-                textLines.add(line);
-            }
+            textLines.add(line);
         }
     }
 
     @Override
-    public void saveAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void saveAdditional(final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
+        super.saveAdditional(output);
 
-        @NotNull final ListTag lines = new ListTag();
+        final ValueOutput.TypedOutputList<String> lines = output.list(TAG_CONTENT, Codec.STRING);
         for (@NotNull final String line : textLines)
         {
-            lines.add(StringTag.valueOf(line));
+            lines.add(line);
         }
-        compound.put(TAG_CONTENT, lines);
     }
 
     @Override
@@ -89,19 +84,19 @@ public class AbstractTileEntityNamedGrave extends BlockEntity
     @Override
     public CompoundTag getUpdateTag(@NotNull final HolderLookup.Provider provider)
     {
-        return this.saveWithId(provider);
+        return this.saveWithoutMetadata(provider);
     }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket packet, @NotNull final HolderLookup.Provider provider)
+    public void onDataPacket(final Connection net, final ValueInput input)
     {
-        this.loadAdditional(packet.getTag(), provider);
+        this.loadAdditional(input);
     }
 
     @Override
-    public void handleUpdateTag(final CompoundTag tag, @NotNull final HolderLookup.Provider provider)
+    public void handleUpdateTag(final ValueInput input)
     {
-        this.loadAdditional(tag, provider);
+        this.loadAdditional(input);
     }
 
     @Override

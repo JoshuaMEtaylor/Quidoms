@@ -21,6 +21,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
@@ -99,6 +101,17 @@ public final class BlockPosUtil
     }
 
     /**
+     * Writes chunk coordinates under {@code name} using the legacy x/y/z child compound format.
+     */
+    public static void write(@NotNull final ValueOutput output, final String name, @NotNull final BlockPos pos)
+    {
+        final ValueOutput coords = output.child(name);
+        coords.putInt("x", pos.getX());
+        coords.putInt("y", pos.getY());
+        coords.putInt("z", pos.getZ());
+    }
+
+    /**
      * Writes a chunk coordinate to a CompoundTag, but only if not null.
      *
      * @param compound Compound to write to.
@@ -116,6 +129,17 @@ public final class BlockPosUtil
             write(compound, name, value);
         }
         return compound;
+    }
+
+    /**
+     * Writes chunk coordinates under {@code name} when non-null.
+     */
+    public static void writeOptional(@NotNull final ValueOutput output, @NotNull final String name, @Nullable final BlockPos value)
+    {
+        if (value != null)
+        {
+            write(output, name, value);
+        }
     }
 
     /**
@@ -192,11 +216,21 @@ public final class BlockPosUtil
     @NotNull
     public static BlockPos read(@NotNull final CompoundTag compound, final String name)
     {
-        final CompoundTag coordsCompound = compound.getCompound(name);
-        final int x = coordsCompound.getInt("x");
-        final int y = coordsCompound.getInt("y");
-        final int z = coordsCompound.getInt("z");
+        final CompoundTag coordsCompound = compound.getCompoundOrEmpty(name);
+        final int x = coordsCompound.getIntOr("x", 0);
+        final int y = coordsCompound.getIntOr("y", 0);
+        final int z = coordsCompound.getIntOr("z", 0);
         return new BlockPos(x, y, z);
+    }
+
+    /**
+     * Reads chunk coordinates written by {@link #write(ValueOutput, String, BlockPos)}.
+     */
+    @NotNull
+    public static BlockPos read(@NotNull final ValueInput input, final String name)
+    {
+        final ValueInput coords = input.childOrEmpty(name);
+        return new BlockPos(coords.getIntOr("x", 0), coords.getIntOr("y", 0), coords.getIntOr("z", 0));
     }
 
     /**
@@ -210,6 +244,20 @@ public final class BlockPosUtil
     public static BlockPos readOrNull(@NotNull final CompoundTag compound, @NotNull final String name)
     {
         final BlockPos result = read(compound, name);
+        return result.equals(BlockPos.ZERO) ? null : result;
+    }
+
+    /**
+     * Reads chunk coordinates from a ValueInput, but returns null if the child is absent or zero.
+     */
+    @Nullable
+    public static BlockPos readOrNull(@NotNull final ValueInput input, @NotNull final String name)
+    {
+        if (input.child(name).isEmpty())
+        {
+            return null;
+        }
+        final BlockPos result = read(input, name);
         return result.equals(BlockPos.ZERO) ? null : result;
     }
 
@@ -255,7 +303,7 @@ public final class BlockPosUtil
     public static List<BlockPos> readPosListFromNBT(final CompoundTag compoundNBT, final String tagname)
     {
         final List<BlockPos> result = new ArrayList<>();
-        ListTag listNBT = compoundNBT.getList(tagname, Tag.TAG_COMPOUND);
+        ListTag listNBT = compoundNBT.getListOrEmpty(tagname);
         for (int i = 0; i < listNBT.size(); i++)
         {
             result.add(readFromListNBT(listNBT, i));
@@ -274,10 +322,10 @@ public final class BlockPosUtil
     @NotNull
     public static BlockPos readFromListNBT(@NotNull final ListTag tagList, final int index)
     {
-        final CompoundTag coordsCompound = tagList.getCompound(index);
-        final int x = coordsCompound.getInt("x");
-        final int y = coordsCompound.getInt("y");
-        final int z = coordsCompound.getInt("z");
+        final CompoundTag coordsCompound = tagList.getCompoundOrEmpty(index);
+        final int x = coordsCompound.getIntOr("x", 0);
+        final int y = coordsCompound.getIntOr("y", 0);
+        final int z = coordsCompound.getIntOr("z", 0);
         return new BlockPos(x, y, z);
     }
 
