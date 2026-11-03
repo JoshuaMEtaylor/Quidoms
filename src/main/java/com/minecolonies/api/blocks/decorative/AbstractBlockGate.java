@@ -1,5 +1,8 @@
 package com.minecolonies.api.blocks.decorative;
 
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
+
 import com.minecolonies.api.util.WorldUtil;
 import com.minecolonies.api.util.constant.Constants;
 import net.minecraft.core.BlockPos;

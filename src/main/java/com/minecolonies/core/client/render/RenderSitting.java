@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <T> the entity that shall sit.
  */
-public class RenderSitting<T extends Entity> extends EntityRenderer<T>
+public class RenderSitting<T extends Entity> extends EntityRenderer<T, net.minecraft.client.renderer.entity.state.EntityRenderState>
 {
     public RenderSitting(final EntityRendererProvider.Context context)
     {
@@ -29,5 +29,11 @@ public class RenderSitting<T extends Entity> extends EntityRenderer<T>
     public boolean shouldRender(@NotNull T entity, @NotNull Frustum clippingHelper, double x, double y, double z)
     {
         return false;
+    }
+
+    @Override
+    public net.minecraft.client.renderer.entity.state.EntityRenderState createRenderState()
+    {
+        return new net.minecraft.client.renderer.entity.state.EntityRenderState();
     }
 }

@@ -43,7 +43,7 @@ public class ArchitectsCutterCraftingType extends RecipeCraftingType<ArchitectsC
         {
             final ArchitectsCutterRecipe recipe = holder.value();
             // cutter recipes don't implement getIngredients(), so we have to work around it
-            final Block generatedBlock = BuiltInRegistries.BLOCK.get(recipe.getBlockName());
+            final Block generatedBlock = BuiltInRegistries.BLOCK.getValue(recipe.getBlockName());
 
             if (!(generatedBlock instanceof final IMateriallyTexturedBlock materiallyTexturedBlock))
                 continue;

@@ -417,7 +417,7 @@ public class BuildingFarmer extends AbstractBuilding
                     if (stack.getItem() instanceof BlockItem item && item.getBlock() instanceof StemBlock stem)
                     {
                         recipes.add(GenericRecipe.builder()
-                                .withOutput(BuiltInRegistries.BLOCK.get(stem.fruit))
+                                .withOutput(BuiltInRegistries.BLOCK.getValue(stem.fruit))
                                 .withInputs(List.of(List.of(stack)))
                                 .withIntermediate(Blocks.FARMLAND)
                                 .withRequiredTool(ModEquipmentTypes.hoe.get())

@@ -851,7 +851,7 @@ public final class ItemStackUtils
         final Item item;
         try
         {
-            item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemId));
+            item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(itemId));
         }
         catch (Throwable t)
         {
@@ -1120,7 +1120,7 @@ public final class ItemStackUtils
         }
         catch (final Exception e)
         {
-            Log.getLogger().warn("Could not get attribute value for '{}' on item '{}'", attribute.value().getDescription().getString(), itemStack.getItem().getDescriptionId(), e);
+            Log.getLogger().warn("Could not get attribute value for '{}' on item '{}'", attribute.value().getDescriptionId(), itemStack.getItem().getDescriptionId(), e);
             return 0;
         }
     }

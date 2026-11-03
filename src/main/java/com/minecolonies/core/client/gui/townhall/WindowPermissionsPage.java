@@ -536,7 +536,7 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
 
         try
         {
-            final Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(inputText));
+            final Block block = BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(inputText));
 
             if (block != null && !block.defaultBlockState().isAir())
             {

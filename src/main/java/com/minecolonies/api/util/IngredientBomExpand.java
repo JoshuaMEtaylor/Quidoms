@@ -68,7 +68,7 @@ public final class IngredientBomExpand
         final Map<String, Integer> expanded = expandMap(raw, index);
         for (final Map.Entry<String, Integer> e : expanded.entrySet())
         {
-            final Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(e.getKey()));
+            final Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(e.getKey()));
             if (item == null || item == Items.AIR)
             {
                 continue;

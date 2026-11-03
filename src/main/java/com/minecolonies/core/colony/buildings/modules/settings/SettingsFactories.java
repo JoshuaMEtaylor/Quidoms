@@ -265,8 +265,8 @@ public class SettingsFactories
         @Override
         public BlockSetting deserialize(@NotNull final HolderLookup.Provider provider, @NotNull final IFactoryController controller, @NotNull final CompoundTag nbt)
         {
-            final BlockItem value = (BlockItem) BuiltInRegistries.ITEM.get(ResourceLocation.parse(nbt.getStringOr(TAG_VALUE, "")));
-            final BlockItem def = (BlockItem) BuiltInRegistries.ITEM.get(ResourceLocation.parse(nbt.getStringOr(TAG_DEF, "")));
+            final BlockItem value = (BlockItem) BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(nbt.getStringOr(TAG_VALUE, "")));
+            final BlockItem def = (BlockItem) BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(nbt.getStringOr(TAG_DEF, "")));
             return this.getNewInstance(value, def);
         }
 

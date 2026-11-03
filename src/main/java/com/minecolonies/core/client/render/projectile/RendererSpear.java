@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * Custom renderer for spears
  */
 @OnlyIn(Dist.CLIENT)
-public class RendererSpear extends EntityRenderer<ThrownTrident>
+public class RendererSpear extends EntityRenderer<ThrownTrident, net.minecraft.client.renderer.entity.state.EntityRenderState>
 {
     private final ResourceLocation texture = new ResourceLocation(Constants.MOD_ID, "textures/entity/spear.png");
     private final SpearModel       model ;
@@ -55,5 +55,11 @@ public class RendererSpear extends EntityRenderer<ThrownTrident>
     public ResourceLocation getTextureLocation(@NotNull final ThrownTrident spearEntity)
     {
         return texture;
+    }
+
+    @Override
+    public net.minecraft.client.renderer.entity.state.EntityRenderState createRenderState()
+    {
+        return new net.minecraft.client.renderer.entity.state.EntityRenderState();
     }
 }

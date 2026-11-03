@@ -149,7 +149,7 @@ public final class StandardRequests
         public Component getShortDisplayString()
         {
             final MutableComponent result = Component.literal("");
-            result.append(Component.translatableEscape(stackList.getDescription()));
+            result.append(Component.translatableEscape(Component.translatable(stackList.getDescriptionId())));
             return result;
         }
 

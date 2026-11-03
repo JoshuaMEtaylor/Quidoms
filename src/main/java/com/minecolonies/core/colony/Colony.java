@@ -805,7 +805,7 @@ public class Colony implements IColony
         final ListTag freeBlockTagList = compound.getListOrEmpty(TAG_FREE_BLOCKS);
         for (int i = 0; i < freeBlockTagList.size(); ++i)
         {
-            tempFreeBlocks.add(BuiltInRegistries.BLOCK.get(ResourceLocation.parse(freeBlockTagList.getString(i))));
+            tempFreeBlocks.add(BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(freeBlockTagList.getString(i))));
         }
         freeBlocks = ImmutableSet.copyOf(tempFreeBlocks);
 

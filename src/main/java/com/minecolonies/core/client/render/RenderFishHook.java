@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  * Determines how the fish hook is rendered.
  */
 @OnlyIn(Dist.CLIENT)
-public class RenderFishHook extends EntityRenderer<NewBobberEntity>
+public class RenderFishHook extends EntityRenderer<NewBobberEntity, net.minecraft.client.renderer.entity.state.EntityRenderState>
 {
     /**
      * The resource location containing the particle textures (Spawned by the fishHook).
@@ -159,5 +159,11 @@ public class RenderFishHook extends EntityRenderer<NewBobberEntity>
     private static ResourceLocation getTexture()
     {
         return TEXTURE;
+    }
+
+    @Override
+    public net.minecraft.client.renderer.entity.state.EntityRenderState createRenderState()
+    {
+        return new net.minecraft.client.renderer.entity.state.EntityRenderState();
     }
 }

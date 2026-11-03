@@ -118,7 +118,7 @@ public class EntityAIConcreteMixer extends AbstractEntityAICrafting<JobConcreteM
         final BlockState blockToMine = world.getBlockState(posToMine);
         if (mineBlock(posToMine))
         {
-            StatsUtil.trackStatByName(building, ITEMS_CRAFTED_DETAIL, blockToMine.getBlock().getDescription().getString(), 1);
+            StatsUtil.trackStatByName(building, ITEMS_CRAFTED_DETAIL, blockToMine.getBlock().getDescriptionId(), 1);
             
             if (currentRequest != null && currentRecipeStorage != null && blockToMine.getBlock().asItem().equals(currentRecipeStorage.getPrimaryOutput().getItem()))
             {

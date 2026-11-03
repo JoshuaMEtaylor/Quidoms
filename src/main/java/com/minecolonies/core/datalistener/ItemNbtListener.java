@@ -61,14 +61,14 @@ public class ItemNbtListener extends SimpleJsonResourceReloadListener
                     final JsonArray jsonArray = jsonObj.getAsJsonArray("checkednbtkeys");
                     for (final JsonElement subElement : jsonArray)
                     {
-                        set.add(BuiltInRegistries.DATA_COMPONENT_TYPE.get(ResourceLocation.parse(subElement.getAsString())));
+                        set.add(BuiltInRegistries.DATA_COMPONENT_TYPE.getValue(ResourceLocation.parse(subElement.getAsString())));
                     }
 
-                    ItemStackUtils.CHECKED_NBT_KEYS.put(BuiltInRegistries.ITEM.get(itemLoc), set);
+                    ItemStackUtils.CHECKED_NBT_KEYS.put(BuiltInRegistries.ITEM.getValue(itemLoc), set);
                 }
                 else
                 {
-                    ItemStackUtils.CHECKED_NBT_KEYS.put(BuiltInRegistries.ITEM.get(itemLoc), new HashSet<>());
+                    ItemStackUtils.CHECKED_NBT_KEYS.put(BuiltInRegistries.ITEM.getValue(itemLoc), new HashSet<>());
                 }
             }
             catch (Exception e)

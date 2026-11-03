@@ -84,7 +84,7 @@ public class DefaultDamageTypeProvider extends JsonCodecProvider<DamageType> {
 
     @NotNull
     private static DamageType entityDamage(@NotNull final EntityType<?> entityType) {
-        return damage(entityType.getDescription().getString());
+        return damage(entityType.getDescriptionId());
     }
 
     @NotNull

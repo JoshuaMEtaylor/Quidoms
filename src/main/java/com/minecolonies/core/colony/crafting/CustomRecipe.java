@@ -953,7 +953,7 @@ public class CustomRecipe
             altOutputs.add(Utils.deserializeCodecMess(buffer));
         }
 
-        final Block intermediate = BuiltInRegistries.BLOCK.get(buffer.readResourceLocation());
+        final Block intermediate = BuiltInRegistries.BLOCK.getValue(buffer.readResourceLocation());
 
         return new CustomRecipe(crafter, minBldgLevel, maxBldgLevel, mustExist, showTooltip, recipeId,
                 researchReq, researchExclude, lootTable, requiredTool,

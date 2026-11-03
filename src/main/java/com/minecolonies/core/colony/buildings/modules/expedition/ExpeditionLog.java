@@ -311,7 +311,7 @@ public class ExpeditionLog
         {
             final CompoundTag mob = mobs.getCompound(i);
             final ResourceLocation type = ResourceLocation.parse(mob.getString(TAG_TYPE));
-            final EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(type);
+            final EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getValue(type);
             if (entityType != null)
             {
                 this.mobs.put(entityType, mob.getInt(TAG_COUNT));

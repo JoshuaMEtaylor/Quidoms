@@ -162,7 +162,7 @@ public final class LootTableAnalyzer
         switch (type)
         {
             case "minecraft:item" -> {
-                final Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(GsonHelper.getAsString(entryJson, "name")));
+                final Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(GsonHelper.getAsString(entryJson, "name")));
                 final float quality = GsonHelper.getAsFloat(entryJson, "quality", 0);
                 float modifier = 1.0F;
                 final JsonArray conditions = GsonHelper.getAsJsonArray(entryJson, "conditions", new JsonArray());

@@ -1,5 +1,7 @@
 package com.minecolonies.core.blocks;
 
+import net.minecraft.world.level.ScheduledTickAccess;
+
 import com.minecolonies.api.blocks.AbstractBlockMinecolonies;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.network.messages.client.VanillaParticleMessage;

@@ -246,7 +246,7 @@ public final class WorkerUtil
                     {
                         final CompoundTag teData = te.getTileEntityData();
                         final ResourceLocation teId = teData == null ? null : ResourceLocation.tryParse(teData.getString("id"));
-                        final BlockEntityType<?> teType = teId == null ? null : BuiltInRegistries.BLOCK_ENTITY_TYPE.get(teId);
+                        final BlockEntityType<?> teType = teId == null ? null : BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(teId);
                         if (teType == BlockEntityType.SIGN || teType == BlockEntityType.HANGING_SIGN)
                         {
                             if (BlockEntity.loadStatic(te.getPos(), te.getState(), te.getTileEntityData(), level.registryAccess()) instanceof SignBlockEntity sign)

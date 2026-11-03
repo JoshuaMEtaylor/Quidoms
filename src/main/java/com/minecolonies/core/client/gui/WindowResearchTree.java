@@ -810,7 +810,7 @@ public class WindowResearchTree extends AbstractWindowSkeleton
             for (ItemStorage cost : missingItems)
             {
                 undoTipBuilder.paragraphBreak().append(Component.translatableEscape("com.minecolonies.coremod.research.requirement.research",
-                  cost.getItem().getDescription())).color(COLOR_TEXT_UNFULFILLED);
+                  Component.translatable(cost.getItem().getDescriptionId()))).color(COLOR_TEXT_UNFULFILLED);
             }
         }
         else

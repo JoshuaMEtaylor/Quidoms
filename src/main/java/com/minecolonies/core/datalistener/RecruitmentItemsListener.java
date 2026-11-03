@@ -127,7 +127,7 @@ public class RecruitmentItemsListener extends SimpleJsonResourceReloadListener
             }
 
             final JsonObject object = entry.getValue().getAsJsonObject();
-            final Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(GsonHelper.getAsString(object, KEY_ITEM)));
+            final Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(GsonHelper.getAsString(object, KEY_ITEM)));
             final int rarity = GsonHelper.getAsInt(object, KEY_RARITY);
 
             if (item == Items.AIR)
