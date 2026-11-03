@@ -1,12 +1,18 @@
+modLoader="javafml"
+loaderVersion="[4,)"
 license="${mod_license}"
+issueTrackerURL="https://github.com/JoshuaMEtaylor/Quidoms/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-authors="Serioxo"
+authors="JoshuaMEtaylor"
+displayURL="https://github.com/JoshuaMEtaylor/Quidoms"
 description='''
-Clean-room colony management for NeoForge 1.21.10: found a town hall, house citizens, and build with ingredient bills of materials.
+Clean-room colony management for NeoForge 1.21.10.
+Found a town hall, house citizens, stock a warehouse with ingredient materials,
+and let builders place schematic structures. No raids. Economics stay in QuidCraft.
 '''
 
 [[dependencies.${mod_id}]]

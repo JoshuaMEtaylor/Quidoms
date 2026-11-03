@@ -36,6 +36,7 @@ public class QuidomsMod {
         modBus.addListener(QuidomsNetwork::register);
         ModBusEvents.register(modBus);
         NeoForge.EVENT_BUS.register(QuidomsEvents.class);
+        NeoForge.EVENT_BUS.register(com.quidoms.server.ColonyTicker.class);
         LOGGER.info("Quidoms loaded");
     }
 }

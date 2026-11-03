@@ -29,7 +29,7 @@ public class WarehouseBlock extends Block implements EntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new HutBlockEntity(pos, state);
+        return new WarehouseBlockEntity(pos, state);
     }
 
     @Override
@@ -47,18 +47,25 @@ public class WarehouseBlock extends Block implements EntityBlock {
             return;
         }
         BuildingData building = colony.addBuilding(BuildingType.WAREHOUSE, pos);
-        if (level.getBlockEntity(pos) instanceof HutBlockEntity hut) {
-            hut.setColonyId(colony.id());
-            hut.setBuildingId(building.id());
+        if (level.getBlockEntity(pos) instanceof WarehouseBlockEntity warehouse) {
+            warehouse.setColonyId(colony.id());
+            warehouse.setBuildingId(building.id());
         }
         manager.markChanged();
+        if (placer instanceof ServerPlayer player) {
+            player.displayClientMessage(Component.translatable("quidoms.message.warehouse_ready"), false);
+        }
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.displayClientMessage(Component.translatable("quidoms.message.warehouse_hint"), true);
+        if (!(level instanceof ServerLevel) || !(player instanceof ServerPlayer serverPlayer)) {
+            return InteractionResult.SUCCESS;
         }
-        return InteractionResult.SUCCESS;
+        if (level.getBlockEntity(pos) instanceof WarehouseBlockEntity warehouse) {
+            serverPlayer.openMenu(warehouse, buf -> buf.writeBlockPos(pos));
+            return InteractionResult.CONSUME;
+        }
+        return InteractionResult.PASS;
     }
 }

@@ -1,4 +1,4 @@
-package com.quidoms.client;
+package com.quidoms.menu;
 
 import com.quidoms.registry.ModMenus;
 

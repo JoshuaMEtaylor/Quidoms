@@ -7,18 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.quidoms.block.WarehouseBlockEntity;
+import com.quidoms.colony.BuildingData;
 import com.quidoms.colony.BuildingType;
 import com.quidoms.colony.CitizenData;
 import com.quidoms.colony.Colony;
 import com.quidoms.colony.ColonyManager;
 import com.quidoms.entity.CitizenEntity;
+import com.quidoms.tool.ColonistTools;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -26,17 +28,16 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 
 /**
- * Builder job: ingredient BOM → consume nearby player supplies → place schematic blocks.
+ * Builder job: recursive ingredient BOM → pull from warehouse → craft intermediates
+ * in the citizen inventory → place schematic target blocks.
  */
 public final class BuilderWork {
     private BuilderWork() {
@@ -61,8 +62,7 @@ public final class BuilderWork {
 
         Map<String, Integer> expanded = raw;
         if (level instanceof ServerLevel serverLevel) {
-            RecipeManager recipes = serverLevel.getServer().getRecipeManager();
-            Map<String, IngredientBom.RecipeInputs> index = indexCraftingRecipes(recipes);
+            Map<String, IngredientBom.RecipeInputs> index = indexCraftingRecipes(serverLevel.getServer().getRecipeManager());
             expanded = IngredientBom.expand(raw, index::get);
         }
 
@@ -83,7 +83,6 @@ public final class BuilderWork {
             }
             ResourceLocation resultId = BuiltInRegistries.ITEM.getKey(result.getItem());
             if (resultId == null || index.containsKey(resultId.toString())) {
-                // Prefer first recipe; skip duplicates / cycles later via IngredientBom stack.
                 continue;
             }
             List<Map.Entry<String, Integer>> inputs = new ArrayList<>();
@@ -120,6 +119,9 @@ public final class BuilderWork {
             CitizenData data,
             CitizenEntity citizen,
             ColonyManager manager) {
+        ColonistTools.enforceInventory(citizen);
+        ensureBuilderTool(citizen);
+
         WorkOrder order = findActiveOrder(colony);
         if (order == null) {
             return;
@@ -137,6 +139,11 @@ public final class BuilderWork {
             order.setStatus(WorkOrder.Status.COMPLETE);
             manager.markChanged();
             return;
+        }
+
+        // Restock from warehouse when carrying little.
+        if (citizen.getMainHandItem().getCount() < 8) {
+            pullFromWarehouse(level, colony, citizen, order);
         }
 
         Schematic.BlockEntry entry = schematic.blocks().get(order.nextIndex());
@@ -160,11 +167,17 @@ public final class BuilderWork {
 
         Item needItem = wanted.asItem();
         if (needItem != null && needItem != Items.AIR) {
-            ResourceLocation needId = BuiltInRegistries.ITEM.getKey(needItem);
-            // Prefer consuming collapsed BOM entries; fall back to the direct block item.
-            if (!consumeForBlock(level, colony, order, needId, placePos)) {
+            if (!ensurePlaceItem(level, colony, citizen, order, needItem)) {
+                // Seek warehouse for missing materials.
+                colony.findBuilding(BuildingType.WAREHOUSE).ifPresent(wh ->
+                        citizen.getNavigation().moveTo(wh.pos().getX() + 0.5, wh.pos().getY(), wh.pos().getZ() + 0.5, 1.0D));
                 return;
             }
+            // Consume one placeable item from hand / offhand.
+            if (!consumeHeld(citizen, needItem)) {
+                return;
+            }
+            decrementBom(order, needItem);
         }
 
         level.setBlock(placePos, wanted.defaultBlockState(), Block.UPDATE_ALL);
@@ -173,6 +186,19 @@ public final class BuilderWork {
             order.setStatus(WorkOrder.Status.COMPLETE);
         }
         manager.markChanged();
+    }
+
+    private static void ensureBuilderTool(CitizenEntity citizen) {
+        ItemStack main = citizen.getMainHandItem();
+        if (main.isEmpty()) {
+            // Any-tier tool, unbreakable, player-equivalent attributes — no citizen level gate.
+            ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE);
+            ColonistTools.makeUnbreakable(pick);
+            citizen.setItemSlot(EquipmentSlot.MAINHAND, pick);
+        } else {
+            ColonistTools.makeUnbreakable(main);
+        }
+        ColonistTools.makeUnbreakable(citizen.getOffhandItem());
     }
 
     private static WorkOrder findActiveOrder(Colony colony) {
@@ -191,50 +217,134 @@ public final class BuilderWork {
         return best;
     }
 
+    private static void pullFromWarehouse(ServerLevel level, Colony colony, CitizenEntity citizen, WorkOrder order) {
+        BuildingData warehouseBuilding = colony.findBuilding(BuildingType.WAREHOUSE).orElse(null);
+        if (warehouseBuilding == null) {
+            return;
+        }
+        if (!(level.getBlockEntity(warehouseBuilding.pos()) instanceof WarehouseBlockEntity warehouse)) {
+            return;
+        }
+        // Prefer BOM ingredients still remaining.
+        for (Map.Entry<ResourceLocation, Integer> entry : List.copyOf(order.remainingBom().entrySet())) {
+            Item item = BuiltInRegistries.ITEM.getValue(entry.getKey());
+            if (item == null || item == Items.AIR) {
+                continue;
+            }
+            ItemStack taken = warehouse.takeOne(item);
+            if (!taken.isEmpty()) {
+                putMaterials(citizen, taken);
+                return;
+            }
+        }
+    }
+
     /**
-     * Consume one unit of materials for placing {@code needId}. Tries remaining BOM keys first
-     * (ingredient expansion), then nearby player inventories around warehouse/origin.
+     * Ensure citizen holds the target block item. If only ingredients are available,
+     * craft/convert via warehouse + recipes (e.g. logs → planks).
      */
-    private static boolean consumeForBlock(
+    private static boolean ensurePlaceItem(
             ServerLevel level,
             Colony colony,
+            CitizenEntity citizen,
             WorkOrder order,
-            ResourceLocation needId,
-            BlockPos placePos) {
-        // If BOM still lists this item (or any entry), require a matching inventory take.
-        Item needItem = BuiltInRegistries.ITEM.getValue(needId);
-        if (needItem == null || needItem == Items.AIR) {
+            Item needItem) {
+        if (hasItem(citizen, needItem)) {
             return true;
         }
+        // Try craft one batch from warehouse ingredients using a matching recipe.
+        Map<String, IngredientBom.RecipeInputs> index = indexCraftingRecipes(level.getServer().getRecipeManager());
+        ResourceLocation needId = BuiltInRegistries.ITEM.getKey(needItem);
+        if (needId == null) {
+            return false;
+        }
+        IngredientBom.RecipeInputs recipe = index.get(needId.toString());
+        BuildingData warehouseBuilding = colony.findBuilding(BuildingType.WAREHOUSE).orElse(null);
+        WarehouseBlockEntity warehouse = warehouseBuilding != null
+                && level.getBlockEntity(warehouseBuilding.pos()) instanceof WarehouseBlockEntity wh ? wh : null;
 
-        BlockPos gatherCenter = colony.findBuilding(BuildingType.WAREHOUSE)
-                .map(b -> b.pos())
-                .orElse(placePos);
-
-        if (!takeOneFromNearbyPlayers(level, gatherCenter, needItem) && !takeOneFromNearbyPlayers(level, placePos, needItem)) {
-            // Creative owners may place without inventory; still decrement BOM when present.
-            boolean creativeOwnerNearby = level.getEntitiesOfClass(
-                    ServerPlayer.class,
-                    new AABB(gatherCenter).inflate(16.0D),
-                    p -> colony.permissions().canManage(p.getUUID()) && p.getAbilities().instabuild
-            ).stream().findAny().isPresent();
-            if (!creativeOwnerNearby) {
-                return false;
+        if (recipe != null && warehouse != null) {
+            // Check warehouse has each input.
+            boolean ok = true;
+            Map<Item, Integer> needCounts = new HashMap<>();
+            for (Map.Entry<String, Integer> in : recipe.inputs()) {
+                Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(in.getKey()));
+                if (item == null || item == Items.AIR) {
+                    ok = false;
+                    break;
+                }
+                needCounts.merge(item, in.getValue(), Integer::sum);
+            }
+            if (ok) {
+                for (Map.Entry<Item, Integer> e : needCounts.entrySet()) {
+                    if (warehouse.count(e.getKey()) < e.getValue()) {
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+            if (ok) {
+                for (Map.Entry<Item, Integer> e : needCounts.entrySet()) {
+                    warehouse.tryTake(e.getKey(), e.getValue());
+                }
+                ItemStack crafted = new ItemStack(needItem, recipe.resultCount());
+                putMaterials(citizen, crafted);
+                return true;
             }
         }
 
-        // Decrement BOM: prefer exact item, else any positive entry (collapsed ingredients already tracked).
-        if (order.remainingBom().containsKey(needId)) {
-            int left = order.remainingBom().get(needId) - 1;
-            if (left <= 0) {
-                order.remainingBom().remove(needId);
-            } else {
-                order.remainingBom().put(needId, left);
+        // Direct take of the placeable item from warehouse.
+        if (warehouse != null) {
+            ItemStack taken = warehouse.takeOne(needItem);
+            if (!taken.isEmpty()) {
+                putMaterials(citizen, taken);
+                return true;
             }
-        } else if (!order.remainingBom().isEmpty()) {
-            // Block was expanded into base ingredients — leave BOM until those are consumed via matching takes.
-            // When placing oak_planks that expanded to oak_logs, consumeOne already took planks OR we took from creative.
-            // Best-effort: decrement first BOM entry by 1 so UI progresses.
+        }
+        return hasItem(citizen, needItem);
+    }
+
+    private static void putMaterials(CitizenEntity citizen, ItemStack stack) {
+        ColonistTools.makeUnbreakable(stack);
+        ItemStack off = citizen.getOffhandItem();
+        if (off.isEmpty()) {
+            citizen.setItemSlot(EquipmentSlot.OFFHAND, stack);
+        } else if (ItemStack.isSameItemSameComponents(off, stack)) {
+            off.grow(stack.getCount());
+        } else {
+            citizen.setItemSlot(EquipmentSlot.OFFHAND, stack);
+        }
+    }
+
+    private static boolean hasItem(CitizenEntity citizen, Item item) {
+        return !citizen.getOffhandItem().isEmpty() && citizen.getOffhandItem().is(item);
+    }
+
+    private static boolean consumeHeld(CitizenEntity citizen, Item item) {
+        // Materials live in offhand; mainhand keeps the unbreakable tool.
+        ItemStack off = citizen.getOffhandItem();
+        if (!off.isEmpty() && off.is(item)) {
+            off.shrink(1);
+            if (off.isEmpty()) {
+                citizen.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private static void decrementBom(WorkOrder order, Item placedOrIngredient) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(placedOrIngredient);
+        if (id != null && order.remainingBom().containsKey(id)) {
+            int left = order.remainingBom().get(id) - 1;
+            if (left <= 0) {
+                order.remainingBom().remove(id);
+            } else {
+                order.remainingBom().put(id, left);
+            }
+            return;
+        }
+        if (!order.remainingBom().isEmpty()) {
             ResourceLocation first = order.remainingBom().keySet().iterator().next();
             int left = order.remainingBom().get(first) - 1;
             if (left <= 0) {
@@ -243,28 +353,5 @@ public final class BuilderWork {
                 order.remainingBom().put(first, left);
             }
         }
-        return true;
-    }
-
-    private static boolean takeOneFromNearbyPlayers(ServerLevel level, BlockPos center, Item item) {
-        List<ServerPlayer> players = level.getEntitiesOfClass(ServerPlayer.class, new AABB(center).inflate(12.0D));
-        for (ServerPlayer player : players) {
-            if (player.getAbilities().instabuild) {
-                return true;
-            }
-            Inventory inv = player.getInventory();
-            for (int i = 0; i < inv.getContainerSize(); i++) {
-                ItemStack stack = inv.getItem(i);
-                if (!stack.isEmpty() && stack.is(item)) {
-                    stack.shrink(1);
-                    if (stack.isEmpty()) {
-                        inv.setItem(i, ItemStack.EMPTY);
-                    }
-                    player.containerMenu.broadcastChanges();
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

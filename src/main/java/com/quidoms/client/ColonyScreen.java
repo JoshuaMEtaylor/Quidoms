@@ -14,7 +14,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
- * Modern colony overview — flat panels inspired by QuidCraft chrome, not BlockUI.
+ * Modern colony overview — flat panels / accent bar, not BlockUI.
  */
 public class ColonyScreen extends Screen {
     private static final int SCRIM = 0x99101216;
@@ -35,30 +35,32 @@ public class ColonyScreen extends Screen {
 
     @Override
     protected void init() {
-        int panelX = (width - 320) / 2;
-        int panelY = (height - 220) / 2;
+        int panelX = (width - 340) / 2;
+        int panelY = (height - 240) / 2;
         addRenderableWidget(Button.builder(Component.translatable("quidoms.tab.overview"), b -> tab = "overview")
-                .bounds(panelX + 8, panelY + 28, 72, 18).build());
+                .bounds(panelX + 8, panelY + 28, 76, 18).build());
         addRenderableWidget(Button.builder(Component.translatable("quidoms.tab.citizens"), b -> tab = "citizens")
-                .bounds(panelX + 84, panelY + 28, 72, 18).build());
+                .bounds(panelX + 88, panelY + 28, 76, 18).build());
         addRenderableWidget(Button.builder(Component.translatable("quidoms.tab.buildings"), b -> tab = "buildings")
-                .bounds(panelX + 160, panelY + 28, 72, 18).build());
+                .bounds(panelX + 168, panelY + 28, 76, 18).build());
         addRenderableWidget(Button.builder(Component.translatable("quidoms.tab.build"), b -> tab = "build")
-                .bounds(panelX + 236, panelY + 28, 72, 18).build());
+                .bounds(panelX + 248, panelY + 28, 84, 18).build());
 
-        addRenderableWidget(Button.builder(Component.translatable("quidoms.action.start_pavilion"), b -> startBuild())
-                .bounds(panelX + 8, panelY + 190, 140, 20).build());
+        addRenderableWidget(Button.builder(Component.translatable("quidoms.action.start_pavilion"), b -> startBuild("quidoms:wood_pavilion"))
+                .bounds(panelX + 8, panelY + 188, 100, 20).build());
+        addRenderableWidget(Button.builder(Component.translatable("quidoms.action.start_cabin"), b -> startBuild("quidoms:wood_cabin"))
+                .bounds(panelX + 112, panelY + 188, 100, 20).build());
+        addRenderableWidget(Button.builder(Component.translatable("quidoms.action.start_path"), b -> startBuild("quidoms:stone_path"))
+                .bounds(panelX + 216, panelY + 188, 56, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("quidoms.action.refresh"), b -> refresh())
-                .bounds(panelX + 156, panelY + 190, 72, 20).build());
-        addRenderableWidget(Button.builder(Component.translatable("quidoms.action.close"), b -> onClose())
-                .bounds(panelX + 236, panelY + 190, 72, 20).build());
+                .bounds(panelX + 276, panelY + 188, 56, 20).build());
     }
 
-    private void startBuild() {
+    private void startBuild(String schematicId) {
         BlockPos origin = minecraft != null && minecraft.player != null
                 ? minecraft.player.blockPosition()
                 : BlockPos.ZERO;
-        send(new ColonyActionC2S(data.colonyId(), "start_build", "quidoms:wood_pavilion", origin));
+        send(new ColonyActionC2S(data.colonyId(), "start_build", schematicId, origin));
     }
 
     private void refresh() {
@@ -72,15 +74,15 @@ public class ColonyScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         graphics.fill(0, 0, width, height, SCRIM);
-        int panelX = (width - 320) / 2;
-        int panelY = (height - 220) / 2;
-        fillPanel(graphics, panelX, panelY, 320, 220, PANEL);
-        graphics.fill(panelX, panelY, panelX + 320, panelY + 3, ACCENT);
+        int panelX = (width - 340) / 2;
+        int panelY = (height - 240) / 2;
+        fillPanel(graphics, panelX, panelY, 340, 240, PANEL);
+        graphics.fill(panelX, panelY, panelX + 340, panelY + 3, ACCENT);
         graphics.drawString(font, Component.literal("Quidoms"), panelX + 10, panelY + 8, ACCENT, false);
         graphics.drawString(font, Component.literal(data.name()), panelX + 80, panelY + 8, TEXT, false);
 
         int contentY = panelY + 54;
-        fillPanel(graphics, panelX + 8, contentY, 304, 128, RAISED);
+        fillPanel(graphics, panelX + 8, contentY, 324, 128, RAISED);
 
         switch (tab) {
             case "citizens" -> drawLines(graphics, data.citizenLines(), panelX + 14, contentY + 8);
@@ -99,6 +101,8 @@ public class ColonyScreen extends Screen {
                         panelX + 14, contentY + 38, TEXT, false);
                 graphics.drawString(font, Component.translatable("quidoms.label.hint"),
                         panelX + 14, contentY + 60, MUTED, false);
+                graphics.drawString(font, Component.translatable("quidoms.label.hint2"),
+                        panelX + 14, contentY + 74, MUTED, false);
             }
         }
 

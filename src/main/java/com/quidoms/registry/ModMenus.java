@@ -1,7 +1,8 @@
 package com.quidoms.registry;
 
 import com.quidoms.QuidomsMod;
-import com.quidoms.client.ColonyMenu;
+import com.quidoms.inventory.WarehouseMenu;
+import com.quidoms.menu.ColonyMenu;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
@@ -15,6 +16,9 @@ public final class ModMenus {
 
     public static final DeferredHolder<MenuType<?>, MenuType<ColonyMenu>> COLONY =
             MENUS.register("colony", () -> IMenuTypeExtension.create(ColonyMenu::fromNetwork));
+
+    public static final DeferredHolder<MenuType<?>, MenuType<WarehouseMenu>> WAREHOUSE =
+            MENUS.register("warehouse", () -> IMenuTypeExtension.create(WarehouseMenu::fromNetwork));
 
     private ModMenus() {
     }
