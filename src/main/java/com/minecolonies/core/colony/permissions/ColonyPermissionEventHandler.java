@@ -421,7 +421,7 @@ public class ColonyPermissionEventHandler
                 }
 
                 final ItemStack stack = event.getItemStack();
-                if (ItemStackUtils.isEmpty(stack) || stack.getFoodProperties(event.getEntity()) != null)
+                if (ItemStackUtils.isEmpty(stack) || com.minecolonies.api.util.FoodCompat.getFoodProperties(stack, event.getEntity()) != null)
                 {
                     return;
                 }

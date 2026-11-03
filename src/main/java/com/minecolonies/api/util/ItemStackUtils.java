@@ -138,7 +138,7 @@ public final class ItemStackUtils
     public static final Predicate<ItemStack> IS_ANY_FOOD =
             stack ->
             {
-                final FoodProperties foodProperties = stack.getFoodProperties(null);
+                final FoodProperties foodProperties = com.minecolonies.api.util.FoodCompat.getFoodProperties(stack);
                 return ItemStackUtils.isNotEmpty(stack) && foodProperties != null && foodProperties.nutrition() > 0
                         && foodProperties.saturation() > 0;
             };

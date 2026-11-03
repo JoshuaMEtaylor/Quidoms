@@ -187,7 +187,7 @@ public abstract class AbstractBlockGate extends DoorBlock implements LiquidBlock
     }
 
     @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos)
+    public BlockState updateShape(BlockState stateIn, LevelReader worldIn, ScheduledTickAccess scheduledTickAccess, BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random)
     {
         if (stateIn.hasProperty(BlockStateProperties.WATERLOGGED))
         {

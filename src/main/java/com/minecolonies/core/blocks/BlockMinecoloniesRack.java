@@ -23,6 +23,9 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -150,23 +153,17 @@ public class BlockMinecoloniesRack extends AbstractBlockMinecoloniesRack<BlockMi
 
     @Override
     @NotNull
-    public BlockState updateShape(
-      @NotNull final BlockState state,
-      @NotNull final Direction dir,
-      final BlockState neighbourState,
-      @NotNull final LevelAccessor level,
-      @NotNull final BlockPos pos,
-      @NotNull final BlockPos neighbourPos)
+    public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction dir, BlockPos neighbourPos, BlockState neighbourState, RandomSource random)
     {
         if (state.getBlock() != this || pos.subtract(neighbourPos).getY() != 0)
         {
-            return super.updateShape(state, dir, neighbourState, level, pos, neighbourPos);
+            return super.updateShape(state, level, scheduledTickAccess, pos, dir, neighbourPos, neighbourState, random);
         }
 
         final BlockEntity here = level.getBlockEntity(pos);
         if (!(here instanceof TileEntityRack hereRack))
         {
-            return super.updateShape(state, dir, neighbourState, level, pos, neighbourPos);
+            return super.updateShape(state, level, scheduledTickAccess, pos, dir, neighbourPos, neighbourState, random);
         }
 
         if (neighbourState.getBlock() != this)
@@ -177,7 +174,7 @@ public class BlockMinecoloniesRack extends AbstractBlockMinecoloniesRack<BlockMi
                 return state.setValue(VARIANT, hereRack.isEmpty() ? RackType.EMPTY : RackType.FULL);
             }
 
-            return super.updateShape(state, dir, neighbourState, level, pos, neighbourPos);
+            return super.updateShape(state, level, scheduledTickAccess, pos, dir, neighbourPos, neighbourState, random);
         }
 
 
@@ -189,7 +186,7 @@ public class BlockMinecoloniesRack extends AbstractBlockMinecoloniesRack<BlockMi
 
             if (!(neighbour instanceof TileEntityRack neighborRack))
             {
-                return super.updateShape(state, dir, neighbourState, level, pos, neighbourPos);
+                return super.updateShape(state, level, scheduledTickAccess, pos, dir, neighbourPos, neighbourState, random);
             }
 
             boolean isEmpty = hereRack.isEmpty() && neighborRack.isEmpty();
@@ -215,7 +212,7 @@ public class BlockMinecoloniesRack extends AbstractBlockMinecoloniesRack<BlockMi
             }
         }
 
-        return super.updateShape(state, dir, neighbourState, level, pos, neighbourPos);
+        return super.updateShape(state, level, scheduledTickAccess, pos, dir, neighbourPos, neighbourState, random);
     }
 
     @Override

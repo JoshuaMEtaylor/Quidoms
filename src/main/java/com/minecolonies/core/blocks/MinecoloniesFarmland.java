@@ -72,7 +72,7 @@ public class MinecoloniesFarmland extends AbstractBlockMinecolonies<Minecolonies
 
     @NotNull
     @Override
-    public BlockState updateShape(@NotNull BlockState state, @NotNull Direction direction, @NotNull BlockState newState, @NotNull LevelAccessor level, @NotNull BlockPos pos, @NotNull BlockPos neighborPos)
+    public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState newState, RandomSource random)
     {
         if (direction == Direction.UP && !state.canSurvive(level, pos))
         {
@@ -83,7 +83,7 @@ public class MinecoloniesFarmland extends AbstractBlockMinecolonies<Minecolonies
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
 
-        return super.updateShape(state, direction, newState, level, pos, neighborPos);
+        return super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, newState, random);
     }
 
     @Override

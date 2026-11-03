@@ -452,7 +452,7 @@ public class CraftingTagAuditor
         {
             if (!ItemStackUtils.ISFOOD.test(item)) continue;
 
-            final FoodProperties properties = item.getItem().getFoodProperties(item, null);
+            final FoodProperties properties = com.minecolonies.api.util.FoodCompat.getFoodProperties(item, null);
             if (properties == null) continue;
 
             writeItemData(writer, item);

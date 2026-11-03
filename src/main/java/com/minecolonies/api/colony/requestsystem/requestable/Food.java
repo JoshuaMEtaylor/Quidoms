@@ -183,7 +183,7 @@ public class Food implements IDeliverable
         return ItemStackUtils.ISFOOD.test(stack)
                  && !exclusionList.contains(new ItemStorage(stack))
                  && !(ItemStackUtils.ISCOOKABLE.test(stack) && exclusionList.contains(new ItemStorage(MinecoloniesAPIProxy.getInstance().getFurnaceRecipes().getSmeltingResult(stack))))
-                 && (ItemStackUtils.ISCOOKABLE.test(stack) || stack.getItem().getFoodProperties(stack, null).nutrition() >= minNutrition);
+                 && (ItemStackUtils.ISCOOKABLE.test(stack) || com.minecolonies.api.util.FoodCompat.getFoodProperties(stack).nutrition() >= minNutrition);
     }
 
     @Override

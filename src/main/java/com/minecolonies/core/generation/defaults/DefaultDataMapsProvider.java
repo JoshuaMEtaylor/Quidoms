@@ -62,7 +62,7 @@ public class DefaultDataMapsProvider extends DataMapProvider
 
     private static void registerCompostItemFromNutrition(final Builder<Compostable, Item> builder, final Item item, final float factor)
     {
-        final FoodProperties food = item.getFoodProperties(new ItemStack(item), null);
+        final FoodProperties food = com.minecolonies.api.util.FoodCompat.getFoodProperties(item, new ItemStack(item), null);
         if (food != null)
         {
             final float strength = Math.min(1.0f, food.nutrition() / factor);

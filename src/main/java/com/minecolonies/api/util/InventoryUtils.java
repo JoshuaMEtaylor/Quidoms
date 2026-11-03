@@ -3113,7 +3113,7 @@ public class InventoryUtils
                 if (!ItemStackUtils.isEmpty(stack) && foodPredicate.test(stack))
                 {
                     // Found food
-                    final FoodProperties itemFood = stack.getItem().getFoodProperties(stack, null);
+                    final FoodProperties itemFood = com.minecolonies.api.util.FoodCompat.getFoodProperties(stack);
                     if (itemFood == null)
                     {
                         continue;

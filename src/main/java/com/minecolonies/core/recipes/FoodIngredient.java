@@ -68,7 +68,7 @@ public record FoodIngredient(@NotNull Optional<Integer> minHealing,
 
     private boolean matchesFood(@NotNull final ItemStack stack)
     {
-        @NotNull final FoodProperties food = Objects.requireNonNull(stack.getItem().getFoodProperties(stack, null));
+        @NotNull final FoodProperties food = Objects.requireNonNull(com.minecolonies.api.util.FoodCompat.getFoodProperties(stack));
         return minHealing.map(healing -> food.nutrition() >= healing).orElse(true) &&
                maxHealing.map(healing -> food.nutrition() < healing).orElse(true) &&
                minSaturation.map(saturation -> food.saturation() >= saturation).orElse(true) &&

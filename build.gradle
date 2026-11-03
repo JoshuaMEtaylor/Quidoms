@@ -44,6 +44,11 @@ sourceSets.main.java {
     exclude '**/domumornamentum/jei/**'
     exclude '**/domumornamentum/client/event/handlers/ModBusEventHandler.java'
 
+    exclude '**/domumornamentum/client/model/loader/MateriallyTexturedModelLoader.java'
+    exclude '**/domumornamentum/client/model/geometry/**'
+    exclude '**/domumornamentum/client/event/handlers/MateriallyTexturedBlockPreviewRenderHandler.java'
+
+
             exclude '**/domumornamentum/client/render/ModelGhostRenderer.java'
     exclude '**/domumornamentum/client/model/utils/ModelSpriteQuadTransformer.java'
     exclude '**/domumornamentum/client/model/geometry/MateriallyTexturedGeometry.java'

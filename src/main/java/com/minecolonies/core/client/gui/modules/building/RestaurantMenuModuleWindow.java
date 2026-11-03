@@ -315,7 +315,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
             {
                 ingredients.merge(ingredient, (double) ingredient.getAmount() / input.getAmount(), Double::sum);
             }
-            final FoodProperties foodProperty = dish.getItem().getFoodProperties(dish.getItemStack(), null);
+            final FoodProperties foodProperty = com.minecolonies.api.util.FoodCompat.getFoodProperties(dish.getItemStack(), null);
             saturationSum += FoodUtils.getFoodValue(dish.getItemStack(), foodProperty, researchBonus);
         }
         final double consumption = (avgCustomerConsumption * 10 * numerOfCustomers) / saturationSum;
