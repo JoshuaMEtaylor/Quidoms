@@ -10,10 +10,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(QuidomsMod.MOD_ID);
 
-    public static final DeferredItem<BlockItem> TOWN_HALL = ITEMS.registerSimpleBlockItem("town_hall", ModBlocks.TOWN_HALL);
-    public static final DeferredItem<BlockItem> HOUSE = ITEMS.registerSimpleBlockItem("house", ModBlocks.HOUSE);
-    public static final DeferredItem<BlockItem> BUILDER_HUT = ITEMS.registerSimpleBlockItem("builder_hut", ModBlocks.BUILDER_HUT);
-    public static final DeferredItem<BlockItem> WAREHOUSE = ITEMS.registerSimpleBlockItem("warehouse", ModBlocks.WAREHOUSE);
+    // Prefer Holder overloads so Item.Properties get setId() on 1.21.10.
+    public static final DeferredItem<BlockItem> TOWN_HALL = ITEMS.registerSimpleBlockItem(ModBlocks.TOWN_HALL);
+    public static final DeferredItem<BlockItem> HOUSE = ITEMS.registerSimpleBlockItem(ModBlocks.HOUSE);
+    public static final DeferredItem<BlockItem> BUILDER_HUT = ITEMS.registerSimpleBlockItem(ModBlocks.BUILDER_HUT);
+    public static final DeferredItem<BlockItem> WAREHOUSE = ITEMS.registerSimpleBlockItem(ModBlocks.WAREHOUSE);
 
     public static final DeferredItem<Item> COLONY_BANNER = ITEMS.registerSimpleItem("colony_banner");
 
