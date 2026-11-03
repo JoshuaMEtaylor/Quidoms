@@ -135,7 +135,6 @@ public class MineColonies
         ModInteractionsInitializer.DEFERRED_REGISTER.register(modBus);
         ModResearchEffectInitializer.DEFERRED_REGISTER.register(modBus);
         ModLootConditions.DEFERRED_REGISTER.register(modBus);
-        ModItemsInitializer.DEFERRED_REGISTER.register(modBus);
         ModEquipmentTypes.DEFERRED_REGISTER.register(modBus);
 
         ModQuestInitializer.DEFERRED_REGISTER_OBJECTIVE.register(modBus);

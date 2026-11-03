@@ -21,7 +21,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -100,17 +99,13 @@ public class BuildingNetherWorker extends AbstractBuilding
         keepX.put(itemStack -> itemStack.getItem() instanceof FlintAndSteelItem, new Tuple<>(1, true));
 
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-            && itemStack.getItem() instanceof ArmorItem
-            && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.HEAD, new Tuple<>(1, true));
+            && EquipmentSlot.HEAD.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-            && itemStack.getItem() instanceof ArmorItem
-            && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.CHEST, new Tuple<>(1, true));
+            && EquipmentSlot.CHEST.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-            && itemStack.getItem() instanceof ArmorItem
-            && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.LEGS, new Tuple<>(1, true));
+            && EquipmentSlot.LEGS.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-            && itemStack.getItem() instanceof ArmorItem
-            && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.FEET, new Tuple<>(1, true));
+            && EquipmentSlot.FEET.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
     }
 
     @NotNull

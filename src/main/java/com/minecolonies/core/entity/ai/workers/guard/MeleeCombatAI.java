@@ -45,7 +45,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
@@ -320,7 +319,7 @@ public class MeleeCombatAI extends AttackMoveAI<EntityCitizen>
 
         if (ItemStackUtils.doesItemServeAsWeapon(heldItem))
         {
-            if (heldItem.getItem() instanceof SwordItem)
+            if (ItemStackUtils.isSword(heldItem))
             {
                 addDmg += user.getAttribute(Attributes.ATTACK_DAMAGE).getValue();
             }

@@ -41,7 +41,6 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -166,17 +165,13 @@ public abstract class AbstractBuildingGuards extends AbstractBuilding implements
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack) && ItemStackUtils.doesItemServeAsWeapon(itemStack), new Tuple<>(1, true));
 
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-                                 && itemStack.getItem() instanceof ArmorItem
-                                 && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.CHEST, new Tuple<>(1, true));
+                                 && EquipmentSlot.CHEST.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-                                 && itemStack.getItem() instanceof ArmorItem
-                                 && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.HEAD, new Tuple<>(1, true));
+                                 && EquipmentSlot.HEAD.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-                                 && itemStack.getItem() instanceof ArmorItem
-                                 && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.LEGS, new Tuple<>(1, true));
+                                 && EquipmentSlot.LEGS.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-                                 && itemStack.getItem() instanceof ArmorItem
-                                 && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.FEET, new Tuple<>(1, true));
+                                 && EquipmentSlot.FEET.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
 
         keepX.put(itemStack -> {
             if (ItemStackUtils.isEmpty(itemStack) || !(itemStack.getItem() instanceof ArrowItem))

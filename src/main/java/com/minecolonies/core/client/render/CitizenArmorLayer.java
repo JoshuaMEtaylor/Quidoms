@@ -30,13 +30,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.SkullBlock;
@@ -142,7 +139,7 @@ public class CitizenArmorLayer<T extends AbstractEntityCitizen, M extends Humano
         final ItemStack itemstack = displayArmor.isEmpty() ? citizen.getItemBySlot(equipmentSlot) : displayArmor;
         final Item armorItem = itemstack.getItem();
 
-        if (armorItem instanceof ArmorItem && !disabledFromRendering.contains(armorItem))
+        if (HumanoidArmorLayer.shouldRender(itemstack, equipmentSlot) && !disabledFromRendering.contains(armorItem))
         {
             try
             {

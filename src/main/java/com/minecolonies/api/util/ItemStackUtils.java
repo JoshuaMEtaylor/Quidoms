@@ -25,6 +25,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -44,6 +45,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
@@ -302,7 +304,7 @@ public final class ItemStackUtils
             return value;
         }
 
-        final EquipmentSlot targetEquipmentSlot = Optional.ofNullable(Equipable.get(itemStack)).map(Equipable::getEquipmentSlot).orElse(EquipmentSlot.MAINHAND);
+        final EquipmentSlot targetEquipmentSlot = Optional.ofNullable(getHumanoidArmorSlot(itemStack)).orElse(EquipmentSlot.MAINHAND);
         final List<Item> armorItems = VANILLA_ARMOR_MAPPING.get(targetEquipmentSlot);
         if (armorItems == null)
         {
@@ -313,17 +315,69 @@ public final class ItemStackUtils
 
         for (final Item item : armorItems)
         {
-            if (item instanceof ArmorItem armorItem)
+            final ItemStack reference = item.getDefaultInstance();
+            final EquipmentSlot slot = getHumanoidArmorSlot(reference);
+            if (slot != null)
             {
-                final double armorValue = getArmorValue(armorItem.getDefaultInstance(), armorItem.getEquipmentSlot());
+                final double armorValue = getArmorValue(reference, slot);
                 if (targetArmorLevel <= armorValue)
                 {
-                    return VANILLA_ARMOR_DISTRIBUTION.get(armorItem);
+                    return VANILLA_ARMOR_DISTRIBUTION.get(item);
                 }
             }
         }
 
         return 5;
+    }
+
+    /**
+     * @return the humanoid armor slot for this stack, or null if it is not humanoid armor.
+     */
+    @Nullable
+    public static EquipmentSlot getHumanoidArmorSlot(@NotNull final ItemStack stack)
+    {
+        final Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        if (equippable == null)
+        {
+            return null;
+        }
+        final EquipmentSlot slot = equippable.slot();
+        return slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR ? slot : null;
+    }
+
+    /**
+     * @return true if the stack is humanoid armor (helmet/chest/legs/boots).
+     */
+    public static boolean isHumanoidArmor(@NotNull final ItemStack stack)
+    {
+        return getHumanoidArmorSlot(stack) != null;
+    }
+
+    /**
+     * @return true if the item's default stack is humanoid armor.
+     */
+    public static boolean isHumanoidArmorItem(@NotNull final Item item)
+    {
+        return isHumanoidArmor(item.getDefaultInstance());
+    }
+
+    /**
+     * @return true if the stack is tagged as a sword.
+     */
+    public static boolean isSword(@NotNull final ItemStack stack)
+    {
+        return stack.is(ItemTags.SWORDS);
+    }
+
+    /**
+     * @return true if the stack is a digger tool (pickaxe/axe/shovel/hoe).
+     */
+    public static boolean isDigger(@NotNull final ItemStack stack)
+    {
+        return stack.is(ItemTags.PICKAXES)
+                 || stack.is(ItemTags.AXES)
+                 || stack.is(ItemTags.SHOVELS)
+                 || stack.is(ItemTags.HOES);
     }
 
     /**
@@ -390,7 +444,7 @@ public final class ItemStackUtils
      */
     public static boolean doesItemServeAsWeapon(@NotNull final ItemStack stack)
     {
-        return stack.getItem() instanceof SwordItem || stack.getItem() instanceof DiggerItem || Compatibility.isTinkersWeapon(stack) || stack.getItem() instanceof ItemSpear;
+        return isSword(stack) || isDigger(stack) || Compatibility.isTinkersWeapon(stack) || stack.getItem() instanceof ItemSpear;
     }
 
     /**

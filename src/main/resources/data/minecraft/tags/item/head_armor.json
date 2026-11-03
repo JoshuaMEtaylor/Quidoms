@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecolonies:pirate_hat",
+    "minecolonies:pirate_cap",
+    "minecolonies:plate_armor_helmet",
+    "minecolonies:santa_hat",
+    "minecolonies:build_goggles"
+  ]
+}

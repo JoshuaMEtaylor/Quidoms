@@ -19,7 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -260,7 +259,7 @@ public class ContainerCitizenInventory extends AbstractContainerMenu
             @Override
             public boolean mayPlace(final @NotNull ItemStack stack)
             {
-                if (stack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == equipmentSlot)
+                if (equipmentSlot.equals(ItemStackUtils.getHumanoidArmorSlot(stack)))
                 {
                     for (final GuardGear gear : guardGear)
                     {

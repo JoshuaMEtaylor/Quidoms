@@ -24,7 +24,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.BlockGetter;
@@ -146,7 +145,7 @@ public final class WorkerUtil
         {
             for (final Tuple<EquipmentTypeEntry, ItemStack> tool : getOrInitTestTools())
             {
-                if (tool.getB() != null && tool.getB().getItem() instanceof DiggerItem)
+                if (tool.getB() != null && ItemStackUtils.isDigger(tool.getB()))
                 {
                     if (state.getBlock() instanceof IMateriallyTexturedBlock materiallyTexturedBlock)
                     {
@@ -175,14 +174,17 @@ public final class WorkerUtil
     public static int getCorrectHarvestLevelForBlock(final BlockState target)
     {
         int required = 0;
-        for (final Tiers tier : Tiers.values())
+        if (target.is(net.minecraft.tags.BlockTags.NEEDS_DIAMOND_TOOL))
         {
-            TagKey<Block> tag = tier.getTag();
-            if (target.is(tag))
-            {
-                required = tier.ordinal();
-                break;
-            }
+            required = 3;
+        }
+        else if (target.is(net.minecraft.tags.BlockTags.NEEDS_IRON_TOOL))
+        {
+            required = 2;
+        }
+        else if (target.is(net.minecraft.tags.BlockTags.NEEDS_STONE_TOOL))
+        {
+            required = 1;
         }
 
         if (target.getBlock() instanceof GlazedTerracottaBlock)

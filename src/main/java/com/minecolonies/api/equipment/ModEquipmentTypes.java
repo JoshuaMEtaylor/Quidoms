@@ -10,11 +10,20 @@ import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.api.util.constant.translation.ToolTranslationConstants;
 import com.minecolonies.apiimp.CommonMinecoloniesAPIImpl;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.FlintAndSteelItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.LeadItem;
+import net.minecraft.world.item.ToolMaterial;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -59,7 +68,7 @@ public class ModEquipmentTypes
 
         pickaxe = register("pickaxe",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_PICKAXE))
-                       .setIsEquipment((itemStack, equipmentType) -> canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_PICKAXE_ACTIONS) || Compatibility.isTinkersTool(
+                       .setIsEquipment((itemStack, equipmentType) -> itemStack.is(ItemTags.PICKAXES) || Compatibility.isTinkersTool(
                          itemStack,
                          equipmentType))
                        .setEquipmentLevel(ModEquipmentTypes::vanillaToolLevel)
@@ -67,29 +76,31 @@ public class ModEquipmentTypes
 
         shovel = register("shovel",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_SHOVEL))
-                       .setIsEquipment((itemStack, equipmentType) -> canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_SHOVEL_ACTIONS) || Compatibility.isTinkersTool(
-                         itemStack,
-                         equipmentType))
+                       .setIsEquipment((itemStack, equipmentType) -> itemStack.is(ItemTags.SHOVELS)
+                                                                       || canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_SHOVEL_ACTIONS)
+                                                                       || Compatibility.isTinkersTool(itemStack, equipmentType))
                        .setEquipmentLevel(ModEquipmentTypes::vanillaToolLevel)
                   .build());
 
         axe = register("axe",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_AXE))
-                       .setIsEquipment((itemStack, equipmentType) -> canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_AXE_ACTIONS) || Compatibility.isTinkersTool(itemStack,
-                         equipmentType))
+                       .setIsEquipment((itemStack, equipmentType) -> itemStack.is(ItemTags.AXES)
+                                                                       || canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_AXE_ACTIONS)
+                                                                       || Compatibility.isTinkersTool(itemStack, equipmentType))
                        .setEquipmentLevel(ModEquipmentTypes::vanillaToolLevel)
                   .build());
 
         hoe = register("hoe",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_HOE))
-                       .setIsEquipment((itemStack, equipmentType) -> canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_HOE_ACTIONS) || Compatibility.isTinkersTool(itemStack,
-                         equipmentType))
+                       .setIsEquipment((itemStack, equipmentType) -> itemStack.is(ItemTags.HOES)
+                                                                       || canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_HOE_ACTIONS)
+                                                                       || Compatibility.isTinkersTool(itemStack, equipmentType))
                        .setEquipmentLevel(ModEquipmentTypes::vanillaToolLevel)
                   .build());
 
         sword = register("sword",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_SWORD))
-                       .setIsEquipment((itemStack, equipmentType) -> canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_SWORD_ACTIONS)
+                       .setIsEquipment((itemStack, equipmentType) -> itemStack.is(ItemTags.SWORDS)
                                                                      || Compatibility.isTinkersWeapon(itemStack)
                                                                      || Compatibility.isCustomWeapon(itemStack))
                        .setEquipmentLevel(ModEquipmentTypes::vanillaToolLevel)
@@ -121,31 +132,31 @@ public class ModEquipmentTypes
 
         shield = register("shield",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_SHIELD))
-                       .setIsEquipment((itemStack, equipmentType) -> canPerformDefaultActions(itemStack, ItemAbilities.DEFAULT_SHIELD_ACTIONS))
+                       .setIsEquipment((itemStack, equipmentType) -> itemStack.is(Items.SHIELD))
                        .setEquipmentLevel((itemStack, equipmentType) -> Compatibility.getItemLevel(itemStack))
                   .build());
 
         helmet = register("helmet",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_HELMET))
-                       .setIsEquipment((itemStack, equipmentType) -> itemStack.getItem() instanceof ArmorItem armor && EquipmentSlot.HEAD.equals(armor.getEquipmentSlot()))
+                       .setIsEquipment((itemStack, equipmentType) -> EquipmentSlot.HEAD.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)))
                        .setEquipmentLevel((itemStack, equipmentType) -> Compatibility.getItemLevel(itemStack))
                   .build());
 
         leggings = register("leggings",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_LEGGINGS))
-                       .setIsEquipment((itemStack, equipmentType) -> itemStack.getItem() instanceof ArmorItem armor && EquipmentSlot.LEGS.equals(armor.getEquipmentSlot()))
+                       .setIsEquipment((itemStack, equipmentType) -> EquipmentSlot.LEGS.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)))
                        .setEquipmentLevel((itemStack, equipmentType) -> Compatibility.getItemLevel(itemStack))
                   .build());
 
         chestplate = register("chestplate",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_CHEST_PLATE))
-                       .setIsEquipment((itemStack, equipmentType) -> itemStack.getItem() instanceof ArmorItem armor && EquipmentSlot.CHEST.equals(armor.getEquipmentSlot()))
+                       .setIsEquipment((itemStack, equipmentType) -> EquipmentSlot.CHEST.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)))
                        .setEquipmentLevel((itemStack, equipmentType) -> Compatibility.getItemLevel(itemStack))
                   .build());
 
         boots = register("boots",
           builder -> builder.setDisplayName(Component.translatable(ToolTranslationConstants.TOOL_TYPE_BOOTS))
-                       .setIsEquipment((itemStack, equipmentType) -> itemStack.getItem() instanceof ArmorItem armor && EquipmentSlot.FEET.equals(armor.getEquipmentSlot()))
+                       .setIsEquipment((itemStack, equipmentType) -> EquipmentSlot.FEET.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)))
                        .setEquipmentLevel((itemStack, equipmentType) -> Compatibility.getItemLevel(itemStack))
                   .build());
 
@@ -260,11 +271,16 @@ public class ModEquipmentTypes
             {
                 final ItemStack dummy = new ItemStack(item);
 
-                if (item instanceof final TieredItem tiered)
+                if (dummy.has(DataComponents.TOOL) && (dummy.is(ItemTags.SWORDS)
+                                                         || dummy.is(ItemTags.PICKAXES)
+                                                         || dummy.is(ItemTags.AXES)
+                                                         || dummy.is(ItemTags.SHOVELS)
+                                                         || dummy.is(ItemTags.HOES)))
                 {
-                    Compatibility.registerItemTierIfAbsent(item, tiered.getTier(), (int) tiered.getTier().getAttackDamageBonus());
+                    final ToolMaterial material = matchToolMaterial(dummy);
+                    Compatibility.registerItemTierIfAbsent(item, material, (int) material.attackDamageBonus());
                 }
-                else if (item instanceof ArmorItem)
+                else if (ItemStackUtils.isHumanoidArmor(dummy))
                 {
                     final int level = ItemStackUtils.getArmorLevel(dummy);
                     if (level > 0)
@@ -284,7 +300,7 @@ public class ModEquipmentTypes
                 {
                     Compatibility.registerItemTierIfAbsent(item, durabilityBasedLevel(dummy, shearsRef));
                 }
-                else if (canPerformDefaultActions(dummy, ItemAbilities.DEFAULT_SHIELD_ACTIONS))
+                else if (dummy.is(Items.SHIELD))
                 {
                     Compatibility.registerItemTierIfAbsent(item, durabilityBasedLevel(dummy, shieldRef));
                 }
@@ -317,5 +333,28 @@ public class ModEquipmentTypes
             }
         }
         return true;
+    }
+
+    /**
+     * Pick the closest vanilla {@link ToolMaterial} by durability for tier registration.
+     */
+    private static ToolMaterial matchToolMaterial(final ItemStack stack)
+    {
+        final int durability = stack.getMaxDamage();
+        ToolMaterial best = ToolMaterial.WOOD;
+        int bestDiff = Integer.MAX_VALUE;
+        for (final ToolMaterial material : new ToolMaterial[] {
+          ToolMaterial.WOOD, ToolMaterial.STONE, ToolMaterial.COPPER, ToolMaterial.IRON,
+          ToolMaterial.DIAMOND, ToolMaterial.GOLD, ToolMaterial.NETHERITE
+        })
+        {
+            final int diff = Math.abs(material.durability() - durability);
+            if (diff < bestDiff)
+            {
+                bestDiff = diff;
+                best = material;
+            }
+        }
+        return best;
     }
 }

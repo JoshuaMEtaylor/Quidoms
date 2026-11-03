@@ -39,6 +39,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
@@ -423,9 +424,9 @@ public class EntityAIWorkNether extends AbstractEntityAICrafting<JobNetherWorker
                                 final ItemStack sword = worker.getItemBySlot(EquipmentSlot.MAINHAND);
                                 if (!sword.isEmpty())
                                 {
-                                    if (sword.getItem() instanceof SwordItem swordItem)
+                                    if (ItemStackUtils.isSword(sword))
                                     {
-                                        damageToDo += swordItem.getDamage(sword);
+                                        damageToDo += ItemStackUtils.getItemStackAttributeValue(sword, EquipmentSlot.MAINHAND, Attributes.ATTACK_DAMAGE);
                                     }
                                     else
                                     {
@@ -518,7 +519,7 @@ public class EntityAIWorkNether extends AbstractEntityAICrafting<JobNetherWorker
                         final Block block = bi.getBlock();
 
                         ItemStack tool = findTool(block.defaultBlockState(), worker.blockPosition());
-                        if (tool.getItem() instanceof TieredItem)
+                        if (tool.has(net.minecraft.core.component.DataComponents.TOOL))
                         {
                             worker.setItemSlot(EquipmentSlot.MAINHAND, tool);
 
