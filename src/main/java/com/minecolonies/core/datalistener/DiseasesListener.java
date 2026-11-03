@@ -21,7 +21,8 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.util.random.WeightedRandomList;
+import net.minecraft.util.random.Weighted;
+import net.minecraft.util.random.WeightedList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,11 +50,27 @@ public class DiseasesListener extends SimpleJsonResourceReloadListener
     /**
      * The map of diseases.
      */
-    private static WeightedRandomList<Disease> DISEASES = WeightedRandomList.create();
+    private static WeightedList<Disease> DISEASES = WeightedList.of();
 
     /**
      * Default constructor.
      */
+
+    private static WeightedList<Disease> buildWeighted(final List<Disease> diseases)
+    {
+        final WeightedList.Builder<Disease> builder = WeightedList.builder();
+        for (final Disease disease : diseases)
+        {
+            builder.add(disease, Math.max(1, disease.rarity()));
+        }
+        return builder.build();
+    }
+
+    private static List<Disease> unwrapDiseases()
+    {
+        return DISEASES.unwrap().stream().map(Weighted::value).toList();
+    }
+
     public DiseasesListener()
     {
         super(GSON, "colony/diseases");
@@ -67,8 +84,9 @@ public class DiseasesListener extends SimpleJsonResourceReloadListener
     public static void sendGlobalDiseasesPackets(final ServerPlayer player)
     {
         final RegistryFriendlyByteBuf byteBuf = new RegistryFriendlyByteBuf(new FriendlyByteBuf(Unpooled.buffer()), player.level().registryAccess());
-        byteBuf.writeInt(DISEASES.unwrap().size());
-        for (final Disease disease : DISEASES.unwrap())
+        final List<Disease> all = unwrapDiseases();
+        byteBuf.writeInt(all.size());
+        for (final Disease disease : all)
         {
             byteBuf.writeResourceLocation(disease.id());
             Utils.serializeCodecMess(ComponentSerialization.STREAM_CODEC, byteBuf, disease.name());
@@ -106,7 +124,7 @@ public class DiseasesListener extends SimpleJsonResourceReloadListener
 
             newDiseases.add(new Disease(id, name, rarity, cureItems));
         }
-        DISEASES = WeightedRandomList.create(newDiseases);
+        DISEASES = buildWeighted(newDiseases);
     }
 
     /**
@@ -117,7 +135,7 @@ public class DiseasesListener extends SimpleJsonResourceReloadListener
     @NotNull
     public static List<Disease> getDiseases()
     {
-        return DISEASES.unwrap();
+        return unwrapDiseases();
     }
 
     /**
@@ -129,7 +147,7 @@ public class DiseasesListener extends SimpleJsonResourceReloadListener
     @Nullable
     public static Disease getDisease(final ResourceLocation id)
     {
-        for (final Disease disease : DISEASES.unwrap())
+        for (final Disease disease : unwrapDiseases())
         {
             if (disease.id().equals(id))
             {
@@ -185,6 +203,6 @@ public class DiseasesListener extends SimpleJsonResourceReloadListener
 
             diseases.add(new Disease(entry.getKey(), name, rarity, cureItems));
         }
-        DISEASES = WeightedRandomList.create(diseases);
+        DISEASES = buildWeighted(diseases);
     }
 }

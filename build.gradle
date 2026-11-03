@@ -36,25 +36,20 @@ sourceSets.main.java {
     exclude '**/datagen/**'
     exclude '**/generation/**'
     exclude '**/GatherDataHandler.java'
-    // Domum's ModBus handler is mostly data-gen wiring still on 1.21.1 APIs
+    // Domum pieces still on pre-1.21.10 client model / network APIs
     exclude '**/domumornamentum/event/handlers/ModBusEventHandler.java'
-
-    exclude '**/domumornamentum/client/render/ModRenderTypes.java'
-    exclude '**/domumornamentum/client/model/baked/**'
-    exclude '**/domumornamentum/jei/**'
     exclude '**/domumornamentum/client/event/handlers/ModBusEventHandler.java'
-
-    exclude '**/domumornamentum/client/model/loader/MateriallyTexturedModelLoader.java'
-    exclude '**/domumornamentum/client/model/geometry/**'
     exclude '**/domumornamentum/client/event/handlers/MateriallyTexturedBlockPreviewRenderHandler.java'
-
-
-            exclude '**/domumornamentum/client/render/ModelGhostRenderer.java'
+    exclude '**/domumornamentum/client/render/ModRenderTypes.java'
+    exclude '**/domumornamentum/client/render/ModelGhostRenderer.java'
+    exclude '**/domumornamentum/client/model/baked/**'
+    exclude '**/domumornamentum/client/model/geometry/**'
+    exclude '**/domumornamentum/client/model/loader/MateriallyTexturedModelLoader.java'
     exclude '**/domumornamentum/client/model/utils/ModelSpriteQuadTransformer.java'
-    exclude '**/domumornamentum/client/model/geometry/MateriallyTexturedGeometry.java'
+    exclude '**/domumornamentum/jei/**'
     exclude '**/domumornamentum/network/IServerboundDistributor.java'
-
 }
+
 
 sourceSets.main.resources {
     srcDirs(vendorResources.findAll { it.exists() })

@@ -578,11 +578,11 @@ public abstract class AbstractResearchProvider implements DataProvider
             final JsonElement itemJson;
             if (items.size() == 1)
             {
-                itemJson = Utils.serializeCodecMessToJson(SizedIngredient.FLAT_CODEC, provider, items.getFirst());
+                itemJson = Utils.serializeCodecMessToJson(SizedIngredient.NESTED_CODEC, provider, items.getFirst());
             }
             else
             {
-                itemJson = Utils.serializeCodecMessToJson(SizedIngredient.FLAT_CODEC.listOf(), provider, items);
+                itemJson = Utils.serializeCodecMessToJson(SizedIngredient.NESTED_CODEC.listOf(), provider, items);
             }
             costArray.add(itemJson);
 

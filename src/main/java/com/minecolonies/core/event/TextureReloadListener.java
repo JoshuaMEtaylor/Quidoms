@@ -10,7 +10,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -70,12 +70,14 @@ public class TextureReloadListener extends SimplePreparableReloadListener<Textur
     }
 
     @SubscribeEvent
-    public static void modInitClient(final RegisterClientReloadListenersEvent event)
+    public static void modInitClient(final AddClientReloadListenersEvent event)
     {
-        event.registerReloadListener(new TextureReloadListener());
+        event.addListener(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("minecolonies", "texture_reload"), new TextureReloadListener());
 
         // registry minecolonies gui atlas
-        AtlasManager.INSTANCE.addAtlas(event::registerReloadListener, Constants.MOD_ID);
+        AtlasManager.INSTANCE.addAtlas(
+            listener -> event.addListener(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "gui_atlas"), listener),
+            Constants.MOD_ID);
     }
 }
 

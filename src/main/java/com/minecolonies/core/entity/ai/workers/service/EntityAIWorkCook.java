@@ -233,7 +233,7 @@ public class EntityAIWorkCook extends AbstractEntityAIUsesFurnace<JobCook, Build
             worker.getCitizenData().triggerInteraction(new StandardInteraction(Component.translatable(POOR_RESTAURANT_INTERACTION), ChatPriority.IMPORTANT));
         }
 
-        String foodName = worker.getInventoryCitizen().getStackInSlot(foodSlot).getDescriptionId();
+        String foodName = worker.getInventoryCitizen().getStackInSlot(foodSlot).getItem().getDescriptionId();
         int qty = (int) (Math.max(1.0, (FULL_SATURATION - citizen.getCitizenData().getSaturation()) / FoodUtils.getFoodValue(worker.getInventoryCitizen().getStackInSlot(foodSlot), citizen)));
         // Hand out a bit extra
         qty = (int) Math.ceil(qty * 1.5);

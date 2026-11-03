@@ -164,7 +164,7 @@ public abstract class AbstractCraftingProductionResolver<C extends AbstractCraft
             if (!ItemStackUtils.isEmpty(ingredient.getItemStack()))
             {
                 final ItemStack craftingHelperStack = ingredient.getItemStack().copy();
-                final ItemStack container = ingredient.getItemStack().getCraftingRemainingItem();
+                final ItemStack container = ingredient.getItemStack().getCraftingRemainder();
                 //if recipe secondary produces craftinghelperstack, don't add it by count, add it once. If it's in the tools list, check to see if we need it first. 
                 if(!storage.getSecondaryOutputs().isEmpty() && ItemStackUtils.compareItemStackListIgnoreStackSize(storage.getSecondaryOutputs(), craftingHelperStack, false, true))
                 {

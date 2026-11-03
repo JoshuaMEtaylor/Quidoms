@@ -84,7 +84,7 @@ public class GlobalResearchFactory implements IGlobalResearchFactory
         compound.putBoolean(TAG_AUTOSTART, research.isAutostart());
         compound.putBoolean(TAG_IMMUTABLE, research.isImmutable());
         compound.putBoolean(TAG_HIDDEN, research.isHidden());
-        compound.put(TAG_COSTS, Utils.serializeCodecMess(SizedIngredient.FLAT_CODEC.listOf(), provider, research.getCostList()));
+        compound.put(TAG_COSTS, Utils.serializeCodecMess(SizedIngredient.NESTED_CODEC.listOf(), provider, research.getCostList()));
 
         @NotNull final ListTag reqTagList = research.getResearchRequirements().stream().map(req ->
         {
@@ -134,7 +134,7 @@ public class GlobalResearchFactory implements IGlobalResearchFactory
 
         final IGlobalResearch research = getNewInstance(id, parent, branch, name, subtitle, depth, sortOrder, onlyChild, hidden, autostart, instant, immutable);
 
-        Utils.deserializeCodecMess(SizedIngredient.FLAT_CODEC.listOf(), provider, nbt.get(TAG_COSTS)).forEach(research::addCost);
+        Utils.deserializeCodecMess(SizedIngredient.NESTED_CODEC.listOf(), provider, nbt.get(TAG_COSTS)).forEach(research::addCost);
 
         NBTUtils.streamCompound(nbt.getListOrEmpty(TAG_REQS))
             .forEach(compound -> research.addRequirement(Objects.requireNonNull(IMinecoloniesAPI.getInstance()

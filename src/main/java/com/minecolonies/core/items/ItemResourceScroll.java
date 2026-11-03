@@ -182,7 +182,7 @@ public class ItemResourceScroll extends AbstractItemMinecolonies
             {
                 rack.getAllContent().forEach((item, amount) -> {
                     final int hashCode = item.getItemStack().getComponentsPatch().hashCode();
-                    final String key = item.getItemStack().getDescriptionId() + "-" + hashCode;
+                    final String key = item.getItemStack().getDescription().getString() + "-" + hashCode;
                     if (!resourcesModule.getResources().containsKey(key))
                     {
                         return;

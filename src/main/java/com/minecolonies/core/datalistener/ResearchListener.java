@@ -355,7 +355,7 @@ public class ResearchListener extends SimpleJsonResourceReloadListener
         for (int index = 0; index < jsonCosts.size(); index++)
         {
             final JsonElement jsonCost = jsonCosts.get(index);
-            costs.add(Utils.deserializeCodecMessFromJson(SizedIngredient.FLAT_CODEC, getRegistryLookup(), jsonCost));
+            costs.add(Utils.deserializeCodecMessFromJson(SizedIngredient.NESTED_CODEC, getRegistryLookup(), jsonCost));
         }
 
         // TODO: 1.22 remove the json requirements array as a potential input here, costs should move to a separate list to get them mixed out with requirements
@@ -365,7 +365,7 @@ public class ResearchListener extends SimpleJsonResourceReloadListener
             if (jsonRequirement.has("items"))
             {
                 Log.getLogger().warn("Research '{}' requirement #{} is deprecated. Cost requirements should be put in the 'costs' array.", researchId, index);
-                costs.add(Utils.deserializeCodecMessFromJson(SizedIngredient.FLAT_CODEC, getRegistryLookup(), jsonRequirement.get("items")));
+                costs.add(Utils.deserializeCodecMessFromJson(SizedIngredient.NESTED_CODEC, getRegistryLookup(), jsonRequirement.get("items")));
             }
         }
 

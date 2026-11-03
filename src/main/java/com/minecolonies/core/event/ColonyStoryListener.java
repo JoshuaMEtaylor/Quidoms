@@ -17,7 +17,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,9 +66,9 @@ public class ColonyStoryListener extends SimpleJsonResourceReloadListener
     public static Set<StoryText> supplyCampStories = new HashSet<>();
 
     @SubscribeEvent
-    public static void modInitClient(final RegisterClientReloadListenersEvent event)
+    public static void modInitClient(final AddClientReloadListenersEvent event)
     {
-        event.registerReloadListener(new ColonyStoryListener());
+        event.addListener(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("minecolonies", "colony_story"), new ColonyStoryListener());
     }
 
     /**

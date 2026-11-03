@@ -831,7 +831,7 @@ public class EntityAIWorkAlchemist extends AbstractEntityAICrafting<JobAlchemist
     private void extractFromBrewingStandSlot(final BrewingStandBlockEntity brewingStand, final int slot)
     {
         InvWrapper standWrapper = new InvWrapper(brewingStand);
-        String extractName = standWrapper.getStackInSlot(slot).getDescriptionId();
+        String extractName = standWrapper.getStackInSlot(slot).getItem().getDescriptionId();
         int extractQty = standWrapper.getStackInSlot(slot).getCount();
         
         InventoryUtils.transferItemStackIntoNextFreeSlotInItemHandler(standWrapper, slot, worker.getInventoryCitizen());
