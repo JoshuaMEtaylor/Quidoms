@@ -53,7 +53,15 @@ The release jar is written to `build/libs/quidoms-<version>.jar` and mirrored to
 
 ## Crash notes (1.0.0 → 1.1.0)
 
-The earlier ~96KB jar was an incomplete scaffold: missing `assets/<mod>/items/*.json` (required on 1.21.10), incomplete `mods.toml` loader metadata, client menu class under the wrong package, and a missing `com.quidoms.build` package until reconstructed. 1.1.0 addresses those and ships warehouse logistics + multiple schematics.
+Immediate client crash causes fixed in 1.1.0:
+
+1. **`Block id not set` / unbound block holders** — NeoForge 1.21.10 requires `BlockBehaviour.Properties.setId(...)` via `DeferredRegister.Blocks#registerBlock` (and matching item helpers). Plain `BLOCKS.register("name", () -> new Block(props))` hard-crashes during `RegisterEvent`.
+2. Missing `assets/quidoms/items/*.json` item model defs (1.21.2+ item model system).
+3. Incomplete `neoforge.mods.toml` (`modLoader` / `loaderVersion`).
+4. Client-only menu class referenced from common registration; moved to `com.quidoms.menu`.
+5. Earlier missing `com.quidoms.build` package (reconstructed).
+
+Verified locally: `./gradlew runClient` reaches `Quidoms loaded` + `Quidoms client ready` without a mod-loading crash.
 
 ## License
 
