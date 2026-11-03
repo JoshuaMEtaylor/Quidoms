@@ -1,68 +1,44 @@
 # Quidoms
 
-Clean-room colony management mod for **Minecraft 1.21.10 / NeoForge 21.10.x**.
-
-Inspired by MineColonies concepts — **not** a port. No Structurize / BlockUI / Domum Ornamemtum. Economics stay in QuidCraft.
+Colony simulator for **NeoForge / Minecraft 1.21.1**, based on the **full [MineColonies](https://github.com/ldtteam/minecolonies)** codebase (LDT Team).
 
 Repository: https://github.com/JoshuaMEtaylor/Quidoms
 
-## Install (play)
+## License & attribution
 
-1. Install **Minecraft 1.21.10** with **NeoForge 21.10.64+** (same game version).
-2. Drop the playable jar from [`dist/quidoms-1.1.0.jar`](dist/quidoms-1.1.0.jar) into your `mods/` folder.
-3. Launch the NeoForge 1.21.10 profile. Quidoms should appear in the mods list and creative tab **Quidoms**.
+- **License: GPL-3.0** (see [`LICENSE`](LICENSE)) — inherited from MineColonies.
+- Upstream: [ldtteam/minecolonies](https://github.com/ldtteam/minecolonies) (`version/1.21`).
+- Required LDT libraries (also GPL/LGPL as upstream): **Structurize**, **BlockUI**, **Domum Ornamentum**, **MultiPiston**.
 
-## Design rules
+This is **not** a from-scratch stub. Quidoms keeps essentially the whole MineColonies game surface and applies product cuts below.
 
-- **Colonist tools**: Any tool or weapon on a colonist is made unbreakable and stays that way. No citizen-level gate on tool tiers; mining, damage, and enchantments match the item a player would use.
-- **Ingredient builds**: Build cost is the recursive crafting BOM of the schematic palette — not exotic pre-crafted blocks. The builder pulls stock from the warehouse, crafts intermediates when needed, and places target blocks.
-- **No raids**: Raid/invasion systems are out of scope (and not stubbed into the tick loop).
-- **UI**: Vanilla/NeoForge screens only — no BlockUI / Structurize / LDT stack.
+## Quidoms changes vs upstream MineColonies
 
-## Requirements (dev)
+1. **No raids** — raid scheduling/tick paths hard-disabled (`RaidManager.canRaid` / `onNightFall`); config default `enablecolonyraids=false`.
+2. **Colonist tools** — durability loss disabled; tools forced unbreakable; hut/citizen **tool level gates removed** so any tier works immediately; item attributes/enchants retained.
+3. **Ingredient BOM builds** — builder resource lists expand schematic items through recursive crafting recipes into base ingredients (`IngredientBomExpand` → `BuildingResourcesModule`).
+4. **Branding** — display name **Quidoms** (mod id remains `minecolonies` for blueprint/save compatibility).
 
-- JDK 21
-- NeoForge `21.10.64` (or newer 21.10.x)
-- Minecraft `1.21.10`
+UI modernization beyond branding is **deferred** this pass (BlockUI still powers the majority of screens).
 
-## Build / run
+## Minecraft version note
+
+Upstream LDT NeoForge line for this tree is **1.21.1** (`neo 21.1.x`), not 1.21.10. Structurize / BlockUI / Domum do not yet publish a 1.21.10 line usable as hard deps. Quidoms therefore ships the **real full mod on 1.21.1**. A later pass can port the LDT stack to 1.21.10 when those libs exist.
+
+## Install
+
+1. Install **Minecraft 1.21.1** + **NeoForge 21.1.x**.
+2. Install matching **Structurize**, **BlockUI**, **Domum Ornamentum**, and **MultiPiston** (versions from `gradle.properties`).
+3. Drop `dist/quidoms-*.jar` (or the built `minecolonies-*-1.21.1.jar`) into `mods/`.
+
+## Build
 
 ```bash
 ./gradlew build
-./gradlew runClient
 ```
 
-The release jar is written to `build/libs/quidoms-<version>.jar` and mirrored to `dist/` for downloads.
+Playable jar: `build/libs/minecolonies-*-1.21.1.jar` (also mirrored under `dist/`).
 
-## Found a colony (vertical slice)
+## Play
 
-1. Creative tab **Quidoms** → place **Town Hall** to found a colony (chunk claim + owner).
-2. Place **House** blocks to raise citizen capacity; citizens spawn to fill beds.
-3. Place a **Builder Hut** (auto-assigns an unemployed citizen as builder).
-4. Place a **Warehouse**, open it, and stock **ingredient** materials (e.g. oak logs for pavilion/cabin — planks are crafted by the builder from logs when recipes allow; cobble/gravel for the path).
-5. Open the Town Hall UI → **Build** → start **Pavilion**, **Cabin**, or **Path**. Stand where you want the origin.
-6. The builder walks the schematic, crafts/converts from warehouse stock, and places blocks until the order completes.
-
-## Schematics included
-
-| Id | Description |
-| --- | --- |
-| `quidoms:wood_pavilion` | Small wood roof pavilion |
-| `quidoms:wood_cabin` | Simple oak cabin |
-| `quidoms:stone_path` | Cobble + gravel path strip |
-
-## Crash notes (1.0.0 → 1.1.0)
-
-Immediate client crash causes fixed in 1.1.0:
-
-1. **`Block id not set` / unbound block holders** — NeoForge 1.21.10 requires `BlockBehaviour.Properties.setId(...)` via `DeferredRegister.Blocks#registerBlock` (and matching item helpers). Plain `BLOCKS.register("name", () -> new Block(props))` hard-crashes during `RegisterEvent`.
-2. Missing `assets/quidoms/items/*.json` item model defs (1.21.2+ item model system).
-3. Incomplete `neoforge.mods.toml` (`modLoader` / `loaderVersion`).
-4. Client-only menu class referenced from common registration; moved to `com.quidoms.menu`.
-5. Earlier missing `com.quidoms.build` package (reconstructed).
-
-Verified locally: `./gradlew runClient` reaches `Quidoms loaded` + `Quidoms client ready` without a mod-loading crash.
-
-## License
-
-All Rights Reserved.
+Same colony flow as MineColonies: supply camp → Town Hall → huts → builders/warehouse, etc. Raids will not occur. Stock builders with ingredient materials rather than only finished crafted blocks where recipes expand.
