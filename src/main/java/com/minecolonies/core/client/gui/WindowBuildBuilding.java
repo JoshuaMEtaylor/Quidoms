@@ -363,7 +363,7 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
             return;
         }
         final int hashCode = res.getComponentsPatch().hashCode();
-        final String key = res.getDescriptionId() + "-" + hashCode;
+        final String key = res.getItem().getDescriptionId() + "-" + hashCode;
         ItemStorage resource = resources.get(key);
         if (resource == null)
         {

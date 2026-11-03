@@ -30,7 +30,7 @@ import static com.minecolonies.core.blocks.MinecoloniesFarmland.FLOODED_FARMLAND
 /**
  * This class deals with the initialization of blocks and their items.
  */
-@EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public final class ModBlocksInitializer
 {
 

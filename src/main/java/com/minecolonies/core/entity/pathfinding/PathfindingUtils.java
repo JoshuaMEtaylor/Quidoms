@@ -154,7 +154,7 @@ public class PathfindingUtils
             bs = down;
             down = level.getBlockState(pos.below());
 
-            if (pos.getY() < entity.getCommandSenderWorld().getMinBuildHeight())
+            if (pos.getY() < entity.level().getMinBuildHeight())
             {
                 return entity.blockPosition();
             }

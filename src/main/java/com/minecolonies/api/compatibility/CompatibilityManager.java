@@ -1,5 +1,7 @@
 package com.minecolonies.api.compatibility;
 
+import com.minecolonies.api.util.ItemStackUtils;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -812,13 +814,13 @@ public class CompatibilityManager implements ICompatibilityManager
     private static CompoundTag writeLeafSaplingEntryToNBT(@NotNull final HolderLookup.Provider provider, final BlockState state, final ItemStorage storage)
     {
         final CompoundTag compound = NbtUtils.writeBlockState(state);
-        compound.put(NbtTagConstants.STACK, storage.getItemStack().saveOptional(provider));
+        compound.put(NbtTagConstants.STACK, com.minecolonies.api.util.ItemStackUtils.saveOptional(storage.getItemStack(), provider));
         return compound;
     }
 
     private static Tuple<BlockState, ItemStorage> readLeafSaplingEntryFromNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        return new Tuple<>(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compound), new ItemStorage(ItemStack.parseOptional(provider, compound.getCompoundOrEmpty(NbtTagConstants.STACK)), false, true));
+        return new Tuple<>(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compound), new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compound.getCompoundOrEmpty(NbtTagConstants.STACK)), false, true));
     }
 
     /**

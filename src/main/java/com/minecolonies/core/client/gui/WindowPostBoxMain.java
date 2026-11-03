@@ -251,7 +251,7 @@ public class WindowPostBoxMain extends AbstractWindowSkeleton
     private void updateResources()
     {
         final Predicate<ItemStack> filterPredicate =
-            stack -> filter.isEmpty() || stack.getDescriptionId().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US)) || stack.getHoverName()
+            stack -> filter.isEmpty() || stack.getItem().getDescriptionId().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US)) || stack.getHoverName()
                 .getString()
                 .toLowerCase(Locale.US)
                 .contains(filter.toLowerCase(Locale.US)) || (stack.getItem() instanceof EnchantedBookItem && stack.getTagEnchantments()

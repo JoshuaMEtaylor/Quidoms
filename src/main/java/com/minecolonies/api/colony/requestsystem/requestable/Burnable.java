@@ -58,7 +58,7 @@ public class Burnable implements IDeliverable
 
         if (!ItemStackUtils.isEmpty(burnable.result))
         {
-            compound.put(NBT_RESULT, burnable.result.saveOptional(provider));
+            compound.put(NBT_RESULT, com.minecolonies.api.util.ItemStackUtils.saveOptional(burnable.result, provider));
         }
 
         return compound;

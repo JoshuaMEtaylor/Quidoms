@@ -1,5 +1,7 @@
 package com.minecolonies.core.colony;
 
+import com.minecolonies.api.util.ItemStackUtils;
+
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.IVisitorData;
 import com.minecolonies.api.util.BlockPosUtil;
@@ -58,7 +60,7 @@ public class VisitorData extends CitizenData implements IVisitorData
         final ItemStack recruitCopy = recruitCost.copy();
         recruitCopy.setCount(1);
 
-        compoundNBT.put(TAG_RECRUIT_COST, recruitCopy.saveOptional(provider));
+        compoundNBT.put(TAG_RECRUIT_COST, com.minecolonies.api.util.ItemStackUtils.saveOptional(recruitCopy, provider));
         compoundNBT.putInt(TAG_RECRUIT_COST_QTY, recruitCost.getCount());
         BlockPosUtil.write(compoundNBT, TAG_SITTING, sittingPosition);
         return compoundNBT;
@@ -69,7 +71,7 @@ public class VisitorData extends CitizenData implements IVisitorData
     {
         super.deserializeNBT(provider, nbtTagCompound);
         sittingPosition = BlockPosUtil.read(nbtTagCompound, TAG_SITTING);
-        recruitCost = ItemStack.parseOptional(provider, nbtTagCompound.getCompoundOrEmpty(TAG_RECRUIT_COST));
+        recruitCost = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, nbtTagCompound.getCompoundOrEmpty(TAG_RECRUIT_COST));
         recruitCost.setCount(nbtTagCompound.getIntOr(TAG_RECRUIT_COST_QTY, 0));
     }
 

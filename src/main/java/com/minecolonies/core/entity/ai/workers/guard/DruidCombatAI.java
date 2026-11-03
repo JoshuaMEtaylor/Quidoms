@@ -162,7 +162,7 @@ public class DruidCombatAI extends AttackMoveAI<EntityCitizen>
         }
 
         stack.set(DataComponents.POTION_CONTENTS, PotionContents.EMPTY.withEffectAdded((new MobEffectInstance(effect, time, gotMaterial ? 2 : 0))));
-        DruidPotionEntity.throwPotionAt(stack, target, user, user.getCommandSenderWorld(), POTION_VELOCITY, inaccuracy, predicate);
+        DruidPotionEntity.throwPotionAt(stack, target, user, user.level(), POTION_VELOCITY, inaccuracy, predicate);
 
         if (gotMaterial)
         {

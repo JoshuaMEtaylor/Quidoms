@@ -411,7 +411,7 @@ public class EventHandler
 
             if (entityCitizen.getCitizenJobHandler().getColonyJob() instanceof AbstractJobGuard)
             {
-                final Level world = entityCitizen.getCommandSenderWorld();
+                final Level world = entityCitizen.level();
 
                 final LevelChunk chunk = world.getChunk(newChunkPos.x, newChunkPos.z);
                 final int owningColony = ColonyUtils.getOwningColony(chunk);
@@ -713,7 +713,7 @@ public class EventHandler
         LivingEntity entity = event.getEntity();
         if (entity instanceof ZombieVillager && event.getOutcome() == EntityType.VILLAGER)
         {
-            final Level world = entity.getCommandSenderWorld();
+            final Level world = entity.level();
             final IColony colony = IColonyManager.getInstance().getIColony(world, entity.blockPosition());
             if (colony != null && colony.getCommonBuildingManager().hasBuilding(ModBuildings.tavern.get().getRegistryName(), 1, false))
             {

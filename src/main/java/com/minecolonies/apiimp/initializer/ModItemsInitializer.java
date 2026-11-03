@@ -22,7 +22,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import static com.minecolonies.api.blocks.decorative.AbstractBlockGate.IRON_GATE;
 import static com.minecolonies.api.blocks.decorative.AbstractBlockGate.WOODEN_GATE;
 
-@EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public final class ModItemsInitializer
 {
     private ModItemsInitializer()

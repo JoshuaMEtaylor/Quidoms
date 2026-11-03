@@ -69,7 +69,7 @@ public final class TeleportHelper
      */
     public static void homeTeleport(@NotNull final ServerPlayer player)
     {
-        final IColony colony = IColonyManager.getInstance().getIColonyByOwner(player.getCommandSenderWorld(), player);
+        final IColony colony = IColonyManager.getInstance().getIColonyByOwner(player.level(), player);
         if (colony == null)
         {
             MessageUtils.format(COMMAND_COLONY_ID_NOT_FOUND).sendTo(player);

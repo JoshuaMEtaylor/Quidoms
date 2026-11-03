@@ -86,14 +86,14 @@ public class Food implements IDeliverable
 
         if (!ItemStackUtils.isEmpty(food.result))
         {
-            compound.put(NBT_RESULT, food.result.saveOptional(provider));
+            compound.put(NBT_RESULT, com.minecolonies.api.util.ItemStackUtils.saveOptional(food.result, provider));
         }
         if (!food.exclusionList.isEmpty())
         {
             @NotNull final ListTag items = new ListTag();
             for (@NotNull final ItemStorage item : food.exclusionList)
             {
-                items.add(item.getItemStack().saveOptional(provider));
+                items.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(item.getItemStack(), provider));
             }
             compound.put(NBT_EXCLUSION, items);
         }
@@ -119,7 +119,7 @@ public class Food implements IDeliverable
             final ListTag filterableItems = compound.getListOrEmpty(NBT_EXCLUSION);
             for (int i = 0; i < filterableItems.size(); ++i)
             {
-                items.add(new ItemStorage(ItemStack.parseOptional(provider, filterableItems.getCompound(i))));
+                items.add(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, filterableItems.getCompound(i))));
             }
         }
         final int minNutrition = compound.getIntOr(NBT_MIN_NUTRITION, 0);

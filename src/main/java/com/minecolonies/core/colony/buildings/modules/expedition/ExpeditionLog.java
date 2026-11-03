@@ -1,5 +1,7 @@
 package com.minecolonies.core.colony.buildings.modules.expedition;
 
+import com.minecolonies.api.util.ItemStackUtils;
+
 import com.google.common.base.Enums;
 import com.google.common.collect.ImmutableList;
 import com.minecolonies.api.colony.requestsystem.StandardFactoryController;
@@ -252,7 +254,7 @@ public class ExpeditionLog
         final ListTag equipment = new ListTag();
         for (final ItemStack stack : this.equipment)
         {
-            equipment.add(stack.saveOptional(provider));
+            equipment.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(stack, provider));
         }
         compound.put(TAG_EQUIPMENT, equipment);
 
@@ -300,7 +302,7 @@ public class ExpeditionLog
         final ListTag equipment = compound.getListOrEmpty(TAG_EQUIPMENT);
         for (int i = 0; i < equipment.size(); i++)
         {
-            this.equipment.add(ItemStack.parseOptional(provider, equipment.getCompound(i)));
+            this.equipment.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, equipment.getCompound(i)));
         }
 
         this.mobs.clear();

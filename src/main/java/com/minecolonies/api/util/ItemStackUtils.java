@@ -28,6 +28,8 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -708,6 +710,33 @@ public final class ItemStackUtils
     }
 
     /**
+     * 1.21.10 replacement for removed {@code ItemStack.saveOptional(Provider)}.
+     */
+    @NotNull
+    public static Tag saveOptional(@NotNull final ItemStack stack, @NotNull final HolderLookup.Provider provider)
+    {
+        return ItemStack.OPTIONAL_CODEC
+                 .encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), stack)
+                 .getOrThrow();
+    }
+
+    /**
+     * 1.21.10 replacement for removed {@code ItemStack.parseOptional(Provider, CompoundTag)}.
+     */
+    @NotNull
+    public static ItemStack parseOptional(@NotNull final HolderLookup.Provider provider, @Nullable final CompoundTag compound)
+    {
+        if (compound == null || compound.isEmpty())
+        {
+            return ItemStack.EMPTY;
+        }
+        return ItemStack.OPTIONAL_CODEC
+                 .parse(provider.createSerializationContext(NbtOps.INSTANCE), compound)
+                 .result()
+                 .orElse(ItemStack.EMPTY);
+    }
+
+    /**
      * Update method to allow for easy reading the ItemStack data from NBT.
      *
      * @param compound The compound to read from.
@@ -716,7 +745,7 @@ public final class ItemStackUtils
     @NotNull
     public static ItemStack deserializeFromNBT(@NotNull final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
     {
-        return ItemStack.parseOptional(provider, compound);
+        return parseOptional(provider, compound);
     }
 
     /**
@@ -1091,7 +1120,7 @@ public final class ItemStackUtils
         }
         catch (final Exception e)
         {
-            Log.getLogger().warn("Could not get attribute value for '{}' on item '{}'", attribute.value().getDescriptionId(), itemStack.getDescriptionId(), e);
+            Log.getLogger().warn("Could not get attribute value for '{}' on item '{}'", attribute.value().getDescriptionId(), itemStack.getItem().getDescriptionId(), e);
             return 0;
         }
     }

@@ -60,7 +60,7 @@ import static com.minecolonies.api.util.constant.CitizenConstants.CITIZEN_HEIGHT
 import static com.minecolonies.api.util.constant.CitizenConstants.CITIZEN_WIDTH;
 import static com.minecolonies.api.util.constant.Constants.*;
 
-@EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public class EntityInitializer
 {
     public static void setupEntities(RegisterEvent event)

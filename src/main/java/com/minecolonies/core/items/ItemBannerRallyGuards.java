@@ -112,7 +112,7 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
                 }
                 rallyData.withActive(true).writeToItemStack(banner);
                 final int numGuards =
-                  broadcastPlayerToRally(banner, context.getPlayer().getCommandSenderWorld(), new StaticLocation(context.getClickedPos(), context.getLevel().dimension()));
+                  broadcastPlayerToRally(banner, context.getPlayer().level(), new StaticLocation(context.getClickedPos(), context.getLevel().dimension()));
                 if (numGuards > 0)
                 {
                     MessageUtils.format(TOOL_RALLY_BANNER_ACTIVATED, numGuards).sendTo(context.getPlayer());
@@ -156,10 +156,10 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
     @Override
     public boolean onDroppedByPlayer(final ItemStack item, final Player player)
     {
-        if (!player.getCommandSenderWorld().isClientSide())
+        if (!player.level().isClientSide())
         {
             RallyData.updateItemStack(item, rally -> rally.withActive(false));
-            broadcastPlayerToRally(item, player.getCommandSenderWorld(), null);
+            broadcastPlayerToRally(item, player.level(), null);
         }
 
         return super.onDroppedByPlayer(item, player);
@@ -173,11 +173,11 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
      */
     private void handleRightClick(final ItemStack banner, final Player playerIn)
     {
-        if (playerIn.isShiftKeyDown() && !playerIn.getCommandSenderWorld().isClientSide())
+        if (playerIn.isShiftKeyDown() && !playerIn.level().isClientSide())
         {
             toggleBanner(banner, playerIn);
         }
-        else if (!playerIn.isShiftKeyDown() && playerIn.getCommandSenderWorld().isClientSide())
+        else if (!playerIn.isShiftKeyDown() && playerIn.level().isClientSide())
         {
             if (getGuardTowerLocations(banner).isEmpty())
             {
@@ -199,7 +199,7 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
      */
     public static void toggleBanner(final ItemStack banner, final Player playerIn)
     {
-        if (playerIn.getCommandSenderWorld().isClientSide())
+        if (playerIn.level().isClientSide())
         {
             Log.getLogger().error("Tried to run server-side function #toggleBanner() on the client-side!");
             return;
@@ -219,7 +219,7 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
         else if (rallyData.active())
         {
             rallyData.withActive(false).writeToItemStack(banner);
-            broadcastPlayerToRally(banner, playerIn.getCommandSenderWorld(), null);
+            broadcastPlayerToRally(banner, playerIn.level(), null);
             MessageUtils.format(TOOL_RALLY_BANNER_DEACTIVATED).sendTo(playerIn);
         }
         else
@@ -228,7 +228,7 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
            final IColony colony = getColony(banner, playerIn.level());
            if (colony != null && colony.getPermissions().hasPermission(playerIn, Action.RALLY_GUARDS))
            {
-               final int numGuards = broadcastPlayerToRally(banner, playerIn.getCommandSenderWorld(), playerIn == null ? null : new EntityLocation(playerIn.getUUID()));
+               final int numGuards = broadcastPlayerToRally(banner, playerIn.level(), playerIn == null ? null : new EntityLocation(playerIn.getUUID()));
 
                if (numGuards > 0)
                {

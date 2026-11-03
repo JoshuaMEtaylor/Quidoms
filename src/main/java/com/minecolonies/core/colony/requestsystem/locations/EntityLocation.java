@@ -101,7 +101,7 @@ public class EntityLocation implements ILocation
         }
         else
         {
-            return entityRef.getCommandSenderWorld().dimension();
+            return entityRef.level().dimension();
         }
     }
 

@@ -1,5 +1,7 @@
 package com.minecolonies.core.colony.buildings.modules;
 
+import com.minecolonies.api.util.ItemStackUtils;
+
 import com.google.common.reflect.TypeToken;
 import com.minecolonies.api.MinecoloniesAPIProxy;
 import com.minecolonies.api.colony.IColony;
@@ -236,7 +238,7 @@ public class RestaurantMenuModule extends AbstractBuildingModule implements IPer
         final ListTag minimumStockTagList = compound.getListOrEmpty(TAG_MENU);
         for (int i = 0; i < minimumStockTagList.size(); i++)
         {
-            final ItemStack itemStack = ItemStack.parseOptional(provider, minimumStockTagList.getCompound(i));
+            final ItemStack itemStack = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, minimumStockTagList.getCompound(i));
             if (FoodUtils.EDIBLE.test(itemStack))
             {
                 menu.add(new ItemStorage(itemStack));
@@ -250,7 +252,7 @@ public class RestaurantMenuModule extends AbstractBuildingModule implements IPer
         @NotNull final ListTag minimumStockTagList = new ListTag();
         for (final ItemStorage menuItem : menu)
         {
-            minimumStockTagList.add(menuItem.getItemStack().saveOptional(provider));
+            minimumStockTagList.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(menuItem.getItemStack(), provider));
         }
         compound.put(TAG_MENU, minimumStockTagList);
     }

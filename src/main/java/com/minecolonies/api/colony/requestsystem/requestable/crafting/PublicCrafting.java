@@ -57,7 +57,7 @@ public class PublicCrafting extends AbstractCrafting
     public static CompoundTag serialize(@NotNull final HolderLookup.Provider provider, final IFactoryController controller, final PublicCrafting input)
     {
         final CompoundTag compound = new CompoundTag();
-        compound.put(NBT_STACK, input.getStack().saveOptional(provider));
+        compound.put(NBT_STACK, com.minecolonies.api.util.ItemStackUtils.saveOptional(input.getStack(), provider));
         compound.putInt(NBT_COUNT, input.getCount());
         final CompoundTag tokenCompound = StandardFactoryController.getInstance().serializeTag(provider, input.getRecipeID());
         compound.put(NBT_TOKEN, tokenCompound);

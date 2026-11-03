@@ -36,6 +36,8 @@ sourceSets.main.java {
     exclude '**/datagen/**'
     exclude '**/generation/**'
     exclude '**/GatherDataHandler.java'
+    // Domum's ModBus handler is mostly data-gen wiring still on 1.21.1 APIs
+    exclude '**/domumornamentum/event/handlers/ModBusEventHandler.java'
 }
 
 sourceSets.main.resources {

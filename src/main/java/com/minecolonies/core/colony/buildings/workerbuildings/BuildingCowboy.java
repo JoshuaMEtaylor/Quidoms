@@ -120,7 +120,7 @@ public class BuildingCowboy extends AbstractBuilding
      */
     public ItemStack getMilkInputItem()
     {
-        if (getSetting(MILK_ITEM).getValue().equals(ModItems.large_milk_bottle.getDescriptionId()))
+        if (getSetting(MILK_ITEM).getValue().equals(ModItems.large_milk_bottle.getItem().getDescriptionId()))
         {
             return ModItems.large_empty_bottle.getDefaultInstance();
         }
@@ -133,7 +133,7 @@ public class BuildingCowboy extends AbstractBuilding
      */
     public ItemStack getMilkOutputItem()
     {
-        if (getSetting(MILK_ITEM).getValue().equals(ModItems.large_milk_bottle.getDescriptionId()))
+        if (getSetting(MILK_ITEM).getValue().equals(ModItems.large_milk_bottle.getItem().getDescriptionId()))
         {
             return ModItems.large_milk_bottle.getDefaultInstance();
         }

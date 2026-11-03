@@ -269,7 +269,7 @@ public final class EntityUtils
 
         if (!isLivingAtSite(entity, x, y, z, TELEPORT_RANGE))
         {
-            BlockPos spawnPoint = getSpawnPoint(entity.getCommandSenderWorld(), new BlockPos(x,y,z));
+            BlockPos spawnPoint = getSpawnPoint(entity.level(), new BlockPos(x,y,z));
 
             if (spawnPoint == null)
             {

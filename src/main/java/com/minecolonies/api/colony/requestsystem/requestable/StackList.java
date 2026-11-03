@@ -195,7 +195,7 @@ public class StackList implements IConcreteDeliverable, INonExhaustiveDeliverabl
         @NotNull final ListTag neededResTagList = new ListTag();
         for (@NotNull final ItemStack resource : input.theStacks)
         {
-            neededResTagList.add(resource.saveOptional(provider));
+            neededResTagList.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(resource, provider));
         }
         compound.put(NBT_STACK_LIST, neededResTagList);
 
@@ -205,7 +205,7 @@ public class StackList implements IConcreteDeliverable, INonExhaustiveDeliverabl
 
         if (!ItemStackUtils.isEmpty(input.result))
         {
-            compound.put(NBT_RESULT, input.result.saveOptional(provider));
+            compound.put(NBT_RESULT, com.minecolonies.api.util.ItemStackUtils.saveOptional(input.result, provider));
         }
         compound.putString(TAG_DESCRIPTION, input.description);
         compound.putInt(NBT_COUNT, input.getCount());
@@ -230,7 +230,7 @@ public class StackList implements IConcreteDeliverable, INonExhaustiveDeliverabl
         for (int i = 0; i < neededResTagList.size(); ++i)
         {
             final CompoundTag neededRes = neededResTagList.getCompound(i);
-            stacks.add(ItemStack.parseOptional(provider, neededRes));
+            stacks.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, neededRes));
         }
 
         final boolean matchMeta = compound.getBooleanOr(NBT_MATCHMETA, false);

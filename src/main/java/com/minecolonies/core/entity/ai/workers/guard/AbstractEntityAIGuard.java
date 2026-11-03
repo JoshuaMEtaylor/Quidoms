@@ -439,7 +439,7 @@ public abstract class AbstractEntityAIGuard<J extends AbstractJobGuard<J>, B ext
     {
         if (BlockPosUtil.getDistance2D(worker.blockPosition(), buildingGuards.getPositionToFollow()) > MAX_FOLLOW_DERIVATION)
         {
-            TeleportHelper.teleportCitizen(worker, worker.getCommandSenderWorld(), buildingGuards.getPositionToFollow());
+            TeleportHelper.teleportCitizen(worker, worker.level(), buildingGuards.getPositionToFollow());
             return null;
         }
 

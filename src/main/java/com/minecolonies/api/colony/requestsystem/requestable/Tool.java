@@ -78,7 +78,7 @@ public class Tool implements IDeliverable
         compound.putString(NBT_TYPE, equipment.getEquipmentType().getRegistryName().toString());
         compound.putInt(NBT_MIN_LEVEL, equipment.getMinLevel());
         compound.putInt(NBT_MAX_LEVEL, equipment.getMaxLevel());
-        compound.put(NBT_RESULT, equipment.getResult().saveOptional(provider));
+        compound.put(NBT_RESULT, com.minecolonies.api.util.ItemStackUtils.saveOptional(equipment.getResult(), provider));
 
         return compound;
     }
@@ -131,7 +131,7 @@ public class Tool implements IDeliverable
         final EquipmentTypeEntry type = ModEquipmentTypes.getRegistry().get(EquipmentTypeEntry.parseResourceLocation(resLoc));
         final Integer minLevel = nbt.getIntOr(NBT_MIN_LEVEL, 0);
         final Integer maxLevel = nbt.getIntOr(NBT_MAX_LEVEL, 0);
-        final ItemStack result = ItemStack.parseOptional(provider, nbt.getCompoundOrEmpty(NBT_RESULT));
+        final ItemStack result = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, nbt.getCompoundOrEmpty(NBT_RESULT));
 
         return new Tool(type, minLevel, maxLevel, result);
     }

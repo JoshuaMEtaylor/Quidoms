@@ -173,7 +173,7 @@ public class MinimumStockModule extends AbstractBuildingModule implements IMinim
         for (int i = 0; i < minimumStockTagList.size(); i++)
         {
             final CompoundTag compoundNBT = minimumStockTagList.getCompound(i);
-            minimumStock.put(new ItemStorage(ItemStack.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK))), compoundNBT.getIntOr(TAG_QUANTITY, 0));
+            minimumStock.put(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK))), compoundNBT.getIntOr(TAG_QUANTITY, 0));
         }
     }
 
@@ -184,7 +184,7 @@ public class MinimumStockModule extends AbstractBuildingModule implements IMinim
         for (@NotNull final Map.Entry<ItemStorage, Integer> entry : minimumStock.entrySet())
         {
             final CompoundTag compoundNBT = new CompoundTag();
-            compoundNBT.put(NbtTagConstants.STACK, entry.getKey().getItemStack().saveOptional(provider));
+            compoundNBT.put(NbtTagConstants.STACK, entry.getKey(com.minecolonies.api.util.ItemStackUtils.saveOptional().getItemStack(), provider));
             compoundNBT.putInt(TAG_QUANTITY, entry.getValue());
             minimumStockTagList.add(compoundNBT);
         }

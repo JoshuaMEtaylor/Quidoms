@@ -549,7 +549,7 @@ public class Tree
 
         if (compound.contains(TAG_SAPLING))
         {
-            tree.sapling = ItemStack.parseOptional(provider, compound.getCompoundOrEmpty(TAG_SAPLING));
+            tree.sapling = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compound.getCompoundOrEmpty(TAG_SAPLING));
         }
         else
         {
@@ -1005,7 +1005,7 @@ public class Tree
         compound.putBoolean(TAG_IS_SLIME_TREE, slimeTree);
         compound.putBoolean(TAG_DYNAMIC_TREE, dynamicTree);
 
-        compound.put(TAG_SAPLING, sapling.saveOptional(provider));
+        compound.put(TAG_SAPLING, com.minecolonies.api.util.ItemStackUtils.saveOptional(sapling, provider));
         compound.putBoolean(TAG_NETHER_TREE, netherTree);
 
         @NotNull final ListTag leavesBin = new ListTag();

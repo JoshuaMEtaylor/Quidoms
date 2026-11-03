@@ -1,5 +1,7 @@
 package com.minecolonies.core.colony.buildings.modules;
 
+import com.minecolonies.api.util.ItemStackUtils;
+
 import com.google.common.collect.ImmutableList;
 import com.minecolonies.api.colony.buildings.modules.AbstractBuildingModule;
 import com.minecolonies.api.colony.buildings.modules.IItemListModule;
@@ -77,7 +79,7 @@ public class ItemListModule extends AbstractBuildingModule implements IItemListM
         final ListTag filterableList = compound.getListOrEmpty(TAG_ITEMLIST);
         for (int i = 0; i < filterableList.size(); ++i)
         {
-            allowedItems.add(new ItemStorage(ItemStack.parseOptional(provider, filterableList.getCompound(i))));
+            allowedItems.add(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, filterableList.getCompound(i))));
         }
 
         this.itemsAllowed = ImmutableList.copyOf(allowedItems);
@@ -89,7 +91,7 @@ public class ItemListModule extends AbstractBuildingModule implements IItemListM
         @NotNull final ListTag filteredItems = new ListTag();
         for (@NotNull final ItemStorage item : itemsAllowed)
         {
-            filteredItems.add(item.getItemStack().saveOptional(provider));
+            filteredItems.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(item.getItemStack(), provider));
         }
         compound.put(TAG_ITEMLIST, filteredItems);
     }

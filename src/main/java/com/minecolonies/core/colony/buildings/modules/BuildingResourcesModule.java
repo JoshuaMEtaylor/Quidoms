@@ -220,7 +220,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             return;
         }
         final int hashCode = res.getComponentsPatch().hashCode();
-        final String key = res.getDescriptionId() + "-" + hashCode;
+        final String key = res.getItem().getDescriptionId() + "-" + hashCode;
         BuildingBuilderResource resource = this.neededResources.get(key);
         if (resource == null)
         {
@@ -272,7 +272,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     public void reduceNeededResource(final ItemStack res, final int amount)
     {
         final int hashCode = res.getComponentsPatch().hashCode();
-        final String name = res.getDescriptionId() + "-" + hashCode;
+        final String name = res.getItem().getDescriptionId() + "-" + hashCode;
 
         final BuilderBucket last = buckets.isEmpty() ? null : getRequiredResources();
 
@@ -334,7 +334,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     public boolean requiresResourceForBuilding(final ItemStack stack)
     {
         final int hashCode = stack.getComponentsPatch().hashCode();
-        return neededResources.containsKey(stack.getDescriptionId() + "-" + hashCode);
+        return neededResources.containsKey(stack.getItem().getDescriptionId() + "-" + hashCode);
     }
 
     /**

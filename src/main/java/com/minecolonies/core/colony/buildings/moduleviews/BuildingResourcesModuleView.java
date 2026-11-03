@@ -54,7 +54,7 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
             final int amountNeeded = buf.readInt();
             final BuildingBuilderResource resource = new BuildingBuilderResource(itemStack, amountNeeded, amountAvailable);
             final int hashCode = itemStack.getComponentsPatch().hashCode();
-            final String key = itemStack.getDescriptionId() + "-" + hashCode;
+            final String key = itemStack.getItem().getDescriptionId() + "-" + hashCode;
             resources.put(key, resource);
         }
 

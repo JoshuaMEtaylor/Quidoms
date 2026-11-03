@@ -190,14 +190,14 @@ public class Stack implements IConcreteDeliverable
     public static CompoundTag serialize(@NotNull final HolderLookup.Provider provider, final IFactoryController controller, final Stack input)
     {
         final CompoundTag compound = new CompoundTag();
-        compound.put(NBT_STACK, input.theStack.saveOptional(provider));
+        compound.put(NBT_STACK, com.minecolonies.api.util.ItemStackUtils.saveOptional(input.theStack, provider));
         compound.putBoolean(NBT_MATCHMETA, input.matchDamage);
         compound.putBoolean(NBT_MATCHNBT, input.matchNBT);
         compound.putBoolean(NBT_BUILDING_RES, input.canBeResolvedByBuilding);
 
         if (!ItemStackUtils.isEmpty(input.result))
         {
-            compound.put(NBT_RESULT, input.result.saveOptional(provider));
+            compound.put(NBT_RESULT, com.minecolonies.api.util.ItemStackUtils.saveOptional(input.result, provider));
         }
         compound.putInt(NBT_COUNT, input.getCount());
         compound.putInt(NBT_MINCOUNT, input.getMinimumCount());

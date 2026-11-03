@@ -64,7 +64,7 @@ public class SmeltableOre implements INonExhaustiveDeliverable
 
         if (!ItemStackUtils.isEmpty(ore.result))
         {
-            compound.put(NBT_RESULT, ore.result.saveOptional(provider));
+            compound.put(NBT_RESULT, com.minecolonies.api.util.ItemStackUtils.saveOptional(ore.result, provider));
         }
 
         return compound;

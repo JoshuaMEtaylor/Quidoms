@@ -562,7 +562,7 @@ public class InventoryCitizen implements IItemHandlerModifiable, Nameable
             {
                 final CompoundTag compoundNBT = new CompoundTag();
                 compoundNBT.putByte(NbtTagConstants.SLOT, (byte) i);
-                compoundNBT.put(NbtTagConstants.STACK, this.mainInventory.get(i).saveOptional(provider));
+                compoundNBT.put(NbtTagConstants.STACK, com.minecolonies.api.util.ItemStackUtils.saveOptional(this.mainInventory.get(i), provider));
                 invTagList.add(compoundNBT);
                 freeSlots--;
             }
@@ -576,7 +576,7 @@ public class InventoryCitizen implements IItemHandlerModifiable, Nameable
             {
                 final CompoundTag compoundNBT = new CompoundTag();
                 compoundNBT.putByte(NbtTagConstants.SLOT, (byte) i);
-                compoundNBT.put(NbtTagConstants.STACK, this.armorInventory.get(i).saveOptional(provider));
+                compoundNBT.put(NbtTagConstants.STACK, com.minecolonies.api.util.ItemStackUtils.saveOptional(this.armorInventory.get(i), provider));
                 armorTagList.add(compoundNBT);
             }
         }
@@ -604,7 +604,7 @@ public class InventoryCitizen implements IItemHandlerModifiable, Nameable
         {
             final CompoundTag compoundNBT = nbtTagList.getCompound(i);
             final int j = compoundNBT.getByteOr(NbtTagConstants.SLOT, (byte)0) & 255;
-            final ItemStack itemstack = ItemStack.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK));
+            final ItemStack itemstack = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK));
 
             if (!itemstack.isEmpty())
             {
@@ -621,7 +621,7 @@ public class InventoryCitizen implements IItemHandlerModifiable, Nameable
         {
             final CompoundTag compoundNBT = armorTagList.getCompound(i);
             final int j = compoundNBT.getByteOr(SLOT, (byte)0) & 255;
-            final ItemStack itemstack = ItemStack.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK));
+            final ItemStack itemstack = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK));
 
             if (!itemstack.isEmpty())
             {

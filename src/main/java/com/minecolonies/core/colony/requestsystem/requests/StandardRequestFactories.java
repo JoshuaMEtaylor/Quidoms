@@ -1,5 +1,7 @@
 package com.minecolonies.core.colony.requestsystem.requests;
 
+import com.minecolonies.api.util.ItemStackUtils;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import com.minecolonies.api.colony.requestsystem.factory.IFactoryController;
@@ -1115,7 +1117,7 @@ public final class StandardRequestFactories
         compound.put(NBT_CHILDREN, childrenCompound);
 
         final ListTag deliveriesList = new ListTag();
-        request.getDeliveries().forEach(itemStack -> deliveriesList.add(itemStack.saveOptional(provider)));
+        request.getDeliveries().forEach(itemStack -> deliveriesList.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(itemStack, provider)));
 
         compound.put(NBT_DELIVERIES, deliveriesList);
 
@@ -1193,7 +1195,7 @@ public final class StandardRequestFactories
         {
             final ImmutableList.Builder<ItemStack> stackBuilder = ImmutableList.builder();
             final ListTag deliveriesList = compound.getListOrEmpty(NBT_DELIVERIES);
-            NBTUtils.streamCompound(deliveriesList).forEach(itemStackCompound -> stackBuilder.add(ItemStack.parseOptional(provider, itemStackCompound)));
+            NBTUtils.streamCompound(deliveriesList).forEach(itemStackCompound -> stackBuilder.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, itemStackCompound)));
 
             request.overrideCurrentDeliveries(stackBuilder.build());
         }

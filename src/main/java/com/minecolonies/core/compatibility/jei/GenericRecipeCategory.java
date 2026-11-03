@@ -312,7 +312,7 @@ public class GenericRecipeCategory extends JobBasedRecipeCategory<IGenericRecipe
             }
             catch (final Throwable e)
             {
-                Log.getLogger().error("Error drawing {}", entityType.getDescriptionId(), e);
+                Log.getLogger().error("Error drawing {}", entityType.getItem().getDescriptionId(), e);
             }
         }
     }
