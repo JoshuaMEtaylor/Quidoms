@@ -6,6 +6,8 @@ import com.minecolonies.api.util.EntityUtils;
 import com.minecolonies.api.util.LookHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -77,13 +79,13 @@ public class SittingEntity extends Entity
     }
 
     @Override
-    protected void readAdditionalSaveData(final CompoundTag compound)
+    protected void readAdditionalSaveData(final ValueInput compound)
     {
 
     }
 
     @Override
-    protected void addAdditionalSaveData(final CompoundTag compound)
+    protected void addAdditionalSaveData(final ValueOutput compound)
     {
 
     }

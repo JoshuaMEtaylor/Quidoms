@@ -39,7 +39,7 @@ public class FurnaceRecipes implements IFurnaceRecipes
             final NonNullList<Ingredient> list = recipe.getIngredients();
             if (list.size() == 1)
             {
-                for(final ItemStack smeltable: list.get(0).getItems())
+                for(final ItemStack smeltable: com.minecolonies.api.util.IngredientCompat.getItems(list.get(0)))
                 {
                     if (!smeltable.isEmpty())
                     {

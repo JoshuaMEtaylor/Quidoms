@@ -1030,7 +1030,7 @@ public final class ItemStackUtils
             return Component.empty();
         }
 
-        final ItemStack[] items = ingredient.getItems();
+        final ItemStack[] items = com.minecolonies.api.util.IngredientCompat.getItems(ingredient);
         final Optional<TagKey<Item>> tag = getTagEquivalent(items);
 
         return Component.translatable("%sx %s", ingredient.count(), tag.map(t ->

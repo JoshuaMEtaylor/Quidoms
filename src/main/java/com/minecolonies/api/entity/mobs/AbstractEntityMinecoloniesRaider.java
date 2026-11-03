@@ -15,6 +15,8 @@ import com.minecolonies.core.entity.pathfinding.navigation.AbstractAdvancedPathN
 import com.minecolonies.core.entity.pathfinding.navigation.PathingStuckHandler;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -218,7 +220,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundTag compound)
+    public void addAdditionalSaveData(final ValueOutput compound)
     {
         compound.putLong(TAG_TIME, worldTimeAtSpawn);
         compound.putInt(TAG_COLONY_ID, this.colony == null ? 0 : colony.getID());
@@ -237,11 +239,11 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundTag compound)
+    public void readAdditionalSaveData(final ValueInput compound)
     {
         worldTimeAtSpawn = compound.getLongOr(TAG_TIME, 0L);
         eventID = compound.getIntOr(TAG_EVENT_ID, 0);
-        if (compound.contains(TAG_COLONY_ID))
+        if (compound.keySet().contains(TAG_COLONY_ID))
         {
             final int colonyId = compound.getIntOr(TAG_COLONY_ID, 0);
             if (colonyId != 0)

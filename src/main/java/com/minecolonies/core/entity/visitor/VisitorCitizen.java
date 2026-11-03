@@ -31,6 +31,8 @@ import com.minecolonies.core.network.messages.server.colony.OpenInventoryMessage
 import com.minecolonies.core.util.citizenutils.CitizenItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
@@ -533,7 +535,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundTag compound)
+    public void addAdditionalSaveData(final ValueOutput compound)
     {
         super.addAdditionalSaveData(compound);
 
@@ -545,14 +547,14 @@ public class VisitorCitizen extends AbstractEntityCitizen
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundTag compound)
+    public void readAdditionalSaveData(final ValueInput compound)
     {
         super.readAdditionalSaveData(compound);
 
-        if (compound.contains(TAG_COLONY_ID))
+        if (compound.keySet().contains(TAG_COLONY_ID))
         {
             citizenColonyHandler.setColonyId(compound.getIntOr(TAG_COLONY_ID, 0));
-            if (compound.contains(TAG_CITIZEN))
+            if (compound.keySet().contains(TAG_CITIZEN))
             {
                 citizenId = compound.getIntOr(TAG_CITIZEN, 0);
             }

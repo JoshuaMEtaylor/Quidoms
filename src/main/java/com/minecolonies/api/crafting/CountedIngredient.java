@@ -80,10 +80,8 @@ public record CountedIngredient(@NotNull Ingredient child, int count) implements
 
     @NotNull
     @Override
-    public Stream<ItemStack> getItems()
+    public Stream<net.minecraft.core.Holder<net.minecraft.world.item.Item>> items()
     {
-        return Arrays.stream(child.getItems())
-                .map(ItemStack::copy)
-                .peek(s -> s.setCount(this.count));
+        return child.items();
     }
 }

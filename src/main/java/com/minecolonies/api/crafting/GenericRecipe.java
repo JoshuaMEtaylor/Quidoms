@@ -343,7 +343,7 @@ public class GenericRecipe implements IGenericRecipe
 
         final Recipe<?> recipe = holder.value();
         final List<List<ItemStack>> inputs = compactInputs(recipe.getIngredients().stream()
-                .map(ingredient -> Arrays.asList(ingredient.getItems()))
+                .map(ingredient -> Arrays.asList(com.minecolonies.api.util.IngredientCompat.getItems(ingredient)))
                 .toList());
 
         final Builder builder = builder()

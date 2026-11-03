@@ -88,11 +88,11 @@ public record FoodIngredient(@NotNull Optional<Integer> minHealing,
 
     @NotNull
     @Override
-    public Stream<ItemStack> getItems()
+    public Stream<net.minecraft.core.Holder<net.minecraft.world.item.Item>> items()
     {
-        return BuiltInRegistries.ITEM.stream()
-                .map(ItemStack::new)
-                .filter(this::test);
+        return BuiltInRegistries.ITEM.listElements()
+                .map(h -> (net.minecraft.core.Holder<net.minecraft.world.item.Item>) h)
+                .filter(h -> test(new ItemStack(h)));
     }
 
     @Override

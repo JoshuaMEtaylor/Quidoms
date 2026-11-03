@@ -415,7 +415,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
             }
             for (final Ingredient ingredient : recipe.get().value().getIngredients())
             {
-                final ItemStack[] inputs = ingredient.getItems();
+                final ItemStack[] inputs = com.minecolonies.api.util.IngredientCompat.getItems(ingredient);
                 if (inputs.length >= 1)
                 {
                     final ItemStorage input = new ItemStorage(inputs[0]);

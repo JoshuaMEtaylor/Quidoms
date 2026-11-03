@@ -107,7 +107,7 @@ public final class IngredientBomExpand
             final List<Map.Entry<String, Integer>> inputs = new ArrayList<>();
             for (final Ingredient ingredient : crafting.getIngredients())
             {
-                final ItemStack[] stacks = ingredient.getItems();
+                final ItemStack[] stacks = com.minecolonies.api.util.IngredientCompat.getItems(ingredient);
                 if (stacks.length == 0 || stacks[0].isEmpty() || stacks[0].getItem() == Items.AIR)
                 {
                     continue;

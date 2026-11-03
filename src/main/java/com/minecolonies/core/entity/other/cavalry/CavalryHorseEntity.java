@@ -37,6 +37,8 @@ import com.minecolonies.core.entity.pathfinding.navigation.MinecoloniesAdvancedP
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -903,7 +905,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
      * stableDim: The dimension of the stable block, or null if not set.
      */
     @Override
-    public void addAdditionalSaveData(@Nonnull CompoundTag tag)
+    public void addAdditionalSaveData(@Nonnull ValueOutput tag)
     {
         super.addAdditionalSaveData(tag);
 
@@ -927,16 +929,16 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
      * Other persisted data is managed through the associated IAnimalData.
      */
     @Override
-    public void readAdditionalSaveData(@Nonnull CompoundTag tag)
+    public void readAdditionalSaveData(@Nonnull ValueInput tag)
     {
         super.readAdditionalSaveData(tag);
 
-        if (tag.contains(NbtTagConstants.TAG_COLONY_ID))
+        if (tag.keySet().contains(NbtTagConstants.TAG_COLONY_ID))
         {
             int colonyId = tag.getIntOr(NbtTagConstants.TAG_COLONY_ID, 0);
             setColonyId(colonyId);
 
-            if (tag.contains(NbtTagConstants.TAG_MANAGED_ANIMALID))
+            if (tag.keySet().contains(NbtTagConstants.TAG_MANAGED_ANIMALID))
             {
                 setManagedAnimalId(tag.getIntOr(NbtTagConstants.TAG_MANAGED_ANIMALID, 0));
             }
