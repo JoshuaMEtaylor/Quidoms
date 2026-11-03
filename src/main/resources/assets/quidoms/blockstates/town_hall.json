@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "quidoms:block/town_hall" }
+  }
+}
