@@ -49,7 +49,7 @@ public class ItemSugaryBread extends ItemFood
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving) {
 
-        if (!worldIn.isClientSide)
+        if (!worldIn.isClientSide())
         {
             entityLiving.removeEffect(MobEffects.POISON);
         }

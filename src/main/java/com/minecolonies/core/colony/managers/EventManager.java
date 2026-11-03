@@ -223,12 +223,12 @@ public class EventManager implements IEventManager
     {
         if (compound.contains(TAG_EVENT_MANAGER))
         {
-            final CompoundTag eventManagerNBT = compound.getCompound(TAG_EVENT_MANAGER);
-            final ListTag eventListNBT = eventManagerNBT.getList(TAG_EVENT_LIST, Tag.TAG_COMPOUND);
+            final CompoundTag eventManagerNBT = compound.getCompoundOrEmpty(TAG_EVENT_MANAGER);
+            final ListTag eventListNBT = eventManagerNBT.getListOrEmpty(TAG_EVENT_LIST);
             for (final Tag base : eventListNBT)
             {
                 final CompoundTag tagCompound = (CompoundTag) base;
-                final ResourceLocation eventTypeID = new ResourceLocation(MOD_ID, tagCompound.getString(TAG_NAME));
+                final ResourceLocation eventTypeID = new ResourceLocation(MOD_ID, tagCompound.getStringOr(TAG_NAME, ""));
 
                 final ColonyEventTypeRegistryEntry registryEntry = MinecoloniesAPIProxy.getInstance().getColonyEventRegistry().get(eventTypeID);
                 if (registryEntry == null)
@@ -241,7 +241,7 @@ public class EventManager implements IEventManager
                 events.put(colonyEvent.getID(), colonyEvent);
             }
 
-            currentEventID = eventManagerNBT.getInt(TAG_EVENT_ID);
+            currentEventID = eventManagerNBT.getIntOr(TAG_EVENT_ID, 0);
             structureManager.readFromNBT(compound);
         }
     }

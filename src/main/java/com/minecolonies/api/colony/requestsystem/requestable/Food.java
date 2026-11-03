@@ -110,19 +110,19 @@ public class Food implements IDeliverable
      */
     public static Food deserialize(@NotNull final HolderLookup.Provider provider, final IFactoryController controller, final CompoundTag compound)
     {
-        final int count = compound.getInt(NBT_COUNT);
-        final ItemStack result = compound.contains(NBT_RESULT) ? ItemStackUtils.deserializeFromNBT(compound.getCompound(NBT_RESULT), provider) : ItemStackUtils.EMPTY;
+        final int count = compound.getIntOr(NBT_COUNT, 0);
+        final ItemStack result = compound.contains(NBT_RESULT) ? ItemStackUtils.deserializeFromNBT(compound.getCompoundOrEmpty(NBT_RESULT), provider) : ItemStackUtils.EMPTY;
         final List<ItemStorage> items = new ArrayList<>();
 
         if (compound.contains(NBT_EXCLUSION))
         {
-            final ListTag filterableItems = compound.getList(NBT_EXCLUSION, Tag.TAG_COMPOUND);
+            final ListTag filterableItems = compound.getListOrEmpty(NBT_EXCLUSION);
             for (int i = 0; i < filterableItems.size(); ++i)
             {
                 items.add(new ItemStorage(ItemStack.parseOptional(provider, filterableItems.getCompound(i))));
             }
         }
-        final int minNutrition = compound.getInt(NBT_MIN_NUTRITION);
+        final int minNutrition = compound.getIntOr(NBT_MIN_NUTRITION, 0);
         return new Food(count, result, items, minNutrition);
     }
 

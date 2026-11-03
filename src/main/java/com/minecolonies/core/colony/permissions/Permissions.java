@@ -328,13 +328,13 @@ public class Permissions implements IPermissions
      */
     public void loadPermissions(@NotNull final CompoundTag compound)
     {
-        final int version = compound.getInt(TAG_VERSION);
+        final int version = compound.getIntOr(TAG_VERSION, 0);
         // Ranks
         if (compound.contains(TAG_RANKS))
         {
             ranks.clear();
 
-            final ListTag rankTagList = compound.getList(TAG_RANKS, Tag.TAG_COMPOUND);
+            final ListTag rankTagList = compound.getListOrEmpty(TAG_RANKS);
             for (int i = 0; i < rankTagList.size(); ++i)
             {
                 final CompoundTag rankCompound = rankTagList.getCompound(i);
@@ -349,7 +349,7 @@ public class Permissions implements IPermissions
                 upgradePermissions(version, rank);
             }
 
-            final ListTag permissionsTagList = compound.getList(TAG_PERMISSIONS, Tag.TAG_COMPOUND);
+            final ListTag permissionsTagList = compound.getListOrEmpty(TAG_PERMISSIONS);
             for (int i = 0; i < permissionsTagList.size(); ++i)
             {
                 final CompoundTag permissionsCompound = permissionsTagList.getCompound(i);
@@ -360,7 +360,7 @@ public class Permissions implements IPermissions
                     continue;
                 }
 
-                final ListTag flagsTagList = permissionsCompound.getList(TAG_FLAGS, Tag.TAG_STRING);
+                final ListTag flagsTagList = permissionsCompound.getListOrEmpty(TAG_FLAGS);
 
                 for (int j = 0; j < flagsTagList.size(); ++j)
                 {
@@ -383,7 +383,7 @@ public class Permissions implements IPermissions
 
         players.clear();
         //  Owners
-        final ListTag ownerTagList = compound.getList(TAG_OWNERS, Tag.TAG_COMPOUND);
+        final ListTag ownerTagList = compound.getListOrEmpty(TAG_OWNERS);
         for (int i = 0; i < ownerTagList.size(); ++i)
         {
             final CompoundTag ownerCompound = ownerTagList.getCompound(i);
@@ -418,13 +418,13 @@ public class Permissions implements IPermissions
 
         if (compound.contains(TAG_OWNER))
         {
-            ownerName = compound.getString(TAG_OWNER);
+            ownerName = compound.getStringOr(TAG_OWNER, "");
         }
         if (compound.contains(TAG_OWNER_ID))
         {
             try
             {
-                ownerUUID = UUID.fromString(compound.getString(TAG_OWNER_ID));
+                ownerUUID = UUID.fromString(compound.getStringOr(TAG_OWNER_ID, ""));
             }
             catch (final IllegalArgumentException e)
             {
@@ -436,7 +436,7 @@ public class Permissions implements IPermissions
 
         if (compound.contains(TAG_FULLY_ABANDONED))
         {
-            fullyAbandoned = compound.getBoolean(TAG_FULLY_ABANDONED);
+            fullyAbandoned = compound.getBooleanOr(TAG_FULLY_ABANDONED, false);
         }
         else
         {

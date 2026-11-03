@@ -70,11 +70,11 @@ public class ItemListModule extends AbstractBuildingModule implements IItemListM
     {
         if (compound.contains(id))
         {
-            compound = compound.getCompound(id);
+            compound = compound.getCompoundOrEmpty(id);
         }
 
         final List<ItemStorage> allowedItems = new ArrayList<>();
-        final ListTag filterableList = compound.getList(TAG_ITEMLIST, Tag.TAG_COMPOUND);
+        final ListTag filterableList = compound.getListOrEmpty(TAG_ITEMLIST);
         for (int i = 0; i < filterableList.size(); ++i)
         {
             allowedItems.add(new ItemStorage(ItemStack.parseOptional(provider, filterableList.getCompound(i))));

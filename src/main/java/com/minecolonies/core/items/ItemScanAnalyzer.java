@@ -102,7 +102,7 @@ public class ItemScanAnalyzer extends AbstractItemWithPosSelector
     @Override
     public InteractionResult onAirRightClick(final BlockPos start, final BlockPos end, final Level worldIn, final Player playerIn, final ItemStack itemStack)
     {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             if (start != null && end != null && (!lastPos.equals(start) || !lastPos2.equals(end)))
             {

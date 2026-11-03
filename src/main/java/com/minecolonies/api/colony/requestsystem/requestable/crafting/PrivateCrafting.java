@@ -65,13 +65,13 @@ public class PrivateCrafting extends AbstractCrafting
      */
     public static PrivateCrafting deserialize(@NotNull final HolderLookup.Provider provider, final IFactoryController controller, final CompoundTag compound)
     {
-        final ItemStack stack = ItemStackUtils.deserializeFromNBT(compound.getCompound(NBT_STACK), provider);
-        final int count = compound.getInt(NBT_COUNT);
-        final int minCount = compound.getInt(NBT_MIN_COUNT);
+        final ItemStack stack = ItemStackUtils.deserializeFromNBT(compound.getCompoundOrEmpty(NBT_STACK), provider);
+        final int count = compound.getIntOr(NBT_COUNT, 0);
+        final int minCount = compound.getIntOr(NBT_MIN_COUNT, 0);
         IToken<?> token = null;
         if (compound.contains(NBT_TOKEN))
         {
-            token = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompound(NBT_TOKEN));
+            token = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompoundOrEmpty(NBT_TOKEN));
         }
         else
         {

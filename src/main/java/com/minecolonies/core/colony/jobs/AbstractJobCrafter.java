@@ -131,7 +131,7 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
 
         if (compound.contains(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE))
         {
-            rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompound(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE));
+            rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompoundOrEmpty(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE));
         }
         else
         {
@@ -140,17 +140,17 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
 
         if (compound.contains(NbtTagConstants.TAG_PROGRESS))
         {
-            this.progress = compound.getInt(NbtTagConstants.TAG_PROGRESS);
+            this.progress = compound.getIntOr(NbtTagConstants.TAG_PROGRESS, 0);
         }
 
         if (compound.contains(NbtTagConstants.TAG_MAX_COUNTER))
         {
-            this.progress = compound.getInt(NbtTagConstants.TAG_MAX_COUNTER);
+            this.progress = compound.getIntOr(NbtTagConstants.TAG_MAX_COUNTER, 0);
         }
 
         if (compound.contains(NbtTagConstants.TAG_CRAFT_COUNTER))
         {
-            this.progress = compound.getInt(NbtTagConstants.TAG_CRAFT_COUNTER);
+            this.progress = compound.getIntOr(NbtTagConstants.TAG_CRAFT_COUNTER, 0);
         }
 
         if (compound.contains(NbtTagConstants.TAG_SECONDARY_OUTPUTS))

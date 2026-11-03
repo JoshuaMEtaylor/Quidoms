@@ -237,13 +237,13 @@ public abstract class AbstractCraftingBuildingModule extends AbstractBuildingMod
     {
         if (compound.contains(getId()))
         {
-            compound = compound.getCompound(getId());
+            compound = compound.getCompoundOrEmpty(getId());
         }
 
         ListTag recipesTags = new ListTag();
         if (compound.contains(TAG_RECIPES))
         {
-            recipesTags = compound.getList(TAG_RECIPES, Tag.TAG_COMPOUND);
+            recipesTags = compound.getListOrEmpty(TAG_RECIPES);
         }
 
         for (int i = 0; i < recipesTags.size(); i++)
@@ -258,10 +258,10 @@ public abstract class AbstractCraftingBuildingModule extends AbstractBuildingMod
 
         if (compound.contains(TAG_DISABLED_RECIPES))
         {
-            final ListTag disabledRecipeTag = compound.getList(TAG_DISABLED_RECIPES, Tag.TAG_COMPOUND);
+            final ListTag disabledRecipeTag = compound.getListOrEmpty(TAG_DISABLED_RECIPES);
             for (int i = 0; i < disabledRecipeTag.size(); i++)
             {
-                final IToken<?> token = StandardFactoryController.getInstance().deserializeTag(provider, disabledRecipeTag.getCompound(i));
+                final IToken<?> token = StandardFactoryController.getInstance().deserializeTag(provider, disabledRecipeTag.getCompoundOrEmpty(i));
                 if (!disabledRecipes.contains(token))
                 {
                     disabledRecipes.add(token);

@@ -100,7 +100,7 @@ public class GraveyardManagementModule extends AbstractBuildingModule implements
         if (compound.contains(TAG_GRAVE_DATA))
         {
             lastGraveData = new GraveData();
-            lastGraveData.read(compound.getCompound(TAG_GRAVE_DATA));
+            lastGraveData.read(compound.getCompoundOrEmpty(TAG_GRAVE_DATA));
         }
         else lastGraveData = null;
 
@@ -191,7 +191,7 @@ public class GraveyardManagementModule extends AbstractBuildingModule implements
     private void readGravePositions(final CompoundTag compound)
     {
         gravePositions.clear();
-        final ListTag visualGraveTagList = compound.getList(TAG_VISUAL_GRAVES, Tag.TAG_COMPOUND);
+        final ListTag visualGraveTagList = compound.getListOrEmpty(TAG_VISUAL_GRAVES);
         for (int i = 0; i < visualGraveTagList.size(); ++i)
         {
             final CompoundTag graveCompound = visualGraveTagList.getCompound(i);

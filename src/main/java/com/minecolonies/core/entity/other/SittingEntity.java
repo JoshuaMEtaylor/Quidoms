@@ -104,7 +104,7 @@ public class SittingEntity extends Entity
     @Override
     public void tick()
     {
-        if (this.level().isClientSide)
+        if (this.level().isClientSide())
         {
             return;
         }
@@ -126,7 +126,7 @@ public class SittingEntity extends Entity
     protected void addPassenger(Entity passenger)
     {
         super.addPassenger(passenger);
-        if (this.level().isClientSide)
+        if (this.level().isClientSide())
         {
             return;
         }
@@ -138,7 +138,7 @@ public class SittingEntity extends Entity
     protected void removePassenger(Entity passenger)
     {
         super.removePassenger(passenger);
-        if (this.level().isClientSide)
+        if (this.level().isClientSide())
         {
             return;
         }

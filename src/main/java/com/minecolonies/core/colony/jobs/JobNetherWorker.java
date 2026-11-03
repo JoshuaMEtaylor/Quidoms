@@ -99,7 +99,7 @@ public class JobNetherWorker extends AbstractJobCrafter<EntityAIWorkNether, JobN
 
         if (compound.contains(TAG_IN_NETHER))
         {
-            citizenInNether = compound.getBoolean(TAG_IN_NETHER);
+            citizenInNether = compound.getBooleanOr(TAG_IN_NETHER, false);
         }
     }
 

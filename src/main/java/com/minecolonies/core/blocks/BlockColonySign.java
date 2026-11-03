@@ -88,7 +88,7 @@ public class BlockColonySign extends AbstractBlockMinecolonies<BlockColonySign> 
     @Override
     public void setPlacedBy(@NotNull final Level worldIn, @NotNull final BlockPos pos, final BlockState state, final LivingEntity placer, final ItemStack stack)
     {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             super.setPlacedBy(worldIn, pos, state, placer, stack);
             return;
@@ -118,7 +118,7 @@ public class BlockColonySign extends AbstractBlockMinecolonies<BlockColonySign> 
     public void onRemove(final BlockState currentState, final Level level, final BlockPos pos, final BlockState p_60518_, final boolean p_60519_)
     {
         BlockEntity tileEntity = level.getBlockEntity(pos);
-        if (!level.isClientSide && tileEntity instanceof TileEntityColonySign tileEntityColonySign)
+        if (!level.isClientSide() && tileEntity instanceof TileEntityColonySign tileEntityColonySign)
         {
             final IColony colony = IColonyManager.getInstance().getColonyByDimension(tileEntityColonySign.getColonyId(), level.dimension());
             if (colony != null)

@@ -70,7 +70,7 @@ public class GraveManager implements IGraveManager
     public void read(@NotNull final CompoundTag compound)
     {
         graves.clear();
-        final ListTag gravesTagList = compound.getList(TAG_GRAVE, Tag.TAG_COMPOUND);
+        final ListTag gravesTagList = compound.getListOrEmpty(TAG_GRAVE);
         for (int i = 0; i < gravesTagList.size(); ++i)
         {
             final CompoundTag graveCompound = gravesTagList.getCompound(i);

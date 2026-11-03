@@ -96,7 +96,7 @@ public class ClientEventHandler
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onwWorldTick(@NotNull final LevelTickEvent.Pre event)
     {
-        if (event.getLevel().isClientSide && ColonyConstants.rand.nextInt(20) == 0)
+        if (event.getLevel().isClientSide() && ColonyConstants.rand.nextInt(20) == 0)
         {
             WorldEventContext.INSTANCE.checkNearbyColony(event.getLevel());
         }

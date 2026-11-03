@@ -128,7 +128,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         final double spawnDistance = Math.sqrt(BlockPosUtil.getDistanceSquared2D(townHall, world.getSharedSpawnPos()));
         if (spawnDistance < MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.get())
         {
-            if (!world.isClientSide)
+            if (!world.isClientSide())
             {
                 MessageUtils.format(CANT_PLACE_COLONY_TOO_CLOSE_TO_SPAWN, MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.get() - spawnDistance).sendTo(sender);
             }
@@ -136,7 +136,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         }
         else if (spawnDistance > MineColonies.getConfig().getServer().maxDistanceFromWorldSpawn.get())
         {
-            if (!world.isClientSide)
+            if (!world.isClientSide())
             {
                 MessageUtils.format(CANT_PLACE_COLONY_TOO_FAR_FROM_SPAWN, spawnDistance - MineColonies.getConfig().getServer().maxDistanceFromWorldSpawn.get()).sendTo(sender);
             }

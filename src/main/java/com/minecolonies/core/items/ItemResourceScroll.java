@@ -209,7 +209,7 @@ public class ItemResourceScroll extends AbstractItemMinecolonies
 
         final BlockEntity entity = ctx.getLevel().getBlockEntity(ctx.getClickedPos());
 
-        if (ctx.getLevel().isClientSide)
+        if (ctx.getLevel().isClientSide())
         {
             if (entity instanceof AbstractTileEntityColonyBuilding buildingEntity)
             {
@@ -262,7 +262,7 @@ public class ItemResourceScroll extends AbstractItemMinecolonies
     {
         final ItemStack resourceScroll = playerIn.getItemInHand(hand);
 
-        if (!worldIn.isClientSide)
+        if (!worldIn.isClientSide())
         {
             return InteractionResult.SUCCESS;
         }

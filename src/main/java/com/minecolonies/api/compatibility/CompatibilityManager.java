@@ -567,7 +567,7 @@ public class CompatibilityManager implements ICompatibilityManager
     @Override
     public void read(@NotNull final HolderLookup.Provider provider, @NotNull final CompoundTag compound)
     {
-        NBTUtils.streamCompound(compound.getList(TAG_SAP_LEAF, Tag.TAG_COMPOUND))
+        NBTUtils.streamCompound(compound.getListOrEmpty(TAG_SAP_LEAF))
           .map(nbt -> CompatibilityManager.readLeafSaplingEntryFromNBT(provider, nbt))
           .filter(key -> !key.getA().isAir() && !leavesToSaplingMap.containsKey(key.getA().getBlock()) && !leavesToSaplingMap.containsValue(key.getB()))
           .forEach(key -> leavesToSaplingMap.put(key.getA().getBlock(), key.getB()));
@@ -818,7 +818,7 @@ public class CompatibilityManager implements ICompatibilityManager
 
     private static Tuple<BlockState, ItemStorage> readLeafSaplingEntryFromNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        return new Tuple<>(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compound), new ItemStorage(ItemStack.parseOptional(provider, compound.getCompound(NbtTagConstants.STACK)), false, true));
+        return new Tuple<>(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compound), new ItemStorage(ItemStack.parseOptional(provider, compound.getCompoundOrEmpty(NbtTagConstants.STACK)), false, true));
     }
 
     /**

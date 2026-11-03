@@ -156,7 +156,7 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
     public RecipeStorage deserialize(@NotNull final HolderLookup.Provider provider, @NotNull final IFactoryController controller, @NotNull final CompoundTag nbt)
     {
         final List<ItemStorage> input = new ArrayList<>();
-        final ListTag inputTagList = nbt.getList(INPUT_TAG, Tag.TAG_COMPOUND);
+        final ListTag inputTagList = nbt.getListOrEmpty(INPUT_TAG);
         for (int i = 0; i < inputTagList.size(); ++i)
         {
             final CompoundTag inputTag = inputTagList.getCompound(i);
@@ -166,23 +166,23 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
             }
             else
             {
-                final ItemStorage newItem = new ItemStorage(ItemStack.parseOptional(provider, inputTag.getCompound(NbtTagConstants.STACK)));
+                final ItemStorage newItem = new ItemStorage(ItemStack.parseOptional(provider, inputTag.getCompoundOrEmpty(NbtTagConstants.STACK)));
                 input.add(newItem);
             }
         }
 
-        final ItemStack primaryOutput = ItemStack.parseOptional(provider, nbt.getCompound(NbtTagConstants.STACK));
+        final ItemStack primaryOutput = ItemStack.parseOptional(provider, nbt.getCompoundOrEmpty(NbtTagConstants.STACK));
 
-        final Block intermediate = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), nbt.getCompound(BLOCK_TAG)).getBlock();
+        final Block intermediate = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), nbt.getCompoundOrEmpty(BLOCK_TAG)).getBlock();
 
-        final int gridSize = nbt.getInt(TAG_GRID);
-        final IToken<?> token = StandardFactoryController.getInstance().deserializeTag(provider, nbt.getCompound(TAG_TOKEN));
+        final int gridSize = nbt.getIntOr(TAG_GRID, 0);
+        final IToken<?> token = StandardFactoryController.getInstance().deserializeTag(provider, nbt.getCompoundOrEmpty(TAG_TOKEN));
 
-        final ResourceLocation source = nbt.contains(SOURCE_TAG) ? ResourceLocation.parse(nbt.getString(SOURCE_TAG)) : null;
+        final ResourceLocation source = nbt.contains(SOURCE_TAG) ? ResourceLocation.parse(nbt.getStringOr(SOURCE_TAG, "")) : null;
 
-        final ResourceLocation type = nbt.contains(TYPE_TAG) ? ResourceLocation.parse(nbt.getString(TYPE_TAG).toLowerCase()): ModRecipeTypes.CLASSIC_ID;
+        final ResourceLocation type = nbt.contains(TYPE_TAG) ? ResourceLocation.parse(nbt.getStringOr(TYPE_TAG, "").toLowerCase()): ModRecipeTypes.CLASSIC_ID;
 
-        final ListTag altOutputTagList = nbt.getList(ALTOUTPUT_TAG, Tag.TAG_COMPOUND);
+        final ListTag altOutputTagList = nbt.getListOrEmpty(ALTOUTPUT_TAG);
 
         final List<ItemStack> altOutputs = new ArrayList<>();
         for (int i = 0; i < altOutputTagList.size(); ++i)
@@ -191,7 +191,7 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
             altOutputs.add(ItemStack.parseOptional(provider, altOutputTag));
         }
 
-        final ListTag secOutputTagList = nbt.getList(SECOUTPUT_TAG, Tag.TAG_COMPOUND);
+        final ListTag secOutputTagList = nbt.getListOrEmpty(SECOUTPUT_TAG);
 
         final List<ItemStack> secOutputs = new ArrayList<>();
         for (int i = 0; i < secOutputTagList.size(); ++i)
@@ -200,8 +200,8 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
             secOutputs.add(ItemStack.parseOptional(provider, secOutputTag));
         }
 
-        final ResourceKey<LootTable> lootTable = nbt.contains(LOOT_TAG) ? ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(nbt.getString(LOOT_TAG))) : null;
-        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().get(EquipmentTypeEntry.parseResourceLocation(nbt.getString(TOOL_TAG)));
+        final ResourceKey<LootTable> lootTable = nbt.contains(LOOT_TAG) ? ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(nbt.getStringOr(LOOT_TAG, ""))) : null;
+        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().get(EquipmentTypeEntry.parseResourceLocation(nbt.getStringOr(TOOL_TAG, "")));
 
         return RecipeStorage.builder()
                 .withToken(token)

@@ -217,7 +217,7 @@ public abstract class AbstractBuildingGuards extends AbstractBuilding implements
     {
         super.deserializeNBT(provider, compound);
 
-        final ListTag wayPointTagList = compound.getList(NBT_PATROL_TARGETS, Tag.TAG_COMPOUND);
+        final ListTag wayPointTagList = compound.getListOrEmpty(NBT_PATROL_TARGETS);
         for (int i = 0; i < wayPointTagList.size(); ++i)
         {
             final CompoundTag blockAtPos = wayPointTagList.getCompound(i);

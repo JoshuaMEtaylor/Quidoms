@@ -207,7 +207,7 @@ public class ContainerCrafting extends AbstractContainerMenu
     @Override
     public void slotsChanged(final Container inventoryIn)
     {
-        if (!world.isClientSide)
+        if (!world.isClientSide())
         {
             final ServerPlayer player = (ServerPlayer) inv.player;
             final List<RecipeHolder<CraftingRecipe>> recipes = player.server.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), world)

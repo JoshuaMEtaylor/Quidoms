@@ -234,7 +234,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
         int colonyId = getColonyId();
 
         // if the entity is summoned into the world with an ops command rather than created by the stablemaster, this "autoregisters" the entity as a managed animal to the closest colony.
-        if (colonyId == 0 && !CompatibilityUtils.getWorldFromEntity(this).isClientSide)
+        if (colonyId == 0 && !CompatibilityUtils.getWorldFromEntity(this).isClientSide())
         {
             IColony colony = IColonyManager.getInstance().getClosestColony(level(), this.blockPosition());
 
@@ -252,7 +252,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
             setColonyId(colonyId);
         }
 
-        if (CompatibilityUtils.getWorldFromEntity(this).isClientSide)
+        if (CompatibilityUtils.getWorldFromEntity(this).isClientSide())
         {
             animalColonyHandler.updateColonyClient();
 
@@ -517,7 +517,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
     {
         super.tick();
 
-        if (level().isClientSide) return;
+        if (level().isClientSide()) return;
 
         if (hasReservation())
         {
@@ -664,7 +664,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
      */
     public static CavalryHorseEntity createFromVanilla(IColony colony, Level level, AbstractHorse vanilla)
     {
-        if (level.isClientSide) return null;
+        if (level.isClientSide()) return null;
 
         // If already a CavalryHorseEntity, return it
         if (vanilla instanceof CavalryHorseEntity) return (CavalryHorseEntity) vanilla;
@@ -855,7 +855,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
     public boolean hurt(@Nonnull DamageSource damageSource, float damageAmount)
     {
        
-        if (level().isClientSide)
+        if (level().isClientSide())
         {
             return true;
         }
@@ -933,12 +933,12 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
 
         if (tag.contains(NbtTagConstants.TAG_COLONY_ID))
         {
-            int colonyId = tag.getInt(NbtTagConstants.TAG_COLONY_ID);
+            int colonyId = tag.getIntOr(NbtTagConstants.TAG_COLONY_ID, 0);
             setColonyId(colonyId);
 
             if (tag.contains(NbtTagConstants.TAG_MANAGED_ANIMALID))
             {
-                setManagedAnimalId(tag.getInt(NbtTagConstants.TAG_MANAGED_ANIMALID));
+                setManagedAnimalId(tag.getIntOr(NbtTagConstants.TAG_MANAGED_ANIMALID, 0));
             }
             else
             {

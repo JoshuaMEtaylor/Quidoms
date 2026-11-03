@@ -254,7 +254,7 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
             collisionCounter--;
         }
 
-        if (level().isClientSide)
+        if (level().isClientSide())
         {
             super.aiStep();
             return;
@@ -321,7 +321,7 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
     {
         if (compound.contains(TAG_SPAWN_POS))
         {
-            this.spawnPos = BlockPos.of(compound.getLong(TAG_SPAWN_POS));
+            this.spawnPos = BlockPos.of(compound.getLongOr(TAG_SPAWN_POS, 0L));
         }
         super.readAdditionalSaveData(compound);
     }

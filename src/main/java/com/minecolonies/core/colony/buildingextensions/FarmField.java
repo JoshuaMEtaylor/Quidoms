@@ -113,9 +113,9 @@ public class FarmField extends AbstractBuildingExtension
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final @NotNull CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        setSeed(ItemStack.parseOptional(provider, compound.getCompound(TAG_SEED)));
+        setSeed(ItemStack.parseOptional(provider, compound.getCompoundOrEmpty(TAG_SEED)));
         radii = compound.getIntArray(TAG_RADIUS);
-        fieldStage = Stage.valueOf(compound.getString(TAG_STAGE));
+        fieldStage = Stage.valueOf(compound.getStringOr(TAG_STAGE, ""));
     }
 
     @Override

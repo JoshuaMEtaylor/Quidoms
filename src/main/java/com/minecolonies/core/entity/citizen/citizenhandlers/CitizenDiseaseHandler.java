@@ -204,12 +204,12 @@ public class CitizenDiseaseHandler implements ICitizenDiseaseHandler
             return;
         }
 
-        CompoundTag diseaseTag = compound.getCompound(TAG_DISEASE);
+        CompoundTag diseaseTag = compound.getCompoundOrEmpty(TAG_DISEASE);
         if (diseaseTag.contains(TAG_DISEASE_ID))
         {
-            this.disease = DiseasesListener.getDisease(ResourceLocation.parse(diseaseTag.getString(TAG_DISEASE_ID)));
+            this.disease = DiseasesListener.getDisease(ResourceLocation.parse(diseaseTag.getStringOr(TAG_DISEASE_ID, "")));
         }
-        this.immunityTicks = diseaseTag.getInt(TAG_IMMUNITY);
+        this.immunityTicks = diseaseTag.getIntOr(TAG_IMMUNITY, 0);
     }
 
     @Override

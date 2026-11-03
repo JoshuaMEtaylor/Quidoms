@@ -702,7 +702,7 @@ public class EntityAIWorkStablemaster extends AbstractEntityAIHerder<JobStablema
      */
     public void detachHorse(AbstractHorse horse)
     {
-        if (worker == null || horse == null || horse.level().isClientSide)
+        if (worker == null || horse == null || horse.level().isClientSide())
         {
             return;
         }

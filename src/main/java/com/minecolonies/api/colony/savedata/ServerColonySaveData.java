@@ -147,7 +147,7 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
 
     private void readNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag inputTag)
     {
-        final CompoundTag compound = inputTag.getCompound(Constants.MOD_ID);
+        final CompoundTag compound = inputTag.getCompoundOrEmpty(Constants.MOD_ID);
 
         if (!compound.contains(TAG_COLONIES))
         {
@@ -157,7 +157,7 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
 
         // Load all colonies from Nbt
         Multimap<BlockPos, IColony> tempColonies = ArrayListMultimap.create();
-        for (final Tag tag : compound.getList(TAG_COLONIES, Tag.TAG_COMPOUND))
+        for (final Tag tag : compound.getListOrEmpty(TAG_COLONIES))
         {
             final IColony colony = Colony.loadColony((CompoundTag) tag, null, provider);
             if (colony != null)
@@ -169,7 +169,7 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
 
         if (compound.contains(TAG_COLONY_MANAGER))
         {
-            IColonyManager.getInstance().read(provider, compound.getCompound(TAG_COLONY_MANAGER));
+            IColonyManager.getInstance().read(provider, compound.getCompoundOrEmpty(TAG_COLONY_MANAGER));
             this.overworld = true;
         }
 

@@ -9,7 +9,7 @@ import com.minecolonies.core.tileentities.TileEntityGrave;
 import com.minecolonies.api.util.InventoryUtils;
 import com.minecolonies.api.util.constant.Constants;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -141,7 +141,7 @@ public class BlockMinecoloniesGrave extends AbstractBlockMinecoloniesGrave<Block
     }
 
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
       final ItemStack stack,
       final BlockState state,
       final Level worldIn,
@@ -157,13 +157,13 @@ public class BlockMinecoloniesGrave extends AbstractBlockMinecoloniesGrave<Block
               && tileEntity instanceof TileEntityGrave)
         {
             final TileEntityGrave grave = (TileEntityGrave) tileEntity;
-            if (!worldIn.isClientSide)
+            if (!worldIn.isClientSide())
             {
                 ((ServerPlayer) player).openMenu(grave, buf -> buf.writeBlockPos(grave.getBlockPos()));
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ItemInteractionResult.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override

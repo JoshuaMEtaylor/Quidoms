@@ -16,7 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -166,7 +166,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
     }
 
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
       final ItemStack Stack,
       final BlockState state,
       final Level worldIn,
@@ -175,7 +175,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
       final InteractionHand hand,
       final BlockHitResult ray)
     {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             final BlockEntity tileEntity = worldIn.getBlockEntity(pos);
             if (tileEntity instanceof TileEntityDecorationController)
@@ -183,7 +183,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
                 new WindowDecorationController(pos).open();
             }
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -200,7 +200,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
         /*
         Only work on server side
         */
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             return;
         }

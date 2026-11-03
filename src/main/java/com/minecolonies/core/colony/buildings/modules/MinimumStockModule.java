@@ -169,11 +169,11 @@ public class MinimumStockModule extends AbstractBuildingModule implements IMinim
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         minimumStock.clear();
-        final ListTag minimumStockTagList = compound.getList(TAG_MINIMUM_STOCK, Tag.TAG_COMPOUND);
+        final ListTag minimumStockTagList = compound.getListOrEmpty(TAG_MINIMUM_STOCK);
         for (int i = 0; i < minimumStockTagList.size(); i++)
         {
             final CompoundTag compoundNBT = minimumStockTagList.getCompound(i);
-            minimumStock.put(new ItemStorage(ItemStack.parseOptional(provider, compoundNBT.getCompound(NbtTagConstants.STACK))), compoundNBT.getInt(TAG_QUANTITY));
+            minimumStock.put(new ItemStorage(ItemStack.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK))), compoundNBT.getIntOr(TAG_QUANTITY, 0));
         }
     }
 

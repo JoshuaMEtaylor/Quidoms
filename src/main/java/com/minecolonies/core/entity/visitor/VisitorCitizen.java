@@ -425,7 +425,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
             return result;
         }
 
-        if (CompatibilityUtils.getWorldFromCitizen(this).isClientSide)
+        if (CompatibilityUtils.getWorldFromCitizen(this).isClientSide())
         {
             if (player.isShiftKeyDown())
             {
@@ -509,7 +509,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
             markDirty(0);
         }
 
-        if (CompatibilityUtils.getWorldFromCitizen(this).isClientSide)
+        if (CompatibilityUtils.getWorldFromCitizen(this).isClientSide())
         {
             citizenColonyHandler.updateColonyClient();
             if (citizenColonyHandler.getColonyId() != 0 && citizenId != 0 && getOffsetTicks() % TICKS_20 == 0)
@@ -551,10 +551,10 @@ public class VisitorCitizen extends AbstractEntityCitizen
 
         if (compound.contains(TAG_COLONY_ID))
         {
-            citizenColonyHandler.setColonyId(compound.getInt(TAG_COLONY_ID));
+            citizenColonyHandler.setColonyId(compound.getIntOr(TAG_COLONY_ID, 0));
             if (compound.contains(TAG_CITIZEN))
             {
-                citizenId = compound.getInt(TAG_CITIZEN);
+                citizenId = compound.getIntOr(TAG_CITIZEN, 0);
             }
         }
     }

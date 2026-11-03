@@ -312,7 +312,7 @@ public class MinecoloniesMinecart extends Minecart
         }
 
         this.checkBelowWorld();
-        if (this.level().isClientSide)
+        if (this.level().isClientSide())
         {
             if (this.lerpSteps > 0)
             {

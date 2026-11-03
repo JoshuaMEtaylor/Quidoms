@@ -118,8 +118,8 @@ public class StandardRequestResolversIdentitiesDataStore implements IRequestReso
         @Override
         public StandardRequestResolversIdentitiesDataStore deserialize(@NotNull final HolderLookup.Provider provider, @NotNull final IFactoryController controller, @NotNull final CompoundTag nbt)
         {
-            final IToken<?> token = controller.deserializeTag(provider, nbt.getCompound(TAG_TOKEN));
-            final ListTag list = nbt.getList(TAG_LIST, Tag.TAG_COMPOUND);
+            final IToken<?> token = controller.deserializeTag(provider, nbt.getCompoundOrEmpty(TAG_TOKEN));
+            final ListTag list = nbt.getListOrEmpty(TAG_LIST);
             final BiMap<IToken<?>, IRequestResolver<?>> biMap = HashBiMap.create();
 
             for (int i = 0; i < list.size(); i++)

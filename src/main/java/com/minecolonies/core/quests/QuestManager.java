@@ -253,7 +253,7 @@ public class QuestManager implements IQuestManager
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag nbt)
     {
         final Map<ResourceLocation, IQuestInstance> localAvailableQuests = new HashMap<>();
-        final ListTag availableListTag = nbt.getList(TAG_AVAILABLE, Tag.TAG_COMPOUND);
+        final ListTag availableListTag = nbt.getListOrEmpty(TAG_AVAILABLE);
         for (final Tag element : availableListTag)
         {
             final ResourceLocation key = ResourceLocation.parse(((CompoundTag) element).getString(TAG_ID));
@@ -269,7 +269,7 @@ public class QuestManager implements IQuestManager
         this.availableQuests.putAll(localAvailableQuests);
 
         final Map<ResourceLocation, IQuestInstance> localInProgressQuests = new HashMap<>();
-        final ListTag inProgressListTag = nbt.getList(TAG_IN_PROGRESS, Tag.TAG_COMPOUND);
+        final ListTag inProgressListTag = nbt.getListOrEmpty(TAG_IN_PROGRESS);
         for (final Tag element : inProgressListTag)
         {
             final ResourceLocation key = ResourceLocation.parse(((CompoundTag) element).getString(TAG_ID));
@@ -286,7 +286,7 @@ public class QuestManager implements IQuestManager
 
 
         this.finishedQuests.clear();
-        final ListTag finishedListTag = nbt.getList(TAG_FINISHED, Tag.TAG_COMPOUND);
+        final ListTag finishedListTag = nbt.getListOrEmpty(TAG_FINISHED);
         for (final Tag element : finishedListTag)
         {
             this.finishedQuests.put(ResourceLocation.parse(((CompoundTag) element).getString(TAG_ID)), ((CompoundTag) element).getInt(TAG_QUANTITY));
@@ -294,12 +294,12 @@ public class QuestManager implements IQuestManager
         finishedQuestsCache = null;
 
         this.unlockedQuests.clear();
-        final ListTag unlockedListTag = nbt.getList(TAG_UNLOCKED, Tag.TAG_COMPOUND);
+        final ListTag unlockedListTag = nbt.getListOrEmpty(TAG_UNLOCKED);
         for (final Tag element : unlockedListTag)
         {
             this.unlockedQuests.add(ResourceLocation.parse(((CompoundTag) element).getString(TAG_ID)));
         }
-        this.questReputation = nbt.getDouble(TAG_REPUTATION);
+        this.questReputation = nbt.getDoubleOr(TAG_REPUTATION, 0.0);
     }
 
     @Override

@@ -76,19 +76,19 @@ public abstract class AbstractBuildingContainer extends AbstractSchematicProvide
     {
         super.deserializeNBT(provider, compound);
 
-        final ListTag containerTagList = compound.getList(TAG_CONTAINERS, Tag.TAG_INT_ARRAY);
+        final ListTag containerTagList = compound.getListOrEmpty(TAG_CONTAINERS);
         for (int i = 0; i < containerTagList.size(); ++i)
         {
             containerList.add(NBTUtils.readBlockPos(containerTagList.get(i)));
         }
         if (compound.contains(TAG_PRIO))
         {
-            this.unscaledPickUpPriority = compound.getInt(TAG_PRIO);
+            this.unscaledPickUpPriority = compound.getIntOr(TAG_PRIO, 0);
         }
         if (compound.contains(TAG_PRIO_STATE))
         {
             // This was the old int representation of Pickup:Never
-            if (compound.getInt(TAG_PRIO_STATE) == 0)
+            if (compound.getIntOr(TAG_PRIO_STATE, 0) == 0)
             {
                 this.unscaledPickUpPriority = 0;
             }

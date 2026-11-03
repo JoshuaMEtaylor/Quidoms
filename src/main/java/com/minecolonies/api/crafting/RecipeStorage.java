@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -121,7 +121,7 @@ public class RecipeStorage implements IRecipeStorage
     /**
      * The loot parameter set definition
      */
-    public static final LootContextParamSet recipeLootParameters = (new LootContextParamSet.Builder())
+    public static final ContextKeySet recipeLootParameters = (new ContextKeySet.Builder())
                 .required(LootContextParams.ORIGIN)
                 .required(LootContextParams.THIS_ENTITY)
                 .required(LootContextParams.TOOL)

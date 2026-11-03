@@ -225,7 +225,7 @@ public class WorldUtil
         ResourceLocation loc = dynRegistries.registry(Registries.DIMENSION_TYPE).get().getKey(world.dimensionType());
         if (loc == null)
         {
-            if (world.isClientSide)
+            if (world.isClientSide())
             {
                 return world.dimensionType().effectsLocation().equals(type.location());
             }

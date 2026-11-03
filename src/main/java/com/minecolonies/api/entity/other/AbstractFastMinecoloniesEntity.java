@@ -13,7 +13,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -189,7 +189,7 @@ public abstract class AbstractFastMinecoloniesEntity extends PathfinderMob imple
      */
     @Nullable
     @Override
-    public Entity changeDimension(final DimensionTransition dimensionTransition)
+    public Entity changeDimension(final TeleportTransition dimensionTransition)
     {
         return null;
     }
@@ -257,7 +257,7 @@ public abstract class AbstractFastMinecoloniesEntity extends PathfinderMob imple
     public boolean isInWaterRainOrBubble()
     {
         // Used to extinguish fire, only check if on fire
-        if (getRemainingFireTicks() > 0 || level().isClientSide)
+        if (getRemainingFireTicks() > 0 || level().isClientSide())
         {
             return super.isInWaterRainOrBubble();
         }
@@ -269,7 +269,7 @@ public abstract class AbstractFastMinecoloniesEntity extends PathfinderMob imple
     public void updateFallFlying()
     {
         // Simplified updateFallflying to only set flags when they did change
-        if (!this.level().isClientSide && tickCount % 5 == randomVariance % 5)
+        if (!this.level().isClientSide() && tickCount % 5 == randomVariance % 5)
         {
             boolean flag = this.getSharedFlag(7);
             if (!flag || this.onGround() || this.isPassenger() || this.hasEffect(MobEffects.LEVITATION))

@@ -129,7 +129,7 @@ public class CitizenExperienceHandler implements ICitizenExperienceHandler
     {
         int experience;
 
-        if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide && citizen.getRecentlyHit() > 0 && citizen.checkCanDropLoot() && CompatibilityUtils.getWorldFromCitizen(
+        if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide() && citizen.getRecentlyHit() > 0 && citizen.checkCanDropLoot() && CompatibilityUtils.getWorldFromCitizen(
           citizen).getGameRules().getBoolean(
           GameRules.RULE_DOMOBLOOT))
         {
@@ -163,7 +163,7 @@ public class CitizenExperienceHandler implements ICitizenExperienceHandler
     @Override
     public void gatherXp()
     {
-        if (citizen.level().isClientSide)
+        if (citizen.level().isClientSide())
         {
             return;
         }

@@ -334,10 +334,10 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
     @Override
     public void readAdditionalSaveData(final CompoundTag compound)
     {
-        worldTimeAtSpawn = compound.getLong(TAG_TIME);
+        worldTimeAtSpawn = compound.getLongOr(TAG_TIME, 0L);
         if (compound.contains(TAG_COLONY_ID))
         {
-            colonyId = compound.getInt(TAG_COLONY_ID);
+            colonyId = compound.getIntOr(TAG_COLONY_ID, 0);
             if (colonyId != 0)
             {
                 setColony(IColonyManager.getInstance().getColonyByWorld(colonyId, level()));
@@ -453,7 +453,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
     @Override
     public void aiStep()
     {
-        if (level() != null && !level().isClientSide)
+        if (level() != null && !level().isClientSide())
         {
             stateMachine.tick();
         }

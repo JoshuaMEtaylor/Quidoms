@@ -957,7 +957,7 @@ public class RaidManager implements IRaiderManager
     {
         if (compound.contains(TAG_RAIDABLE))
         {
-            setCanHaveRaiderEvents(compound.getBoolean(TAG_RAIDABLE));
+            setCanHaveRaiderEvents(compound.getBooleanOr(TAG_RAIDABLE, false));
         }
         else
         {
@@ -966,20 +966,20 @@ public class RaidManager implements IRaiderManager
 
         if (compound.contains(TAG_NIGHTS_SINCE_LAST_RAID))
         {
-            setNightsSinceLastRaid(compound.getInt(TAG_NIGHTS_SINCE_LAST_RAID));
+            setNightsSinceLastRaid(compound.getIntOr(TAG_NIGHTS_SINCE_LAST_RAID, 0));
         }
 
         if (compound.contains(TAG_RAID_DELAY))
         {
-            extraDaysToNextRaid = compound.getInt(TAG_RAID_DELAY);
+            extraDaysToNextRaid = compound.getIntOr(TAG_RAID_DELAY, 0);
         }
 
-        raidDifficulty = Mth.clamp(compound.getInt(TAG_RAID_DIFFICULTY), MIN_RAID_DIFFICULTY, MAX_RAID_DIFFICULTY);
+        raidDifficulty = Mth.clamp(compound.getIntOr(TAG_RAID_DIFFICULTY, 0), MIN_RAID_DIFFICULTY, MAX_RAID_DIFFICULTY);
 
         if (compound.contains(TAG_RAID_HISTORY))
         {
             raidHistories.clear();
-            ListTag nbtList = compound.getList(TAG_RAID_HISTORY, Tag.TAG_COMPOUND);
+            ListTag nbtList = compound.getListOrEmpty(TAG_RAID_HISTORY);
             for (final Tag tag : nbtList)
             {
                 raidHistories.add(RaidHistory.fromNBT((CompoundTag) tag));
@@ -1144,10 +1144,10 @@ public class RaidManager implements IRaiderManager
 
         private static RaidHistory fromNBT(final CompoundTag tag)
         {
-            RaidHistory history = new RaidHistory(tag.getInt(TAG_RAIDERAMOUNT), tag.getLong(TAG_RAIDTIME));
-            history.lostCitizens = tag.getInt(TAG_LOST_CITIZENS);
-            history.difficulty = tag.getDouble(TAG_DIFFICULTY);
-            ListTag nbtList = tag.getList(TAG_SPAWNINFO, Tag.TAG_COMPOUND);
+            RaidHistory history = new RaidHistory(tag.getIntOr(TAG_RAIDERAMOUNT, 0), tag.getLongOr(TAG_RAIDTIME, 0L));
+            history.lostCitizens = tag.getIntOr(TAG_LOST_CITIZENS, 0);
+            history.difficulty = tag.getDoubleOr(TAG_DIFFICULTY, 0.0);
+            ListTag nbtList = tag.getListOrEmpty(TAG_SPAWNINFO);
             for (final Tag entry : nbtList)
             {
                 history.spawnData.add(RaidSpawnInfo.fromNBT((CompoundTag) entry));
@@ -1206,7 +1206,7 @@ public class RaidManager implements IRaiderManager
 
         public static RaidSpawnInfo fromNBT(final CompoundTag tag)
         {
-            return new RaidSpawnInfo(ResourceLocation.parse(tag.getString(TAG_RAIDTYPE)), new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z")));
+            return new RaidSpawnInfo(ResourceLocation.parse(tag.getStringOr(TAG_RAIDTYPE, "")), new BlockPos(tag.getIntOr("x", 0), tag.getIntOr("y", 0), tag.getIntOr("z", 0)));
         }
 
         public String toString()

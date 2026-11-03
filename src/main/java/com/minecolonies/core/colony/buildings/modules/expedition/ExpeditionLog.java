@@ -280,13 +280,13 @@ public class ExpeditionLog
      */
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, @NotNull final CompoundTag compound)
     {
-        this.status = Enums.getIfPresent(Status.class, compound.getString(TAG_STATUS)).or(Status.NONE);
-        this.id = compound.getInt(TAG_ID);
-        this.name = compound.getString(TAG_NAME);
+        this.status = Enums.getIfPresent(Status.class, compound.getStringOr(TAG_STATUS, "")).or(Status.NONE);
+        this.id = compound.getIntOr(TAG_ID, 0);
+        this.name = compound.getStringOr(TAG_NAME, "");
         if (this.name.isEmpty()) this.name = null;
 
         this.stats.clear();
-        final CompoundTag stats = compound.getCompound(TAG_STATS);
+        final CompoundTag stats = compound.getCompoundOrEmpty(TAG_STATS);
         for (final StatType stat : StatType.values())
         {
             final String key = stat.name().toLowerCase(Locale.US);
@@ -297,14 +297,14 @@ public class ExpeditionLog
         }
 
         this.equipment.clear();
-        final ListTag equipment = compound.getList(TAG_EQUIPMENT, Tag.TAG_COMPOUND);
+        final ListTag equipment = compound.getListOrEmpty(TAG_EQUIPMENT);
         for (int i = 0; i < equipment.size(); i++)
         {
             this.equipment.add(ItemStack.parseOptional(provider, equipment.getCompound(i)));
         }
 
         this.mobs.clear();
-        final ListTag mobs = compound.getList(TAG_MOBS, Tag.TAG_COMPOUND);
+        final ListTag mobs = compound.getListOrEmpty(TAG_MOBS);
         for (int i = 0; i < mobs.size(); ++i)
         {
             final CompoundTag mob = mobs.getCompound(i);
@@ -317,7 +317,7 @@ public class ExpeditionLog
         }
 
         this.loot.clear();
-        final ListTag loot = compound.getList(TAG_LOOT, Tag.TAG_COMPOUND);
+        final ListTag loot = compound.getListOrEmpty(TAG_LOOT);
         for (int i = 0; i < loot.size(); i++)
         {
             final ItemStorage storage = StandardFactoryController.getInstance().deserializeTag(provider, loot.getCompound(i));

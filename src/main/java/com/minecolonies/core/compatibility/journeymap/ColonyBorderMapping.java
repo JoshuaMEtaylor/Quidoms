@@ -26,7 +26,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ArrayListDeque;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -406,16 +406,16 @@ public class ColonyBorderMapping
 
         private static int intensify(final int colour)
         {
-            int a = FastColor.ARGB32.alpha(colour);
-            int r = FastColor.ARGB32.red(colour);
-            int g = FastColor.ARGB32.green(colour);
-            int b = FastColor.ARGB32.blue(colour);
+            int a = ARGB.alpha(colour);
+            int r = ARGB.red(colour);
+            int g = ARGB.green(colour);
+            int b = ARGB.blue(colour);
 
             int max = Math.max(r, Math.max(g, b));
 
-            int pure = FastColor.ARGB32.color(a, r == max ? 255 : 0, g == max ? 255 : 0, b == max ? 255 : 0);
+            int pure = ARGB.color(a, r == max ? 255 : 0, g == max ? 255 : 0, b == max ? 255 : 0);
 
-            return FastColor.ARGB32.lerp(0.25f, colour, pure);
+            return ARGB.lerp(0.25f, colour, pure);
         }
 
         /** Update the map overlays if needed */

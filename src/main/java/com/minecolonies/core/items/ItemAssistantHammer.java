@@ -183,7 +183,7 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
     @Override
     public InteractionResult useOn(UseOnContext context)
     {
-        if (context.getLevel().isClientSide)
+        if (context.getLevel().isClientSide())
         {
             final BlockPos interactPos = context.getClickedPos().relative(context.getClickedFace());
             useOnBlock(context.getPlayer(), interactPos);
@@ -196,13 +196,13 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand)
     {
-        if (level.isClientSide)
+        if (level.isClientSide())
         {
             final BlockPos interactPos = BlockPos.containing(player.getEyePosition().add(player.getLookAngle().multiply(3, 3, 3)));
             useOnBlock(player, interactPos);
         }
 
-        return InteractionResult.SUCCESS);
+        return InteractionResult.SUCCESS;
     }
 
     /**
@@ -332,7 +332,7 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
                         }
 
                         // Server message
-                        if (colony.getWorld().isClientSide)
+                        if (colony.getWorld().isClientSide())
                         {
                             new PlayerAssistantBuildRequestMessage(colony, workOrder.getID(), interactPos).sendToServer();
                         }

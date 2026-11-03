@@ -127,11 +127,11 @@ public class Tool implements IDeliverable
     public static Tool deserialize(@NotNull final HolderLookup.Provider provider, final IFactoryController controller, final CompoundTag nbt)
     {
         //API:Map the given strings a proper way.
-        String resLoc = nbt.getString(NBT_TYPE);
+        String resLoc = nbt.getStringOr(NBT_TYPE, "");
         final EquipmentTypeEntry type = ModEquipmentTypes.getRegistry().get(EquipmentTypeEntry.parseResourceLocation(resLoc));
-        final Integer minLevel = nbt.getInt(NBT_MIN_LEVEL);
-        final Integer maxLevel = nbt.getInt(NBT_MAX_LEVEL);
-        final ItemStack result = ItemStack.parseOptional(provider, nbt.getCompound(NBT_RESULT));
+        final Integer minLevel = nbt.getIntOr(NBT_MIN_LEVEL, 0);
+        final Integer maxLevel = nbt.getIntOr(NBT_MAX_LEVEL, 0);
+        final ItemStack result = ItemStack.parseOptional(provider, nbt.getCompoundOrEmpty(NBT_RESULT));
 
         return new Tool(type, minLevel, maxLevel, result);
     }

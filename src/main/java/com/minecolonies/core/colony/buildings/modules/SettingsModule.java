@@ -56,8 +56,8 @@ public class SettingsModule extends AbstractBuildingModule implements IPersisten
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        final CompoundTag settingsCompound = compound.contains("settings") ? compound.getCompound("settings") : compound;
-        final ListTag list = settingsCompound.getList("settingslist", Tag.TAG_COMPOUND);
+        final CompoundTag settingsCompound = compound.contains("settings") ? compound.getCompoundOrEmpty("settings") : compound;
+        final ListTag list = settingsCompound.getListOrEmpty("settingslist");
         for (int i = 0; i < list.size(); i++)
         {
             final CompoundTag entryCompound = list.getCompound(i);

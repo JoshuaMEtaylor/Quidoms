@@ -122,13 +122,13 @@ public class JobDeliveryman extends AbstractJob<EntityAIWorkDeliveryman, JobDeli
 
         if (compound.contains(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE))
         {
-            rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompound(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE));
+            rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompoundOrEmpty(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE));
         }
         else
         {
             setupRsDataStore();
         }
-        this.ongoingDeliveries = compound.getInt(TAG_ONGOING);
+        this.ongoingDeliveries = compound.getIntOr(TAG_ONGOING, 0);
     }
 
     /**

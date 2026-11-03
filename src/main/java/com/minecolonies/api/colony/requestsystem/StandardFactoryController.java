@@ -277,7 +277,7 @@ public final class StandardFactoryController implements IFactoryController
         final IFactory<?, OUTPUT> factory;
         if (compound.contains(NEW_NBT_TYPE))
         {
-            short classId = compound.getShort(NEW_NBT_TYPE);
+            short classId = compound.getShortOr(NEW_NBT_TYPE, (short)0);
             try
             {
                 factory = getFactoryForOutput(classId);
@@ -289,7 +289,7 @@ public final class StandardFactoryController implements IFactoryController
         }
         else
         {
-            String className = compound.getString(NBT_TYPE).replace("coremod", "core");
+            String className = compound.getStringOr(NBT_TYPE, "").replace("coremod", "core");
             try
             {
                 factory = getFactoryForOutput(className);
@@ -303,7 +303,7 @@ public final class StandardFactoryController implements IFactoryController
 
         try
         {
-            return factory.deserialize(provider, this, compound.getCompound(NBT_DATA));
+            return factory.deserialize(provider, this, compound.getCompoundOrEmpty(NBT_DATA));
         }
         catch (Throwable throwable)
         {

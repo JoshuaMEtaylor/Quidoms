@@ -109,7 +109,7 @@ public class StandardRecipeManager implements IRecipeManager
     @Override
     public void read(@NotNull final HolderLookup.Provider provider, @NotNull final CompoundTag compound)
     {
-        final ListTag list = compound.getList(TAG_RECIPES, Tag.TAG_COMPOUND);
+        final ListTag list = compound.getListOrEmpty(TAG_RECIPES);
         for (int i = 0; i < list.size(); i++)
         {
             IRecipeStorage recipe = StandardFactoryController.getInstance().deserializeTag(provider, list.getCompound(i));

@@ -51,10 +51,10 @@ public class EntityListModule extends AbstractBuildingModule implements IEntityL
     {
         if (compound.contains(id))
         {
-            compound = compound.getCompound(id);
+            compound = compound.getCompoundOrEmpty(id);
         }
 
-        final ListTag filterableList = compound.getList(TAG_MOBLIST, Tag.TAG_STRING);
+        final ListTag filterableList = compound.getListOrEmpty(TAG_MOBLIST);
         for (int i = 0; i < filterableList.size(); ++i)
         {
             final ResourceLocation res = ResourceLocation.parse(filterableList.getString(i));

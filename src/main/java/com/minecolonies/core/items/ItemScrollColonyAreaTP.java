@@ -103,7 +103,7 @@ public class ItemScrollColonyAreaTP extends AbstractItemScroll
     @Override
     public void onUseTick(Level worldIn, LivingEntity entity, ItemStack stack, int count)
     {
-        if (!worldIn.isClientSide && worldIn.getGameTime() % 5 == 0 && entity instanceof Player)
+        if (!worldIn.isClientSide() && worldIn.getGameTime() % 5 == 0 && entity instanceof Player)
         {
             final ServerPlayer sPlayer = (ServerPlayer) entity;
             for (final Entity player : getAffectedPlayers(sPlayer))

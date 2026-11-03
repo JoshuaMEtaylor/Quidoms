@@ -265,7 +265,7 @@ public class BuildingFarmer extends AbstractBuilding
         super.deserializeNBT(provider, compound);
         if (compound.contains(TAG_CELL))
         {
-            this.cell = compound.getInt(TAG_CELL);
+            this.cell = compound.getIntOr(TAG_CELL, 0);
         }
         if (compound.contains(TAG_WORKING_OFFSET))
         {

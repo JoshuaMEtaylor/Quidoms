@@ -86,7 +86,7 @@ public class ContainerCitizenInventory extends AbstractContainerMenu
         this.playerInventory = inv;
 
         final IColony colony;
-        if (inv.player.level().isClientSide)
+        if (inv.player.level().isClientSide())
         {
             colony = IColonyManager.getInstance().getColonyView(colonyId, inv.player.level().dimension());
         }
@@ -105,7 +105,7 @@ public class ContainerCitizenInventory extends AbstractContainerMenu
         final BlockPos workBuilding;
 
         int workBuildingLevel = 0;
-        if (inv.player.level().isClientSide)
+        if (inv.player.level().isClientSide())
         {
             final ICitizenDataView data = ((IColonyView) colony).getCitizen(citizenId);
             this.entity = Optional.of(inv.player.level().getEntity(data.getEntityId()));
@@ -174,7 +174,7 @@ public class ContainerCitizenInventory extends AbstractContainerMenu
                             @Override
                             public void set(@NotNull final ItemStack stack)
                             {
-                                if (workBuilding != null && !playerInventory.player.level().isClientSide && !ItemStackUtils.isEmpty(stack))
+                                if (workBuilding != null && !playerInventory.player.level().isClientSide() && !ItemStackUtils.isEmpty(stack))
                                 {
                                     final IBuilding building = colony.getServerBuildingManager().getBuilding(workBuilding);
                                     final ICitizenData citizenData = colony.getCitizenManager().getCivilian(citizenId);
@@ -237,7 +237,7 @@ public class ContainerCitizenInventory extends AbstractContainerMenu
             @Override
             public void set(@NotNull final ItemStack stack)
             {
-                if (workBuilding != null && !playerInventory.player.level().isClientSide && !ItemStackUtils.isEmpty(stack))
+                if (workBuilding != null && !playerInventory.player.level().isClientSide() && !ItemStackUtils.isEmpty(stack))
                 {
                     final IBuilding building = colony.getServerBuildingManager().getBuilding(workBuilding);
                     final ICitizenData citizenData = colony.getCitizenManager().getCivilian(citizenId);

@@ -316,7 +316,7 @@ public class EventHandler
         }
 
         final BlockPos pos = BlockPos.containing(event.getX(), event.getY(), event.getZ());
-        if (event.getSpawnType() == MobSpawnType.SPAWNER || event.getLevel().isClientSide() || !WorldUtil.isEntityBlockLoaded(event.getLevel(), pos))
+        if (event.getSpawnType() == EntitySpawnReason.SPAWNER || event.getLevel().isClientSide() || !WorldUtil.isEntityBlockLoaded(event.getLevel(), pos))
         {
             return;
         }
@@ -534,7 +534,7 @@ public class EventHandler
                 if (!(player.isCreative() && player.isShiftKeyDown()))
                 {
                     final ItemStack stack = event.getItemStack();
-                    if (!stack.isEmpty() && !world.isClientSide)
+                    if (!stack.isEmpty() && !world.isClientSide())
                     {
                         new OpenSuggestionWindowMessage(
                             block.defaultBlockState().setValue(AbstractBlockHut.FACING, event.getEntity().getDirection()),

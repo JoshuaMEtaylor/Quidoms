@@ -35,13 +35,13 @@ public final class BuildingExtensionDataManager
      */
     public static IBuildingExtension compoundToExtension(@NotNull final HolderLookup.Provider provider, final @NotNull CompoundTag compound)
     {
-        final ResourceLocation name = ResourceLocation.parse(compound.getString(TAG_EXTENSION_NAME));
+        final ResourceLocation name = ResourceLocation.parse(compound.getStringOr(TAG_EXTENSION_NAME, ""));
         final BlockPos position = BlockPosUtil.read(compound, TAG_EXTENSION_POSITION);
 
         final IBuildingExtension extension = resourceLocationToExtension(name, position);
         if (extension != null)
         {
-            extension.deserializeNBT(provider, compound.getCompound(TAG_EXTENSION_DATA));
+            extension.deserializeNBT(provider, compound.getCompoundOrEmpty(TAG_EXTENSION_DATA));
         }
         return extension;
     }

@@ -37,7 +37,7 @@ public class ItemSpear extends TridentItem
             int usedForDuration = this.getUseDuration(stack, entityLiving) - timeLeft;
             if (usedForDuration >= 10)
             {
-                if (!worldIn.isClientSide)
+                if (!worldIn.isClientSide())
                 {
                     stack.hurtAndBreak(1, playerEntity, EquipmentSlot.MAINHAND);
                     SpearEntity spearEntity = new SpearEntity(worldIn, playerEntity, stack);

@@ -137,7 +137,7 @@ public class CitizenSkillHandler implements ICitizenSkillHandler
     @Override
     public void read(@NotNull final CompoundTag compoundNBT)
     {
-        final ListTag levelTagList = compoundNBT.getList(TAG_LEVEL_MAP, Tag.TAG_COMPOUND);
+        final ListTag levelTagList = compoundNBT.getListOrEmpty(TAG_LEVEL_MAP);
         for (int i = 0; i < levelTagList.size(); ++i)
         {
             final CompoundTag levelExperienceAtJob = levelTagList.getCompound(i);

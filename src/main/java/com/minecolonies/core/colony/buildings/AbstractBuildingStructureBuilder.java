@@ -215,7 +215,7 @@ public abstract class AbstractBuildingStructureBuilder extends AbstractBuilding
         if (compound.contains(TAG_PROGRESS_POS))
         {
             progressPos = BlockPosUtil.read(compound, TAG_PROGRESS_POS);
-            progressStage = BuildingProgressStage.values()[compound.getInt(TAG_PROGRESS_STAGE)];
+            progressStage = BuildingProgressStage.values()[compound.getIntOr(TAG_PROGRESS_STAGE, 0)];
         }
 
         if (compound.contains(TAG_FLUIDS_REMOVE))
@@ -236,7 +236,7 @@ public abstract class AbstractBuildingStructureBuilder extends AbstractBuilding
 
         if (compound.contains(TAG_WORK_ORDER))
         {
-            this.workOrderId = compound.getInt(TAG_WORK_ORDER);
+            this.workOrderId = compound.getIntOr(TAG_WORK_ORDER, 0);
         }
     }
 

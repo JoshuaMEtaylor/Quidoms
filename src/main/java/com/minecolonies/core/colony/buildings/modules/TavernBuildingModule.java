@@ -270,7 +270,7 @@ public class TavernBuildingModule extends AbstractBuildingModule implements IDef
                 citizenData.setHomeBuilding(building);
             }
         }
-        noVisitorTime = nbt.getInt(TAG_NOVISITTIME);
+        noVisitorTime = nbt.getIntOr(TAG_NOVISITTIME, 0);
     }
 
     /**

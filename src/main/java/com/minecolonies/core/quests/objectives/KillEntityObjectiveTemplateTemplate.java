@@ -201,7 +201,7 @@ public class KillEntityObjectiveTemplateTemplate extends DialogueObjectiveTempla
         @Override
         public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag nbt)
         {
-            this.currentProgress = nbt.getInt(TAG_QUANTITY);
+            this.currentProgress = nbt.getIntOr(TAG_QUANTITY, 0);
         }
     }
 }

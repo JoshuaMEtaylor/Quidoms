@@ -331,7 +331,7 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
         loadRequestSystemFromNBT(provider, compound);
         if (compound.contains(TAG_IS_BUILT))
         {
-            isBuilt = compound.getBoolean(TAG_IS_BUILT);
+            isBuilt = compound.getBooleanOr(TAG_IS_BUILT, false);
         }
         else if (getBuildingLevel() > 0)
         {
@@ -339,20 +339,20 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
         }
         if (compound.contains(TAG_CUSTOM_NAME))
         {
-            this.customName = compound.getString(TAG_CUSTOM_NAME);
+            this.customName = compound.getStringOr(TAG_CUSTOM_NAME, "");
         }
         if (compound.contains(TAG_PRESTIGE))
         {
-            this.prestige = compound.getInt(TAG_PRESTIGE);
+            this.prestige = compound.getIntOr(TAG_PRESTIGE, 0);
         }
 
         if (compound.contains(TAG_BUILDING_MODULES))
         {
             for (IPersistentModule module : getModulesByType(IPersistentModule.class))
             {
-                if (compound.getCompound(TAG_BUILDING_MODULES).contains(module.getProducer().key))
+                if (compound.getCompoundOrEmpty(TAG_BUILDING_MODULES).contains(module.getProducer().key))
                 {
-                    module.deserializeNBT(provider, compound.getCompound(TAG_BUILDING_MODULES).getCompound(module.getProducer().key));
+                    module.deserializeNBT(provider, compound.getCompoundOrEmpty(TAG_BUILDING_MODULES).getCompound(module.getProducer().key));
                 }
                 else
                 {
@@ -1318,7 +1318,7 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
     {
         if (compound.contains(TAG_REQUESTOR_ID))
         {
-            this.requester = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompound(TAG_REQUESTOR_ID));
+            this.requester = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompoundOrEmpty(TAG_REQUESTOR_ID));
         }
         else
         {
@@ -1327,7 +1327,7 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
 
         if (compound.contains(TAG_RS_BUILDING_DATASTORE))
         {
-            this.rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompound(TAG_RS_BUILDING_DATASTORE));
+            this.rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompoundOrEmpty(TAG_RS_BUILDING_DATASTORE));
         }
         else
         {

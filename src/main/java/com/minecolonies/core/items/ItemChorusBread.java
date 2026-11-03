@@ -50,7 +50,7 @@ public class ItemChorusBread extends ItemFood
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving)
     {
-        if (!worldIn.isClientSide && entityLiving instanceof ServerPlayer && WorldUtil.isOverworldType(worldIn))
+        if (!worldIn.isClientSide() && entityLiving instanceof ServerPlayer && WorldUtil.isOverworldType(worldIn))
         {
             TeleportHelper.surfaceTeleport((ServerPlayer)entityLiving);
         }

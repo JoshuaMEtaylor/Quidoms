@@ -109,8 +109,8 @@ public class CombinedItemHandler implements IItemHandlerModifiable, INBTSerializ
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag nbt)
     {
-        final ListTag handlerList = nbt.getList(NBT_KEY_HANDLERS, Tag.TAG_COMPOUND);
-        final ListTag indexList = nbt.getList(NBT_KEY_HANDLERS_INDEXLIST, Tag.TAG_INT);
+        final ListTag handlerList = nbt.getListOrEmpty(NBT_KEY_HANDLERS);
+        final ListTag indexList = nbt.getListOrEmpty(NBT_KEY_HANDLERS_INDEXLIST);
 
         if (handlerList.size() == handlers.length)
         {
@@ -126,7 +126,7 @@ public class CombinedItemHandler implements IItemHandlerModifiable, INBTSerializ
             }
         }
 
-        setName(nbt.contains(NBT_KEY_NAME) ? nbt.getString(NBT_KEY_NAME) : null);
+        setName(nbt.contains(NBT_KEY_NAME) ? nbt.getStringOr(NBT_KEY_NAME, "") : null);
     }
 
     /**

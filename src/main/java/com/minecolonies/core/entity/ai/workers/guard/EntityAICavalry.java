@@ -351,7 +351,7 @@ public class EntityAICavalry extends AbstractEntityAIGuard<JobCavalry, AbstractB
     @Nullable protected CavalryHorseEntity findNearestHorse()
     {
         final Level level = worker.level();
-        if (level.isClientSide) return null;
+        if (level.isClientSide()) return null;
 
         final AABB box = worker.getBoundingBox().inflate(HORSE_SEARCH_RADIUS, 20.0, HORSE_SEARCH_RADIUS);
         final UUID me = worker.getUUID();

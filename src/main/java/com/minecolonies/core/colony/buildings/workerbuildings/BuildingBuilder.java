@@ -98,7 +98,7 @@ public class BuildingBuilder extends AbstractBuildingStructureBuilder
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        this.purgedMobsToday = compound.getBoolean(TAG_PURGED_MOBS);
+        this.purgedMobsToday = compound.getBooleanOr(TAG_PURGED_MOBS, false);
     }
 
     @Override

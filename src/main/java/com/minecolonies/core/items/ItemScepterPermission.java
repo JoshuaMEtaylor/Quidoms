@@ -101,7 +101,7 @@ public class ItemScepterPermission extends AbstractItemMinecolonies implements I
     @NotNull
     public InteractionResult useOn(final UseOnContext ctx)
     {
-        if (!ctx.getLevel().isClientSide)
+        if (!ctx.getLevel().isClientSide())
         {
             return InteractionResult.SUCCESS;
         }
@@ -130,7 +130,7 @@ public class ItemScepterPermission extends AbstractItemMinecolonies implements I
       final InteractionHand hand)
     {
         final ItemStack scepter = playerIn.getItemInHand(hand);
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             return InteractionResult.SUCCESS;
         }

@@ -226,26 +226,26 @@ public class StackList implements IConcreteDeliverable, INonExhaustiveDeliverabl
     {
         final List<ItemStack> stacks = new ArrayList<>();
 
-        final ListTag neededResTagList = compound.getList(NBT_STACK_LIST, Tag.TAG_COMPOUND);
+        final ListTag neededResTagList = compound.getListOrEmpty(NBT_STACK_LIST);
         for (int i = 0; i < neededResTagList.size(); ++i)
         {
             final CompoundTag neededRes = neededResTagList.getCompound(i);
             stacks.add(ItemStack.parseOptional(provider, neededRes));
         }
 
-        final boolean matchMeta = compound.getBoolean(NBT_MATCHMETA);
-        final boolean matchNBT = compound.getBoolean(NBT_MATCHNBT);
-        final boolean matchOreDic = compound.getBoolean(NBT_MATCHOREDIC);
-        final ItemStack result = compound.contains(NBT_RESULT) ? ItemStackUtils.deserializeFromNBT(compound.getCompound(NBT_RESULT), provider) : ItemStackUtils.EMPTY;
-        final String desc = compound.contains(TAG_DESCRIPTION) ? compound.getString(TAG_DESCRIPTION) : REQUEST_SYSTEM_STACK_LIST;
+        final boolean matchMeta = compound.getBooleanOr(NBT_MATCHMETA, false);
+        final boolean matchNBT = compound.getBooleanOr(NBT_MATCHNBT, false);
+        final boolean matchOreDic = compound.getBooleanOr(NBT_MATCHOREDIC, false);
+        final ItemStack result = compound.contains(NBT_RESULT) ? ItemStackUtils.deserializeFromNBT(compound.getCompoundOrEmpty(NBT_RESULT), provider) : ItemStackUtils.EMPTY;
+        final String desc = compound.contains(TAG_DESCRIPTION) ? compound.getStringOr(TAG_DESCRIPTION, "") : REQUEST_SYSTEM_STACK_LIST;
         int count = stacks.isEmpty() ? 0 : stacks.get(0).getCount();
         int minCount = count;
         if (compound.contains(NBT_COUNT))
         {
-            count = compound.getInt(NBT_COUNT);
-            minCount = compound.getInt(NBT_MINCOUNT);
+            count = compound.getIntOr(NBT_COUNT, 0);
+            minCount = compound.getIntOr(NBT_MINCOUNT, 0);
         }
-        int leftOver = compound.getInt(NBT_LEFTOVER);
+        int leftOver = compound.getIntOr(NBT_LEFTOVER, 0);
 
         return new StackList(stacks, matchMeta, matchNBT, matchOreDic, result, desc, count, minCount, leftOver);
     }

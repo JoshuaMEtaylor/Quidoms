@@ -155,7 +155,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
         AbstractEntityCitizen citizen = (AbstractEntityCitizen) this.getOwner();
         if (citizen == null) {
             this.discard();
-        } else if (this.level().isClientSide || !this.shouldStopFishing(citizen)) {
+        } else if (this.level().isClientSide() || !this.shouldStopFishing(citizen)) {
             if (this.onGround()) {
                 this.life++;
                 if (this.life >= 1200) {
@@ -225,7 +225,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
                             );
                         }
 
-                        if (!this.level().isClientSide) {
+                        if (!this.level().isClientSide()) {
                             this.catchingFish(blockpos);
                         }
                     } else {
@@ -283,7 +283,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     protected void onHitEntity(EntityHitResult hitEntity)
     {
         super.onHitEntity(hitEntity);
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             this.setHookedEntity(hitEntity.getEntity());
         }
     }
@@ -496,7 +496,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     public int retrieve(ItemStack p_37157_)
     {
         AbstractEntityCitizen citizen = (AbstractEntityCitizen) this.getOwner();
-        if (!this.level().isClientSide && citizen != null && !this.shouldStopFishing(citizen))
+        if (!this.level().isClientSide() && citizen != null && !this.shouldStopFishing(citizen))
         {
             int i = 0;
             if (this.hookedEntity != null)
@@ -548,7 +548,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     @Override
     public void handleEntityEvent(byte b)
     {
-        if (b == 31 && this.level().isClientSide && this.hookedEntity instanceof Player && ((Player)this.hookedEntity).isLocalPlayer())
+        if (b == 31 && this.level().isClientSide() && this.hookedEntity instanceof Player && ((Player)this.hookedEntity).isLocalPlayer())
         {
             this.pullEntity(this.hookedEntity);
         }

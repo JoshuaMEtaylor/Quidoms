@@ -18,7 +18,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -179,7 +179,7 @@ public class BlockHutTownHall extends AbstractBlockHut<BlockHutTownHall>
      */
     @NotNull
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
       final ItemStack stack,
       final BlockState state,
       final Level worldIn,
@@ -191,7 +191,7 @@ public class BlockHutTownHall extends AbstractBlockHut<BlockHutTownHall>
        /*
         If the world is client, open the gui of the building
          */
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             @Nullable final IBuildingView building = IColonyManager.getInstance().getBuildingView(worldIn.dimension(), pos);
 
@@ -207,7 +207,7 @@ public class BlockHutTownHall extends AbstractBlockHut<BlockHutTownHall>
                 timeout = System.currentTimeMillis() + 1000;
             }
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     /**
@@ -226,7 +226,7 @@ public class BlockHutTownHall extends AbstractBlockHut<BlockHutTownHall>
         {
             IBuilding townHall = colony.getServerBuildingManager().getTownHall();
             
-            if (colony.getWorld() != null && !colony.getWorld().isClientSide)
+            if (colony.getWorld() != null && !colony.getWorld().isClientSide())
             {
                 MessageUtils.format(WARNING_DUPLICATE_TOWN_HALL, townHall.getPosition().toShortString()).sendTo(player);
             }

@@ -60,12 +60,12 @@ public class ItemClipboard extends AbstractItemMinecolonies
         {
             buildingEntity.writeColonyToItemStack(clipboard);
 
-            if (!ctx.getLevel().isClientSide)
+            if (!ctx.getLevel().isClientSide())
             {
                 MessageUtils.format(COM_MINECOLONIES_CLIPBOARD_COLONY_SET, buildingEntity.getColony().getName()).sendTo(ctx.getPlayer());
             }
         }
-        else if (ctx.getLevel().isClientSide)
+        else if (ctx.getLevel().isClientSide())
         {
             openWindow(clipboard, ctx.getLevel(), ctx.getPlayer());
         }
@@ -90,7 +90,7 @@ public class ItemClipboard extends AbstractItemMinecolonies
     {
         final ItemStack clipboard = playerIn.getItemInHand(hand);
 
-        if (!worldIn.isClientSide) {
+        if (!worldIn.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
 
@@ -116,7 +116,7 @@ public class ItemClipboard extends AbstractItemMinecolonies
 
             if (compound.contains(TAG_HIDEUNIMPORTANT))
             {
-                hide = compound.getBoolean(TAG_HIDEUNIMPORTANT);
+                hide = compound.getBooleanOr(TAG_HIDEUNIMPORTANT, false);
             }
 
             new WindowClipBoard(colonyView, hide).open();

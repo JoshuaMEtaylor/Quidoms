@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
@@ -46,15 +46,15 @@ public abstract class AbstractItemScroll extends AbstractItemMinecolonies
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack itemStack)
+    public ItemUseAnimation getUseAnimation(ItemStack itemStack)
     {
-        return UseAnim.BOW;
+        return ItemUseAnimation.BOW;
     }
 
     @Override
     public ItemStack finishUsingItem(ItemStack itemStack, Level world, LivingEntity entityLiving)
     {
-        if (!(entityLiving instanceof ServerPlayer) || world.isClientSide)
+        if (!(entityLiving instanceof ServerPlayer) || world.isClientSide())
         {
             return itemStack;
         }
@@ -106,7 +106,7 @@ public abstract class AbstractItemScroll extends AbstractItemMinecolonies
     public InteractionResult useOn(UseOnContext ctx)
     {
         // Right click on block
-        if (ctx.getLevel().isClientSide || !ctx.getPlayer().isShiftKeyDown() || !needsColony())
+        if (ctx.getLevel().isClientSide() || !ctx.getPlayer().isShiftKeyDown() || !needsColony())
         {
             return InteractionResult.PASS;
         }

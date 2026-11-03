@@ -48,7 +48,7 @@ public class ItemGoldenBread extends ItemFood
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving) {
         
-        if (!worldIn.isClientSide)
+        if (!worldIn.isClientSide())
         {
             entityLiving.heal(4);
         }

@@ -59,7 +59,7 @@ public class CavalryOverlayLayer extends RenderLayer<Horse, HorseModel<Horse>>
 
         // 0.85f alpha -> 217 (out of 255)
         int alpha = (int)(0.85f * 255.0f);
-        int color = net.minecraft.util.FastColor.ARGB32.color(alpha, 255, 255, 255);
+        int color = net.minecraft.util.ARGB.color(alpha, 255, 255, 255);
 
         this.getParentModel().renderToBuffer(pose, vc, packedLight, OverlayTexture.NO_OVERLAY, color);
     }

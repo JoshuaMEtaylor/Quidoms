@@ -35,7 +35,7 @@ public final class TeleportHelper
 
     public static boolean teleportCitizen(final AbstractEntityCitizen citizen, final Level world, final BlockPos location)
     {
-        if (citizen == null || world == null || world.isClientSide)
+        if (citizen == null || world == null || world.isClientSide())
         {
             return false;
         }

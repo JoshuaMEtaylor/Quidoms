@@ -88,7 +88,7 @@ public class BuildingHospital extends AbstractBuilding
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        final ListTag bedTagList = compound.getList(TAG_BEDS, Tag.TAG_COMPOUND);
+        final ListTag bedTagList = compound.getListOrEmpty(TAG_BEDS);
         for (int i = 0; i < bedTagList.size(); ++i)
         {
             final CompoundTag bedCompound = bedTagList.getCompound(i);
@@ -99,7 +99,7 @@ public class BuildingHospital extends AbstractBuilding
             }
         }
 
-        final ListTag patientTagList = compound.getList(TAG_PATIENTS, Tag.TAG_COMPOUND);
+        final ListTag patientTagList = compound.getListOrEmpty(TAG_PATIENTS);
         for (int i = 0; i < patientTagList.size(); ++i)
         {
             final CompoundTag patientCompound = patientTagList.getCompound(i);

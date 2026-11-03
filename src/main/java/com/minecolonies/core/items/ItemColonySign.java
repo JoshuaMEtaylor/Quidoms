@@ -55,7 +55,7 @@ public class ItemColonySign extends BlockItem
         {
             if (state.getBlock() == ModBlocks.blockHutGateHouse && entity instanceof TileEntityColonyBuilding buildingEntity)
             {
-                if (!ctx.getLevel().isClientSide)
+                if (!ctx.getLevel().isClientSide())
                 {
                     if (buildingEntity.getColony() == null)
                     {
@@ -105,7 +105,7 @@ public class ItemColonySign extends BlockItem
             }
             else if (entity instanceof TileEntityColonySign signEntity)
             {
-                if (!ctx.getLevel().isClientSide)
+                if (!ctx.getLevel().isClientSide())
                 {
                     final IColony colony = IColonyManager.getInstance().getColonyByDimension(signEntity.getColonyId(), ctx.getLevel().dimension());
                     if (colony == null)
@@ -164,14 +164,14 @@ public class ItemColonySign extends BlockItem
         final ColonyId colonyComponent = ColonyId.readFromItemStack(ctx.getItemInHand());
         if (!colonyComponent.hasColonyId())
         {
-            if (ctx.getLevel().isClientSide)
+            if (ctx.getLevel().isClientSide())
             {
                 MessageUtils.format(COM_MINECOLONIES_NEED_COLONY).sendTo(ctx.getPlayer());
             }
             return false;
         }
 
-        if (!ctx.getLevel().isClientSide)
+        if (!ctx.getLevel().isClientSide())
         {
             final int colonyId = colonyComponent.id();
             final IColony colony = IColonyManager.getInstance().getColonyByDimension(colonyId, ctx.getLevel().dimension());

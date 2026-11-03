@@ -235,7 +235,7 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
         try
         {
             // TODO: In 1.19 remove this check as this is purely for backwards compatibility with old class mappings
-            String type = compound.getString(TAG_TYPE);
+            String type = compound.getStringOr(TAG_TYPE, "");
             if (type.equals("removal"))
             {
                 oclass = WorkOrderBuilding.class;
@@ -258,7 +258,7 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
 
         if (order == null)
         {
-            Log.getLogger().warn(String.format("Unknown WorkOrder type '%s' or missing constructor of proper format.", compound.getString(TAG_TYPE)));
+            Log.getLogger().warn(String.format("Unknown WorkOrder type '%s' or missing constructor of proper format.", compound.getStringOr(TAG_TYPE, "")));
             return null;
         }
 
@@ -271,7 +271,7 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
         catch (final RuntimeException ex)
         {
             Log.getLogger().error(String.format("A WorkOrder %s(%s) has thrown an exception during loading, its state cannot be restored. Report this to the mod author",
-                compound.getString(TAG_TYPE), oclass.getName()), ex);
+                compound.getStringOr(TAG_TYPE, ""), oclass.getName()), ex);
             return null;
         }
 
@@ -642,15 +642,15 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
     @Override
     public void read(@NotNull final CompoundTag compound, final IWorkManager manager)
     {
-        id = compound.getInt(TAG_ID);
+        id = compound.getIntOr(TAG_ID, 0);
         if (compound.contains(TAG_TH_PRIORITY))
         {
-            priority = compound.getInt(TAG_TH_PRIORITY);
+            priority = compound.getIntOr(TAG_TH_PRIORITY, 0);
         }
 
         if (compound.contains(TAG_CLAIMED_BY))
         {
-            final int citizenId = compound.getInt(TAG_CLAIMED_BY);
+            final int citizenId = compound.getIntOr(TAG_CLAIMED_BY, 0);
             if (manager.getColony() != null)
             {
                 final ICitizenData data = manager.getColony().getCitizenManager().getCivilian(citizenId);
@@ -664,28 +664,28 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
         {
             claimedBy = BlockPosUtil.read(compound, TAG_CLAIMED_BY_BUILDING);
         }
-        packName = compound.getString(TAG_STRUCTURE_PACK);
-        path = compound.getString(TAG_STRUCTURE_PATH);
-        translationKey = compound.getString(TAG_TRANSLATION_KEY);
-        workOrderType = WorkOrderType.values()[compound.getInt(TAG_WO_TYPE)];
+        packName = compound.getStringOr(TAG_STRUCTURE_PACK, "");
+        path = compound.getStringOr(TAG_STRUCTURE_PATH, "");
+        translationKey = compound.getStringOr(TAG_TRANSLATION_KEY, "");
+        workOrderType = WorkOrderType.values()[compound.getIntOr(TAG_WO_TYPE, 0)];
         location = BlockPosUtil.read(compound, TAG_LOCATION);
-        rotationMirror = RotationMirror.values()[compound.getByte(TAG_ROTATION_MIRROR)];
-        currentLevel = compound.getInt(TAG_CURRENT_LEVEL);
-        targetLevel = compound.getInt(TAG_TARGET_LEVEL);
-        amountOfResources = compound.getInt(TAG_AMOUNT_OF_RESOURCES);
-        iteratorType = compound.getString(TAG_ITERATOR);
-        cleared = compound.getBoolean(TAG_IS_CLEARED);
-        requested = compound.getBoolean(TAG_IS_REQUESTED);
+        rotationMirror = RotationMirror.values()[compound.getByteOr(TAG_ROTATION_MIRROR, (byte)0)];
+        currentLevel = compound.getIntOr(TAG_CURRENT_LEVEL, 0);
+        targetLevel = compound.getIntOr(TAG_TARGET_LEVEL, 0);
+        amountOfResources = compound.getIntOr(TAG_AMOUNT_OF_RESOURCES, 0);
+        iteratorType = compound.getStringOr(TAG_ITERATOR, "");
+        cleared = compound.getBooleanOr(TAG_IS_CLEARED, false);
+        requested = compound.getBooleanOr(TAG_IS_REQUESTED, false);
 
         if (compound.contains(TAG_STAGE))
         {
-            stage = BuildingProgressStage.values()[compound.getInt(TAG_STAGE)];
+            stage = BuildingProgressStage.values()[compound.getIntOr(TAG_STAGE, 0)];
         }
 
         if (compound.contains(TAG_BB))
         {
             CompoundTag tag = (CompoundTag) compound.get(TAG_BB);
-            box = new AABB(tag.getInt("minx"), tag.getInt("miny"), tag.getInt("minz"), tag.getInt("maxx"), tag.getInt("maxy"), tag.getInt("maxz"));
+            box = new AABB(tag.getIntOr("minx", 0), tag.getIntOr("miny", 0), tag.getIntOr("minz", 0), tag.getIntOr("maxx", 0), tag.getIntOr("maxy", 0), tag.getIntOr("maxz", 0));
         }
     }
 
@@ -817,7 +817,7 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
                             final BlockEntity te = colony.getWorld().getBlockEntity(tePos);
                             if (te instanceof IBlueprintDataProviderBE blueprintDataProviderBE)
                             {
-                                final CompoundTag tagData = compoundNBT.getCompound(TAG_BLUEPRINTDATA);
+                                final CompoundTag tagData = compoundNBT.getCompoundOrEmpty(TAG_BLUEPRINTDATA);
                                 tagData.putString(NbtTagConstants.TAG_PACK, blueprint.getPackName());
                                 if (blueprint.getPrimaryBlockOffset().equals(offset))
                                 {

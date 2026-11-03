@@ -280,7 +280,7 @@ public class AnimalManager implements IAnimalManager
             return;
         }
 
-        final CompoundTag animalManagerNBT = compound.getCompound(TAG_ANIMAL_MANAGER);
+        final CompoundTag animalManagerNBT = compound.getCompoundOrEmpty(TAG_ANIMAL_MANAGER);
 
         // Start from a clean slate so reloads don't accumulate stale entries.
         animalMap.clear();
@@ -288,7 +288,7 @@ public class AnimalManager implements IAnimalManager
         // Restore next id even if animals list is absent/corrupt.
         if (animalManagerNBT.contains(TAG_NEXTID, Tag.TAG_INT))
         {
-            nextAnimalID = animalManagerNBT.getInt(TAG_NEXTID);
+            nextAnimalID = animalManagerNBT.getIntOr(TAG_NEXTID, 0);
         }
         else
         {
@@ -298,7 +298,7 @@ public class AnimalManager implements IAnimalManager
         // Read animals list (if present). If missing, we still keep nextAnimalID restored.
         if (animalManagerNBT.contains(TAG_ANIMALS, Tag.TAG_LIST))
         {
-            final ListTag animalList = animalManagerNBT.getList(TAG_ANIMALS, Tag.TAG_COMPOUND);
+            final ListTag animalList = animalManagerNBT.getListOrEmpty(TAG_ANIMALS);
 
             for (int i = 0; i < animalList.size(); i++)
             {

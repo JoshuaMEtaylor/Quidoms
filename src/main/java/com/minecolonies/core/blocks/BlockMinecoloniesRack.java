@@ -219,7 +219,7 @@ public class BlockMinecoloniesRack extends AbstractBlockMinecoloniesRack<BlockMi
     }
 
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
       final ItemStack p_316304_,
       final BlockState state,
       final Level worldIn,
@@ -235,14 +235,14 @@ public class BlockMinecoloniesRack extends AbstractBlockMinecoloniesRack<BlockMi
               && tileEntity instanceof TileEntityRack)
         {
             final TileEntityRack rack = (TileEntityRack) tileEntity;
-            if (!worldIn.isClientSide)
+            if (!worldIn.isClientSide())
             {
                 ((ServerPlayer) player).openMenu(rack,
                   buf -> buf.writeBlockPos(rack.getBlockPos()).writeBlockPos(rack.getOtherChest() == null ? BlockPos.ZERO : rack.getOtherChest().getBlockPos()));
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ItemInteractionResult.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override

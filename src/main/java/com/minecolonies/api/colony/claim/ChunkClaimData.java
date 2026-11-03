@@ -275,22 +275,22 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         // Set owning
-        owningColony = compound.getInt(TAG_ID);
+        owningColony = compound.getIntOr(TAG_ID, 0);
 
-        final ListTag colonyClaim = compound.getList(TAG_COLONIES, Tag.TAG_INT);
+        final ListTag colonyClaim = compound.getListOrEmpty(TAG_COLONIES);
         for (int i = 0; i < colonyClaim.size(); i++)
         {
             colonies.add(colonyClaim.getInt(i));
         }
 
-        final ListTag buildingClaim = compound.getList(TAG_BUILDING_LIST_CLAIM, Tag.TAG_COMPOUND);
+        final ListTag buildingClaim = compound.getListOrEmpty(TAG_BUILDING_LIST_CLAIM);
         for (int i = 0; i < buildingClaim.size(); i++)
         {
             final CompoundTag perColonyCompound = buildingClaim.getCompound(i);
             final int id = perColonyCompound.getInt(TAG_ID);
             final Set<BlockPos> buildings = claimingBuildings.computeIfAbsent(id, HashSet::new);
 
-            final ListTag buildingList = perColonyCompound.getList(TAG_BUILDING_CLAIM, Tag.TAG_COMPOUND);
+            final ListTag buildingList = perColonyCompound.getListOrEmpty(TAG_BUILDING_CLAIM);
             for (int j = 0; j < buildingList.size(); j++)
             {
                 buildings.add(BlockPosUtil.readFromListNBT(buildingList, j));

@@ -1437,15 +1437,15 @@ public class CitizenData implements ICitizenData
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag nbtTagCompound)
     {
-        name = nbtTagCompound.getString(TAG_NAME);
-        female = nbtTagCompound.getBoolean(TAG_FEMALE);
-        paused = nbtTagCompound.getBoolean(TAG_PAUSED);
-        isChild = nbtTagCompound.getBoolean(TAG_CHILD);
-        textureId = nbtTagCompound.getInt(TAG_TEXTURE);
+        name = nbtTagCompound.getStringOr(TAG_NAME, "");
+        female = nbtTagCompound.getBooleanOr(TAG_FEMALE, false);
+        paused = nbtTagCompound.getBooleanOr(TAG_PAUSED, false);
+        isChild = nbtTagCompound.getBooleanOr(TAG_CHILD, false);
+        textureId = nbtTagCompound.getIntOr(TAG_TEXTURE, 0);
 
         if (nbtTagCompound.contains(TAG_SUFFIX))
         {
-            textureSuffix = nbtTagCompound.getString(TAG_SUFFIX);
+            textureSuffix = nbtTagCompound.getStringOr(TAG_SUFFIX, "");
         }
         else
         {
@@ -1454,7 +1454,7 @@ public class CitizenData implements ICitizenData
 
         if (nbtTagCompound.contains(TAG_SOUND_PROFILE))
         {
-            voiceProfile = nbtTagCompound.getInt(TAG_SOUND_PROFILE);
+            voiceProfile = nbtTagCompound.getIntOr(TAG_SOUND_PROFILE, 0);
         }
         else
         {
@@ -1468,20 +1468,20 @@ public class CitizenData implements ICitizenData
             nextRespawnPos = BlockPosUtil.read(nbtTagCompound, TAG_RESPAWN_POS);
         }
 
-        citizenSkillHandler.read(nbtTagCompound.getCompound(TAG_NEW_SKILLS));
+        citizenSkillHandler.read(nbtTagCompound.getCompoundOrEmpty(TAG_NEW_SKILLS));
 
-        saturation = nbtTagCompound.getDouble(TAG_SATURATION);
+        saturation = nbtTagCompound.getDoubleOr(TAG_SATURATION, 0.0);
 
         if (nbtTagCompound.contains("job"))
         {
-            setJob(IJobDataManager.getInstance().createFrom(this, nbtTagCompound.getCompound("job"), provider), true);
+            setJob(IJobDataManager.getInstance().createFrom(this, nbtTagCompound.getCompoundOrEmpty("job"), provider), true);
         }
 
         if (nbtTagCompound.contains(TAG_INVENTORY))
         {
             this.inventory.read(provider, nbtTagCompound);
-            this.inventory.setHeldItem(InteractionHand.MAIN_HAND, nbtTagCompound.getInt(TAG_HELD_ITEM_SLOT));
-            this.inventory.setHeldItem(InteractionHand.OFF_HAND, nbtTagCompound.getInt(TAG_OFFHAND_HELD_ITEM_SLOT));
+            this.inventory.setHeldItem(InteractionHand.MAIN_HAND, nbtTagCompound.getIntOr(TAG_HELD_ITEM_SLOT, 0));
+            this.inventory.setHeldItem(InteractionHand.OFF_HAND, nbtTagCompound.getIntOr(TAG_OFFHAND_HELD_ITEM_SLOT, 0));
         }
 
         if (name.isEmpty())
@@ -1492,18 +1492,18 @@ public class CitizenData implements ICitizenData
         if (nbtTagCompound.contains(TAG_ASLEEP))
         {
             bedPos = BlockPosUtil.read(nbtTagCompound, TAG_BEDS);
-            isAsleep = nbtTagCompound.getBoolean(TAG_ASLEEP);
+            isAsleep = nbtTagCompound.getBooleanOr(TAG_ASLEEP, false);
         }
 
         if (nbtTagCompound.contains(TAG_JUST_ATE))
         {
-            justAte = nbtTagCompound.getBoolean(TAG_JUST_ATE);
+            justAte = nbtTagCompound.getBooleanOr(TAG_JUST_ATE, false);
         }
 
         //  Citizen chat options.
         if (nbtTagCompound.contains(TAG_CHAT_OPTIONS))
         {
-            final ListTag handlerTagList = nbtTagCompound.getList(TAG_CHAT_OPTIONS, Tag.TAG_COMPOUND);
+            final ListTag handlerTagList = nbtTagCompound.getListOrEmpty(TAG_CHAT_OPTIONS);
             for (int i = 0; i < handlerTagList.size(); ++i)
             {
                 try
@@ -1530,7 +1530,7 @@ public class CitizenData implements ICitizenData
         {
             citizenSkillHandler.init((int) citizenHappinessHandler.getHappiness(getColony(), this));
             final Map<String, Integer> levels = new HashMap<>();
-            final ListTag levelTagList = nbtTagCompound.getList(TAG_LEVEL_MAP, Tag.TAG_COMPOUND);
+            final ListTag levelTagList = nbtTagCompound.getListOrEmpty(TAG_LEVEL_MAP);
             for (int i = 0; i < levelTagList.size(); ++i)
             {
                 final CompoundTag levelExperienceAtJob = levelTagList.getCompound(i);
@@ -1551,55 +1551,55 @@ public class CitizenData implements ICitizenData
 
         if (nbtTagCompound.contains(TAG_JOB_STATUS))
         {
-            this.jobStatus = JobStatus.values()[nbtTagCompound.getInt(TAG_JOB_STATUS)];
+            this.jobStatus = JobStatus.values()[nbtTagCompound.getIntOr(TAG_JOB_STATUS, 0)];
         }
-        else if (nbtTagCompound.getBoolean(TAG_IDLE))
+        else if (nbtTagCompound.getBooleanOr(TAG_IDLE, false))
         {
             this.jobStatus = JobStatus.STUCK;
         }
 
-        final String parentA = nbtTagCompound.getString(TAG_PARENT_A);
-        final String parentB = nbtTagCompound.getString(TAG_PARENT_B);
+        final String parentA = nbtTagCompound.getStringOr(TAG_PARENT_A, "");
+        final String parentB = nbtTagCompound.getStringOr(TAG_PARENT_B, "");
 
         this.parents = new Tuple<>(parentA, parentB);
-        @NotNull final ListTag siblingsNBT = nbtTagCompound.getList(TAG_SIBLINGS, Tag.TAG_INT);
+        @NotNull final ListTag siblingsNBT = nbtTagCompound.getListOrEmpty(TAG_SIBLINGS);
         for (int i = 0; i < siblingsNBT.size(); i++)
         {
-            siblings.add(siblingsNBT.getInt(i));
+            siblings.add(siblingsNBT.getIntOr(i, 0));
         }
 
-        @NotNull final ListTag childrenNBT = nbtTagCompound.getList(TAG_CHILDREN, Tag.TAG_INT);
+        @NotNull final ListTag childrenNBT = nbtTagCompound.getListOrEmpty(TAG_CHILDREN);
         for (int i = 0; i < childrenNBT.size(); i++)
         {
-            children.add(childrenNBT.getInt(i));
+            children.add(childrenNBT.getIntOr(i, 0));
         }
 
-        partner = nbtTagCompound.getInt(TAG_PARTNER);
-        this.isWorking = nbtTagCompound.getBoolean(TAG_ACTIVE);
-        this.leisureTime = nbtTagCompound.getInt(TAG_LEISURE);
+        partner = nbtTagCompound.getIntOr(TAG_PARTNER, 0);
+        this.isWorking = nbtTagCompound.getBooleanOr(TAG_ACTIVE, false);
+        this.leisureTime = nbtTagCompound.getIntOr(TAG_LEISURE, 0);
 
         @NotNull final ListTag availQuestNbt = nbtTagCompound.getList(TAG_AV_QUESTS, TAG_STRING);
         for (int i = 0; i < availQuestNbt.size(); i++)
         {
-            availableQuests.add(ResourceLocation.parse(availQuestNbt.getString(i)));
+            availableQuests.add(ResourceLocation.parse(availQuestNbt.getStringOr(i, "")));
         }
 
         @NotNull final ListTag partQuestsNbt = nbtTagCompound.getList(TAG_PART_QUESTS, TAG_STRING);
         for (int i = 0; i < partQuestsNbt.size(); i++)
         {
-            participatingQuests.add(ResourceLocation.parse(partQuestsNbt.getString(i)));
+            participatingQuests.add(ResourceLocation.parse(partQuestsNbt.getStringOr(i, "")));
         }
 
         @NotNull final ListTag finQuestNbt = nbtTagCompound.getList(TAG_FINISHED_AV_QUESTS, TAG_STRING);
         for (int i = 0; i < finQuestNbt.size(); i++)
         {
-            finishedQuests.add(ResourceLocation.parse(finQuestNbt.getString(i)));
+            finishedQuests.add(ResourceLocation.parse(finQuestNbt.getStringOr(i, "")));
         }
 
         @NotNull final ListTag finPartQuestsNbt = nbtTagCompound.getList(TAG_FINISHED_PART_QUESTS, TAG_STRING);
         for (int i = 0; i < finPartQuestsNbt.size(); i++)
         {
-            finishedQuestParticipation.add(ResourceLocation.parse(finPartQuestsNbt.getString(i)));
+            finishedQuestParticipation.add(ResourceLocation.parse(finPartQuestsNbt.getStringOr(i, "")));
         }
 
         if (nbtTagCompound.contains(TAG_TEXTURE_UUID))
@@ -1852,7 +1852,7 @@ public class CitizenData implements ICitizenData
      */
     public static CitizenData loadFromNBT(final IColony colony, final CompoundTag nbt, @NotNull final HolderLookup.Provider provider)
     {
-        final CitizenData data = new CitizenData(nbt.getInt(TAG_ID), colony);
+        final CitizenData data = new CitizenData(nbt.getIntOr(TAG_ID, 0), colony);
         data.deserializeNBT(provider, nbt);
         return data;
     }

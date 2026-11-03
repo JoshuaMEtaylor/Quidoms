@@ -51,12 +51,12 @@ public class ItemQuestLog extends AbstractItemMinecolonies
         if (entity instanceof TileEntityColonyBuilding buildingEntity)
         {
             buildingEntity.writeColonyToItemStack(questLog);
-            if (!ctx.getLevel().isClientSide)
+            if (!ctx.getLevel().isClientSide())
             {
                 MessageUtils.format(COM_MINECOLONIES_QUEST_LOG_COLONY_SET, buildingEntity.getColony().getName()).sendTo(ctx.getPlayer());
             }
         }
-        else if (ctx.getLevel().isClientSide)
+        else if (ctx.getLevel().isClientSide())
         {
             openWindow(questLog, ctx.getLevel(), ctx.getPlayer());
         }
@@ -81,7 +81,7 @@ public class ItemQuestLog extends AbstractItemMinecolonies
     {
         final ItemStack questLog = playerIn.getItemInHand(hand);
 
-        if (!worldIn.isClientSide)
+        if (!worldIn.isClientSide())
         {
             return InteractionResult.SUCCESS;
         }

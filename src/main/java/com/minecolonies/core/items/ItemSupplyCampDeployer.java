@@ -58,7 +58,7 @@ public class ItemSupplyCampDeployer extends AbstractItemMinecolonies implements 
         {
             currentComponent.withRandomKey(ctx.getClickedPos().asLong()).writeToItemStack(ctx.getItemInHand());
         }
-        if (ctx.getLevel().isClientSide)
+        if (ctx.getLevel().isClientSide())
         {
             if (!MineColonies.getConfig().getServer().allowOtherDimColonies.get() && !WorldUtil.isOverworldType(ctx.getLevel()))
             {
@@ -82,7 +82,7 @@ public class ItemSupplyCampDeployer extends AbstractItemMinecolonies implements 
             currentComponent.withRandomKey(playerIn.blockPosition().asLong()).writeToItemStack(stack);
         }
 
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             if (!MineColonies.getConfig().getServer().allowOtherDimColonies.get() && !WorldUtil.isOverworldType(worldIn))
             {

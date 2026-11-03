@@ -48,7 +48,7 @@ public class ItemScrollHighlight extends AbstractItemScroll
     public InteractionResult useOn(UseOnContext ctx)
     {
         // Right click on block
-        if (ctx.getLevel().isClientSide || ctx.getPlayer() == null || !ctx.getPlayer().isShiftKeyDown())
+        if (ctx.getLevel().isClientSide() || ctx.getPlayer() == null || !ctx.getPlayer().isShiftKeyDown())
         {
             return InteractionResult.PASS;
         }

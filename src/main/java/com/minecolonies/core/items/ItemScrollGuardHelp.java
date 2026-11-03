@@ -159,7 +159,7 @@ public class ItemScrollGuardHelp extends AbstractItemScroll
     {
         final InteractionResult result = super.useOn(ctx);
 
-        if (ctx.getLevel().isClientSide)
+        if (ctx.getLevel().isClientSide())
         {
             return result;
         }
@@ -180,7 +180,7 @@ public class ItemScrollGuardHelp extends AbstractItemScroll
     @Override
     public void onUseTick(Level worldIn, LivingEntity entity, ItemStack stack, int count)
     {
-        if (!worldIn.isClientSide && worldIn.getGameTime() % 5 == 0)
+        if (!worldIn.isClientSide() && worldIn.getGameTime() % 5 == 0)
         {
             final Entity entity1 = entity;
             new VanillaParticleMessage(entity.getX(), entity.getY(), entity.getZ(), ParticleTypes.ENCHANT).sendToTrackingEntity(entity1);

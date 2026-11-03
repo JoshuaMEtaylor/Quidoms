@@ -56,8 +56,8 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        currentStage = compound.getInt(TAG_CURR_STAGE);
-        totalStages = compound.getInt(TAG_TOTAL_STAGES);
+        currentStage = compound.getIntOr(TAG_CURR_STAGE, 0);
+        totalStages = compound.getIntOr(TAG_TOTAL_STAGES, 0);
     }
 
     @Override

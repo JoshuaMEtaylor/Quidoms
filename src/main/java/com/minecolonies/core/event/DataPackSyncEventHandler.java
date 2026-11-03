@@ -132,7 +132,7 @@ public class DataPackSyncEventHandler
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void sendOnLogin(final PlayerEvent.PlayerLoggedInEvent event)
         {
-            if (!event.getEntity().level().isClientSide && event.getEntity() instanceof ServerPlayer)
+            if (!event.getEntity().level().isClientSide() && event.getEntity() instanceof ServerPlayer)
             {
                 final MinecraftServer server = event.getEntity().getServer();
                 sendPackets((ServerPlayer) event.getEntity(), new UpdateClientWithCompatibilityMessage(server.registryAccess()));

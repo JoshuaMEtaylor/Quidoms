@@ -151,12 +151,12 @@ public class BuildingNetherWorker extends AbstractBuilding
         super.deserializeNBT(provider, compound);
         if (compound.contains(TAG_CURRENT_TRIPS))
         {
-            this.currentTrips = compound.getInt(TAG_CURRENT_TRIPS);
+            this.currentTrips = compound.getIntOr(TAG_CURRENT_TRIPS, 0);
         }
 
         if (compound.contains(TAG_CURRENT_DAY))
         {
-            this.currentPeriodDay = compound.getInt(TAG_CURRENT_DAY);
+            this.currentPeriodDay = compound.getIntOr(TAG_CURRENT_DAY, 0);
         }
     }
 

@@ -33,7 +33,7 @@ public class GraveManagerView implements IGraveManager
     {
         final ImmutableMap.Builder<BlockPos, Boolean> graves = ImmutableMap.builder();
 
-        final ListTag gravesTagList = compound.getList(TAG_GRAVE, Tag.TAG_COMPOUND);
+        final ListTag gravesTagList = compound.getListOrEmpty(TAG_GRAVE);
         for (int i = 0; i < gravesTagList.size(); ++i)
         {
             final CompoundTag graveCompound = gravesTagList.getCompound(i);

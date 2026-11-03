@@ -58,7 +58,7 @@ public class ItemCrop extends BlockItem
         {
             final BlockPos clickedPos = ctx.getClickedPos().below();
             final BlockState worldState = ctx.getLevel().getBlockState(clickedPos);
-            if (ctx.getLevel().isClientSide && (worldState.getBlock() instanceof MinecoloniesFarmland || worldState.getBlock() instanceof FarmBlock))
+            if (ctx.getLevel().isClientSide() && (worldState.getBlock() instanceof MinecoloniesFarmland || worldState.getBlock() instanceof FarmBlock))
             {
                 MessageUtils.format(Component.translatable("com.minecolonies.core.crop.cantplant")).sendTo(player);
             }

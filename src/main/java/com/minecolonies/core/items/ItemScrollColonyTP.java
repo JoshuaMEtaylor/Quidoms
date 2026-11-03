@@ -114,7 +114,7 @@ public class ItemScrollColonyTP extends AbstractItemScroll
     @Override
     public void onUseTick(Level worldIn, LivingEntity entity, ItemStack stack, int count)
     {
-        if (!worldIn.isClientSide && worldIn.getGameTime() % 5 == 0)
+        if (!worldIn.isClientSide() && worldIn.getGameTime() % 5 == 0)
         {
             final Entity entity1 = entity;
             new VanillaParticleMessage(entity.getX(), entity.getY(), entity.getZ(), ParticleTypes.INSTANT_EFFECT).sendToTrackingEntity(entity1);

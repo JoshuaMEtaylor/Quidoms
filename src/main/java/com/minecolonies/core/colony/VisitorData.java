@@ -69,8 +69,8 @@ public class VisitorData extends CitizenData implements IVisitorData
     {
         super.deserializeNBT(provider, nbtTagCompound);
         sittingPosition = BlockPosUtil.read(nbtTagCompound, TAG_SITTING);
-        recruitCost = ItemStack.parseOptional(provider, nbtTagCompound.getCompound(TAG_RECRUIT_COST));
-        recruitCost.setCount(nbtTagCompound.getInt(TAG_RECRUIT_COST_QTY));
+        recruitCost = ItemStack.parseOptional(provider, nbtTagCompound.getCompoundOrEmpty(TAG_RECRUIT_COST));
+        recruitCost.setCount(nbtTagCompound.getIntOr(TAG_RECRUIT_COST_QTY, 0));
     }
 
     @Override
@@ -95,7 +95,7 @@ public class VisitorData extends CitizenData implements IVisitorData
      */
     public static IVisitorData loadVisitorFromNBT(final IColony colony, final CompoundTag nbt, final HolderLookup.@NotNull Provider provider)
     {
-        final IVisitorData data = new VisitorData(nbt.getInt(TAG_ID), colony);
+        final IVisitorData data = new VisitorData(nbt.getIntOr(TAG_ID, 0), colony);
         data.deserializeNBT(provider, nbt);
         return data;
     }

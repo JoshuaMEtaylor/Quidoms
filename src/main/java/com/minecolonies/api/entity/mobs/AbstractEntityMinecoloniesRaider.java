@@ -26,7 +26,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -231,7 +231,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
      */
     @Nullable
     @Override
-    public Entity changeDimension(final DimensionTransition dimensionTransition)
+    public Entity changeDimension(final TeleportTransition dimensionTransition)
     {
         return null;
     }
@@ -239,11 +239,11 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
     @Override
     public void readAdditionalSaveData(final CompoundTag compound)
     {
-        worldTimeAtSpawn = compound.getLong(TAG_TIME);
-        eventID = compound.getInt(TAG_EVENT_ID);
+        worldTimeAtSpawn = compound.getLongOr(TAG_TIME, 0L);
+        eventID = compound.getIntOr(TAG_EVENT_ID, 0);
         if (compound.contains(TAG_COLONY_ID))
         {
-            final int colonyId = compound.getInt(TAG_COLONY_ID);
+            final int colonyId = compound.getIntOr(TAG_COLONY_ID, 0);
             if (colonyId != 0)
             {
                 setColony(IColonyManager.getInstance().getColonyByWorld(colonyId, level()));
@@ -287,7 +287,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
             envDmgCooldown--;
         }
 
-        if (level().isClientSide)
+        if (level().isClientSide())
         {
             super.aiStep();
             return;
@@ -366,7 +366,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
     public SpawnGroupData finalizeSpawn(
       final ServerLevelAccessor worldIn,
       final DifficultyInstance difficultyIn,
-      final MobSpawnType reason,
+      final EntitySpawnReason reason,
       @Nullable final SpawnGroupData spawnDataIn)
     {
         RaiderMobUtils.setEquipment(this);
@@ -376,7 +376,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
     @Override
     public void remove(@NotNull final RemovalReason reason)
     {
-        if (!level().isClientSide && colony != null && eventID > 0)
+        if (!level().isClientSide() && colony != null && eventID > 0)
         {
             colony.getEventManager().unregisterEntity(this, eventID);
         }
@@ -412,7 +412,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
     public void die(@NotNull final DamageSource cause)
     {
         super.die(cause);
-        if (!level().isClientSide && getColony() != null)
+        if (!level().isClientSide() && getColony() != null)
         {
             getColony().getEventManager().onEntityDeath(this, eventID);
         }

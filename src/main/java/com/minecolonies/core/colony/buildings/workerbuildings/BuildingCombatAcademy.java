@@ -83,10 +83,10 @@ public class BuildingCombatAcademy extends AbstractBuilding
 
         fightingPos.clear();
 
-        final ListTag targetList = compound.getList(TAG_COMBAT_TARGET, Tag.TAG_COMPOUND);
+        final ListTag targetList = compound.getListOrEmpty(TAG_COMBAT_TARGET);
         fightingPos.addAll(NBTUtils.streamCompound(targetList).map(targetCompound -> BlockPosUtil.read(targetCompound, TAG_TARGET)).collect(Collectors.toList()));
 
-        final ListTag partnersTagList = compound.getList(TAG_COMBAT_PARTNER, Tag.TAG_COMPOUND);
+        final ListTag partnersTagList = compound.getListOrEmpty(TAG_COMBAT_PARTNER);
         trainingPartners.putAll(NBTUtils.streamCompound(partnersTagList)
                                   .collect(Collectors.toMap(targetCompound -> targetCompound.getInt(TAG_PARTNER1), targetCompound -> targetCompound.getInt(TAG_PARTNER2))));
     }

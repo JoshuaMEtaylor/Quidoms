@@ -69,12 +69,12 @@ public class BuildingAlternatesResearchRequirement implements IResearchRequireme
     public BuildingAlternatesResearchRequirement(final CompoundTag nbt)
     {
         buildings = new HashSet<>();
-        buildingLevel = nbt.getInt(TAG_BUILDING_LVL);
+        buildingLevel = nbt.getIntOr(TAG_BUILDING_LVL, 0);
         final ListTag buildingsNBT = nbt.getList(TAG_BUILDINGS_LIST, Constants.TAG_COMPOUND);
         for (int i = 0; i < buildingsNBT.size(); i++)
         {
-            final CompoundTag buildingNBT = buildingsNBT.getCompound(i);
-            buildings.add(parseFallbackBuildingKey(buildingNBT.getString(TAG_BUILDING_NAME)));
+            final CompoundTag buildingNBT = buildingsNBT.getCompoundOrEmpty(i);
+            buildings.add(parseFallbackBuildingKey(buildingNBT.getStringOr(TAG_BUILDING_NAME, "")));
         }
     }
 

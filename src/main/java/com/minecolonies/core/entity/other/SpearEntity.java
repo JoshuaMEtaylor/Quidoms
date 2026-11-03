@@ -143,7 +143,7 @@ public class SpearEntity extends ThrownTrident implements ICustomAttackSound
     public void readAdditionalSaveData(@NotNull CompoundTag nbt)
     {
         super.readAdditionalSaveData(nbt);
-        this.dealtDamage = nbt.getBoolean(NBT_DEALT_DAMAGE);
+        this.dealtDamage = nbt.getBooleanOr(NBT_DEALT_DAMAGE, false);
     }
 
     @Override

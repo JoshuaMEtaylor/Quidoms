@@ -46,12 +46,12 @@ public class ItemColonyMap extends AbstractItemMinecolonies
         {
             buildingEntity.writeColonyToItemStack(colonymap);
 
-            if (!ctx.getLevel().isClientSide)
+            if (!ctx.getLevel().isClientSide())
             {
                 MessageUtils.format(COM_MINECOLONIES_MAP_COLONY_SET, buildingEntity.getColony().getName()).sendTo(ctx.getPlayer());
             }
         }
-        else if (ctx.getLevel().isClientSide)
+        else if (ctx.getLevel().isClientSide())
         {
             openWindow(colonymap, ctx.getLevel(), ctx.getPlayer());
         }
@@ -76,7 +76,7 @@ public class ItemColonyMap extends AbstractItemMinecolonies
     {
         final ItemStack colonymap = playerIn.getItemInHand(hand);
 
-        if (!worldIn.isClientSide) {
+        if (!worldIn.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
 

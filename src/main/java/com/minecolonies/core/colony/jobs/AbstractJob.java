@@ -212,14 +212,14 @@ public abstract class AbstractJob<AI extends AbstractAISkeleton<J> & ITickingSta
         this.asyncRequests.clear();
         if (compound.contains(TAG_ASYNC_REQUESTS))
         {
-            this.asyncRequests.addAll(NBTUtils.streamCompound(compound.getList(TAG_ASYNC_REQUESTS, Tag.TAG_COMPOUND))
+            this.asyncRequests.addAll(NBTUtils.streamCompound(compound.getListOrEmpty(TAG_ASYNC_REQUESTS))
                                         .map(s -> StandardFactoryController.getInstance().deserializeTag(provider, s))
                                         .map(o -> (IToken<?>) o)
                                         .collect(Collectors.toSet()));
         }
         if (compound.contains(TAG_ACTIONS_DONE))
         {
-            actionsDone = compound.getInt(TAG_ACTIONS_DONE);
+            actionsDone = compound.getIntOr(TAG_ACTIONS_DONE, 0);
         }
 
         if (compound.contains(TAG_WORK_POS))
