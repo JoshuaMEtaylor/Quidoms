@@ -84,17 +84,17 @@ public class JobNetherWorker extends AbstractJobCrafter<EntityAIWorkNether, JobN
     {
         super.deserializeNBT(provider, compound);
 
-        final ListTag craftedList = compound.getList(TAG_CRAFTED, CompoundTag.TAG_COMPOUND);
+        final ListTag craftedList = compound.getListOrEmpty(TAG_CRAFTED);
         for (int i = 0; i < craftedList.size(); ++i)
         {
-            final CompoundTag itemCompound = craftedList.getCompound(i);
+            final CompoundTag itemCompound = craftedList.getCompoundOrEmpty(i);
             craftedResults.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, itemCompound));
         }
 
-        final ListTag processedList = compound.getList(TAG_PROCESSED, CompoundTag.TAG_COMPOUND);
+        final ListTag processedList = compound.getListOrEmpty(TAG_PROCESSED);
         for (int i = 0; i < processedList.size(); ++i)
         {
-            final CompoundTag itemCompound = processedList.getCompound(i);
+            final CompoundTag itemCompound = processedList.getCompoundOrEmpty(i);
             processedResults.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, itemCompound));
         }
 

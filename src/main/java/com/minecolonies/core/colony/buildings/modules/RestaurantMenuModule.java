@@ -238,7 +238,7 @@ public class RestaurantMenuModule extends AbstractBuildingModule implements IPer
         final ListTag minimumStockTagList = compound.getListOrEmpty(TAG_MENU);
         for (int i = 0; i < minimumStockTagList.size(); i++)
         {
-            final ItemStack itemStack = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, minimumStockTagList.getCompound(i));
+            final ItemStack itemStack = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, minimumStockTagList.getCompoundOrEmpty(i));
             if (FoodUtils.EDIBLE.test(itemStack))
             {
                 menu.add(new ItemStorage(itemStack));

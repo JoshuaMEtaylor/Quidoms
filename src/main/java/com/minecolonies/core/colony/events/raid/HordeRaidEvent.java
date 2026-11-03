@@ -524,7 +524,7 @@ public abstract class HordeRaidEvent implements IColonyRaidEvent, IColonyCampFir
         setHorde(Horde.loadFromNbt(compound));
         spawnPoint = BlockPosUtil.read(compound, TAG_SPAWN_POS);
 
-        for (final Tag posCompound : compound.getList(TAG_CAMPFIRE_LIST, TAG_COMPOUND))
+        for (final Tag posCompound : compound.getListOrEmpty(TAG_CAMPFIRE_LIST))
         {
             campFires.add(BlockPosUtil.read((CompoundTag) posCompound, NbtTagConstants.TAG_POS));
         }

@@ -337,12 +337,12 @@ public class Permissions implements IPermissions
             final ListTag rankTagList = compound.getListOrEmpty(TAG_RANKS);
             for (int i = 0; i < rankTagList.size(); ++i)
             {
-                final CompoundTag rankCompound = rankTagList.getCompound(i);
-                final int id = rankCompound.getInt(TAG_ID);
-                final String name = rankCompound.getString(TAG_NAME);
-                final boolean isInitial = rankCompound.getBoolean(TAG_INITIAL);
-                final boolean isColonyManager = rankCompound.getBoolean(TAG_COLONY_MANAGER);
-                final boolean isHostile = rankCompound.getBoolean(TAG_HOSTILE);
+                final CompoundTag rankCompound = rankTagList.getCompoundOrEmpty(i);
+                final int id = rankCompound.getIntOr(TAG_ID, 0);
+                final String name = rankCompound.getStringOr(TAG_NAME, "");
+                final boolean isInitial = rankCompound.getBooleanOr(TAG_INITIAL, false);
+                final boolean isColonyManager = rankCompound.getBooleanOr(TAG_COLONY_MANAGER, false);
+                final boolean isHostile = rankCompound.getBooleanOr(TAG_HOSTILE, false);
 
                 final Rank rank = new Rank(id, 0L, name, isInitial, isColonyManager, isHostile);
                 ranks.put(id, rank);
@@ -352,9 +352,9 @@ public class Permissions implements IPermissions
             final ListTag permissionsTagList = compound.getListOrEmpty(TAG_PERMISSIONS);
             for (int i = 0; i < permissionsTagList.size(); ++i)
             {
-                final CompoundTag permissionsCompound = permissionsTagList.getCompound(i);
+                final CompoundTag permissionsCompound = permissionsTagList.getCompoundOrEmpty(i);
 
-                final Rank rank = ranks.get(permissionsCompound.getInt(TAG_RANK));
+                final Rank rank = ranks.get(permissionsCompound.getIntOr(TAG_RANK, 0));
                 if (rank == null)
                 {
                     continue;
@@ -364,7 +364,7 @@ public class Permissions implements IPermissions
 
                 for (int j = 0; j < flagsTagList.size(); ++j)
                 {
-                    final String flag = flagsTagList.getString(j);
+                    final String flag = flagsTagList.getStringOr(j, "");
                     try
                     {
                         rank.addPermission(Action.valueOf(flag));
@@ -386,21 +386,21 @@ public class Permissions implements IPermissions
         final ListTag ownerTagList = compound.getListOrEmpty(TAG_OWNERS);
         for (int i = 0; i < ownerTagList.size(); ++i)
         {
-            final CompoundTag ownerCompound = ownerTagList.getCompound(i);
-            @NotNull final UUID id = UUID.fromString(ownerCompound.getString(TAG_ID));
+            final CompoundTag ownerCompound = ownerTagList.getCompoundOrEmpty(i);
+            @NotNull final UUID id = UUID.fromString(ownerCompound.getStringOr(TAG_ID, ""));
             String name = "";
             if (ownerCompound.contains(TAG_NAME))
             {
-                name = ownerCompound.getString(TAG_NAME);
+                name = ownerCompound.getStringOr(TAG_NAME, "");
             }
             Rank rank;
             if (version >= 3)
             {
-                rank = ranks.get(ownerCompound.getInt(TAG_RANK));
+                rank = ranks.get(ownerCompound.getIntOr(TAG_RANK, 0));
             }
             else
             {
-                final OldRank oldRank = OldRank.valueOf(ownerCompound.getString(TAG_RANK));
+                final OldRank oldRank = OldRank.valueOf(ownerCompound.getStringOr(TAG_RANK, ""));
                 rank = ranks.get(oldRank.ordinal());
             }
 

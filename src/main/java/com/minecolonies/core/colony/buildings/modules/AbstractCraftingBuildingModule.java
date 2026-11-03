@@ -248,7 +248,7 @@ public abstract class AbstractCraftingBuildingModule extends AbstractBuildingMod
 
         for (int i = 0; i < recipesTags.size(); i++)
         {
-            final IToken<?> token = StandardFactoryController.getInstance().deserializeTag(provider, recipesTags.getCompound(i));
+            final IToken<?> token = StandardFactoryController.getInstance().deserializeTag(provider, recipesTags.getCompoundOrEmpty(i));
             if (!recipes.contains(token))
             {
                 recipes.add(token);

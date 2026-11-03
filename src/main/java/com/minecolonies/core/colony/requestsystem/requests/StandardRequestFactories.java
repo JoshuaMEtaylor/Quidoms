@@ -1174,7 +1174,7 @@ public final class StandardRequestFactories
         final ListTag childCompound = compound.getListOrEmpty(NBT_CHILDREN);
         for (int i = 0; i < childCompound.size(); i++)
         {
-            childTokens.add(controller.deserializeTag(provider, childCompound.getCompound(i)));
+            childTokens.add(controller.deserializeTag(provider, childCompound.getCompoundOrEmpty(i)));
         }
 
         @SuppressWarnings(Suppression.LEFT_CURLY_BRACE) final R request = objectConstructor.construct(requested, token, requester, state);

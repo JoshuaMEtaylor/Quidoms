@@ -116,7 +116,7 @@ public class FarmField extends AbstractBuildingExtension
     {
         super.deserializeNBT(provider, compound);
         setSeed(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compound.getCompoundOrEmpty(TAG_SEED)));
-        radii = compound.getIntArray(TAG_RADIUS);
+        radii = compound.getIntArray(TAG_RADIUS).orElse(new int[0]);
         fieldStage = Stage.valueOf(compound.getStringOr(TAG_STAGE, ""));
     }
 

@@ -89,7 +89,7 @@ public class BuildingSchool extends AbstractBuilding
         final ListTag carpetTagList = compound.getListOrEmpty(NBT_CARPET);
         for (int i = 0; i < carpetTagList.size(); ++i)
         {
-            final CompoundTag bedCompound = carpetTagList.getCompound(i);
+            final CompoundTag bedCompound = carpetTagList.getCompoundOrEmpty(i);
             final BlockPos pos = BlockPosUtil.read(bedCompound, TAG_POS);
             if (!carpet.contains(pos))
             {

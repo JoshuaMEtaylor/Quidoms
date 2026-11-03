@@ -120,7 +120,7 @@ public class StandardDataStoreManager implements IDataStoreManager
             final ListTag list = nbt.getListOrEmpty(NbtTagConstants.TAG_LIST);
             for (int i = 0; i < list.size(); i++)
             {
-                final CompoundTag tag = list.getCompound(i);
+                final CompoundTag tag = list.getCompoundOrEmpty(i);
                 try
                 {
                     final IToken<?> token = controller.deserializeTag(provider, tag.getCompoundOrEmpty(NbtTagConstants.TAG_TOKEN));

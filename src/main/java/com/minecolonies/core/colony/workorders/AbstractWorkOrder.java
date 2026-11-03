@@ -821,7 +821,7 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
                                 tagData.putString(NbtTagConstants.TAG_PACK, blueprint.getPackName());
                                 if (blueprint.getPrimaryBlockOffset().equals(offset))
                                 {
-                                    tagData.putString(NbtTagConstants.TAG_PATH, StructurePacks.getStructurePack(blueprint.getPackName()).getSubPath(Utils.resolvePath(blueprint.getFilePath(), tagData.getString(TAG_SCHEMATIC_NAME))) + ".blueprint");
+                                    tagData.putString(NbtTagConstants.TAG_PATH, StructurePacks.getStructurePack(blueprint.getPackName()).getSubPath(Utils.resolvePath(blueprint.getFilePath(), tagData.getStringOr(TAG_SCHEMATIC_NAME, ""))) + ".blueprint");
                                 }
 
                                 try

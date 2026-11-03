@@ -57,7 +57,7 @@ public class CourierAssignmentModule extends AbstractAssignedCitizenModule imple
             compound = compound.getCompoundOrEmpty(getModuleSerializationIdentifier());
         }
 
-        final int[] residentIds = compound.getIntArray(TAG_COURIERS);
+        final int[] residentIds = compound.getIntArray(TAG_COURIERS).orElse(new int[0]);
         for (final int citizenId : residentIds)
         {
             final ICitizenData citizen = building.getColony().getCitizenManager().getCivilian(citizenId);

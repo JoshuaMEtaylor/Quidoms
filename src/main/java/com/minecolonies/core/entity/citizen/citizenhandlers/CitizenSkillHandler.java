@@ -140,9 +140,9 @@ public class CitizenSkillHandler implements ICitizenSkillHandler
         final ListTag levelTagList = compoundNBT.getListOrEmpty(TAG_LEVEL_MAP);
         for (int i = 0; i < levelTagList.size(); ++i)
         {
-            final CompoundTag levelExperienceAtJob = levelTagList.getCompound(i);
-            skillMap.put(Skill.values()[levelExperienceAtJob.getInt(TAG_SKILL)],
-              new SkillData(Math.max(1, Math.min(levelExperienceAtJob.getInt(TAG_LEVEL), MAX_CITIZEN_LEVEL)), levelExperienceAtJob.getDouble(TAG_EXPERIENCE)));
+            final CompoundTag levelExperienceAtJob = levelTagList.getCompoundOrEmpty(i);
+            skillMap.put(Skill.values()[levelExperienceAtJob.getIntOr(TAG_SKILL, 0)],
+              new SkillData(Math.max(1, Math.min(levelExperienceAtJob.getIntOr(TAG_LEVEL, 0), MAX_CITIZEN_LEVEL)), levelExperienceAtJob.getDoubleOr(TAG_EXPERIENCE, 0.0D)));
         }
     }
 

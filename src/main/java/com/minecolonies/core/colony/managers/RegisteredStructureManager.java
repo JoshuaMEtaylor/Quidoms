@@ -146,7 +146,7 @@ public class RegisteredStructureManager implements IRegisteredStructureManager
         {
             try
             {
-                final CompoundTag extensionCompound = extensionsTagList.getCompound(i);
+                final CompoundTag extensionCompound = extensionsTagList.getCompoundOrEmpty(i);
                 final IBuildingExtension extension = BuildingExtensionDataManager.compoundToExtension(provider, extensionCompound);
                 if (extension != null)
                 {
@@ -163,7 +163,7 @@ public class RegisteredStructureManager implements IRegisteredStructureManager
         final ListTag buildingTagList = compound.getListOrEmpty(TAG_BUILDINGS);
         for (int i = 0; i < buildingTagList.size(); ++i)
         {
-            final CompoundTag buildingCompound = buildingTagList.getCompound(i);
+            final CompoundTag buildingCompound = buildingTagList.getCompoundOrEmpty(i);
             @Nullable final IBuilding b = IBuildingDataManager.getInstance().createFrom(colony, buildingCompound, provider);
             if (b != null)
             {
@@ -178,7 +178,7 @@ public class RegisteredStructureManager implements IRegisteredStructureManager
             final List<BlockPos> leisureSitesList = new ArrayList<>();
             for (int i = 0; i < leisureTagList.size(); ++i)
             {
-                final BlockPos pos = BlockPosUtil.read(leisureTagList.getCompound(i), TAG_POS);
+                final BlockPos pos = BlockPosUtil.read(leisureTagList.getCompoundOrEmpty(i), TAG_POS);
                 if (!leisureSitesList.contains(pos))
                 {
                     leisureSitesList.add(pos);

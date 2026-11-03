@@ -151,7 +151,7 @@ public class MinerLevel
         final ListTag nodeTagList = compound.getListOrEmpty(TAG_NODES);
         for (int i = 0; i < nodeTagList.size(); i++)
         {
-            @NotNull final MineNode node = MineNode.createFromNBT(nodeTagList.getCompound(i));
+            @NotNull final MineNode node = MineNode.createFromNBT(nodeTagList.getCompoundOrEmpty(i));
             this.nodes.put(new Vec2i(node.getX(), node.getZ()), node);
         }
 
@@ -176,7 +176,7 @@ public class MinerLevel
         final ListTag openNodeTagList = compound.getListOrEmpty(TAG_OPEN_NODES);
         for (int i = 0; i < openNodeTagList.size(); i++)
         {
-            @NotNull final MineNode node = MineNode.createFromNBT(openNodeTagList.getCompound(i));
+            @NotNull final MineNode node = MineNode.createFromNBT(openNodeTagList.getCompoundOrEmpty(i));
             this.openNodes.add(node);
         }
     }

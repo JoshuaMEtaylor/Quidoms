@@ -665,7 +665,7 @@ public class ColonyConnectionManager implements IColonyConnectionManager
         final ListTag diplomacyStatusTagList = compound.getListOrEmpty(TAG_DIPLOMACY);
         for (final Tag tag : diplomacyStatusTagList)
         {
-            diplomacyStatus.put(((CompoundTag)tag).getInt(TAG_COLONY_ID), DiplomacyStatus.values()[((CompoundTag)tag).getInt(TAG_STATUS)]);
+            diplomacyStatus.put(((CompoundTag)tag).getIntOr(TAG_COLONY_ID, 0), DiplomacyStatus.values()[((CompoundTag)tag).getIntOr(TAG_STATUS, 0)]);
         }
     }
 
