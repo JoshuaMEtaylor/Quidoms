@@ -70,10 +70,8 @@ neoForge {
         }
     }
 
-    unitTest {
-        enable()
-        testedMod = mods.getByName(mod_id)
-    }
+    // Pure JUnit tests (IngredientBom) do not need NeoForge game bootstrap.
+    // Re-enable unitTest { } when adding in-game tests that need registries.
 }
 
 dependencies {
