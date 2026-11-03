@@ -4,14 +4,12 @@ import com.ldtteam.structurize.util.WorldRenderMacros;
 import com.minecolonies.api.colony.IColonyManager;
 import com.minecolonies.api.colony.IColonyView;
 import com.minecolonies.core.client.render.TileEntityColonySignRenderer;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4fStack;
 
 /**
  * Main class for handling world rendering.
@@ -30,7 +28,7 @@ public class WorldEventContext extends WorldRenderMacros
     public IColonyView nearestColony;
 
     @Override
-    protected void renderWithinContext(final Stage stage)
+    protected void renderWithinContext(final Class<? extends RenderLevelStageEvent> stage)
     {
         if (stage == STAGE_FOR_LINES)
         {
@@ -45,7 +43,7 @@ public class WorldEventContext extends WorldRenderMacros
             HighlightManager.render(this);
 
         }
-        else if (stage == Stage.AFTER_TRIPWIRE_BLOCKS)
+        else if (stage == RenderLevelStageEvent.AfterTripwireBlocks.class)
         {
             TileEntityColonySignRenderer.renderSignHover(this);
         }
