@@ -123,7 +123,7 @@ public class DoBlockPlacementHandler implements IPlacementHandler
         final List<ItemStack> itemList = new ArrayList<>();
         if (tileEntityData != null)
         {
-            BlockPos blockpos = new BlockPos(tileEntityData.getInt("x"), tileEntityData.getInt("y"), tileEntityData.getInt("z"));
+            BlockPos blockpos = new BlockPos(tileEntityData.getIntOr("x", 0), tileEntityData.getIntOr("y", 0), tileEntityData.getIntOr("z", 0));
             final BlockEntity tileEntity = BlockEntity.loadStatic(blockpos, blockState, tileEntityData, world.registryAccess());
             if (tileEntity == null)
             {

@@ -59,8 +59,8 @@ public class SaveStructureNBTMessage extends AbstractClientPlayMessage
         try (ByteBufInputStream stream = new ByteBufInputStream(buffer))
         {
             final CompoundTag wrapperCompound = NbtIo.readCompressed(stream, NbtAccounter.unlimitedHeap());
-            compoundNBT = wrapperCompound.getCompound(TAG_SCHEMATIC);
-            fileName = wrapperCompound.getString(TAG_MILLIS);
+            compoundNBT = wrapperCompound.getCompoundOrEmpty(TAG_SCHEMATIC);
+            fileName = wrapperCompound.getStringOr(TAG_MILLIS, "");
         }
         catch (final RuntimeException e)
         {

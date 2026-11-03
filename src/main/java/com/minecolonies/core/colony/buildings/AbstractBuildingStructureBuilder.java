@@ -223,7 +223,7 @@ public abstract class AbstractBuildingStructureBuilder extends AbstractBuilding
             fluidsToRemove.clear();
             ListTag fluidsToRemove = (ListTag) compound.get(TAG_FLUIDS_REMOVE);
             fluidsToRemove.forEach(fluidsRemove -> {
-                int y = ((CompoundTag) fluidsRemove).getInt(TAG_FLUIDS_REMOVE_Y);
+                int y = ((CompoundTag) fluidsRemove).getIntOr(TAG_FLUIDS_REMOVE_Y, 0);
                 ListTag positions = (ListTag) ((CompoundTag) fluidsRemove).get(TAG_FLUIDS_REMOVE_POSITIONS);
                 final List<BlockPos> fluids = new ArrayList<BlockPos>();
                 for (int i = 0; i < positions.size(); i++)

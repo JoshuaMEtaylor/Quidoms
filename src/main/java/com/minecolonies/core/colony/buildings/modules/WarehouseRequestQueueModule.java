@@ -33,7 +33,7 @@ public class WarehouseRequestQueueModule extends AbstractBuildingModule implemen
         final ListTag requestTagList = compound.getListOrEmpty(TAG_REQUEST);
         for (int i = 0; i < requestTagList.size(); ++i)
         {
-            requestList.add(StandardFactoryController.getInstance().deserializeTag(provider, requestTagList.getCompound(i)));
+            requestList.add(StandardFactoryController.getInstance().deserializeTag(provider, requestTagList.getCompoundOrEmpty(i)));
         }
     }
 

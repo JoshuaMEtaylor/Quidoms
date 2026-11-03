@@ -63,7 +63,7 @@ public class MinerLevelManagementModule extends AbstractBuildingModule implement
         final ListTag levelTagList = compound.getListOrEmpty(TAG_LEVELS);
         for (int i = 0; i < levelTagList.size(); i++)
         {
-            this.levels.add(new MinerLevel(levelTagList.getCompound(i)));
+            this.levels.add(new MinerLevel(levelTagList.getCompoundOrEmpty(i)));
         }
 
         if (compound.contains(TAG_ACTIVE))

@@ -73,10 +73,10 @@ public class GraveManager implements IGraveManager
         final ListTag gravesTagList = compound.getListOrEmpty(TAG_GRAVE);
         for (int i = 0; i < gravesTagList.size(); ++i)
         {
-            final CompoundTag graveCompound = gravesTagList.getCompound(i);
+            final CompoundTag graveCompound = gravesTagList.getCompoundOrEmpty(i);
             if (graveCompound.contains(TAG_POS) && graveCompound.contains(TAG_RESERVED))
             {
-                graves.put(BlockPosUtil.read(graveCompound, TAG_POS), graveCompound.getBoolean(TAG_RESERVED));
+                graves.put(BlockPosUtil.read(graveCompound, TAG_POS), graveCompound.getBooleanOr(TAG_RESERVED, false));
             }
         }
     }

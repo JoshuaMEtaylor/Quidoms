@@ -83,7 +83,7 @@ public class QuarryModule extends AbstractAssignedCitizenModule implements IAssi
             compound = compound.getCompoundOrEmpty(getModuleSerializationIdentifier());
         }
 
-        final int[] residentIds = compound.getIntArray(TAG_MINERS);
+        final int[] residentIds = compound.getIntArray(TAG_MINERS).orElse(new int[0]);
         for (final int citizenId : residentIds)
         {
             final ICitizenData citizen = building.getColony().getCitizenManager().getCivilian(citizenId);

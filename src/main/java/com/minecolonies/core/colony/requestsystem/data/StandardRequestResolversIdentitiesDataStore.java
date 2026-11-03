@@ -124,9 +124,9 @@ public class StandardRequestResolversIdentitiesDataStore implements IRequestReso
 
             for (int i = 0; i < list.size(); i++)
             {
-                final CompoundTag mapCompound = list.getCompound(i);
-                final IToken<?> id = controller.deserializeTag(provider, mapCompound.getCompound(TAG_TOKEN));
-                final IRequestResolver<?> resolver = controller.deserializeTag(provider, mapCompound.getCompound(TAG_RESOLVER));
+                final CompoundTag mapCompound = list.getCompoundOrEmpty(i);
+                final IToken<?> id = controller.deserializeTag(provider, mapCompound.getCompoundOrEmpty(TAG_TOKEN));
+                final IRequestResolver<?> resolver = controller.deserializeTag(provider, mapCompound.getCompoundOrEmpty(TAG_RESOLVER));
                 if (resolver.isValid())
                 {
                     biMap.put(id, resolver);

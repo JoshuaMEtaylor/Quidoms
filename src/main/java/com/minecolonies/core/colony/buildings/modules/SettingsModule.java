@@ -60,11 +60,11 @@ public class SettingsModule extends AbstractBuildingModule implements IPersisten
         final ListTag list = settingsCompound.getListOrEmpty("settingslist");
         for (int i = 0; i < list.size(); i++)
         {
-            final CompoundTag entryCompound = list.getCompound(i);
-            final ResourceLocation key = ResourceLocation.parse(entryCompound.getString("key"));
+            final CompoundTag entryCompound = list.getCompoundOrEmpty(i);
+            final ResourceLocation key = ResourceLocation.parse(entryCompound.getStringOr("key", ""));
             try
             {
-                final ISetting setting = StandardFactoryController.getInstance().deserializeTag(provider, entryCompound.getCompound("value"));
+                final ISetting setting = StandardFactoryController.getInstance().deserializeTag(provider, entryCompound.getCompoundOrEmpty("value"));
                 final ISettingKey<?> settingsKey = new SettingKey<>(setting.getClass(), key);
                 if (settings.containsKey(settingsKey))
                 {

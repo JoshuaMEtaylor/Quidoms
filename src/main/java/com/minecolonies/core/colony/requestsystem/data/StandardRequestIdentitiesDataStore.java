@@ -131,7 +131,7 @@ public class StandardRequestIdentitiesDataStore implements IRequestIdentitiesDat
             final BiMap<IToken<?>, IRequest<?>> map = HashBiMap.create();
             for (int i = 0; i < list.size(); i++)
             {
-                final CompoundTag tag = list.getCompound(i);
+                final CompoundTag tag = list.getCompoundOrEmpty(i);
                 try
                 {
                     final IToken<?> id = controller.deserializeTag(provider, tag.getCompoundOrEmpty(TAG_TOKEN));

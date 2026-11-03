@@ -156,7 +156,7 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
         if (compound.contains(NbtTagConstants.TAG_SECONDARY_OUTPUTS))
         {
             final HashMap<ItemStorage, Integer> newItems = new HashMap<>();
-            final ListTag list = compound.getList(NbtTagConstants.TAG_SECONDARY_OUTPUTS, ListTag.TAG_COMPOUND);
+            final ListTag list = compound.getListOrEmpty(NbtTagConstants.TAG_SECONDARY_OUTPUTS);
             for (final Tag tag : list)
             {
                 if (tag instanceof CompoundTag compoundTag)

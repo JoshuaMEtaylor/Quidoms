@@ -95,15 +95,15 @@ public class StandardRetryingRequestResolverFactory implements IFactory<IRequest
     public StandardRetryingRequestResolver deserialize(@NotNull final HolderLookup.Provider provider, @NotNull final IFactoryController controller, @NotNull final CompoundTag nbt)
     {
         final Map<IToken<?>, Integer> assignments = NBTUtils.streamCompound(nbt.getListOrEmpty(NBT_TRIES)).map(assignmentCompound -> {
-            IToken<?> token = controller.deserializeTag(provider, assignmentCompound.getCompound(NBT_TOKEN));
-            Integer tries = assignmentCompound.getInt(NBT_VALUE);
+            IToken<?> token = controller.deserializeTag(provider, assignmentCompound.getCompoundOrEmpty(NBT_TOKEN));
+            Integer tries = assignmentCompound.getIntOr(NBT_VALUE, 0);
 
             return new HashMap.SimpleEntry<>(token, tries);
         }).collect(Collectors.toMap(HashMap.SimpleEntry::getKey, HashMap.SimpleEntry::getValue));
 
         final Map<IToken<?>, Integer> delays = NBTUtils.streamCompound(nbt.getListOrEmpty(NBT_DELAYS)).map(assignmentCompound -> {
-            IToken<?> token = controller.deserializeTag(provider, assignmentCompound.getCompound(NBT_TOKEN));
-            Integer tries = assignmentCompound.getInt(NBT_VALUE);
+            IToken<?> token = controller.deserializeTag(provider, assignmentCompound.getCompoundOrEmpty(NBT_TOKEN));
+            Integer tries = assignmentCompound.getIntOr(NBT_VALUE, 0);
 
             return new HashMap.SimpleEntry<>(token, tries);
         }).collect(Collectors.toMap(HashMap.SimpleEntry::getKey, HashMap.SimpleEntry::getValue));

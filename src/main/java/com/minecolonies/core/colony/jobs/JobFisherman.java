@@ -106,7 +106,7 @@ public class JobFisherman extends AbstractJob<EntityAIWorkFisherman, JobFisherma
             final ListTag listOfPonds = compound.getListOrEmpty(TAG_PONDS);
             for (int i = 0; i < listOfPonds.size(); i++)
             {
-                ponds.add(new Tuple<>(BlockPosUtil.read(listOfPonds.getCompound(i), TAG_WATER_POND), BlockPosUtil.read(listOfPonds.getCompound(i), TAG_PARENT_POND)));
+                ponds.add(new Tuple<>(BlockPosUtil.read(listOfPonds.getCompoundOrEmpty(i), TAG_WATER_POND), BlockPosUtil.read(listOfPonds.getCompoundOrEmpty(i), TAG_PARENT_POND)));
             }
         }
     }

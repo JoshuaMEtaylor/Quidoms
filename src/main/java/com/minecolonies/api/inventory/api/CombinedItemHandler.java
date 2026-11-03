@@ -116,8 +116,8 @@ public class CombinedItemHandler implements IItemHandlerModifiable, INBTSerializ
         {
             for (int i = 0; i < handlerList.size(); i++)
             {
-                final CompoundTag handlerCompound = handlerList.getCompound(i);
-                final IItemHandlerModifiable modifiable = handlers[indexList.getInt(i)];
+                final CompoundTag handlerCompound = handlerList.getCompoundOrEmpty(i);
+                final IItemHandlerModifiable modifiable = handlers[indexList.getIntOr(i, 0)];
                 if (modifiable instanceof INBTSerializable)
                 {
                     final INBTSerializable<CompoundTag> serializable = (INBTSerializable<CompoundTag>) modifiable;

@@ -57,7 +57,7 @@ public class EntityListModule extends AbstractBuildingModule implements IEntityL
         final ListTag filterableList = compound.getListOrEmpty(TAG_MOBLIST);
         for (int i = 0; i < filterableList.size(); ++i)
         {
-            final ResourceLocation res = ResourceLocation.parse(filterableList.getString(i));
+            final ResourceLocation res = ResourceLocation.parse(filterableList.getStringOr(i, ""));
             if (BuiltInRegistries.ENTITY_TYPE.containsKey(res))
             {
                 mobsAllowed.add(res);

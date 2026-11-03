@@ -79,7 +79,7 @@ public class ItemListModule extends AbstractBuildingModule implements IItemListM
         final ListTag filterableList = compound.getListOrEmpty(TAG_ITEMLIST);
         for (int i = 0; i < filterableList.size(); ++i)
         {
-            allowedItems.add(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, filterableList.getCompound(i))));
+            allowedItems.add(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, filterableList.getCompoundOrEmpty(i))));
         }
 
         this.itemsAllowed = ImmutableList.copyOf(allowedItems);

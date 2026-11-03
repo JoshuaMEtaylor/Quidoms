@@ -102,8 +102,8 @@ public final class CreativeBuildingStructureHandler extends CreativeStructureHan
             final BlockEntity te = getWorld().getBlockEntity(worldPos);
             if (te instanceof IBlueprintDataProviderBE blueprintDataProviderBE)
             {
-                final CompoundTag tagData = teData.getCompound(TAG_BLUEPRINTDATA);
-                final String schematicPath = tagData.getString(TAG_NAME);
+                final CompoundTag tagData = teData.getCompoundOrEmpty(TAG_BLUEPRINTDATA);
+                final String schematicPath = tagData.getStringOr(TAG_NAME, "");
                 final String location = StructurePacks.getStructurePack(blueprint.getPackName()).getSubPath(Utils.resolvePath(blueprint.getFilePath(), schematicPath));
 
                 tagData.putString(TAG_NAME, location);
