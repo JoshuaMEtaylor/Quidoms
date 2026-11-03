@@ -103,7 +103,7 @@ public class ItemNbtCalculator implements DataProvider
                             builder.setComponent(key.getId(), key.getDefault());
                         }
                         final ItemStack copy = item.copy();
-                        builder.writeToItemStack(copy);
+                        builder.build().writeToItemStack(copy);
                         listBuilder.add(copy);
                     }
                     else

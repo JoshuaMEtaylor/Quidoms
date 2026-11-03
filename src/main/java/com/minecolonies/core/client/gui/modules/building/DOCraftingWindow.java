@@ -118,7 +118,7 @@ public class DOCraftingWindow extends AbstractModuleWindow<DOCraftingModuleView>
         final ItemStack stack = DomumOrnamentumUtils.getRequestedStack(request);
         if (stack.isEmpty()) return false;
 
-        final MaterialTextureData textureData = MaterialTextureData.readFromItemStack(stack);
+        final MaterialTextureData textureData = MaterialTextureData.deserializeFromItemStack(stack);
         if (textureData.isEmpty()) return false;
 
         for (final Block block : textureData.getTexturedComponents().values())
@@ -138,7 +138,7 @@ public class DOCraftingWindow extends AbstractModuleWindow<DOCraftingModuleView>
         {
             final ItemStack stack = DomumOrnamentumUtils.getRequestedStack(request);
             final IMateriallyTexturedBlock block = DomumOrnamentumUtils.getBlock(stack);
-            final MaterialTextureData textureData = MaterialTextureData.readFromItemStack(stack);
+            final MaterialTextureData textureData = MaterialTextureData.deserializeFromItemStack(stack);
             if (block != null && !textureData.isEmpty())     // should always be true due to predicate, but hey you never know...
             {
                 int slot = 0;

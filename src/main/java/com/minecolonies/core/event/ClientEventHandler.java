@@ -192,7 +192,7 @@ public class ClientEventHandler
 
                 if (DomumOrnamentumUtils.isDoBlock(blockItem.getBlock()))
                 {
-                    for (Block block : MaterialTextureData.readFromItemStack(event.getItemStack()).getTexturedComponents().values())
+                    for (Block block : MaterialTextureData.deserializeFromItemStack(event.getItemStack()).getTexturedComponents().values())
                     {
                         tier = Math.max(tier, SchemAnalyzerUtil.getBlockTier(block));
                     }

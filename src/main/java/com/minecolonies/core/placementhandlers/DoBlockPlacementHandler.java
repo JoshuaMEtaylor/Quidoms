@@ -207,7 +207,7 @@ public class DoBlockPlacementHandler implements IPlacementHandler
         {
             item.update(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY, props -> props.with(PostBlock.TYPE, complete ? blockState.getValue(PostBlock.TYPE) : PostType.PLAIN));
         }
-        else if (blockState.getBlock() instanceof TimberFrameBlock || blockState.getBlock() instanceof DynamicTimberFrameBlock)
+        else if (blockState.getBlock() instanceof TimberFrameBlock)
         {
             if (complete)
             {
