@@ -94,7 +94,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
      */
     public BlockDecorationController()
     {
-        this(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(BLOCK_HARDNESS, RESISTANCE).noCollission());
+        this(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(BLOCK_HARDNESS, RESISTANCE).noCollision());
     }
 
     public BlockDecorationController(final Properties properties)

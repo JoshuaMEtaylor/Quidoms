@@ -86,7 +86,7 @@ public class WorldUtil
     {
         if (WorldUtil.isBlockLoaded(world, pos))
         {
-            world.getChunk(pos.getX() >> 4, pos.getZ() >> 4).setUnsaved(true);
+            world.getChunk(pos.getX() >> 4, pos.getZ() >> 4).markUnsaved();
             final BlockState state = world.getBlockState(pos);
             world.sendBlockUpdated(pos, state, state, 3);
         }

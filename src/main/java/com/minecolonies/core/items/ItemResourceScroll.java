@@ -35,6 +35,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static com.minecolonies.api.util.constant.TranslationConstants.*;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Class describing the resource scroll item.
@@ -274,15 +276,15 @@ public class ItemResourceScroll extends AbstractItemMinecolonies
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void appendHoverText(ItemStack stack, @Nullable TooltipContext ctx, List<Component> tooltip, TooltipFlag flagIn)
+    public void appendHoverText(ItemStack stack, @Nullable net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn)
     {
-        super.appendHoverText(stack, ctx, tooltip, flagIn);
+        super.appendHoverText(stack, ctx, display, tooltip, flagIn);
 
         final IBuildingView buildingView = BuildingId.readBuildingViewFromItemStack(stack);
         if (buildingView instanceof BuildingBuilder.View builderBuildingView)
         {
             String name = builderBuildingView.getWorkerName();
-            tooltip.add(name != null && !name.trim().isEmpty()
+            tooltip.accept(name != null && !name.trim().isEmpty()
                           ? Component.literal(ChatFormatting.DARK_PURPLE + name)
                           : Component.translatableEscape(COM_MINECOLONIES_SCROLL_BUILDING_NO_WORKER));
         }

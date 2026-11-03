@@ -54,7 +54,7 @@ public class BlockConstructionTape extends AbstractBlockMinecoloniesConstruction
                 .pushReaction(PushReaction.DESTROY)
                 .isRedstoneConductor((state, getter, pos) -> false)
                 .forceSolidOff()
-                .strength(0.0f).noCollission().noLootTable());
+                .strength(0.0f).noCollision().noLootTable());
     }
 
     public BlockConstructionTape(final Properties properties)

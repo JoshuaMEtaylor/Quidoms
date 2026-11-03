@@ -111,7 +111,7 @@ public interface IMCCommand
             return false;
         }
 
-        return player.getServer().getPlayerList().isOp(player.getGameProfile());
+        return player.getServer().getPlayerList().isOp(player.nameAndId());
     }
 
     @FunctionalInterface

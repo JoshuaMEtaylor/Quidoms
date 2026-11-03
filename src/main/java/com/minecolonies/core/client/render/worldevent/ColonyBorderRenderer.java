@@ -94,7 +94,7 @@ public class ColonyBorderRenderer
             chunktickets = draw(ctx, chunkticketsMap, nearestColonyId, playerChunkPos, playerRenderDist);
         }
 
-        final VertexBuffer p = Screen.hasControlDown() ? chunktickets : colonies;
+        final VertexBuffer p = net.minecraft.client.Minecraft.getInstance().hasControlDown() ? chunktickets : colonies;
         if (p == null)
         {
             return;

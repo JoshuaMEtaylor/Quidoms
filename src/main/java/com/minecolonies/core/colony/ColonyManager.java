@@ -546,7 +546,7 @@ public final class ColonyManager implements IColonyManager
     @Nullable
     public IColony getIColonyByOwner(@NotNull final Level w, @NotNull final Player owner)
     {
-        return getIColonyByOwner(w, w.isClientSide() ? owner.getUUID() : owner.getGameProfile().getId());
+        return getIColonyByOwner(w, w.isClientSide() ? owner.getUUID() : owner.getGameProfile().id());
     }
 
     @Override

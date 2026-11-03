@@ -61,7 +61,7 @@ public class DruidCombatAI extends AttackMoveAI<EntityCitizen>
     /**
      * List of potential positive effects.
      */
-    private static final ImmutableList<Holder<MobEffect>> ADVERSE_EFFECTS = ImmutableList.of(MobEffects.MOVEMENT_SLOWDOWN, MobEffects.WEAKNESS);
+    private static final ImmutableList<Holder<MobEffect>> ADVERSE_EFFECTS = ImmutableList.of(MobEffects.SLOWNESS, MobEffects.WEAKNESS);
 
     /**
      * The xp per thrown potion
@@ -308,7 +308,7 @@ public class DruidCombatAI extends AttackMoveAI<EntityCitizen>
      */
     private boolean wasAffectedByDruid(final LivingEntity entity)
     {
-        return entity.hasEffect(MobEffects.MOVEMENT_SLOWDOWN) || entity.hasEffect(MobEffects.SATURATION) || entity.hasEffect(MobEffects.DAMAGE_BOOST)
+        return entity.hasEffect(MobEffects.SLOWNESS) || entity.hasEffect(MobEffects.SATURATION) || entity.hasEffect(MobEffects.DAMAGE_BOOST)
                  || entity.hasEffect(MobEffects.WEAKNESS) || entity.hasEffect(MobEffects.DAMAGE_RESISTANCE) || entity.hasEffect(MobEffects.HEAL);
     }
 

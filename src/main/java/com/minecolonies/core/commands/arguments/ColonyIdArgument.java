@@ -4,6 +4,7 @@ import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.IColonyManager;
 import com.minecolonies.api.util.constant.translation.CommandTranslationConstants;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.players.NameAndId;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -161,7 +162,7 @@ public class ColonyIdArgument extends MultipleOptionsArgument<Integer>
         @Override
         public Integer resolveValue(final CommandSourceStack source, final String value) throws CommandSyntaxException
         {
-            return resolveByOwner(source, source.getPlayerOrException().getGameProfile().getId());
+            return resolveByOwner(source, source.getPlayerOrException().getGameProfile().id());
         }
 
         @Override
@@ -239,7 +240,7 @@ public class ColonyIdArgument extends MultipleOptionsArgument<Integer>
         @Override
         public Integer resolveValue(final CommandSourceStack source, final String value) throws CommandSyntaxException
         {
-            final Optional<GameProfile> profile = Optional.ofNullable(source.getServer().getProfileCache()).flatMap(m -> m.get(value));
+            final Optional<NameAndId> profile = Optional.ofNullable(source.getServer().services().nameToIdCache()).flatMap(m -> m.get(value));
             if (profile.isPresent())
             {
                 return resolveByOwner(source, profile.get().getId());

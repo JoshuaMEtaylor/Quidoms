@@ -1429,7 +1429,7 @@ public class CitizenData implements ICitizenData
 
         if (textureUUID != null)
         {
-            nbtTagCompound.putUUID(TAG_TEXTURE_UUID, textureUUID);
+            nbtTagCompound.store(TAG_TEXTURE_UUID, net.minecraft.core.UUIDUtil.CODEC, textureUUID);
         }
         return nbtTagCompound;
     }
@@ -1604,7 +1604,7 @@ public class CitizenData implements ICitizenData
 
         if (nbtTagCompound.contains(TAG_TEXTURE_UUID))
         {
-            this.textureUUID = nbtTagCompound.getUUID(TAG_TEXTURE_UUID);
+            this.textureUUID = nbtTagCompound.read(TAG_TEXTURE_UUID, net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
         }
     }
 

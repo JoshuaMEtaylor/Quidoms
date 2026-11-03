@@ -316,8 +316,7 @@ public class EntityAIStructureBuilder extends AbstractEntityAIStructureWithWorkO
                 wo.getDisplayName(),
                 BlockPosUtil.calcDirection(building.getColony().getCenter(), position).getLongText())
             .withStyle(style -> style
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                    Component.translatable("message.positiondist",
+                .withHoverEvent(new HoverEvent.ShowText(Component.translatable("message.positiondist",
                         position.getX(),
                         position.getY(),
                         position.getZ(),

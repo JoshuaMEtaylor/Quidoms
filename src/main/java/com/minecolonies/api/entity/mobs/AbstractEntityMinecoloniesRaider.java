@@ -330,9 +330,9 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
                 {
                     for (AbstractEntityMinecoloniesRaider entity : RaiderMobUtils.getBarbariansCloseToEntity(this, SPEED_EFFECT_DISTANCE))
                     {
-                        if (!entity.hasEffect(MobEffects.MOVEMENT_SPEED))
+                        if (!entity.hasEffect(MobEffects.SPEED))
                         {
-                            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, SPEED_EFFECT_DURATION, SPEED_EFFECT_MULTIPLIER));
+                            entity.addEffect(new MobEffectInstance(MobEffects.SPEED, SPEED_EFFECT_DURATION, SPEED_EFFECT_MULTIPLIER));
                         }
                     }
                 }

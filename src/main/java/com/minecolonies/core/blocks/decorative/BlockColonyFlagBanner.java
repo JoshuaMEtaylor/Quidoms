@@ -44,7 +44,7 @@ public class BlockColonyFlagBanner extends AbstractColonyFlagBanner<BlockColonyF
         super(DyeColor.WHITE,
             Properties.of().mapColor(MapColor.WOOD)
               .sound(SoundType.WOOD)
-                .noCollission()
+                .noCollision()
                 .strength(1F)
                 .sound(SoundType.WOOD));
     }

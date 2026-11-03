@@ -395,12 +395,12 @@ public class ColonyPermissionEventHandler
                 }
 
                 final BlockEntity blockEntity = event.getLevel().getBlockEntity(event.getPos());
-                boolean isContainer = event.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, event.getPos(), state, blockEntity, null) != null;
+                boolean isContainer = event.getLevel().getCapability(Capabilities.Item.BLOCK, event.getPos(), state, blockEntity, null) != null;
                 if (!isContainer)
                 {
                     for (Direction direction : Direction.values())
                     {
-                        if (event.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, event.getPos(), state, blockEntity, direction) != null)
+                        if (event.getLevel().getCapability(Capabilities.Item.BLOCK, event.getPos(), state, blockEntity, direction) != null)
                         {
                             isContainer = true;
                             break;

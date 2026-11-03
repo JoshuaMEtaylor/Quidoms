@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Set;
 
 import static com.minecolonies.api.util.constant.translation.ToolTranslationConstants.*;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Permission scepter. used to add free to interact blocks or positions to the colonies permission list
@@ -64,7 +66,7 @@ public class ItemScepterPermission extends AbstractItemMinecolonies implements I
         final BlockState blockState = iColonyView.getWorld().getBlockState(pos);
         final Block block = blockState.getBlock();
 
-        final ChangeFreeToInteractBlockMessage.MessageType type = Screen.hasControlDown()
+        final ChangeFreeToInteractBlockMessage.MessageType type = net.minecraft.client.Minecraft.getInstance().hasControlDown()
                 ? ChangeFreeToInteractBlockMessage.MessageType.REMOVE_BLOCK
                 : ChangeFreeToInteractBlockMessage.MessageType.ADD_BLOCK;
         final ChangeFreeToInteractBlockMessage message = new ChangeFreeToInteractBlockMessage(
@@ -83,7 +85,7 @@ public class ItemScepterPermission extends AbstractItemMinecolonies implements I
       final BlockPos pos,
       final IColonyView iColonyView)
     {
-        final ChangeFreeToInteractBlockMessage.MessageType type = Screen.hasControlDown()
+        final ChangeFreeToInteractBlockMessage.MessageType type = net.minecraft.client.Minecraft.getInstance().hasControlDown()
                 ? ChangeFreeToInteractBlockMessage.MessageType.REMOVE_BLOCK
                 : ChangeFreeToInteractBlockMessage.MessageType.ADD_BLOCK;
         final ChangeFreeToInteractBlockMessage message = new ChangeFreeToInteractBlockMessage(iColonyView, pos, type);
@@ -190,16 +192,16 @@ public class ItemScepterPermission extends AbstractItemMinecolonies implements I
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flags)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flags)
     {
         final MutableComponent mode = switch (PermissionMode.readFromItemStack(stack))
         {
             case BLOCK -> Component.translatable(TOOL_PERMISSION_SCEPTER_MODE_BLOCK);
             case LOCATION -> Component.translatable(TOOL_PERMISSION_SCEPTER_MODE_LOCATION);
         };
-        tooltip.add(Component.translatable(TOOL_PERMISSION_SCEPTER_MODE, mode.withStyle(ChatFormatting.YELLOW)));
+        tooltip.accept(Component.translatable(TOOL_PERMISSION_SCEPTER_MODE, mode.withStyle(ChatFormatting.YELLOW)));
 
-        super.appendHoverText(stack, ctx, tooltip, flags);
+        super.appendHoverText(stack, ctx, display, tooltip, flags);
     }
 
     @NotNull

@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Sweet Bread, made by the baker. Adds speed, removes poison
@@ -30,7 +32,7 @@ public class ItemSugaryBread extends ItemFood
     private static FoodProperties sweetBread = (new FoodProperties.Builder())
                                         .nutrition(6)
                                         .saturationModifier(0.7F)
-                                        .effect(() -> new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 600), 1.0F)
+                                        .effect(() -> new MobEffectInstance(MobEffects.SPEED, 600), 1.0F)
                                         .build(); 
 
     /**
@@ -59,12 +61,12 @@ public class ItemSugaryBread extends ItemFood
     
     @Override
     public void appendHoverText(
-    @NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    @NotNull final ItemStack stack, @Nullable final TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         final MutableComponent guiHint = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_COREMOD_SUGARY_BREAD_TOOLTIP_GUI);
         guiHint.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-        tooltip.add(guiHint);
+        tooltip.accept(guiHint);
 
-        super.appendHoverText(stack, ctx, tooltip, flagIn);
+        super.appendHoverText(stack, ctx, display, tooltip, flagIn);
     }
 }

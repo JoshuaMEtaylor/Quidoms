@@ -30,6 +30,8 @@ import java.util.List;
 
 import static com.minecolonies.api.util.constant.Constants.STACKSIZE;
 import static com.minecolonies.api.util.constant.TranslationConstants.*;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Class describing the colony sign item.
@@ -196,20 +198,20 @@ public class ItemColonySign extends BlockItem
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext tooltipContext, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext tooltipContext, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         final ColonyId colonyComponent = ColonyId.readFromItemStack(stack);
         if (colonyComponent.hasColonyId())
         {
             final MutableComponent colonyHint = Component.translatable(TranslationConstants.COM_MINECOLONIES_CORE_COLONY_SIGN_TOOLTIP_COLONY, colonyComponent.id());
             colonyHint.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_BLUE));
-            tooltip.add(colonyHint);
+            tooltip.accept(colonyHint);
         }
 
         final MutableComponent guiHint = Component.translatable(TranslationConstants.COM_MINECOLONIES_CORE_COLONY_SIGN_TOOLTIP);
         guiHint.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GREEN));
-        tooltip.add(guiHint);
+        tooltip.accept(guiHint);
 
-        super.appendHoverText(stack, tooltipContext, tooltip, flagIn);
+        super.appendHoverText(stack, tooltipContext, display, tooltip, flagIn);
     }
 }

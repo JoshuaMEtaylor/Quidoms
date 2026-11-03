@@ -286,7 +286,7 @@ public class WindowHutAllInventory extends AbstractWindowSkeleton
     private static String getString(final ItemStack stack)
     {
         final StringBuilder output = new StringBuilder();
-        for (final Component comp : stack.getTooltipLines(Item.TooltipContext.of(Minecraft.getInstance().level), Minecraft.getInstance().player, TooltipFlag.Default.NORMAL))
+        for (final Component comp : stack.getTooltipLines(net.minecraft.world.item.Item.TooltipContext.of(Minecraft.getInstance().level), Minecraft.getInstance().player, TooltipFlag.Default.NORMAL))
         {
             output.append(comp.getString()).append(" ");
         }
@@ -326,7 +326,7 @@ public class WindowHutAllInventory extends AbstractWindowSkeleton
                 final String name = resource.getItemStack().getHoverName().getString();
                 resourceLabel.setText(Component.literal(name.substring(0, Math.min(17, name.length()))));
                 final Text qtys = rowPane.findPaneOfTypeByID("quantities", Text.class);
-                if (!Screen.hasShiftDown())
+                if (!net.minecraft.client.Minecraft.getInstance().hasShiftDown())
                 {
                     qtys.setText(Component.literal(Utils.format(resource.getAmount())));
                 }

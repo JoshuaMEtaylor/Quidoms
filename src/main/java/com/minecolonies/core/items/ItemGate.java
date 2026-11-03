@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Item for gates
@@ -30,14 +32,14 @@ public class ItemGate extends BlockItem
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         if (getBlock() instanceof final AbstractBlockGate gate)
         {
             final MutableComponent guiHint2 = Component.translatable(TranslationConstants.GATE_PLACEMENT_TOOLTIP,
                     gate.getMaxWidth(), gate.getMaxHeight(), gate.getMaxWidth() * gate.getMaxHeight());
             guiHint2.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_AQUA));
-            tooltip.add(guiHint2);
+            tooltip.accept(guiHint2);
         }
     }
 }

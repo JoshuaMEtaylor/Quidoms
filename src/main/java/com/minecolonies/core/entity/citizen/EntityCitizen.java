@@ -594,7 +594,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
 
             if (!level().isClientSide())
             {
-                addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 300));
+                addEffect(new MobEffectInstance(MobEffects.SPEED, 300));
 
                 playSound(SoundEvents.GENERIC_EAT, 1.5f, (float) SoundUtils.getRandomPitch(getRandom()));
                 new ItemParticleEffectMessage(usedStack.copy(), getX(), getY(), getZ(), getXRot(), getYRot(), getEyeHeight()).sendToTrackingEntity(this);
@@ -805,14 +805,14 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
         checkHeal();
         if (citizenData.getSaturation() <= 0)
         {
-            if (this.getEffect(MobEffects.MOVEMENT_SLOWDOWN) == null)
+            if (this.getEffect(MobEffects.SLOWNESS) == null)
             {
-                this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, TICKS_SECOND * 30));
+                this.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, TICKS_SECOND * 30));
             }
         }
         else
         {
-            this.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+            this.removeEffect(MobEffects.SLOWNESS);
         }
         return false;
     }
@@ -1627,8 +1627,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
                     .append(Component.translatable(TranslationConstants.COLONIST_DEATH_LOCATION,
                             BlockPosUtil.calcDirection(getCitizenColonyHandler().getColonyOrRegister().getCenter(), blockPosition()).getLongText())
                         .withStyle(style -> style
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                Component.translatable("message.positiondist",
+                            .withHoverEvent(new HoverEvent.ShowText(Component.translatable("message.positiondist",
                                     getBlockX(),
                                     getBlockY(),
                                     getBlockZ(),
@@ -1637,8 +1636,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
                             ? Component.translatable(COM_MINECOLONIES_COREMOD_MOURN, getCitizenData().getName())
                             : Component.empty())
                     .append(gravePos != null ? Component.translatable(WARNING_GRAVE_SPAWNED).withStyle(style -> style
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            Component.translatable("message.positiondist",
+                        .withHoverEvent(new HoverEvent.ShowText(Component.translatable("message.positiondist",
                                 gravePos.getX(),
                                 gravePos.getY(),
                                 gravePos.getZ(),

@@ -8,6 +8,7 @@ import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.Utils;
 import com.minecolonies.core.colony.Colony;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -404,11 +405,11 @@ public class Permissions implements IPermissions
                 rank = ranks.get(oldRank.ordinal());
             }
 
-            final GameProfile player = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(id).orElse(null);
+            final NameAndId player = ServerLifecycleHooks.getCurrentServer().services().nameToIdCache().get(id).orElse(null);
 
             if (player != null && rank != null)
             {
-                players.put(id, new ColonyPlayer(id, player.getName(), rank));
+                players.put(id, new ColonyPlayer(id, player.name(), rank));
             }
             else if (!name.isEmpty() && rank != null)
             {
@@ -454,11 +455,11 @@ public class Permissions implements IPermissions
         final Map.Entry<UUID, ColonyPlayer> owner = getOwnerEntry();
         if (owner == null && ownerUUID != null)
         {
-            final GameProfile player = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer().getProfileCache().get(ownerUUID).orElse(null);
+            final NameAndId player = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer().services().nameToIdCache().get(ownerUUID).orElse(null);
 
             if (player != null)
             {
-                players.put(ownerUUID, new ColonyPlayer(ownerUUID, player.getName(), ranks.get(OWNER_RANK_ID)));
+                players.put(ownerUUID, new ColonyPlayer(ownerUUID, player.name(), ranks.get(OWNER_RANK_ID)));
             }
         }
         else if (owner == null)
@@ -707,7 +708,7 @@ public class Permissions implements IPermissions
     @Override
     public Rank getRank(@NotNull final Player player)
     {
-        return getRank(player.getGameProfile().getId());
+        return getRank(player.getGameProfile().id());
     }
 
     /**
@@ -744,9 +745,9 @@ public class Permissions implements IPermissions
         else
         {
 
-            final GameProfile gameprofile = world.getServer().getProfileCache().get(id).orElse(null);
+            final NameAndId gameprofile = world.getServer().services().nameToIdCache().get(id).orElse(null);
 
-            return gameprofile != null && addPlayer(gameprofile, rank);
+            return gameprofile != null && addPlayer(new GameProfile(gameprofile.id(), gameprofile.name()), rank);
         }
 
         return true;
@@ -806,13 +807,13 @@ public class Permissions implements IPermissions
         {
             return false;
         }
-        final GameProfile gameprofile = world.getServer().getProfileCache().get(player).orElse(null);
+        final NameAndId gameprofile = world.getServer().services().nameToIdCache().get(player).orElse(null);
         //Check if the player already exists so that their rank isn't overridden
 
         // Adds new subscribers
         if (!world.isClientSide() && gameprofile != null)
         {
-            final ServerPlayer playerEntity = (ServerPlayer) world.getPlayerByUUID(gameprofile.getId());
+            final ServerPlayer playerEntity = (ServerPlayer) world.getPlayerByUUID(gameprofile.id());
             if (playerEntity != null)
             {
                 if (rank.getId() == OFFICER_RANK_ID)
@@ -839,7 +840,7 @@ public class Permissions implements IPermissions
             }
         }
 
-        return gameprofile != null && !ownerUUID.equals(gameprofile.getId()) && addPlayer(gameprofile, rank);
+        return gameprofile != null && !ownerUUID.equals(gameprofile.id()) && addPlayer(new GameProfile(gameprofile.id(), gameprofile.name()), rank);
     }
 
     /**
@@ -852,7 +853,7 @@ public class Permissions implements IPermissions
     @Override
     public boolean addPlayer(@NotNull final GameProfile gameprofile, final Rank rank)
     {
-        @NotNull final ColonyPlayer p = new ColonyPlayer(gameprofile.getId(), gameprofile.getName(), rank);
+        @NotNull final ColonyPlayer p = new ColonyPlayer(gameprofile.id(), gameprofile.name(), rank);
 
         players.remove(p.getID());
         players.put(p.getID(), p);
@@ -957,7 +958,7 @@ public class Permissions implements IPermissions
     @Override
     public boolean isColonyMember(@NotNull final Player player)
     {
-        return players.containsKey(player.getGameProfile().getId());
+        return players.containsKey(player.getGameProfile().id());
     }
 
     /**

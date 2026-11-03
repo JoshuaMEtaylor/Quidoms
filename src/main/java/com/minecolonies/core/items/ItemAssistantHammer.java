@@ -47,6 +47,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Assistant Hammer item used to allow the player to assist the builder in building
@@ -409,9 +411,9 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
         boolean didTryBuilding) {}
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltipList, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltipList, @NotNull final TooltipFlag flagIn)
     {
-        tooltipList.add(Component.translatable("item.minecolonies.assistanthammer.reach", reach).withStyle(ChatFormatting.BLUE));
-        tooltipList.add(Component.translatable("item.minecolonies.assistanthammer.desc").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
+        tooltipList.accept(Component.translatable("item.minecolonies.assistanthammer.reach", reach).withStyle(ChatFormatting.BLUE));
+        tooltipList.accept(Component.translatable("item.minecolonies.assistanthammer.desc").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
     }
 }

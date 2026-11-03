@@ -74,7 +74,7 @@ public record ColonyId(int id, ResourceKey<Level> dimension) implements TooltipP
     }
 
     @Override
-    public void addToTooltip(@NotNull final Item.TooltipContext context, @NotNull final Consumer<Component> tooltip, @NotNull final TooltipFlag flags)
+    public void addToTooltip(@NotNull final Item.TooltipContext context, @NotNull final Consumer<Component> tooltip, @NotNull final TooltipFlag flags, @NotNull final net.minecraft.core.component.DataComponentGetter componentGetter)
     {
         final IColonyView colony = IMinecoloniesAPI.getInstance().getColonyManager().getColonyView(id(), dimension());
         final Component name = colony != null ? Component.literal(colony.getName()) : Component.translatable("item.minecolonies.hut.unknowncolony");

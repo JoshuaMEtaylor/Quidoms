@@ -82,7 +82,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.fml.javafmlmod.FMLModContainer;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
@@ -232,16 +232,16 @@ public class MineColonies
     {
         // only register LivingEntities that have our own capability provider
         // barbs (pirates, etc.) have cap registered automatically by forge
-        event.registerEntity(ItemHandler.ENTITY, ModEntities.CITIZEN, IItemHandlerCapProvider::getItemHandlerCap);
-        event.registerEntity(ItemHandler.ENTITY, ModEntities.VISITOR, IItemHandlerCapProvider::getItemHandlerCap);
+        event.registerEntity(Capabilities.Item.ENTITY, ModEntities.CITIZEN, IItemHandlerCapProvider::getItemResourceHandler);
+        event.registerEntity(Capabilities.Item.ENTITY, ModEntities.VISITOR, IItemHandlerCapProvider::getItemResourceHandler);
 
         // BUILDING includes types: WAREHOUSE, ENCHANTER, STASH
-        event.registerBlockEntity(ItemHandler.BLOCK, MinecoloniesTileEntities.BUILDING.get(), IItemHandlerCapProvider::getItemHandlerCap);
-        event.registerBlockEntity(ItemHandler.BLOCK, MinecoloniesTileEntities.ENCHANTER.get(), IItemHandlerCapProvider::getItemHandlerCap);
-        event.registerBlockEntity(ItemHandler.BLOCK, MinecoloniesTileEntities.RACK.get(), IItemHandlerCapProvider::getItemHandlerCap);
-        event.registerBlockEntity(ItemHandler.BLOCK, MinecoloniesTileEntities.GRAVE.get(), IItemHandlerCapProvider::getItemHandlerCap);
-        event.registerBlockEntity(ItemHandler.BLOCK, MinecoloniesTileEntities.WAREHOUSE.get(), IItemHandlerCapProvider::getItemHandlerCap);
-        event.registerBlockEntity(ItemHandler.BLOCK, MinecoloniesTileEntities.STASH.get(), IItemHandlerCapProvider::getItemHandlerCap);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, MinecoloniesTileEntities.BUILDING.get(), IItemHandlerCapProvider::getItemResourceHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, MinecoloniesTileEntities.ENCHANTER.get(), IItemHandlerCapProvider::getItemResourceHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, MinecoloniesTileEntities.RACK.get(), IItemHandlerCapProvider::getItemResourceHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, MinecoloniesTileEntities.GRAVE.get(), IItemHandlerCapProvider::getItemResourceHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, MinecoloniesTileEntities.WAREHOUSE.get(), IItemHandlerCapProvider::getItemResourceHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, MinecoloniesTileEntities.STASH.get(), IItemHandlerCapProvider::getItemResourceHandler);
     }
 
     @SubscribeEvent

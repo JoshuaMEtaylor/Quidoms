@@ -43,6 +43,12 @@ sourceSets.main.java {
     exclude '**/domumornamentum/client/model/baked/**'
     exclude '**/domumornamentum/jei/**'
     exclude '**/domumornamentum/client/event/handlers/ModBusEventHandler.java'
+
+            exclude '**/domumornamentum/client/render/ModelGhostRenderer.java'
+    exclude '**/domumornamentum/client/model/utils/ModelSpriteQuadTransformer.java'
+    exclude '**/domumornamentum/client/model/geometry/MateriallyTexturedGeometry.java'
+    exclude '**/domumornamentum/network/IServerboundDistributor.java'
+
 }
 
 sourceSets.main.resources {

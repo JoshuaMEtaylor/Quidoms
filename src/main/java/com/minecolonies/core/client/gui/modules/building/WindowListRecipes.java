@@ -184,7 +184,7 @@ public class WindowListRecipes extends AbstractModuleWindow<CraftingModuleView>
                     if (moduleView.isRecipeAlterationAllowed())
                     {
                         removeButton.on();
-                        if (recipe.getRecipeSource() != null && !Screen.hasControlDown())
+                        if (recipe.getRecipeSource() != null && !net.minecraft.client.Minecraft.getInstance().hasControlDown())
                         {
                             removeButton.disable();
                             PaneBuilders.tooltipBuilder()
@@ -282,7 +282,7 @@ public class WindowListRecipes extends AbstractModuleWindow<CraftingModuleView>
     public void onUpdate()
     {
         super.onUpdate();
-        if (!Screen.hasShiftDown())
+        if (!net.minecraft.client.Minecraft.getInstance().hasShiftDown())
         {
             lifeCount++;
         }

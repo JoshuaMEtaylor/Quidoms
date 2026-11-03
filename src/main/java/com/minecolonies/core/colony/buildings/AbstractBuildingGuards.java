@@ -233,7 +233,7 @@ public abstract class AbstractBuildingGuards extends AbstractBuilding implements
 
         if (compound.contains(NBT_PLAYER_UUID))
         {
-            followPlayerUUID = compound.getUUID(NBT_PLAYER_UUID);
+            followPlayerUUID = compound.read(NBT_PLAYER_UUID, net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
         }
 
     }
@@ -260,7 +260,7 @@ public abstract class AbstractBuildingGuards extends AbstractBuilding implements
 
         if (followPlayerUUID != null)
         {
-            compound.putUUID(NBT_PLAYER_UUID, followPlayerUUID);
+            compound.store(NBT_PLAYER_UUID, net.minecraft.core.UUIDUtil.CODEC, followPlayerUUID);
         }
 
         return compound;

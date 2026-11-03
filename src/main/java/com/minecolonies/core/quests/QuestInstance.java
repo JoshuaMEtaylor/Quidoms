@@ -282,7 +282,7 @@ public class QuestInstance implements IQuestInstance
 
         if (assignedPlayer != null)
         {
-            compoundNBT.putUUID(TAG_PLAYER, assignedPlayer);
+            compoundNBT.store(TAG_PLAYER, net.minecraft.core.UUIDUtil.CODEC, assignedPlayer);
         }
 
         return compoundNBT;
@@ -311,7 +311,7 @@ public class QuestInstance implements IQuestInstance
 
         if (nbt.contains(TAG_PLAYER))
         {
-            assignedPlayer = nbt.getUUID(TAG_PLAYER);
+            assignedPlayer = nbt.read(TAG_PLAYER, net.minecraft.core.UUIDUtil.CODEC).orElseThrow();
         }
     }
 

@@ -67,7 +67,7 @@ public final class ColonyUtils
         final Consumer<String> errorHandler)
     {
         final CompletableFuture<Blueprint> future =
-            CompletableFuture.supplyAsync(() -> StructurePacks.getBlueprint(structurePack, structurePath, FMLEnvironment.production, world.registryAccess()), IOPool.getExecutor());
+            CompletableFuture.supplyAsync(() -> StructurePacks.getBlueprint(structurePack, structurePath, FMLEnvironment.isProduction(), world.registryAccess()), IOPool.getExecutor());
         if (world.isClientSide())
         {
             ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(future,

@@ -68,7 +68,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             colony.addLoadedChunk(ChunkPos.asLong(chunk.getPos().x, chunk.getPos().z), chunk);
             owningColony = id;
         }
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             }
         }
 
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
         colonies.clear();
         owningColony = NO_COLONY_ID;
         claimingBuildings.clear();
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             colony.addLoadedChunk(ChunkPos.asLong(chunk.getPos().x, chunk.getPos().z), chunk);
         }
 
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -155,7 +155,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             return;
         }
 
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
         final Set<BlockPos> buildings = claimingBuildings.get(colonyId);
         buildings.remove(pos);
 
@@ -216,7 +216,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
     public void setOwningColony(final int id, final LevelChunk chunk)
     {
         this.owningColony = id;
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override

@@ -338,7 +338,7 @@ public abstract class JobBasedRecipeCategory<T> extends AbstractRecipeCategory<T
                 }
             }
 
-            final boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || Screen.hasShiftDown();
+            final boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || net.minecraft.client.Minecraft.getInstance().hasShiftDown();
             if (showAdvanced)
             {
                 final MutableComponent recipeId = Component.translatableEscape("jei.tooltip.recipe.id", id.toString());
@@ -382,7 +382,7 @@ public abstract class JobBasedRecipeCategory<T> extends AbstractRecipeCategory<T
                 tooltip.add(Component.translatableEscape(TranslationConstants.PARTIAL_JEI_INFO + "conditions.tip"));
             }
 
-            final boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || Screen.hasShiftDown();
+            final boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || net.minecraft.client.Minecraft.getInstance().hasShiftDown();
             if (showAdvanced)
             {
                 final MutableComponent recipeId = Component.translatableEscape("com.minecolonies.coremod.jei.loottableid", id.location().toString());

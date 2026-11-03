@@ -284,7 +284,7 @@ public class ContainerCitizenInventory extends AbstractContainerMenu
                     case FEET -> InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS;
                     default -> null;
                 };
-                return icon == null ? null : Pair.of(InventoryMenu.BLOCK_ATLAS, icon);
+                return icon == null ? null : Pair.of(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS, icon);
             }
         });
     }

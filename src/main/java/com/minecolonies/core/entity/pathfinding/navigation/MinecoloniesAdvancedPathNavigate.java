@@ -291,7 +291,7 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
             if (dest != null && !WorldUtil.isBlockLoaded(ourEntity.level(), dest) && pathResult.getJob() instanceof IDestinationPathJob destinationPathJob &&
                 !WorldUtil.isBlockLoaded(ourEntity.level(), destinationPathJob.getDestination()))
             {
-                if (!FMLEnvironment.production)
+                if (!FMLEnvironment.isProduction())
                 {
                     Log.getLogger().info("Unloaded citizen:" + ourEntity + " trying to path into unloaded position at: " + dest, new Exception());
                 }

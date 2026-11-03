@@ -68,7 +68,7 @@ public class BlockColonySign extends AbstractBlockMinecolonies<BlockColonySign> 
      */
     public BlockColonySign()
     {
-        super(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(BLOCK_HARDNESS, RESISTANCE).noCollission());
+        super(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(BLOCK_HARDNESS, RESISTANCE).noCollision());
         this.registerDefaultState(this.defaultBlockState().setValue(CONNECTED, false));
     }
 

@@ -49,7 +49,7 @@ public class RenderHelper
         matrixStack.translate(0, 0, -1);
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+        RenderSystem.setShaderTexture(0, net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         mc.getBlockRenderer().renderSingleBlock(block, matrixStack, ctx.bufferSource(), 0x00F000F0, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, RenderType.solid());

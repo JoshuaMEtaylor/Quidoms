@@ -99,7 +99,7 @@ public class CitizenArmorLayer<T extends AbstractEntityCitizen, M extends Humano
                 poseStack.scale(1.0F, -1.0F, -1.0F);
 
                 final CompoundTag compoundTag = new CompoundTag();
-                compoundTag.putUUID("Id", citizenDataView.getCustomTextureUUID());
+                compoundTag.store("Id", net.minecraft.core.UUIDUtil.CODEC, citizenDataView.getCustomTextureUUID());
 
                 SkullBlock.Type type = SkullBlock.Types.PLAYER;
                 SkullModelBase skullmodelbase = this.skullModels.get(type);

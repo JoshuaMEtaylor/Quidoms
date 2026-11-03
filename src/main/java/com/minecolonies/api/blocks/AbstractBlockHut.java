@@ -50,6 +50,8 @@ import java.util.Map;
 
 import static com.ldtteam.structurize.blockentities.interfaces.IBlueprintDataProviderBE.*;
 import static com.minecolonies.api.util.constant.TranslationConstants.*;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Base class for all Minecolonies Hut Blocks. Hut Blocks are the base blocks for Minecolonies buildings.
@@ -348,10 +350,9 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @NotNull final Item.TooltipContext context,
-        @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flags)
+    public void appendHoverText(@NotNull final ItemStack stack, @NotNull final net.minecraft.world.item.Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flags)
     {
-        super.appendHoverText(stack, context, tooltip, flags);
+        super.appendHoverText(stack, context, display, tooltip, flags);
 
         stack.addToTooltip(ModDataComponents.HUT_COMPONENT, context, tooltip::add, flags);
         stack.addToTooltip(ModDataComponents.COLONY_ID_COMPONENT, context, tooltip::add, flags);

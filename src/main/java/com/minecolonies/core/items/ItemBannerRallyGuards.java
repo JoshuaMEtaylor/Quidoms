@@ -38,6 +38,8 @@ import java.util.*;
 import static com.minecolonies.api.research.util.ResearchConstants.STANDARD;
 import static com.minecolonies.api.util.constant.TranslationConstants.*;
 import static com.minecolonies.api.util.constant.translation.ToolTranslationConstants.*;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Rally Guards Banner Item class. Used to give tasks to guards.
@@ -434,15 +436,15 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         final MutableComponent guiHint = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_BANNER_RALLY_GUARDS_TOOLTIP_GUI);
         guiHint.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-        tooltip.add(guiHint);
+        tooltip.accept(guiHint);
 
         final MutableComponent rallyHint = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_BANNER_RALLY_GUARDS_TOOLTIP_RALLY);
         rallyHint.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-        tooltip.add(rallyHint);
+        tooltip.accept(rallyHint);
 
         final List<BlockPos> guardTowerPositions = getGuardTowerLocations(stack);
 
@@ -450,16 +452,16 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
         {
             final MutableComponent emptyTooltip = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_BANNER_RALLY_GUARDS_TOOLTIP_EMPTY);
             emptyTooltip.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-            tooltip.add(emptyTooltip);
+            tooltip.accept(emptyTooltip);
         }
         else
         {
             final MutableComponent numGuardTowers = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_BANNER_RALLY_GUARDS_TOOLTIP, guardTowerPositions.size());
             numGuardTowers.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_AQUA));
-            tooltip.add(numGuardTowers);
+            tooltip.accept(numGuardTowers);
         }
 
 
-        super.appendHoverText(stack, ctx, tooltip, flagIn);
+        super.appendHoverText(stack, ctx, display, tooltip, flagIn);
     }
 }
