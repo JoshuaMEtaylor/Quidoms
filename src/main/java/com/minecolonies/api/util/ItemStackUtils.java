@@ -902,7 +902,7 @@ public final class ItemStackUtils
         itemId = itemId.replace("[NS]", baseItemId.getNamespace());
         itemId = TEMPLATE_PATH_PATTERN.matcher(itemId).replaceAll(m ->
         {
-            if (m.group(1) != null && m.group(2) != null)
+            if (m.group(1, "") != null && m.group(2) != null)
             {
                 return baseItemId.getPath().replace(m.group(1), m.group(2));
             }

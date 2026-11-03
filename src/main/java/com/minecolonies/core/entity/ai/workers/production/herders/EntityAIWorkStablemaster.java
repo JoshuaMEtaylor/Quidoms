@@ -540,7 +540,7 @@ public class EntityAIWorkStablemaster extends AbstractEntityAIHerder<JobStablema
         if (didSomething)
         {
             horse.gameEvent(GameEvent.EAT);
-            horse.level().playSound(null, horse, SoundEvents.GENERIC_EAT, SoundSource.NEUTRAL, 0.8f, 1.0f);
+            horse.level().playSound(null, horse, SoundEvents.GENERIC_EAT.value(), SoundSource.NEUTRAL, 0.8f, 1.0f);
         }
         return didSomething;
     }

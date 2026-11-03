@@ -32,10 +32,27 @@ import java.util.Map;
  */
 public class ZeroWasteRecipe extends ShapelessRecipe
 {
+    private final ItemStack resultStack;
+    private final NonNullList<Ingredient> inputIngredients;
+
     public ZeroWasteRecipe(@NotNull final ItemStack output,
                            @NotNull final NonNullList<Ingredient> inputs)
     {
         super("", CraftingBookCategory.MISC, output, inputs);
+        this.resultStack = output.copy();
+        this.inputIngredients = inputs;
+    }
+
+    @NotNull
+    public ItemStack getResultStack()
+    {
+        return this.resultStack.copy();
+    }
+
+    @NotNull
+    public NonNullList<Ingredient> getInputIngredients()
+    {
+        return this.inputIngredients;
     }
 
     @NotNull
@@ -49,7 +66,7 @@ public class ZeroWasteRecipe extends ShapelessRecipe
 
     @NotNull
     @Override
-    public RecipeSerializer<?> getSerializer()
+    public RecipeSerializer<? extends CraftingRecipe> getSerializer()
     {
         return ModRecipeSerializer.ZeroWasteRecipeSerializer.get();
     }
@@ -58,10 +75,10 @@ public class ZeroWasteRecipe extends ShapelessRecipe
     {
         private static final MapCodec<ZeroWasteRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 builder -> builder.group(
-                        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(r -> r.getResultItem(null)),
+                        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(ZeroWasteRecipe::getResultStack),
                         NonNullList.codecOf(Ingredient.CODEC)
                                 .fieldOf("ingredients")
-                                .forGetter(ShapelessRecipe::getIngredients)
+                                .forGetter(ZeroWasteRecipe::getInputIngredients)
                 ).apply(builder, ZeroWasteRecipe::new)
         );
         private static final StreamCodec<RegistryFriendlyByteBuf, ZeroWasteRecipe> STREAM_CODEC = StreamCodec.of(
@@ -85,8 +102,11 @@ public class ZeroWasteRecipe extends ShapelessRecipe
         private static ZeroWasteRecipe fromNetwork(@NotNull final RegistryFriendlyByteBuf buf)
         {
             final int count = buf.readVarInt();
-            final NonNullList<Ingredient> inputs = NonNullList.withSize(count, Ingredient.EMPTY);
-            inputs.replaceAll(ingredient -> Ingredient.CONTENTS_STREAM_CODEC.decode(buf));
+            final NonNullList<Ingredient> inputs = NonNullList.createWithCapacity(count);
+            for (int i = 0; i < count; i++)
+            {
+                inputs.add(Ingredient.CONTENTS_STREAM_CODEC.decode(buf));
+            }
             final ItemStack output = ItemStack.STREAM_CODEC.decode(buf);
 
             return new ZeroWasteRecipe(output, inputs);
@@ -95,12 +115,12 @@ public class ZeroWasteRecipe extends ShapelessRecipe
         private static void toNetwork(@NotNull final RegistryFriendlyByteBuf buf,
                                       @NotNull final ZeroWasteRecipe recipe)
         {
-            buf.writeVarInt(recipe.getIngredients().size());
-            for (final Ingredient input : recipe.getIngredients())
+            buf.writeVarInt(recipe.getInputIngredients().size());
+            for (final Ingredient input : recipe.getInputIngredients())
             {
                 Ingredient.CONTENTS_STREAM_CODEC.encode(buf, input);
             }
-            ItemStack.STREAM_CODEC.encode(buf, recipe.getResultItem(null));
+            ItemStack.STREAM_CODEC.encode(buf, recipe.getResultStack());
         }
     }
 
@@ -184,7 +204,8 @@ public class ZeroWasteRecipe extends ShapelessRecipe
             return this;
         }
 
-        public void save(@NotNull final RecipeOutput consumer, @NotNull final ResourceLocation id)
+        @Override
+        public void save(@NotNull final RecipeOutput consumer, @NotNull final net.minecraft.resources.ResourceKey<Recipe<?>> id)
         {
             this.ensureValid(id);
 
@@ -196,16 +217,16 @@ public class ZeroWasteRecipe extends ShapelessRecipe
                     .rewards(AdvancementRewards.Builder.recipe(id))
                     .requirements(AdvancementRequirements.Strategy.OR);
             this.criteria.forEach(advancementBuilder::addCriterion);
-            final AdvancementHolder advancement = advancementBuilder.build(id.withPrefix("recipes/" + this.category.getFolderName() + "/"));
+            final AdvancementHolder advancement = advancementBuilder.build(id.location().withPrefix("recipes/" + this.category.getFolderName() + "/"));
 
             consumer.accept(id, recipe, advancement);
         }
 
-        private void ensureValid(@NotNull final ResourceLocation id)
+        private void ensureValid(@NotNull final net.minecraft.resources.ResourceKey<Recipe<?>> id)
         {
             if (this.criteria.isEmpty())
             {
-                throw new IllegalStateException("No way of obtaining recipe " + id);
+                throw new IllegalStateException("No way of obtaining recipe " + id.location());
             }
         }
     }

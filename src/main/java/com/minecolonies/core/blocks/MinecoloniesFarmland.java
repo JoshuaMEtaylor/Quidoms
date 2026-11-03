@@ -78,11 +78,11 @@ public class MinecoloniesFarmland extends AbstractBlockMinecolonies<Minecolonies
     {
         if (direction == Direction.UP && !state.canSurvive(level, pos))
         {
-            level.scheduleTick(pos, this, 1);
+            scheduledTickAccess.scheduleTick(pos, this, 1);
         }
         if (state.getValue(WATERLOGGED) && waterLogged)
         {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            scheduledTickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
 
         return super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, newState, random);

@@ -155,7 +155,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
     {
         if (stateIn.getValue(WATERLOGGED))
         {
-            worldIn.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+            scheduledTickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
         }
 
 
@@ -264,7 +264,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
 
         try
         {
-            return Integer.parseInt(beData.getCompoundOrEmpty(TAG_BLUEPRINTDATA).getStringOr(TAG_SCHEMATIC_NAME, "").replaceAll("[^0-9]"));
+            return Integer.parseInt(beData.getCompoundOrEmpty(TAG_BLUEPRINTDATA).getStringOr(TAG_SCHEMATIC_NAME, "").replaceAll("[^0-9]", ""));
         }
         catch (final NumberFormatException exception)
         {
