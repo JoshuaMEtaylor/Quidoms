@@ -136,8 +136,8 @@ public class ColonyBorderRenderer
             final float maxX = chunkPos.getMaxBlockX() - playerChunkPos.getMinBlockX() + 1.0f;
             final float minZ = chunkPos.getMinBlockZ() - playerChunkPos.getMinBlockZ();
             final float maxZ = chunkPos.getMaxBlockZ() - playerChunkPos.getMinBlockZ() + 1.0f;
-            final int minY = ctx.clientLevel.getMinBuildHeight();
-            final int maxY = ctx.clientLevel.getMaxBuildHeight();
+            final int minY = ctx.clientLevel.getMinY();
+            final int maxY = ctx.clientLevel.getMaxY();
             final int testedColonyId = colonyId;
 
             if (useColonyColour)

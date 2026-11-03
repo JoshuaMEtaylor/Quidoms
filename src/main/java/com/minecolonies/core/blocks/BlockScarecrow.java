@@ -212,7 +212,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
     {
         @NotNull final Direction dir = (context.getPlayer() == null) ? Direction.NORTH : Direction.fromYRot(context.getPlayer().getYRot() + 180);
 
-        if (context.getClickedPos().getY() < context.getLevel().getMaxBuildHeight() && context.getLevel().getBlockState(context.getClickedPos().above()).canBeReplaced(context))
+        if (context.getClickedPos().getY() < context.getLevel().getMaxY() && context.getLevel().getBlockState(context.getClickedPos().above()).canBeReplaced(context))
         {
             return this.defaultBlockState().setValue(FACING, dir).setValue(HALF, DoubleBlockHalf.LOWER);
         }

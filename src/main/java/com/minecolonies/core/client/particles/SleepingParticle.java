@@ -4,11 +4,11 @@ import com.minecolonies.api.util.constant.Constants;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 
 /**
  * Custom particle for sleeping (MC 1.21.10 SingleQuadParticle).
@@ -74,9 +74,9 @@ public class SleepingParticle extends SingleQuadParticle
     }
 
     @Override
-    public ParticleRenderType getGroup()
+    public SingleQuadParticle.Layer getLayer()
     {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
     public static class Factory implements ParticleProvider<SimpleParticleType>
@@ -89,7 +89,16 @@ public class SleepingParticle extends SingleQuadParticle
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType particleType, ClientLevel world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed)
+        public Particle createParticle(
+          SimpleParticleType particleType,
+          ClientLevel world,
+          double x,
+          double y,
+          double z,
+          double xSpeed,
+          double ySpeed,
+          double zSpeed,
+          RandomSource random)
         {
             return new SleepingParticle(spriteSet, world, x, y, z, xSpeed, ySpeed, zSpeed);
         }

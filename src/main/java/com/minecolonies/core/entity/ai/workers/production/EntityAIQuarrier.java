@@ -303,7 +303,7 @@ public class EntityAIQuarrier extends AbstractEntityAIStructureWithWorkOrder<Job
             building.setTotalStages(3);
             structurePlacer.getB().setStage(BUILD_SOLID);
         }
-        else if (structurePlacer.getB().getStage() == CLEAR && result.getBlockResult().getWorldPos().getY() <= worker.level().getMinBuildHeight())
+        else if (structurePlacer.getB().getStage() == CLEAR && result.getBlockResult().getWorldPos().getY() <= worker.level().getMinY())
         {
             // At bedrock level, so we're done
             return false;

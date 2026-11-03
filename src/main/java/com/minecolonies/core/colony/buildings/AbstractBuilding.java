@@ -471,8 +471,8 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
             return;
         }
 
-        final int min = colony.getWorld().getMinBuildHeight();
-        final int max = colony.getWorld().getMaxBuildHeight();
+        final int min = colony.getWorld().getMinY();
+        final int max = colony.getWorld().getMaxY();
         if (getCorners().getA().getY() >= max || getCorners().getB().getY() >= max)
         {
             MessageUtils.format(BUILDER_BUILDING_TOO_HIGH, max).sendTo(colony).forAllPlayers();
