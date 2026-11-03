@@ -496,7 +496,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
         final List<EntityMercenary> soldiers = new ArrayList<>();
         for (int i = 0; i < amountOfMercenaries; i++)
         {
-            final EntityMercenary merc = (EntityMercenary) ModEntities.MERCENARY.create(world);
+            final EntityMercenary merc = (EntityMercenary) ModEntities.MERCENARY.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
             merc.setColony(colony);
             merc.setPos(spawn.getX() + i, spawn.getY(), spawn.getZ());
             merc.setDoSpawnEvent();
@@ -505,7 +505,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
         }
 
         // spawn leader for the event.
-        final EntityMercenary merc = (EntityMercenary) ModEntities.MERCENARY.create(world);
+        final EntityMercenary merc = (EntityMercenary) ModEntities.MERCENARY.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
         merc.setColony(colony);
         merc.setPos(spawn.getX(), spawn.getY(), spawn.getZ() + 1);
         merc.setLeader(soldiers);

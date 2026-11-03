@@ -436,7 +436,7 @@ public class CompatibilityManager implements ICompatibilityManager
         final Set<ItemStorage> filteredEdibles = new HashSet<>();
         for (final ItemStorage storage : edibles)
         {
-            if ((storage.getItemStack().getFoodProperties(null) != null && storage.getItemStack().getFoodProperties(null).nutrition() >= minNutrition))
+            if ((com.minecolonies.api.util.FoodCompat.getFoodProperties(storage.getItemStack()) != null && com.minecolonies.api.util.FoodCompat.getFoodProperties(storage.getItemStack()).nutrition() >= minNutrition))
             {
                 filteredEdibles.add(storage);
             }
@@ -570,7 +570,7 @@ public class CompatibilityManager implements ICompatibilityManager
     public void read(@NotNull final HolderLookup.Provider provider, @NotNull final CompoundTag compound)
     {
         NBTUtils.streamCompound(compound.getListOrEmpty(TAG_SAP_LEAF))
-          .map(nbt -> CompatibilityManager.readLeafSaplingEntryFromNBT(provider, nbt))
+          .map(nbt -> CompatibilityManager.readLeafSaplingEntryFromNBT(provider))
           .filter(key -> !key.getA().isAir() && !leavesToSaplingMap.containsKey(key.getA().getBlock()) && !leavesToSaplingMap.containsValue(key.getB()))
           .forEach(key -> leavesToSaplingMap.put(key.getA().getBlock(), key.getB()));
     }
@@ -820,7 +820,7 @@ public class CompatibilityManager implements ICompatibilityManager
 
     private static Tuple<BlockState, ItemStorage> readLeafSaplingEntryFromNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        return new Tuple<>(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compound), new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compound.getCompoundOrEmpty(NbtTagConstants.STACK)), false, true));
+        return new Tuple<>(NbtUtils.readBlockState(BuiltInRegistries.BLOCK, compound), new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compound.getCompoundOrEmpty(NbtTagConstants.STACK)), false, true));
     }
 
     /**

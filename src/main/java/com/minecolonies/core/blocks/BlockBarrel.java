@@ -96,7 +96,7 @@ public class BlockBarrel extends AbstractBlockBarrel<BlockBarrel> implements Ent
       final InteractionHand hand,
       final BlockHitResult ray)
     {
-        final ItemStack itemstack = player.getInventory().getSelected();
+        final ItemStack itemstack = player.getInventory().getSelectedItem();
         final BlockEntity te = worldIn.getBlockEntity(pos);
         if (te instanceof TileEntityBarrel && !worldIn.isClientSide())
         {

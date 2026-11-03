@@ -76,10 +76,10 @@ public class BuildingArchery extends AbstractBuilding
         shootingStands.clear();
 
         final ListTag targetList = compound.getListOrEmpty(TAG_ARCHERY_TARGETS);
-        shootingTargets.addAll(NBTUtils.streamCompound(targetList).map(targetCompound -> BlockPosUtil.read(targetCompound, TAG_TARGET)).collect(Collectors.toList()));
+        shootingTargets.addAll(NBTUtils.streamCompound(targetList).map(targetCompound -> BlockPosUtil.read(targetCompound)).collect(Collectors.toList()));
 
         final ListTag standTagList = compound.getListOrEmpty(TAG_ARCHERY_STANDS);
-        shootingStands.addAll(NBTUtils.streamCompound(standTagList).map(targetCompound -> BlockPosUtil.read(targetCompound, TAG_STAND)).collect(Collectors.toList()));
+        shootingStands.addAll(NBTUtils.streamCompound(standTagList).map(targetCompound -> BlockPosUtil.read(targetCompound)).collect(Collectors.toList()));
     }
 
     @Override

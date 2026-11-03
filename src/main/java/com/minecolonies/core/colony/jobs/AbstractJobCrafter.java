@@ -161,7 +161,7 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
             {
                 if (tag instanceof CompoundTag compoundTag)
                 {
-                    final ItemStorage item = new ItemStorage(ItemStackUtils.deserializeFromNBT(compoundTag, provider));
+                    final ItemStorage item = new ItemStorage(ItemStackUtils.deserializeFromNBT(compoundTag));
                     newItems.put(item, item.getAmount());
                 }
             }

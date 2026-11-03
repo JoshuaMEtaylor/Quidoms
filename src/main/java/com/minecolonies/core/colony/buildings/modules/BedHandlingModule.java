@@ -42,7 +42,7 @@ public class BedHandlingModule extends AbstractBuildingModule implements IModule
     }
 
     @Override
-    public void serializeNBT(@NotNull final HolderLookup.Provider provider, CompoundTag compound)
+    public void serializeNBT(@NotNull final HolderLookup.Provider provider)
     {
         if (!bedList.isEmpty())
         {

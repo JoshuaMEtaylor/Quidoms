@@ -429,7 +429,7 @@ public class RangeCombatAI extends AttackMoveAI<EntityCitizen>
         parentAI.incrementActionsDone();
         user.getCitizenExperienceHandler().addExperience(EXP_PER_MOB_DEATH);
         user.getCitizenColonyHandler().getColonyOrRegister().getStatisticsManager().increment(MOBS_KILLED, user.getCitizenColonyHandler().getColonyOrRegister().getDay());
-        if (entity.getType().getDescription().getContents() instanceof TranslatableContents translatableContents)
+        if (entity.getType().getName().getContents() instanceof TranslatableContents translatableContents)
         {
             parentAI.building.getModule(STATS_MODULE).increment(MOB_KILLED + ";" + translatableContents.getKey());
         }

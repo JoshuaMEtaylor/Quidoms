@@ -119,7 +119,7 @@ public class Food implements IDeliverable
             final ListTag filterableItems = compound.getListOrEmpty(NBT_EXCLUSION);
             for (int i = 0; i < filterableItems.size(); ++i)
             {
-                items.add(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, filterableItems.getCompound(i))));
+                items.add(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, filterableItems.getCompoundOrEmpty(i))));
             }
         }
         final int minNutrition = compound.getIntOr(NBT_MIN_NUTRITION, 0);

@@ -302,15 +302,15 @@ public class ExpeditionLog
         final ListTag equipment = compound.getListOrEmpty(TAG_EQUIPMENT);
         for (int i = 0; i < equipment.size(); i++)
         {
-            this.equipment.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, equipment.getCompound(i)));
+            this.equipment.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, equipment.getCompoundOrEmpty(i)));
         }
 
         this.mobs.clear();
         final ListTag mobs = compound.getListOrEmpty(TAG_MOBS);
         for (int i = 0; i < mobs.size(); ++i)
         {
-            final CompoundTag mob = mobs.getCompound(i);
-            final ResourceLocation type = ResourceLocation.parse(mob.getString(TAG_TYPE));
+            final CompoundTag mob = mobs.getCompoundOrEmpty(i);
+            final ResourceLocation type = ResourceLocation.parse(mob.getStringOr(TAG_TYPE, ""));
             final EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getValue(type);
             if (entityType != null)
             {
@@ -322,7 +322,7 @@ public class ExpeditionLog
         final ListTag loot = compound.getListOrEmpty(TAG_LOOT);
         for (int i = 0; i < loot.size(); i++)
         {
-            final ItemStorage storage = StandardFactoryController.getInstance().deserializeTag(provider, loot.getCompound(i));
+            final ItemStorage storage = StandardFactoryController.getInstance().deserializeTag(provider, loot.getCompoundOrEmpty(i));
             this.loot.put(storage, storage);
         }
     }

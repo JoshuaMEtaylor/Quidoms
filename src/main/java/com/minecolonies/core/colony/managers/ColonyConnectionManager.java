@@ -625,7 +625,7 @@ public class ColonyConnectionManager implements IColonyConnectionManager
         final ListTag connectionTagList = compound.getListOrEmpty(TAG_CONNECTIONS);
         for (final Tag tag : connectionTagList)
         {
-            final BlockPos pos = BlockPosUtil.read((CompoundTag) tag, TAG_POS);
+            final BlockPos pos = BlockPosUtil.read((CompoundTag) tag);
             final ColonyConnectionNode connectionPoint = new ColonyConnectionNode(pos);
             connectionPoint.read((CompoundTag) tag);
             colonyConnections.put(pos, connectionPoint);
@@ -635,14 +635,14 @@ public class ColonyConnectionManager implements IColonyConnectionManager
         for (final Tag tag : connectedColonyTagList)
         {
             final ColonyConnection colonyConnectionData = new ColonyConnection().deserializeNBT((CompoundTag) tag);
-            directlyConnectedColonies.put(colonyConnectionData.id, colonyConnectionData);
+            directlyConnectedColonies.put(colonyConnectionData.id);
         }
 
         gateHouses.clear();
         final ListTag gateHouseTagList = compound.getListOrEmpty(TAG_GATEHOUSES);
         for (final Tag tag : gateHouseTagList)
         {
-            gateHouses.add(BlockPosUtil.read((CompoundTag) tag, TAG_POS));
+            gateHouses.add(BlockPosUtil.read((CompoundTag) tag));
         }
 
         connectionEvents.clear();
@@ -650,13 +650,13 @@ public class ColonyConnectionManager implements IColonyConnectionManager
         for (final Tag tag : connectionEventList)
         {
             final ConnectionEvent connectionEventData = ConnectionEvent.deserializeNBT((CompoundTag) tag);
-            connectionEvents.put(connectionEventData.id(), connectionEventData);
+            connectionEvents.put(connectionEventData.id());
         }
 
         final ListTag pendingConnectionTagList = compound.getListOrEmpty(TAG_PENDING);
         for (final Tag tag : pendingConnectionTagList)
         {
-            final BlockPos pos = BlockPosUtil.read((CompoundTag) tag, TAG_POS);
+            final BlockPos pos = BlockPosUtil.read((CompoundTag) tag);
             final PendingConnectionNode colonyConnectionData = new PendingConnectionNode(pos);
             colonyConnectionData.read((CompoundTag) tag);
             pendingColonyConnections.put(pos, colonyConnectionData);

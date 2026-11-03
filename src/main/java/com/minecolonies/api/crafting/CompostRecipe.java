@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class CompostRecipe implements Recipe<SingleRecipeInput>
 {
     public static final MapCodec<CompostRecipe> CODEC = RecordCodecBuilder.mapCodec(builder -> builder
-        .group(Ingredient.CODEC_NONEMPTY.fieldOf("input").forGetter(CompostRecipe::getInput),
+        .group(Ingredient.CODEC.fieldOf("input").forGetter(CompostRecipe::getInput),
           ExtraCodecs.POSITIVE_INT.optionalFieldOf("strength", 1).forGetter(CompostRecipe::getStrength))
         .apply(builder, CompostRecipe::new));
 

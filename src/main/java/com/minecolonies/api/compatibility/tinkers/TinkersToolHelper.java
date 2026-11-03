@@ -118,24 +118,24 @@ public final class TinkersToolHelper extends TinkersToolProxy
             return false;
         }
 
-        if (ToolType.AXE.equals(toolType) && stack.canPerformAction(ItemAbilities.AXE_DIG))
+        if (ToolType.AXE.equals(toolType) && stack.is(net.minecraft.tags.ItemTags.AXES))
         {
             return true;
         }
 
-        if (ToolType.SHOVEL.equals(toolType) && stack.canPerformAction(ItemAbilities.SHOVEL_DIG))
+        if (ToolType.SHOVEL.equals(toolType) && stack.is(net.minecraft.tags.ItemTags.SHOVELS))
         {
             return true;
         }
 
-        if (ToolType.PICKAXE.equals(toolType) && stack.canPerformAction(ItemAbilities.PICKAXE_DIG))
+        if (ToolType.PICKAXE.equals(toolType) && stack.is(net.minecraft.tags.ItemTags.PICKAXES))
         {
             return true;
         }
 
         if (ToolType.HOE.equals(toolType))
         {
-            return stack.canPerformAction(ItemAbilities.HOE_DIG);
+            return stack.is(net.minecraft.tags.ItemTags.HOES);
         }
 
         return stack.is(TinkerTags.Items.HARVEST);*/

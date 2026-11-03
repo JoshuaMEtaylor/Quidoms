@@ -85,7 +85,7 @@ public class WindowDecorationController extends AbstractWindowSkeleton
 
                 try
                 {
-                    final String cleanedPackName = this.controller.getPackName().replace(Minecraft.getInstance().player.getUUID().toString(), "");
+                    final String cleanedPackName = this.controller.getPackName().replace(Minecraft.getInstance().player.getUUID().toString());
                     ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(StructurePacks.getBlueprintFuture(cleanedPackName,
                       StructurePacks.getStructurePack(cleanedPackName).getPath().resolve(this.controller.getBlueprintPath()), mc.level.registryAccess()), (blueprint -> {
                         if (blueprint != null)

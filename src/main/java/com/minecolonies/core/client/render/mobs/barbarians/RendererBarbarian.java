@@ -2,33 +2,23 @@ package com.minecolonies.core.client.render.mobs.barbarians;
 
 import com.minecolonies.api.entity.mobs.AbstractEntityMinecoloniesMonster;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * Renderer used for Barbarians And Archer Barbarians.
- */
 public class RendererBarbarian extends AbstractRendererBarbarian<AbstractEntityMinecoloniesMonster, HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>>
 {
-    /**
-     * Texture of the entity.
-     */
-    private static final ResourceLocation TEXTURE = new ResourceLocation("minecolonies", "textures/entity/raiders/barbarian1.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("minecolonies", "textures/entity/raiders/barbarian1.png");
 
-    /**
-     * Constructor method for renderer
-     *
-     * @param context the renderManager
-     */
     public RendererBarbarian(final EntityRendererProvider.Context context)
     {
-        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_ARMOR.chest())), 0.5F);
+        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), 0.5F);
     }
 
-
+    @NotNull
     @Override
-    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
+    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState state)
     {
         return TEXTURE;
     }

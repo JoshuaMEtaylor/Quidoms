@@ -137,7 +137,7 @@ public class CitizenFoodHandler implements ICitizenFoodHandler
     @Override
     public void read(final CompoundTag compound)
     {
-        @NotNull final ListTag lastFoodNbt = compound.getList(TAG_LAST_FOODS, TAG_STRING);
+        @NotNull final ListTag lastFoodNbt = compound.getListOrEmpty(TAG_LAST_FOODS);
         for (int i = 0; i < lastFoodNbt.size(); i++)
         {
             final Item lastFood = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(lastFoodNbt.getStringOr(i, "")));

@@ -245,7 +245,7 @@ public final class WorkerUtil
                     if (te != null)
                     {
                         final CompoundTag teData = te.getTileEntityData();
-                        final ResourceLocation teId = teData == null ? null : ResourceLocation.tryParse(teData.getString("id"));
+                        final ResourceLocation teId = teData == null ? null : ResourceLocation.tryParse(teData.getStringOr("id", ""));
                         final BlockEntityType<?> teType = teId == null ? null : BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(teId);
                         if (teType == BlockEntityType.SIGN || teType == BlockEntityType.HANGING_SIGN)
                         {
@@ -253,7 +253,7 @@ public final class WorkerUtil
                             {
                                 if (sign.getFrontText().getMessage(0, false).getString().equals(LEVEL_SIGN_TEXT))
                                 {
-                                    // try to make an anchor in 0,0,0 instead of the middle of the structure
+                                    // try to make an anchor in 0, 0,0 instead of the middle of the structure
                                     return pos.subtract(structure.getPrimaryBlockOffset()).offset(localPos);
                                 }
                             }

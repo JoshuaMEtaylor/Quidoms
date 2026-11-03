@@ -77,7 +77,7 @@ public class ItemScrollGuardHelp extends AbstractItemScroll
         if (world.random.nextInt(10) == 0 || colony.getWorld() != world)
         {
             // Fail
-            final Llama entity = EntityType.LLAMA.create(world);
+            final Llama entity = EntityType.LLAMA.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
             entity.setPos(player.getX(), player.getY(), player.getZ());
             world.addFreshEntity(entity);
 

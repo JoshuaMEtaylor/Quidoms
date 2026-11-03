@@ -303,11 +303,10 @@ public class WindowBannerPicker extends Screen
 
         // Render the instructions
         stack.drawCenteredString(this.font,
-                Component.translatableEscape("com.minecolonies.coremod.gui.flag.choose").getString(),
-                this.width /2,
+                Component.translatableEscape("com.minecolonies.coremod.gui.flag.choose").getString(), this.width /2,
                 16,
                 0xFFFFFF /* white */
-        );
+        , "");
     }
 
     /**
@@ -382,7 +381,7 @@ public class WindowBannerPicker extends Screen
             this.modelRender,
             ModelBakery.BANNER_BASE,
             true,
-            colors.getSelected(),
+            colors.getSelectedItem(),
             builder.build());
         transform.popPose();
         stack.flush();
@@ -522,7 +521,7 @@ public class WindowBannerPicker extends Screen
         {
             if (!this.blocked)
             {
-                setLayer(this.pattern, colors.getSelected());
+                setLayer(this.pattern, colors.getSelectedItem());
             }
         }
 

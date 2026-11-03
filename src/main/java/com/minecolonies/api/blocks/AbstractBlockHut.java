@@ -126,7 +126,7 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
     @Override
     public boolean isVisible(@Nullable final CompoundTag beData)
     {
-        final Map<BlockPos, List<String>> data = readTagPosMapFrom(beData.getCompound(TAG_BLUEPRINTDATA));
+        final Map<BlockPos, List<String>> data = readTagPosMapFrom(beData.getCompoundOrEmpty(TAG_BLUEPRINTDATA));
         return !data.getOrDefault(BlockPos.ZERO, new ArrayList<>()).contains("invisible");
     }
 
@@ -199,7 +199,7 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
 
         try
         {
-            return Integer.parseInt(beData.getCompound(TAG_BLUEPRINTDATA).getString(TAG_SCHEMATIC_NAME).replaceAll("[^0-9]", ""));
+            return Integer.parseInt(beData.getCompoundOrEmpty(TAG_BLUEPRINTDATA).getStringOr(TAG_SCHEMATIC_NAME, "").replaceAll("[^0-9]"));
         }
         catch (final NumberFormatException exception)
         {

@@ -31,7 +31,7 @@ public class RenderBipedCitizen extends HumanoidMobRenderer<AbstractEntityCitize
     {
         super(context, new CitizenModel<>(context.bakeLayer(ModelLayers.PLAYER)), (float) SHADOW_SIZE);
         final ArmorModelSet<HumanoidModel<CitizenRenderState>> armor = ArmorModelSet.bake(ModelLayers.PLAYER_ARMOR, context.getModelSet(), HumanoidModel::new);
-        this.addLayer(new HumanoidArmorLayer<>(this, armorModels, context.getEquipmentRenderer()));
+        this.addLayer(new HumanoidArmorLayer<>(this, armor, context.getEquipmentRenderer()));
         this.addLayer(new ItemInHandLayer<>(this));
         ModModelTypeInitializer.init(context);
     }

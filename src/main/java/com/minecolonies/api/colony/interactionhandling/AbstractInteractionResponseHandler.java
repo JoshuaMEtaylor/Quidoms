@@ -129,7 +129,7 @@ public abstract class AbstractInteractionResponseHandler implements IInteraction
         final ListTag list = compoundNBT.getListOrEmpty(TAG_RESPONSES);
         for (int i = 0; i < list.size(); i++)
         {
-            final CompoundTag nbt = list.getCompound(i);
+            final CompoundTag nbt = list.getCompoundOrEmpty(i);
             this.responses.put(Component.Serializer.fromJson(nbt.getStringOr(TAG_RESPONSE, ""), provider), Component.Serializer.fromJson(nbt.getStringOr(TAG_NEXT_INQUIRY, ""), provider));
         }
         this.primary = compoundNBT.getBooleanOr(TAG_PRIMARY, false);

@@ -1045,7 +1045,7 @@ public final class ItemStackUtils
         {
             if (items.length == 1)
             {
-                return items[0].getItem().getDescription();
+                return items[0].getItem().getName();
             }
             return Component.translatable(String.join("/", Collections.nCopies(items.length, "%s")),
                     Arrays.stream(items).map(ItemStack::getItem).map(Item::getDescription).toArray());

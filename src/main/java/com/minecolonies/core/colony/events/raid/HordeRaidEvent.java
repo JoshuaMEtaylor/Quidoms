@@ -526,7 +526,7 @@ public abstract class HordeRaidEvent implements IColonyRaidEvent, IColonyCampFir
 
         for (final Tag posCompound : compound.getListOrEmpty(TAG_CAMPFIRE_LIST))
         {
-            campFires.add(BlockPosUtil.read((CompoundTag) posCompound, NbtTagConstants.TAG_POS));
+            campFires.add(BlockPosUtil.read((CompoundTag) posCompound));
         }
 
         status = EventStatus.values()[compound.getIntOr(TAG_EVENT_STATUS, 0)];

@@ -76,7 +76,7 @@ public class GraveManager implements IGraveManager
             final CompoundTag graveCompound = gravesTagList.getCompoundOrEmpty(i);
             if (graveCompound.contains(TAG_POS) && graveCompound.contains(TAG_RESERVED))
             {
-                graves.put(BlockPosUtil.read(graveCompound, TAG_POS), graveCompound.getBooleanOr(TAG_RESERVED, false));
+                graves.put(BlockPosUtil.read(graveCompound), graveCompound.getBooleanOr(TAG_RESERVED, false));
             }
         }
     }

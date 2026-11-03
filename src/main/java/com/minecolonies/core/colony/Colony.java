@@ -794,7 +794,7 @@ public class Colony implements IColony
         final ListTag wayPointTagList = compound.getListOrEmpty(TAG_WAYPOINT);
         for (int i = 0; i < wayPointTagList.size(); ++i)
         {
-            final CompoundTag blockAtPos = wayPointTagList.getCompound(i);
+            final CompoundTag blockAtPos = wayPointTagList.getCompoundOrEmpty(i);
             final BlockPos pos = BlockPosUtil.read(blockAtPos, TAG_WAYPOINT);
             final BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), blockAtPos);
             wayPoints.put(pos, state);
@@ -805,7 +805,7 @@ public class Colony implements IColony
         final ListTag freeBlockTagList = compound.getListOrEmpty(TAG_FREE_BLOCKS);
         for (int i = 0; i < freeBlockTagList.size(); ++i)
         {
-            tempFreeBlocks.add(BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(freeBlockTagList.getString(i))));
+            tempFreeBlocks.add(BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(freeBlockTagList.getStringOr(i, ""))));
         }
         freeBlocks = ImmutableSet.copyOf(tempFreeBlocks);
 
@@ -814,7 +814,7 @@ public class Colony implements IColony
         final ListTag freePositionTagList = compound.getListOrEmpty(TAG_FREE_POSITIONS);
         for (int i = 0; i < freePositionTagList.size(); ++i)
         {
-            final CompoundTag blockTag = freePositionTagList.getCompound(i);
+            final CompoundTag blockTag = freePositionTagList.getCompoundOrEmpty(i);
             final BlockPos block = BlockPosUtil.read(blockTag, TAG_FREE_POSITIONS);
             tempFreePositions.add(block);
         }
@@ -877,9 +877,9 @@ public class Colony implements IColony
         @NotNull final ListTag claimTagList = compound.getListOrEmpty(TAG_CLAIM_DATA);
         for (int i = 0; i < claimTagList.size(); i++)
         {
-            @NotNull final CompoundTag chunkCompound = claimTagList.getCompound(i);
+            @NotNull final CompoundTag chunkCompound = claimTagList.getCompoundOrEmpty(i);
             final ChunkClaimData chunkClaimData = new ChunkClaimData();
-            chunkClaimData.deserializeNBT(provider, chunkCompound.getCompound(TAG_CHUNK_CLAIM));
+            chunkClaimData.deserializeNBT(provider, chunkCompound.getCompoundOrEmpty(TAG_CHUNK_CLAIM));
             claimData.put(chunkCompound.getLong(TAG_CHUNK_POS), chunkClaimData);
         }
         IColonyManager.getInstance().addClaimData(this, claimData);

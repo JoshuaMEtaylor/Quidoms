@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -27,6 +28,12 @@ public class MinecoloniesMinecart extends AbstractMinecart
     public MinecoloniesMinecart(final EntityType<?> type, final Level world)
     {
         super(type, world);
+    }
+
+    @Override
+    protected Item getDropItem()
+    {
+        return Items.MINECART;
     }
 
     @Override

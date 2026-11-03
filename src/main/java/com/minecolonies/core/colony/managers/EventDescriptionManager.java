@@ -78,7 +78,7 @@ public class EventDescriptionManager implements IEventDescriptionManager
         for (final Tag event : eventDescListNBT)
         {
             final CompoundTag eventCompound = (CompoundTag) event;
-            final ResourceLocation eventTypeID = new ResourceLocation(MOD_ID, eventCompound.getString(TAG_NAME));
+            final ResourceLocation eventTypeID = new ResourceLocation(MOD_ID, eventCompound.getStringOr(TAG_NAME, ""));
 
             final ColonyEventDescriptionTypeRegistryEntry registryEntry = MinecoloniesAPIProxy.getInstance().getColonyEventDescriptionRegistry().get(eventTypeID);
             if (registryEntry == null)

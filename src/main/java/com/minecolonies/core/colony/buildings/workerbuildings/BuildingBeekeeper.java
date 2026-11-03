@@ -123,7 +123,7 @@ public class BuildingBeekeeper extends AbstractBuilding
         {
             hivesTag.add(NBTUtils.writeBlockPos(entry));
         }
-        nbt.put(NbtTagConstants.TAG_HIVES, hivesTag);
+        nbt.put(NbtTagConstants.TAG_HIVES);
         return nbt;
     }
 

@@ -7,21 +7,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Renderer used for Chief norsemen.
- */
 public class RendererChiefNorsemen extends AbstractRendererNorsemen<AbstractEntityMinecoloniesMonster, ModelChiefNorsemen>
 {
-    /**
-     * Texture of the entity.
-     */
-    private static final ResourceLocation TEXTURE = new ResourceLocation("minecolonies", "textures/entity/raiders/norsemen_chief.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("minecolonies", "textures/entity/raiders/norsemen_chief.png");
 
-    /**
-     * Constructor method for renderer
-     *
-     * @param context the renderManager
-     */
     public RendererChiefNorsemen(final EntityRendererProvider.Context context)
     {
         super(context, new ModelChiefNorsemen(context.bakeLayer(ClientRegistryHandler.NORSEMEN_CHIEF)), 0.5F);
@@ -29,7 +18,7 @@ public class RendererChiefNorsemen extends AbstractRendererNorsemen<AbstractEnti
 
     @NotNull
     @Override
-    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
+    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState state)
     {
         return TEXTURE;
     }

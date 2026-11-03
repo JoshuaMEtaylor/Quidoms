@@ -249,7 +249,7 @@ public class EntityAICavalry extends AbstractEntityAIGuard<JobCavalry, AbstractB
             return CombatAIStates.NO_TARGET;
         }
 
-        boolean mounted = worker.startRiding(targetMount, true);
+        boolean mounted = worker.startRiding(targetMount, true, false);
 
         if (mounted)
         {

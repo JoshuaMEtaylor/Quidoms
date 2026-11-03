@@ -543,7 +543,7 @@ public class WindowColonyMap extends AbstractWindowSkeleton
                     }
                     else
                     {   
-                        tipText = Component.literal(request.getLongDisplayString().getString().replace("§f", ""));
+                        tipText = Component.literal(request.getLongDisplayString().getString().replace("§f"));
                     }
                     statustip.appendNL(tipText);
                     

@@ -196,7 +196,7 @@ public final class CraftingUtils
                     }
                     catch (final Throwable ex)
                     {
-                        Log.getLogger().warn("Error populating items for " + tab.getDisplayName().getString(), ex);
+                        Log.getLogger().warn("Error populating items for " + tab.getDisplayName().getString(), ex, "");
                     }
                 }
                 else

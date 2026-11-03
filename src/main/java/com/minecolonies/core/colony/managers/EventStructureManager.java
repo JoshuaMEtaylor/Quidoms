@@ -177,7 +177,7 @@ public class EventStructureManager implements IEventStructureManager
             for (final Tag base : schematicTags)
             {
                 final CompoundTag tagCompound = (CompoundTag) base;
-                final BlockPos pos = BlockPosUtil.read(tagCompound, TAG_POS);
+                final BlockPos pos = BlockPosUtil.read(tagCompound);
                 final int eventID = tagCompound.getIntOr(TAG_EVENT_ID, 0);
                 if (eventManager.getEventByID(eventID) != null)
                 {

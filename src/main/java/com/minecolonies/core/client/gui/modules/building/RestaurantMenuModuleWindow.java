@@ -466,8 +466,8 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
     protected void applySorting(final List<ItemStorage> displayedList)
     {
         displayedList.sort((o1, o2) -> {
-            int score = FoodUtils.getFoodTier(o1.getItemStack()) * -100 - o1.getItemStack().getFoodProperties(null).nutrition();
-            int score2 = FoodUtils.getFoodTier(o2.getItemStack())* -100 - o2.getItemStack().getFoodProperties(null).nutrition();
+            int score = FoodUtils.getFoodTier(o1.getItemStack()) * -100 - com.minecolonies.api.util.FoodCompat.getFoodProperties(o1.getItemStack()).nutrition();
+            int score2 = FoodUtils.getFoodTier(o2.getItemStack())* -100 - com.minecolonies.api.util.FoodCompat.getFoodProperties(o2.getItemStack()).nutrition();
 
             final int scoreComparison = Integer.compare(score, score2);
             if (scoreComparison != 0)

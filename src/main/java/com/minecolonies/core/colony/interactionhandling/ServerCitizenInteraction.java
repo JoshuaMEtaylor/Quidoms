@@ -208,7 +208,7 @@ public abstract class ServerCitizenInteraction extends AbstractInteractionRespon
         final ListTag list = compoundNBT.getListOrEmpty(TAG_PARENTS);
         for (Tag tag : list)
         {
-            this.parents.add(Utils.deserializeCodecMess(ComponentSerialization.CODEC, provider, tag));
+            this.parents.add(Utils.deserializeCodecMess(ComponentSerialization.CODEC));
         }
         this.validatorId = Utils.deserializeCodecMess(ComponentSerialization.CODEC, provider, compoundNBT.get(TAG_VALIDATOR_ID));
         loadValidator();

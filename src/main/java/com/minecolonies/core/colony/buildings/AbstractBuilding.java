@@ -352,7 +352,7 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
             {
                 if (compound.getCompoundOrEmpty(TAG_BUILDING_MODULES).contains(module.getProducer().key))
                 {
-                    module.deserializeNBT(provider, compound.getCompoundOrEmpty(TAG_BUILDING_MODULES).getCompound(module.getProducer().key));
+                    module.deserializeNBT(provider, compound.getCompoundOrEmpty(TAG_BUILDING_MODULES).getCompoundOrEmpty(module.getProducer().key));
                 }
                 else
                 {

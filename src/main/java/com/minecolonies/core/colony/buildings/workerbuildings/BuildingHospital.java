@@ -92,7 +92,7 @@ public class BuildingHospital extends AbstractBuilding
         for (int i = 0; i < bedTagList.size(); ++i)
         {
             final CompoundTag bedCompound = bedTagList.getCompoundOrEmpty(i);
-            final BlockPos bedPos = BlockPosUtil.read(bedCompound, TAG_POS);
+            final BlockPos bedPos = BlockPosUtil.read(bedCompound);
             if (!bedMap.containsKey(bedPos))
             {
                 bedMap.put(bedPos, bedCompound.getIntOr(TAG_ID, 0));

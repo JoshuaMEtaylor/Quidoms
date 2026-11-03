@@ -138,11 +138,11 @@ public class EntityAIWorkNether extends AbstractEntityAICrafting<JobNetherWorker
             {
                 renderData.append(RENDER_META_TORCH);
             }
-            else if (stack.canPerformAction(ItemAbilities.PICKAXE_DIG) && renderData.indexOf(RENDER_META_PICKAXE) == -1)
+            else if (stack.is(net.minecraft.tags.ItemTags.PICKAXES) && renderData.indexOf(RENDER_META_PICKAXE) == -1)
             {
                 renderData.append(RENDER_META_PICKAXE);
             }
-            else if (stack.canPerformAction(ItemAbilities.SHOVEL_DIG) && renderData.indexOf(RENDER_META_SHOVEL) == -1)
+            else if (stack.is(net.minecraft.tags.ItemTags.SHOVELS) && renderData.indexOf(RENDER_META_SHOVEL) == -1)
             {
                 renderData.append(RENDER_META_SHOVEL);
             }
@@ -402,7 +402,7 @@ public class EntityAIWorkNether extends AbstractEntityAICrafting<JobNetherWorker
 
                             //Set up the mob to do battle with
                             EntityType<?> mobType = component.entityType();
-                            LivingEntity mob = (LivingEntity) mobType.create(world);
+                            LivingEntity mob = (LivingEntity) mobType.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
                             float mobHealth = mob.getHealth();
 
                             // Calculate how much damage the mob will do if it lands a hit (Before armor)

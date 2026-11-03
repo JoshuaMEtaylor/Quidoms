@@ -120,7 +120,7 @@ public final class RecipeAnalyzer
             try
             {
                 // sadly there doesn't seem to be a better way to discover the actual classes for each type, because Java
-                final Entity entity = entityType.create(level);
+                final Entity entity = entityType.create(level, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
                 if (entity instanceof Animal animal)
                 {
                     animals.add(animal);

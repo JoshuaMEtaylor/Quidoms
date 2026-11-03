@@ -168,7 +168,7 @@ public abstract class AbstractWindowWorkerModuleBuilding<B extends IBuildingView
         {
             for (final int worker : module.getAssignedCitizens())
             {
-                workers.add(new Tuple<>(Component.translatableEscape(module.getJobEntry().getTranslationKey()).getString(), worker));
+                workers.add(new Tuple<>(Component.translatableEscape(module.getJobEntry().getTranslationKey()).getString(), worker, ""));
             }
         }
 

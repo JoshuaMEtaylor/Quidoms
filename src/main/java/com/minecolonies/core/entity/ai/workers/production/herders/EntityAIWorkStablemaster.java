@@ -505,7 +505,7 @@ public class EntityAIWorkStablemaster extends AbstractEntityAIHerder<JobStablema
         {
             if (!building.hasWorkerOpenRequestsOfType(worker.getCitizenData().getId(), TypeToken.of(StackList.class)))
             {
-                StackList requestableItems = new StackList(neededItem, (ServerLevel) worker.getCitizenData().getColony().getWorld(), component.getString(), 8, 4, 0);
+                StackList requestableItems = new StackList(neededItem, (ServerLevel) worker.getCitizenData().getColony().getWorld(), component.getString(), 8, 4, 0, "");
                 worker.getCitizenData().createRequestAsync(requestableItems);
             }
         }

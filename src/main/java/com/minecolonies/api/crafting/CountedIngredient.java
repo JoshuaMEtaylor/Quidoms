@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 public record CountedIngredient(@NotNull Ingredient child, int count) implements ICustomIngredient
 {
     public static final MapCodec<CountedIngredient> CODEC = RecordCodecBuilder.mapCodec(builder -> builder
-        .group(Ingredient.CODEC_NONEMPTY.fieldOf("item").forGetter(CountedIngredient::child),
+        .group(Ingredient.CODEC.fieldOf("item").forGetter(CountedIngredient::child),
           ExtraCodecs.POSITIVE_INT.optionalFieldOf("count", 1).forGetter(CountedIngredient::count))
         .apply(builder, CountedIngredient::new));
 

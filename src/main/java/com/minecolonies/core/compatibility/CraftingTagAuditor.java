@@ -163,7 +163,7 @@ public class CraftingTagAuditor
             writer.write(entry.getKey().location().toString());
             writer.write(',');
             writer.write('"');
-            writer.write(Component.translatableEscape(entry.getValue().getDescription().getString()).getString().replace("\"", "\"\""));
+            writer.write(Component.translatableEscape(entry.getValue().getName().getString()).getString().replace("\"", "\"\""));
             writer.write('"');
             entry.getValue().builtInRegistryHolder().tags().map(t -> t.location().toString()).sorted().forEach(t -> {
                 try
@@ -192,7 +192,7 @@ public class CraftingTagAuditor
             writer.write(entry.getKey().location().toString());
             writer.write(',');
             writer.write('"');
-            writer.write(Component.translatable(entry.getValue().getDescription().getString()).getString().replace("\"", "\"\""));
+            writer.write(Component.translatable(entry.getValue().getName().getString()).getString().replace("\"", "\"\""));
             writer.write('"');
             writer.write(',');
             if (entry.getValue().defaultBlockState().is(ModTags.pathingBlocks))
@@ -225,7 +225,7 @@ public class CraftingTagAuditor
             writer.write(entry.getKey().location().toString());
             writer.write(',');
             writer.write('"');
-            writer.write(Component.translatable(entry.getValue().getDescription().getString()).getString().replace("\"", "\"\""));
+            writer.write(Component.translatable(entry.getValue().getName().getString()).getString().replace("\"", "\"\""));
             writer.write('"');
             writer.write(',');
             writer.write(String.valueOf(SchemAnalyzerUtil.getScoreFor(entry.getValue())));

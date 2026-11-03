@@ -199,7 +199,7 @@ public class CitizenDiseaseHandler implements ICitizenDiseaseHandler
     @Override
     public void read(final CompoundTag compound)
     {
-        if (!compound.contains(TAG_DISEASE, Tag.TAG_COMPOUND))
+        if (!compound.contains(TAG_DISEASE))
         {
             return;
         }

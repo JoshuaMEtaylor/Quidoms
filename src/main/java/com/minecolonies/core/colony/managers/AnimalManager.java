@@ -275,7 +275,7 @@ public class AnimalManager implements IAnimalManager
     public void read(@NotNull final HolderLookup.Provider provider, @NotNull final CompoundTag compound)
     {
         // If the tag doesn't exist, don't mutate current state.
-        if (!compound.contains(TAG_ANIMAL_MANAGER, Tag.TAG_COMPOUND))
+        if (!compound.contains(TAG_ANIMAL_MANAGER))
         {
             return;
         }
@@ -286,7 +286,7 @@ public class AnimalManager implements IAnimalManager
         animalMap.clear();
 
         // Restore next id even if animals list is absent/corrupt.
-        if (animalManagerNBT.contains(TAG_NEXTID, Tag.TAG_INT))
+        if (animalManagerNBT.contains(TAG_NEXTID))
         {
             nextAnimalID = animalManagerNBT.getIntOr(TAG_NEXTID, 0);
         }
@@ -296,17 +296,17 @@ public class AnimalManager implements IAnimalManager
         }
 
         // Read animals list (if present). If missing, we still keep nextAnimalID restored.
-        if (animalManagerNBT.contains(TAG_ANIMALS, Tag.TAG_LIST))
+        if (animalManagerNBT.contains(TAG_ANIMALS))
         {
             final ListTag animalList = animalManagerNBT.getListOrEmpty(TAG_ANIMALS);
 
             for (int i = 0; i < animalList.size(); i++)
             {
-                final CompoundTag animalTag = animalList.getCompound(i);
+                final CompoundTag animalTag = animalList.getCompoundOrEmpty(i);
 
                 try
                 {
-                    final IAnimalData data = AnimalData.loadAnimalFromNBT(colony, animalTag, provider);
+                    final IAnimalData data = AnimalData.loadAnimalFromNBT(colony);
                     if (data == null)
                     {
                         Log.getLogger().warn("Skipped null animal data at index {} while reading animal manager.", i);

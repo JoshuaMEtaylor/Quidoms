@@ -80,7 +80,7 @@ public class BuildingLibrary extends AbstractBuilding
         {
             bookcaseTagList.add(NBTUtils.writeBlockPos(entry));
         }
-        compound.put(TAG_BOOKCASES, bookcaseTagList);
+        compound.put(TAG_BOOKCASES);
 
         return compound;
     }

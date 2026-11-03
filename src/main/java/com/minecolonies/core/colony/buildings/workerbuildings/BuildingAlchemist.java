@@ -135,7 +135,7 @@ public class BuildingAlchemist extends AbstractBuilding
         {
             sandCompoundList.add(NBTUtils.writeBlockPos(entry));
         }
-        compound.put(TAG_PLANTGROUND, sandCompoundList);
+        compound.put(TAG_PLANTGROUND);
 
         @NotNull final ListTag leavesCompoundList = new ListTag();
         for (@NotNull final BlockPos entry : leaves)

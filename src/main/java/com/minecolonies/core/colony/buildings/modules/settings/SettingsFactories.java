@@ -157,7 +157,7 @@ public class SettingsFactories
             final ListTag list = nbt.getListOrEmpty(TAG_LIST);
             for (int i = 0; i < list.size(); i++)
             {
-                settings.add(list.getCompound(i).getString(TAG_VALUE));
+                settings.add(list.getCompoundOrEmpty(i).getStringOr(TAG_VALUE, ""));
             }
 
             return this.getNewInstance(settings, current);

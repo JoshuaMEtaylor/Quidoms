@@ -104,7 +104,7 @@ public class KillEntityObjectiveTemplateTemplate extends DialogueObjectiveTempla
             return Component.translatableEscape("com.minecolonies.coremod.questobjectives.kill.progress",
               progress.currentProgress,
               entitiesToKill,
-              entityToKill.getDescription().plainCopy().setStyle(style));
+              entityToKill.getName().plainCopy().setStyle(style));
         }
         return Component.empty();
     }

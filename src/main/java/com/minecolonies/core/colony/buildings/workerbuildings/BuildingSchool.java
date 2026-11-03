@@ -90,7 +90,7 @@ public class BuildingSchool extends AbstractBuilding
         for (int i = 0; i < carpetTagList.size(); ++i)
         {
             final CompoundTag bedCompound = carpetTagList.getCompoundOrEmpty(i);
-            final BlockPos pos = BlockPosUtil.read(bedCompound, TAG_POS);
+            final BlockPos pos = BlockPosUtil.read(bedCompound);
             if (!carpet.contains(pos))
             {
                 carpet.add(pos);

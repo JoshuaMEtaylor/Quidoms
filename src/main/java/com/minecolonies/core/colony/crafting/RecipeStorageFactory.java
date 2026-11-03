@@ -161,10 +161,10 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
         final ListTag inputTagList = nbt.getListOrEmpty(INPUT_TAG);
         for (int i = 0; i < inputTagList.size(); ++i)
         {
-            final CompoundTag inputTag = inputTagList.getCompound(i);
+            final CompoundTag inputTag = inputTagList.getCompoundOrEmpty(i);
             if(inputTag.contains(NEW_NBT_TYPE) || inputTag.contains(NBT_TYPE)) //Check to see if it's something the factorycontroller can handle
             {
-                input.add(StandardFactoryController.getInstance().deserializeTag(provider, inputTag));
+                input.add(StandardFactoryController.getInstance().deserializeTag(provider));
             }
             else
             {
@@ -175,7 +175,7 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
 
         final ItemStack primaryOutput = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, nbt.getCompoundOrEmpty(NbtTagConstants.STACK));
 
-        final Block intermediate = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), nbt.getCompoundOrEmpty(BLOCK_TAG)).getBlock();
+        final Block intermediate = NbtUtils.readBlockState(BuiltInRegistries.BLOCK, nbt.getCompoundOrEmpty(BLOCK_TAG)).getBlock();
 
         final int gridSize = nbt.getIntOr(TAG_GRID, 0);
         final IToken<?> token = StandardFactoryController.getInstance().deserializeTag(provider, nbt.getCompoundOrEmpty(TAG_TOKEN));
@@ -189,8 +189,8 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
         final List<ItemStack> altOutputs = new ArrayList<>();
         for (int i = 0; i < altOutputTagList.size(); ++i)
         {
-            final CompoundTag altOutputTag = altOutputTagList.getCompound(i);
-            altOutputs.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, altOutputTag));
+            final CompoundTag altOutputTag = altOutputTagList.getCompoundOrEmpty(i);
+            altOutputs.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider));
         }
 
         final ListTag secOutputTagList = nbt.getListOrEmpty(SECOUTPUT_TAG);
@@ -198,8 +198,8 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
         final List<ItemStack> secOutputs = new ArrayList<>();
         for (int i = 0; i < secOutputTagList.size(); ++i)
         {
-            final CompoundTag secOutputTag = secOutputTagList.getCompound(i);
-            secOutputs.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, secOutputTag));
+            final CompoundTag secOutputTag = secOutputTagList.getCompoundOrEmpty(i);
+            secOutputs.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider));
         }
 
         final ResourceKey<LootTable> lootTable = nbt.contains(LOOT_TAG) ? ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(nbt.getStringOr(LOOT_TAG, ""))) : null;

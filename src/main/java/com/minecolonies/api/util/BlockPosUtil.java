@@ -306,7 +306,7 @@ public final class BlockPosUtil
         ListTag listNBT = compoundNBT.getListOrEmpty(tagname);
         for (int i = 0; i < listNBT.size(); i++)
         {
-            result.add(readFromListNBT(listNBT, i));
+            result.add(readFromListNBT(listNBT));
         }
 
         return result;

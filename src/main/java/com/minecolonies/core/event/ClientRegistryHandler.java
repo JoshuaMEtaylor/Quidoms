@@ -337,13 +337,8 @@ public class ClientRegistryHandler
 
         event.registerEntityRenderer(ModEntities.MERCENARY, RenderMercenary::new);
         event.registerEntityRenderer(ModEntities.SITTINGENTITY, RenderSitting::new);
-        event.registerEntityRenderer(ModEntities.MINECART, (context) -> new MinecartRenderer<>(context, ModelLayers.MINECART));
-        event.registerEntityRenderer(ModEntities.CAVALRY_HORSE, ctx -> 
-        {
-            HorseRenderer renderer = new HorseRenderer(ctx); 
-            renderer.addLayer(new CavalryOverlayLayer(renderer));
-            return renderer;
-        });
+        event.registerEntityRenderer(ModEntities.MINECART, (context) -> new MinecartRenderer(context, ModelLayers.MINECART));
+        event.registerEntityRenderer(ModEntities.CAVALRY_HORSE, HorseRenderer::new);
 
         event.registerBlockEntityRenderer(MinecoloniesTileEntities.BUILDING.get(), EmptyTileEntitySpecialRenderer::new);
         event.registerBlockEntityRenderer(MinecoloniesTileEntities.SCARECROW.get(), TileEntityScarecrowRenderer::new);
@@ -354,16 +349,16 @@ public class ClientRegistryHandler
         event.registerBlockEntityRenderer(MinecoloniesTileEntities.COLONY_SIGN.get(), TileEntityColonySignRenderer::new);
 
         Arrays.stream(ModBlocks.getHuts())
-          .forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, renderType -> renderType.equals(RenderType.cutout()) || renderType.equals(RenderType.solid())));
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockScarecrow, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockRack, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockDecorationPlaceholder, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockCompostedDirt, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockBarrel, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockWayPoint, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.floodedFarmland, RenderType.cutout());
+          .forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT));
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockScarecrow, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockRack, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockDecorationPlaceholder, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockCompostedDirt, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockBarrel, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockWayPoint, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.floodedFarmland, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
 
-        Arrays.stream(ModBlocks.getCrops()).forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, RenderType.cutout()));
+        Arrays.stream(ModBlocks.getCrops()).forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT));
         // ItemProperties API replaced by item model properties in 1.21.10 — register via assets later.
     }
 

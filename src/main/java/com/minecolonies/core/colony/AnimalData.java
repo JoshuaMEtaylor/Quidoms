@@ -173,7 +173,7 @@ public class AnimalData implements IAnimalData
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag nbtTagCompound)
     {
         lastPosition = BlockPosUtil.read(nbtTagCompound, NbtTagConstants.TAG_POS);
-        BlockPos homePos = nbtTagCompound.contains(NbtTagConstants.TAG_ANIMALHOME) ? BlockPosUtil.read(nbtTagCompound, NbtTagConstants.TAG_ANIMALHOME) : BlockPos.ZERO;
+        BlockPos homePos = nbtTagCompound.contains(NbtTagConstants.TAG_ANIMALHOME) ? BlockPosUtil.read(nbtTagCompound) : BlockPos.ZERO;
 
         if (!homePos.equals(BlockPos.ZERO))
         {

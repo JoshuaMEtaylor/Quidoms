@@ -602,7 +602,7 @@ public class InventoryCitizen implements IItemHandlerModifiable, Nameable
         final ListTag nbtTagList = nbtTagCompound.getListOrEmpty(TAG_INVENTORY);
         for (int i = 0; i < nbtTagList.size(); i++)
         {
-            final CompoundTag compoundNBT = nbtTagList.getCompound(i);
+            final CompoundTag compoundNBT = nbtTagList.getCompoundOrEmpty(i);
             final int j = compoundNBT.getByteOr(NbtTagConstants.SLOT, (byte)0) & 255;
             final ItemStack itemstack = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK));
 
@@ -619,7 +619,7 @@ public class InventoryCitizen implements IItemHandlerModifiable, Nameable
         final ListTag armorTagList = nbtTagCompound.getListOrEmpty(TAG_ARMOR_INVENTORY);
         for (int i = 0; i < armorTagList.size(); ++i)
         {
-            final CompoundTag compoundNBT = armorTagList.getCompound(i);
+            final CompoundTag compoundNBT = armorTagList.getCompoundOrEmpty(i);
             final int j = compoundNBT.getByteOr(SLOT, (byte)0) & 255;
             final ItemStack itemstack = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK));
 

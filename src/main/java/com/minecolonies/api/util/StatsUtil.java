@@ -119,7 +119,7 @@ public class StatsUtil
             return;
         }
 
-        trackStatByName(building, statIdentifier, displayName.getString(), count);
+        trackStatByName(building, statIdentifier, displayName.getString(), count, "");
     }
 
     /**

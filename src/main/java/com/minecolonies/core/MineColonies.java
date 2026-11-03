@@ -33,7 +33,6 @@ import com.minecolonies.core.blocks.BlockPlantationField;
 import com.minecolonies.core.blocks.huts.BlockHutGateHouse;
 import com.minecolonies.core.blocks.huts.BlockHutMiner;
 import com.minecolonies.core.blocks.huts.BlockHutSchool;
-import com.minecolonies.core.client.render.SpearItemTileEntityRenderer;
 import com.minecolonies.core.colony.crafting.CustomRecipeManagerMessage;
 import com.minecolonies.core.colony.requestsystem.init.RequestSystemInitializer;
 import com.minecolonies.core.colony.requestsystem.init.StandardFactoryControllerInitializer;
@@ -71,7 +70,6 @@ import com.minecolonies.core.placementhandlers.main.SuppliesHandler;
 import com.minecolonies.core.placementhandlers.main.SurvivalHandler;
 import com.minecolonies.core.research.GlobalResearchTreeMessage;
 import com.minecolonies.core.structures.MineColoniesStructures;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
@@ -84,8 +82,6 @@ import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.fml.javafmlmod.FMLModContainer;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
@@ -479,18 +475,7 @@ public class MineColonies
         ItemSettingMessage.TYPE.register(registry);
     }
 
-    @SubscribeEvent
-    static void onRegisterClientExtensions(RegisterClientExtensionsEvent event)
-    {
-        event.registerItem(new IClientItemExtensions() {
-            @NotNull
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer()
-            {
-                return new SpearItemTileEntityRenderer();
-            }
-        }, ModItems.spear);
-    }
+    // Spear special item renderer deferred: BlockEntityWithoutLevelRenderer removed in 1.21.10.
 
     /**
      * Report known incompatibilities to the log.

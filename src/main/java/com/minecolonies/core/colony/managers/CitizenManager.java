@@ -176,7 +176,7 @@ public class CitizenManager implements ICitizenManager
         citizens.clear();
         //  Citizens before Buildings, because Buildings track the Citizens
         citizens.putAll(NBTUtils.streamCompound(compound.getListOrEmpty(TAG_CITIZENS))
-                          .map(s -> deserializeCitizen(provider, s))
+                          .map(s -> deserializeCitizen(provider))
                           .collect(Collectors.toMap(ICitizenData::getId, Function.identity())));
 
         // Update child state after loading citizen data
@@ -306,7 +306,7 @@ public class CitizenManager implements ICitizenManager
             }
         }
 
-        final EntityCitizen entity = (EntityCitizen) ModEntities.CITIZEN.create(world);
+        final EntityCitizen entity = (EntityCitizen) ModEntities.CITIZEN.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
 
         entity.setUUID(citizenData.getUUID());
         entity.setPos(spawnPoint.getX() + HALF_BLOCK, spawnPoint.getY() + SLIGHTLY_UP, spawnPoint.getZ() + HALF_BLOCK);

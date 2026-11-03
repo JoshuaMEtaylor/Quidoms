@@ -194,7 +194,7 @@ public class QuestDialogueInteraction extends StandardInteraction
     {
         // TODO: this is not ideal, we should do something more clever and preserve the item subcomponents for tooltips etc
         String localText = text.getString();
-        if (localText.contains("$") && colonyQuest != null)
+        if (localText.contains("$", "") && colonyQuest != null)
         {
             localText = localText.replace("$0", citizen.getColony().getCitizen(this.colonyQuest.getQuestGiverId()).getName());
             int index = 1;

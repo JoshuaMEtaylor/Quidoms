@@ -951,7 +951,7 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
                 }
                 else
                 {
-                    MinecoloniesMinecart minecart = ModEntities.MINECART.create(level);
+                    MinecoloniesMinecart minecart = ModEntities.MINECART.create(level, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
                     final double x = pEx.x + 0.5D;
                     final double y = pEx.y + 0.625D + yOffset;
                     final double z = pEx.z + 0.5D;
@@ -964,7 +964,7 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
 
                     level.addFreshEntity(minecart);
                     minecart.setHurtDir(1);
-                    mob.startRiding(minecart, true);
+                    mob.startRiding(minecart, true, false);
                 }
                 spawnedPos = tempPos.immutable();
             }

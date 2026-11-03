@@ -125,7 +125,7 @@ public class BuildingFlorist extends AbstractBuilding
         {
             compostBinTagList.add(NBTUtils.writeBlockPos(entry));
         }
-        compound.put(TAG_PLANTGROUND, compostBinTagList);
+        compound.put(TAG_PLANTGROUND);
 
         return compound;
     }

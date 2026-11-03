@@ -120,7 +120,7 @@ public final class RaiderMobUtils
 
             for (int i = 0; i < numberOfSpawns; i++)
             {
-                final AbstractEntityMinecoloniesRaider entity = (AbstractEntityMinecoloniesRaider) entityToSpawn.create(world);
+                final AbstractEntityMinecoloniesRaider entity = (AbstractEntityMinecoloniesRaider) entityToSpawn.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
 
                 if (entity != null)
                 {

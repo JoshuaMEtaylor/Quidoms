@@ -132,7 +132,7 @@ public class BuildingComposter extends AbstractBuilding
         {
             compostBinTagList.add(NBTUtils.writeBlockPos(entry));
         }
-        compound.put(TAG_BARRELS, compostBinTagList);
+        compound.put(TAG_BARRELS);
         return compound;
     }
 }

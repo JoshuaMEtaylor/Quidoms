@@ -129,7 +129,7 @@ public class BuildingConcreteMixer extends AbstractBuilding
                     water.add(waterPos);
                 }
             }
-            waterPos.put(level, water);
+            waterPos.put(level);
         }
     }
 

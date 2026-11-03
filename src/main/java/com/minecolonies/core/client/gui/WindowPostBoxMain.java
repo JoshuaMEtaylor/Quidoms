@@ -260,7 +260,7 @@ public class WindowPostBoxMain extends AbstractWindowSkeleton
                 .anyMatch(f -> f.getKey().getRegisteredName().contains(filter.toLowerCase(Locale.US))));
         allItems.clear();
         allItems.addAll(getBlockList(filterPredicate));
-        allItems.sort(Comparator.comparingInt(s1 -> StringUtils.getLevenshteinDistance(s1.getHoverName().getString(), filter)));
+        allItems.sort(Comparator.comparingInt(s1 -> StringUtils.getLevenshteinDistance(s1.getHoverName().getString(), filter, "")));
         updateResourceList();
     }
 

@@ -131,7 +131,7 @@ public class TravellingManager implements ITravellingManager, INBTSerializable<C
         {
             if (travelerDatum instanceof final CompoundTag compoundTag)
             {
-                TravelerData data = new TravelerData(provider, compoundTag);
+                TravelerData data = new TravelerData(provider);
                 travelerDataMap.put(data.getCitizenId(), data);
             }
         }

@@ -101,7 +101,7 @@ public class WindowCitizenInventory extends AbstractContainerScreen<ContainerCit
     protected void renderLabels(@NotNull final GuiGraphics stack, final int mouseX, final int mouseY)
     {
         stack.drawString(this.font, this.menu.getDisplayName(), 80, 9, 4210752, false);
-        stack.drawString(this.font, this.playerInventoryTitle.getString(), 8, 25 + this.inventoryRows * SLOT_OFFSET, 4210752, false);
+        stack.drawString(this.font, this.playerInventoryTitle.getString(), 8, 25 + this.inventoryRows * SLOT_OFFSET, 4210752, false, "");
     }
 
     /**

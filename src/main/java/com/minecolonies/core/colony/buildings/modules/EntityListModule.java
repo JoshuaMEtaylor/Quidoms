@@ -66,7 +66,7 @@ public class EntityListModule extends AbstractBuildingModule implements IEntityL
     }
 
     @Override
-    public void serializeNBT(@NotNull final HolderLookup.Provider provider, CompoundTag compound)
+    public void serializeNBT(@NotNull final HolderLookup.Provider provider)
     {
         @NotNull final ListTag filteredMobs = new ListTag();
         for (@NotNull final ResourceLocation mob : mobsAllowed)

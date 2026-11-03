@@ -144,7 +144,7 @@ public class DruidPotionEntity extends ThrownPotion
      */
     public static void throwPotionAt(final ItemStack potionStack, final LivingEntity target, final AbstractEntityCitizen thrower, final Level world, final float velocity, final float inaccuracy, final BiPredicate<LivingEntity,MobEffect> entitySelectionPredicate)
     {
-        final DruidPotionEntity potionentity = (DruidPotionEntity) ModEntities.DRUID_POTION.create(world);
+        final DruidPotionEntity potionentity = (DruidPotionEntity) ModEntities.DRUID_POTION.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
         potionentity.setOwner(thrower);
         potionentity.setEntitySelectionPredicate(entitySelectionPredicate);
         potionentity.setItem(potionStack);

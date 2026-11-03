@@ -59,7 +59,7 @@ public class ZeroWasteRecipe extends ShapelessRecipe
         private static final MapCodec<ZeroWasteRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 builder -> builder.group(
                         ItemStack.STRICT_CODEC.fieldOf("result").forGetter(r -> r.getResultItem(null)),
-                        NonNullList.codecOf(Ingredient.CODEC_NONEMPTY)
+                        NonNullList.codecOf(Ingredient.CODEC)
                                 .fieldOf("ingredients")
                                 .forGetter(ShapelessRecipe::getIngredients)
                 ).apply(builder, ZeroWasteRecipe::new)

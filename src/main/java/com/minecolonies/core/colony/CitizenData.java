@@ -1511,7 +1511,7 @@ public class CitizenData implements ICitizenData
                     final ServerCitizenInteraction handler =
                         (ServerCitizenInteraction) MinecoloniesAPIProxy.getInstance()
                             .getInteractionResponseHandlerDataManager()
-                            .createFrom(provider, this, handlerTagList.getCompound(i).getCompound(TAG_CHAT_OPTION));
+                            .createFrom(provider, this, handlerTagList.getCompoundOrEmpty(i).getCompoundOrEmpty(TAG_CHAT_OPTION));
                     citizenChatOptions.put(handler.getId(), handler);
                 }
                 catch (final Exception ex)
@@ -1533,8 +1533,8 @@ public class CitizenData implements ICitizenData
             final ListTag levelTagList = nbtTagCompound.getListOrEmpty(TAG_LEVEL_MAP);
             for (int i = 0; i < levelTagList.size(); ++i)
             {
-                final CompoundTag levelExperienceAtJob = levelTagList.getCompound(i);
-                final String jobName = levelExperienceAtJob.getString(TAG_NAME);
+                final CompoundTag levelExperienceAtJob = levelTagList.getCompoundOrEmpty(i);
+                final String jobName = levelExperienceAtJob.getStringOr(TAG_NAME, "");
                 final int level = Math.min(levelExperienceAtJob.getInt(TAG_LEVEL), MAX_CITIZEN_LEVEL);
                 levels.put(jobName, level);
             }

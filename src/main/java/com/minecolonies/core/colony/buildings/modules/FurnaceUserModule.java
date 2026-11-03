@@ -72,7 +72,7 @@ public class FurnaceUserModule extends AbstractBuildingModule implements IPersis
     }
 
     @Override
-    public void serializeNBT(@NotNull final HolderLookup.Provider provider, CompoundTag compound)
+    public void serializeNBT(@NotNull final HolderLookup.Provider provider)
     {
         @NotNull final ListTag furnacesTagList = new ListTag();
         for (@NotNull final BlockPos entry : furnaces)

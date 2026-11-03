@@ -60,7 +60,7 @@ public class ExpeditionLogModuleWindow extends AbstractModuleWindow<ExpeditionLo
     {
         final ExpeditionLog expeditionLog = moduleView.getLog();
 
-        findPaneOfTypeByID(WINDOW_ID_NAME, Text.class).setText(Component.literal(Objects.requireNonNullElse(expeditionLog.getName(), "")));
+        findPaneOfTypeByID(WINDOW_ID_NAME, Text.class).setText(Component.literal(Objects.requireNonNullElse(expeditionLog.getName())));
         findPaneOfTypeByID("status", Text.class).setText(Component.translatable(TranslationConstants.PARTIAL_EXPEDITION_STATUS + expeditionLog.getStatus().name().toLowerCase(Locale.US)));
 
         final Gradient bg = findPaneOfTypeByID("resourcesbg", Gradient.class);

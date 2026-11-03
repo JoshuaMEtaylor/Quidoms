@@ -258,7 +258,7 @@ public class WorkManager implements IWorkManager
         for (int i = 0; i < list.size(); ++i)
         {
             final CompoundTag orderCompound = list.getCompoundOrEmpty(i);
-            @Nullable final IServerWorkOrder o = AbstractWorkOrder.createFromNBT(orderCompound, this);
+            @Nullable final IServerWorkOrder o = AbstractWorkOrder.createFromNBT(orderCompound);
             if (o != null)
             {
                 addWorkOrder(o, true);

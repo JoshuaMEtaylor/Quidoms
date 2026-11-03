@@ -220,8 +220,8 @@ public abstract class AbstractBuildingGuards extends AbstractBuilding implements
         final ListTag wayPointTagList = compound.getListOrEmpty(NBT_PATROL_TARGETS);
         for (int i = 0; i < wayPointTagList.size(); ++i)
         {
-            final CompoundTag blockAtPos = wayPointTagList.getCompound(i);
-            final BlockPos pos = BlockPosUtil.read(blockAtPos, NBT_TARGET);
+            final CompoundTag blockAtPos = wayPointTagList.getCompoundOrEmpty(i);
+            final BlockPos pos = BlockPosUtil.read(blockAtPos);
             patrolTargets.add(pos);
         }
 
