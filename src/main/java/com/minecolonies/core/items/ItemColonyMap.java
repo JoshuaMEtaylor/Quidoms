@@ -9,7 +9,6 @@ import com.minecolonies.api.util.constant.TranslationConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -70,7 +69,7 @@ public class ItemColonyMap extends AbstractItemMinecolonies
      */
     @Override
     @NotNull
-    public InteractionResultHolder<ItemStack> use(
+    public InteractionResult use(
         final Level worldIn,
         final Player playerIn,
         final InteractionHand hand)
@@ -78,12 +77,12 @@ public class ItemColonyMap extends AbstractItemMinecolonies
         final ItemStack colonymap = playerIn.getItemInHand(hand);
 
         if (!worldIn.isClientSide) {
-            return new InteractionResultHolder<>(InteractionResult.SUCCESS, colonymap);
+            return InteractionResult.SUCCESS;
         }
 
         openWindow(colonymap, worldIn, playerIn);
 
-        return new InteractionResultHolder<>(InteractionResult.SUCCESS, colonymap);
+        return InteractionResult.SUCCESS;
     }
 
     /**

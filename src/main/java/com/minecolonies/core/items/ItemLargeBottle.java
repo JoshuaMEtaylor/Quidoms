@@ -8,7 +8,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.animal.goat.Goat;
@@ -85,12 +84,12 @@ public class ItemLargeBottle extends Item
 
     @NotNull
     @Override
-    public InteractionResultHolder<ItemStack> use(@NotNull final Level level, final Player player, @NotNull final InteractionHand hand)
+    public InteractionResult use(@NotNull final Level level, final Player player, @NotNull final InteractionHand hand)
     {
         final ItemStack itemstack = player.getItemInHand(hand);
         if (this != ModItems.large_empty_bottle)
         {
-            return InteractionResultHolder.pass(itemstack);
+            return InteractionResult.PASS;
         }
 
         BlockHitResult blockhitresult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
@@ -101,7 +100,7 @@ public class ItemLargeBottle extends Item
                 BlockPos blockpos = blockhitresult.getBlockPos();
                 if (!level.mayInteract(player, blockpos))
                 {
-                    return InteractionResultHolder.pass(itemstack);
+                    return InteractionResult.PASS;
                 }
 
                 if (level.getFluidState(blockpos).is(FluidTags.WATER))
@@ -113,10 +112,10 @@ public class ItemLargeBottle extends Item
                     }
                     itemstack.shrink(1);
                     player.getCooldowns().addCooldown(this, TICKS_SECOND);
-                    return InteractionResultHolder.success(itemstack);
+                    return InteractionResult.SUCCESS;
                 }
             }
         }
-        return InteractionResultHolder.pass(itemstack);
+        return InteractionResult.PASS;
     }
 }

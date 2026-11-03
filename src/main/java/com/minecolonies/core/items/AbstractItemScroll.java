@@ -20,7 +20,6 @@ import static com.minecolonies.api.util.constant.TranslationConstants.*;
 
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 
 /**
  * Scroll items base class, does colony registering/checks.
@@ -94,13 +93,12 @@ public abstract class AbstractItemScroll extends AbstractItemMinecolonies
     protected abstract ItemStack onItemUseSuccess(final ItemStack itemStack, final Level world, final ServerPlayer player);
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+    public InteractionResult use(Level world, Player player, InteractionHand hand)
     {
-        ItemStack itemStack = player.getItemInHand(hand);
         player.startUsingItem(hand);
 
         // Sneak rightclick
-        return new InteractionResultHolder<>(InteractionResult.FAIL, itemStack);
+        return InteractionResult.FAIL;
     }
 
     @Override

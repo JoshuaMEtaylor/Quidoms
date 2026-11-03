@@ -15,7 +15,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -125,7 +124,7 @@ public class ItemScepterPermission extends AbstractItemMinecolonies implements I
      */
     @Override
     @NotNull
-    public InteractionResultHolder<ItemStack> use(
+    public InteractionResult use(
       final Level worldIn,
       final Player playerIn,
       final InteractionHand hand)
@@ -133,12 +132,12 @@ public class ItemScepterPermission extends AbstractItemMinecolonies implements I
         final ItemStack scepter = playerIn.getItemInHand(hand);
         if (worldIn.isClientSide)
         {
-            return new InteractionResultHolder<>(InteractionResult.SUCCESS, scepter);
+            return InteractionResult.SUCCESS;
         }
 
         toggleItemMode(playerIn, scepter);
 
-        return new InteractionResultHolder<>(InteractionResult.SUCCESS, scepter);
+        return InteractionResult.SUCCESS;
     }
 
     private static void toggleItemMode(final Player playerIn, final ItemStack stack)

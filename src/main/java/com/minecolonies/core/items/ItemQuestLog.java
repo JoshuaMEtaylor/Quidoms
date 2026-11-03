@@ -10,7 +10,6 @@ import com.minecolonies.core.client.gui.questlog.WindowQuestLog;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -75,7 +74,7 @@ public class ItemQuestLog extends AbstractItemMinecolonies
      */
     @Override
     @NotNull
-    public InteractionResultHolder<ItemStack> use(
+    public InteractionResult use(
       final Level worldIn,
       final Player playerIn,
       final InteractionHand hand)
@@ -84,12 +83,12 @@ public class ItemQuestLog extends AbstractItemMinecolonies
 
         if (!worldIn.isClientSide)
         {
-            return new InteractionResultHolder<>(InteractionResult.SUCCESS, questLog);
+            return InteractionResult.SUCCESS;
         }
 
         openWindow(questLog, worldIn, playerIn);
 
-        return new InteractionResultHolder<>(InteractionResult.SUCCESS, questLog);
+        return InteractionResult.SUCCESS;
     }
 
     /**

@@ -12,7 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -84,7 +83,7 @@ public class ItemClipboard extends AbstractItemMinecolonies
      */
     @Override
     @NotNull
-    public InteractionResultHolder<ItemStack> use(
+    public InteractionResult use(
             final Level worldIn,
             final Player playerIn,
             final InteractionHand hand)
@@ -92,12 +91,12 @@ public class ItemClipboard extends AbstractItemMinecolonies
         final ItemStack clipboard = playerIn.getItemInHand(hand);
 
         if (!worldIn.isClientSide) {
-            return new InteractionResultHolder<>(InteractionResult.SUCCESS, clipboard);
+            return InteractionResult.SUCCESS;
         }
 
         openWindow(clipboard, worldIn, playerIn);
 
-        return new InteractionResultHolder<>(InteractionResult.SUCCESS, clipboard);
+        return InteractionResult.SUCCESS;
     }
 
     /**

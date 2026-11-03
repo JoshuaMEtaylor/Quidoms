@@ -34,7 +34,6 @@ import static com.minecolonies.api.util.constant.TranslationConstants.CANT_PLACE
 
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 
 /**
  * Class to handle the placement of the supplychest and with it the supplyship.
@@ -95,7 +94,7 @@ public class ItemSupplyChestDeployer extends AbstractItemMinecolonies implements
 
     @NotNull
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level worldIn, final Player playerIn, final InteractionHand hand)
+    public InteractionResult use(final Level worldIn, final Player playerIn, final InteractionHand hand)
     {
         final ItemStack stack = playerIn.getItemInHand(hand);
         final SupplyData currentComponent = SupplyData.readFromItemStack(stack);
@@ -109,12 +108,12 @@ public class ItemSupplyChestDeployer extends AbstractItemMinecolonies implements
             if (!MineColonies.getConfig().getServer().allowOtherDimColonies.get() && !WorldUtil.isOverworldType(worldIn))
             {
                 MessageUtils.format(CANT_PLACE_COLONY_IN_OTHER_DIM).sendTo(playerIn);
-                return new InteractionResultHolder<>(InteractionResult.FAIL, stack);
+                return InteractionResult.FAIL;
             }
             placeSupplyShip(worldIn, null, hand, stack);
         }
 
-        return new InteractionResultHolder<>(InteractionResult.FAIL, stack);
+        return InteractionResult.FAIL;
     }
 
     /**
