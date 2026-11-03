@@ -29,7 +29,7 @@ public class RendererChiefNorsemen extends AbstractRendererNorsemen<AbstractEnti
 
     @NotNull
     @Override
-    public ResourceLocation getTextureLocation(final AbstractEntityMinecoloniesMonster entity)
+    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
     {
         return TEXTURE;
     }

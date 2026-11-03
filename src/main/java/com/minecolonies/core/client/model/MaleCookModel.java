@@ -4,14 +4,14 @@
 package com.minecolonies.core.client.model;
 
 import com.minecolonies.api.client.render.modeltype.CitizenModel;
-import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
+import com.minecolonies.api.client.render.modeltype.CitizenRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.model.HumanoidModel;
 import org.jetbrains.annotations.NotNull;
 
-public class MaleCookModel extends CitizenModel<AbstractEntityCitizen>
+public class MaleCookModel extends CitizenModel<CitizenRenderState>
 {
 
     public MaleCookModel(final ModelPart part)
@@ -79,9 +79,9 @@ public class MaleCookModel extends CitizenModel<AbstractEntityCitizen>
     }
 
     @Override
-    public void setupAnim(@NotNull final AbstractEntityCitizen entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(@NotNull final CitizenRenderState entity)
     {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        super.setupAnim(entity);
         final boolean working = isWorking(entity);
         head.getChild("BakerHat").visible = working && displayHat(entity);
         body.getChild("apronBody").visible = working;

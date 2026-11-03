@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Renderer used for Chief Barbarians.
  */
-public class RendererDrownedChiefPirate extends AbstractRendererDrownedPirate<AbstractEntityMinecoloniesMonster, HumanoidModel<AbstractEntityMinecoloniesMonster>>
+public class RendererDrownedChiefPirate extends AbstractRendererDrownedPirate<AbstractEntityMinecoloniesMonster, HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>>
 {
     /**
      * Texture of the entity.
@@ -25,12 +25,12 @@ public class RendererDrownedChiefPirate extends AbstractRendererDrownedPirate<Ab
      */
     public RendererDrownedChiefPirate(final EntityRendererProvider.Context context)
     {
-        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)), 0.5F);
+        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_ARMOR.head())), 0.5F);
     }
 
     @NotNull
     @Override
-    public ResourceLocation getTextureLocation(final AbstractEntityMinecoloniesMonster entity)
+    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
     {
         return TEXTURE1;
     }

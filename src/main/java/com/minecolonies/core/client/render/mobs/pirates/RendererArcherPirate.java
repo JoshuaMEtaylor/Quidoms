@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Renderer used for Barbarians And Archer Barbarians.
  */
-public class RendererArcherPirate extends AbstractRendererPirate<AbstractEntityMinecoloniesMonster, HumanoidModel<AbstractEntityMinecoloniesMonster>>
+public class RendererArcherPirate extends AbstractRendererPirate<AbstractEntityMinecoloniesMonster, HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>>
 {
     /**
      * Texture of the entity.
@@ -27,12 +27,12 @@ public class RendererArcherPirate extends AbstractRendererPirate<AbstractEntityM
      */
     public RendererArcherPirate(final EntityRendererProvider.Context context)
     {
-        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), 0.5F);
+        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_ARMOR.chest())), 0.5F);
     }
 
     @NotNull
     @Override
-    public ResourceLocation getTextureLocation(final AbstractEntityMinecoloniesMonster entity)
+    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
     {
         switch (entity.getTextureId())
         {

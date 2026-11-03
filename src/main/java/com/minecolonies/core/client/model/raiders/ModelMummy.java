@@ -11,7 +11,7 @@ import net.minecraft.util.Mth;
 /**
  * Create a mummy model. Created using Tabula 7.0.0
  */
-public class ModelMummy extends EgyptianModel<AbstractEntityMinecoloniesMonster>
+public class ModelMummy extends EgyptianModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     private ModelPart stripRightA;
     private ModelPart stripRightB;

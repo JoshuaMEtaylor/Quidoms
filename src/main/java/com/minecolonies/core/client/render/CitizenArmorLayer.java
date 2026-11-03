@@ -44,7 +44,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
-public class CitizenArmorLayer<T extends AbstractEntityCitizen, M extends HumanoidModel<T>, A extends HumanoidModel<T>> extends HumanoidArmorLayer<T, M, A>
+public class CitizenArmorLayer<T extends AbstractEntityCitizen, M extends HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>, A extends HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>> extends HumanoidArmorLayer<T, M, A>
 {
     private final Map<SkullBlock.Type, SkullModelBase> skullModels;
     private final Map<UUID, ResolvableProfile> gameProfileMap = new HashMap<>();

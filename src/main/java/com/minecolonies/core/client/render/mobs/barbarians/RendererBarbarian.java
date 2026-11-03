@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * Renderer used for Barbarians And Archer Barbarians.
  */
-public class RendererBarbarian extends AbstractRendererBarbarian<AbstractEntityMinecoloniesMonster, HumanoidModel<AbstractEntityMinecoloniesMonster>>
+public class RendererBarbarian extends AbstractRendererBarbarian<AbstractEntityMinecoloniesMonster, HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>>
 {
     /**
      * Texture of the entity.
@@ -23,12 +23,12 @@ public class RendererBarbarian extends AbstractRendererBarbarian<AbstractEntityM
      */
     public RendererBarbarian(final EntityRendererProvider.Context context)
     {
-        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), 0.5F);
+        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_ARMOR.chest())), 0.5F);
     }
 
 
     @Override
-    public ResourceLocation getTextureLocation(final AbstractEntityMinecoloniesMonster entity)
+    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
     {
         return TEXTURE;
     }

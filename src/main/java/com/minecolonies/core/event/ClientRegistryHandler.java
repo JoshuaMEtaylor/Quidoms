@@ -32,7 +32,6 @@ import com.minecolonies.core.client.render.mobs.pirates.RendererPirate;
 import com.minecolonies.core.client.render.projectile.FireArrowRenderer;
 import com.minecolonies.core.client.render.projectile.RendererSpear;
 import com.minecolonies.core.client.render.worldevent.ColonyBlueprintRenderer;
-import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -41,7 +40,6 @@ import net.minecraft.client.renderer.entity.HorseRenderer;
 import net.minecraft.client.renderer.entity.MinecartRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.TippableArrowRenderer;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -49,7 +47,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterRecipeBookCategoriesEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -367,19 +364,7 @@ public class ClientRegistryHandler
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.floodedFarmland, RenderType.cutout());
 
         Arrays.stream(ModBlocks.getCrops()).forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, RenderType.cutout()));
-
-        ItemProperties.register(ModItems.spear, ResourceLocation.withDefaultNamespace("throwing"), (item, world, entity, light) ->
-                                                                           (entity != null && entity.isUsingItem() && entity.getUseItem() == item) ? 1.0F : 0.0F);
-        ItemProperties.register(ModItems.buildGoggles, ResourceLocation.withDefaultNamespace("disabled"), (item, world, entity, light) ->
-                (ColonyBlueprintRenderer.willRenderBlueprints() ? 0.0F : 1.0F));
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public static void registerRecipeBookCategories(@NotNull final RegisterRecipeBookCategoriesEvent event)
-    {
-        // not worthwhile creating a category for compost, as we never unlock them in the book; this hides some warnings
-        event.registerRecipeCategoryFinder(ModRecipeSerializer.CompostRecipeType.get(), r -> RecipeBookCategories.UNKNOWN);
+        // ItemProperties API replaced by item model properties in 1.21.10 — register via assets later.
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -26,18 +26,18 @@ public class SimpleModelType implements ISimpleModelType
     /**
      * The male model for the renderer.
      */
-    private final CitizenModel<AbstractEntityCitizen> maleModel;
+    private final CitizenModel<CitizenRenderState> maleModel;
 
     /**
      * The female model for the renderer.
      */
-    private final CitizenModel<AbstractEntityCitizen> femaleModel;
+    private final CitizenModel<CitizenRenderState> femaleModel;
 
     public SimpleModelType(
       final ResourceLocation name,
       final int numTextures,
-      final CitizenModel<AbstractEntityCitizen> maleModel,
-      final CitizenModel<AbstractEntityCitizen> femaleModel)
+      final CitizenModel<CitizenRenderState> maleModel,
+      final CitizenModel<CitizenRenderState> femaleModel)
     {
         this.name = name;
         this.numTextures = numTextures;
@@ -64,13 +64,13 @@ public class SimpleModelType implements ISimpleModelType
     }
 
     @Override
-    public CitizenModel<AbstractEntityCitizen> getMaleModel()
+    public CitizenModel<CitizenRenderState> getMaleModel()
     {
         return maleModel;
     }
 
     @Override
-    public CitizenModel<AbstractEntityCitizen> getFemaleModel()
+    public CitizenModel<CitizenRenderState> getFemaleModel()
     {
         return femaleModel;
     }

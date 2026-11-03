@@ -30,7 +30,7 @@ public class RendererShieldmaidenNorsemen extends AbstractRendererNorsemen<Abstr
 
     @NotNull
     @Override
-    public ResourceLocation getTextureLocation(final AbstractEntityMinecoloniesMonster entity)
+    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
     {
         if (entity.getTextureId() == 1)
         {

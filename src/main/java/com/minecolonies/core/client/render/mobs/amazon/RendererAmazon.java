@@ -29,7 +29,7 @@ public class RendererAmazon extends AbstractRendererAmazon<AbstractEntityMinecol
 
     @NotNull
     @Override
-    public ResourceLocation getTextureLocation(@NotNull final AbstractEntityMinecoloniesMonster entity)
+    public ResourceLocation getTextureLocation(@NotNull final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
     {
         return TEXTURE;
     }

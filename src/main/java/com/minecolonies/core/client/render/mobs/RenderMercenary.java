@@ -32,7 +32,7 @@ public class RenderMercenary extends MobRenderer<PathfinderMob, MercenaryModel>
         super(context, new MercenaryModel(context.bakeLayer(ClientRegistryHandler.MERCENARY)), 0.5f);
 
         this.addLayer(new ItemInHandLayer<>(this, context.getItemInHandRenderer()));
-        this.addLayer(new HumanoidArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)), new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), context.getModelManager()));
+        this.addLayer(new HumanoidArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_ARMOR.head())), new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_ARMOR.chest())), context.getModelManager()));
     }
 
     @Override
