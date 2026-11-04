@@ -17,7 +17,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import com.minecolonies.core.datalistener.GsonEventReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Loads and listens to diseases data.
  */
-public class DiseasesListener extends SimpleJsonResourceReloadListener
+public class DiseasesListener extends GsonEventReloadListener
 {
     /**
      * Gson instance

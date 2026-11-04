@@ -10,7 +10,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import com.minecolonies.core.datalistener.GsonEventReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +25,7 @@ import static net.neoforged.neoforge.common.conditions.ConditionalOps.DEFAULT_CO
  *
  * @param <T> the type of entry.
  */
-public abstract class BaseDataListener<T> extends SimpleJsonResourceReloadListener
+public abstract class BaseDataListener<T> extends GsonEventReloadListener
 {
     /**
      * JSON keys.

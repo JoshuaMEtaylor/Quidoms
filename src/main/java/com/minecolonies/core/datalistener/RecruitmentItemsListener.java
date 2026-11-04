@@ -10,7 +10,7 @@ import com.minecolonies.api.util.constant.ColonyConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import com.minecolonies.core.datalistener.GsonEventReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
@@ -26,7 +26,7 @@ import static com.minecolonies.core.generation.DataGeneratorConstants.COLONY_REC
 /**
  * Loads and listens to recruitment costs data.
  */
-public class RecruitmentItemsListener extends SimpleJsonResourceReloadListener
+public class RecruitmentItemsListener extends GsonEventReloadListener
 {
     /**
      * Base recruitment level.

@@ -215,7 +215,7 @@ public class CitizenItemUtils
         // Quidoms: colonist tools/weapons stay unbreakable; never apply durability loss.
         if (heldItem.isDamageableItem())
         {
-            heldItem.set(net.minecraft.core.component.DataComponents.UNBREAKABLE, new net.minecraft.world.item.component.Unbreakable(true));
+            heldItem.set(net.minecraft.core.component.DataComponents.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE);
             if (heldItem.isDamaged())
             {
                 heldItem.setDamageValue(0);

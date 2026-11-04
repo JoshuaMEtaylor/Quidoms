@@ -77,7 +77,7 @@ public class MinerLevelManagementModule extends AbstractBuildingModule implement
     }
 
     @Override
-    public void serializeNBT(@NotNull final HolderLookup.Provider provider)
+    public void serializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         compound.putInt(TAG_STARTING_LEVEL, startingLevelShaft);
         compound.putInt(TAG_CURRENT_LEVEL, currentLevel);

@@ -373,7 +373,7 @@ public class InventoryCitizen implements IItemHandlerModifiable, Nameable
         if (!ItemStackUtils.isEmpty(stack) && stack.isDamageableItem())
         {
             // Quidoms: never break colonist equipment; force unbreakable and clear damage.
-            stack.set(net.minecraft.core.component.DataComponents.UNBREAKABLE, new net.minecraft.world.item.component.Unbreakable(true));
+            stack.set(net.minecraft.core.component.DataComponents.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE);
             stack.setDamageValue(0);
         }
 

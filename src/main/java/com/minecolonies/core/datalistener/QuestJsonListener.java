@@ -20,7 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import com.minecolonies.core.datalistener.GsonEventReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ import static com.minecolonies.core.quests.QuestParsingConstants.BRACE_CLOSE;
 /**
  * Loader for Json based quest data.
  */
-public class QuestJsonListener extends SimpleJsonResourceReloadListener
+public class QuestJsonListener extends GsonEventReloadListener
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
