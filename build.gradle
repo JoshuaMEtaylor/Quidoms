@@ -173,12 +173,46 @@ idea {
     }
 }
 
+// Never ship NeoForge packages inside the Quidoms/minecolonies jar — doing so
+// makes the automatic module export e.g. net.neoforged.neoforge.common.util and
+// clashes with NeoForge (JPMS ResolutionException with other mods).
+tasks.named('jar', Jar).configure {
+    exclude 'net/neoforged/**'
+    exclude '**/module-info.class'
+    manifest {
+        attributes([
+            'Implementation-Title'   : 'Quidoms',
+            'Implementation-Version' : project.mod_version,
+            'Implementation-Vendor'  : 'JoshuaMEtaylor',
+            'Automatic-Module-Name'  : 'minecolonies',
+        ])
+    }
+}
+
 // Copy the primary jar into dist/ after build
 tasks.register('copyDist', Copy) {
     dependsOn jar
     from jar.archiveFile
     into layout.projectDirectory.dir('dist')
     rename { "quidoms-${mod_version}.jar" }
+    doLast {
+        def out = layout.projectDirectory.file("dist/quidoms-${mod_version}.jar").asFile
+        def bad = new java.util.zip.ZipFile(out).withCloseable { z ->
+            z.entries().iterator().findAll { e ->
+                def n = e.name
+                (n.startsWith('net/neoforged/') && n.endsWith('.class')) || n == 'module-info.class' || n.endsWith('/module-info.class')
+            }.collect { it.name }
+        }
+        if (!bad.isEmpty()) {
+            throw new GradleException("JPMS clash risk: jar still contains NeoForge/module-info entries: ${bad}")
+        }
+        def hasShim = new java.util.zip.ZipFile(out).withCloseable { z ->
+            z.getEntry('com/minecolonies/api/compat/INBTSerializable.class') != null
+        }
+        if (!hasShim) {
+            throw new GradleException('Missing com.minecolonies.api.compat.INBTSerializable shim in dist jar')
+        }
+    }
 }
 
 tasks.named('build').configure {
