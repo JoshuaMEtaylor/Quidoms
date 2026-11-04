@@ -129,9 +129,8 @@ public class CitizenExperienceHandler implements ICitizenExperienceHandler
     {
         int experience;
 
-        if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide() && citizen.getRecentlyHit() > 0 && citizen.checkCanDropLoot() && CompatibilityUtils.getWorldFromCitizen(
-          citizen).getGameRules().getBoolean(
-          GameRules.RULE_DOMOBLOOT))
+        if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide() && citizen.getRecentlyHit() > 0 && citizen.checkCanDropLoot() && CompatibilityUtils.getWorldFromCitizen(citizen).getServer() != null
+          && CompatibilityUtils.getWorldFromCitizen(citizen).getServer().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT))
         {
             experience = (int) (citizen.getCitizenData().getCitizenSkillHandler().getTotalXP());
 

@@ -7,7 +7,9 @@ import com.minecolonies.core.util.BackUpHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.minecraft.resources.ResourceLocation;
+import com.minecolonies.api.util.constant.Constants;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -46,17 +48,17 @@ public class FMLEventHandler
     }
 
     @SubscribeEvent
-    public static void onAddReloadListenerEvent(@NotNull final AddReloadListenerEvent event)
+    public static void onAddReloadListenerEvent(@NotNull final AddServerReloadListenersEvent event)
     {
-        event.addListener(new CrafterRecipeListener());
-        event.addListener(new ResearchListener());
-        event.addListener(new CustomVisitorListener());
-        event.addListener(new CitizenNameListener());
-        event.addListener(new QuestJsonListener());
-        event.addListener(new ItemNbtListener());
-        event.addListener(StudyItemListener.INSTANCE);
-        event.addListener(new DiseasesListener());
-        event.addListener(new RecruitmentItemsListener());
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "crafter_recipes"), new CrafterRecipeListener());
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "research"), new ResearchListener());
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "custom_visitor"), new CustomVisitorListener());
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "citizen_names"), new CitizenNameListener());
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "quests"), new QuestJsonListener());
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "item_nbt"), new ItemNbtListener());
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "study_items"), StudyItemListener.INSTANCE);
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "diseases"), new DiseasesListener());
+        event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "recruitment_items"), new RecruitmentItemsListener());
     }
 
     @SubscribeEvent

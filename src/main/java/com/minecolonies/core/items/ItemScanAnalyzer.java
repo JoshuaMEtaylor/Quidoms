@@ -55,7 +55,7 @@ public class ItemScanAnalyzer extends AbstractItemWithPosSelector
       final Item.Properties properties)
     {
         super(properties.durability(0)
-            .setNoRepair()
+            .setNoCombineRepair()
             .rarity(Rarity.UNCOMMON)
             .component(ModDataComponents.POS_SELECTION, PosSelection.EMPTY));
     }

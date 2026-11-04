@@ -193,14 +193,14 @@ public class ColonyPermissionEventHandler
         {
             if (colony.getServerBuildingManager().hasTownHall())
             {
-                colony.getServerBuildingManager().getTownHall().addPermissionEvent(new PermissionEvent(entity.getUUID(), entity.getName().getString(), action, pos, ""));
+                colony.getServerBuildingManager().getTownHall().addPermissionEvent(new PermissionEvent(entity.getUUID(), entity.getName().getString(), action, pos));
             }
             return;
         }
 
         if (colony.getCommonBuildingManager().hasTownHall())
         {
-            colony.getServerBuildingManager().getTownHall().addPermissionEvent(new PermissionEvent(entity.getUUID(), entity.getName().getString(), action, pos, ""));
+            colony.getServerBuildingManager().getTownHall().addPermissionEvent(new PermissionEvent(entity.getUUID(), entity.getName().getString(), action, pos));
         }
 
         if (entity instanceof FakePlayer)

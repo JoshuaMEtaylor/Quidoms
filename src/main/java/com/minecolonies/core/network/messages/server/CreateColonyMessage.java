@@ -125,7 +125,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         hut.setStructurePack(StructurePacks.getStructurePack(pack));
         hut.setBlueprintPath(pathName);
 
-        final double spawnDistance = Math.sqrt(BlockPosUtil.getDistanceSquared2D(townHall, world.getSharedSpawnPos()));
+        final double spawnDistance = Math.sqrt(BlockPosUtil.getDistanceSquared2D(townHall, world.getRespawnData().pos()));
         if (spawnDistance < MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.get())
         {
             if (!world.isClientSide())

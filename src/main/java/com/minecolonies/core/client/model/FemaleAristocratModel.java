@@ -133,15 +133,5 @@ public class FemaleAristocratModel extends CitizenModel<CitizenRenderState>
         umbrellaArm.visible = entity.pose != Pose.SLEEPING;
     }
 
-    @Override
-    public void renderToBuffer(
-      final @NotNull PoseStack matrixStack,
-      final @NotNull VertexConsumer buffer,
-      final int packedLight,
-      final int packedOverlay,
-      final int color)
-    {
-        super.renderToBuffer(matrixStack, buffer, packedLight, packedOverlay, color);
-        umbrellaArm.render(matrixStack, buffer, packedLight, packedOverlay, color);
-    }
+    // renderToBuffer is final on Model in 1.21.10
 }

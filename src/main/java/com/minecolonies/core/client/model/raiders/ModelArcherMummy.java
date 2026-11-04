@@ -107,21 +107,8 @@ public class ModelArcherMummy extends EgyptianModel<AbstractEntityEgyptianRaider
     }
 
     @Override
-    public void setupAnim(AbstractEntityMinecoloniesMonster entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(final net.minecraft.client.renderer.entity.state.HumanoidRenderState state)
     {
-        super.setupAnim(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        float f = 0.05F * Mth.sin((float) Math.PI * ageInTicks / 30.0F) % 2.0F;
-        setRotateAngle(this.stripLeftA,
-          -1.1F * this.leftArm.xRot + f,
-          -this.leftArm.yRot,
-          -this.leftArm.zRot + f);
-        setRotateAngle(this.stripRightA,
-          -1.1F * this.rightArm.xRot + f,
-          -this.rightArm.yRot,
-          -this.rightArm.zRot + f);
-        setRotateAngle(this.stripRightB,
-          -1.1F * this.rightArm.xRot + f,
-          -this.rightArm.yRot,
-          -this.rightArm.zRot + f);
+        super.setupAnim(state);
     }
 }

@@ -26,7 +26,6 @@ import static com.minecolonies.api.entity.ai.statemachine.states.AIWorkerState.*
 import static com.minecolonies.api.util.constant.Constants.TICKS_SECOND;
 import static com.minecolonies.api.util.constant.StatisticsConstants.ITEM_OBTAINED;
 import static com.minecolonies.core.colony.buildings.modules.BuildingModules.STATS_MODULE;
-import static net.minecraft.world.entity.animal.sheep.Sheep.ITEM_BY_DYE;
 
 /**
  * The AI behind the {@link JobShepherd} for Breeding, Killing and Shearing sheep.
@@ -142,12 +141,12 @@ public class EntityAIWorkShepherd extends AbstractEntityAIHerder<JobShepherd, Bu
 
                 for (int j = 0; j < qty; ++j)
                 {
-                    items.add(new ItemStack(ITEM_BY_DYE.get(sheep.getColor())));
+                    items.add(new ItemStack(getWoolForColor(sheep.getColor())));
                 }
             }
 
             sheep.playSound(SoundEvents.SHEEP_SHEAR, 1.0F, 1.0F);
-            new LocalizedParticleEffectMessage(new ItemStack(ITEM_BY_DYE.get(sheep.getColor())), sheep.getOnPos().above()).sendToTrackingEntity(worker);
+            new LocalizedParticleEffectMessage(new ItemStack(getWoolForColor(sheep.getColor())), sheep.getOnPos().above()).sendToTrackingEntity(worker);
             dyeSheepChance(sheep);
 
             CitizenItemUtils.damageItemInHand(worker, InteractionHand.MAIN_HAND, 1);
@@ -184,5 +183,11 @@ public class EntityAIWorkShepherd extends AbstractEntityAIHerder<JobShepherd, Bu
                 sheep.setColor(colors[dyeIndex]);
             }
         }
+    }
+
+    private static net.minecraft.world.item.Item getWoolForColor(final net.minecraft.world.item.DyeColor color)
+    {
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(
+            net.minecraft.resources.ResourceLocation.withDefaultNamespace(color.getSerializedName() + "_wool"));
     }
 }

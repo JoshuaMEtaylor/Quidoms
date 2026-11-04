@@ -385,7 +385,7 @@ public class LocalResearchTree implements ILocalResearchTree
         isComplete.clear();
         maxLevelResearchCompleted.clear();
         NBTUtils.streamCompound(compound.getListOrEmpty(TAG_RESEARCH_TREE))
-          .map(researchCompound -> (ILocalResearch) StandardFactoryController.getInstance().deserializeTag(provider))
+          .map(researchCompound -> (ILocalResearch) StandardFactoryController.getInstance().deserializeTag(provider, researchCompound))
           .forEach(research -> {
               /// region Updated ID helper.
               if (!MinecoloniesAPIProxy.getInstance().getGlobalResearchTree().hasResearch(research.getBranch(), research.getId()))

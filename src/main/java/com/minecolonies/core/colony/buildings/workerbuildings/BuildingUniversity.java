@@ -92,7 +92,7 @@ public class BuildingUniversity extends AbstractBuilding
         {
             bookcaseTagList.add(NBTUtils.writeBlockPos(entry));
         }
-        compound.put(TAG_BOOKCASES);
+        compound.put(TAG_BOOKCASES, bookcaseTagList);
 
         return compound;
     }

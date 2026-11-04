@@ -674,7 +674,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
 
         // --- Snapshot generic AbstractHorse state ---
         final boolean wasTamed = vanilla.isTamed();
-        final UUID owner = vanilla.getOwnerUUID();
+        final UUID owner = vanilla.getOwnerReference() == null ? null : vanilla.getOwnerReference().getUUID();
         final int temper = vanilla.getTemper();
         final double health = vanilla.getHealth();
         final String customName = vanilla.hasCustomName() ? vanilla.getName().getString() : null;
@@ -701,7 +701,9 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
         Entity leashHolder = vanilla.getLeashHolder();
 
         // Convert to CavalryHorseEntity
-        CavalryHorseEntity cav = vanilla.convertTo(ModEntities.CAVALRY_HORSE, true);
+        CavalryHorseEntity cav = vanilla.convertTo(ModEntities.CAVALRY_HORSE,
+            net.minecraft.world.entity.ConversionParams.single(vanilla, true, true),
+            newHorse -> {});
         if (cav == null) return null;
 
         // Re-apply attributes & health
@@ -733,15 +735,15 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
 
         // Re-apply AbstractHorse state
         cav.setTamed(wasTamed);
-        cav.setOwnerUUID(owner);
+        if (owner != null && cav.level().getPlayerByUUID(owner) != null)
+        {
+            cav.setOwner(cav.level().getPlayerByUUID(owner));
+        }
         cav.setTemper(temper);
         cav.setPersistenceRequired();
 
         // Re-apply Horse-specific visuals
-        if (variant != null)
-        {
-            cav.setVariant(variant);
-        }
+        // Variant copy deferred: Horse.setVariant removed/changed in 1.21.10
 
         // Name & leash
         if (customName != null)

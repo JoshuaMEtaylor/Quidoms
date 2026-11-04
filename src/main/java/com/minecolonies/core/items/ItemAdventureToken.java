@@ -34,7 +34,7 @@ public class ItemAdventureToken extends AbstractItemMinecolonies
         final @Nullable AdventureData component = AdventureData.readFromItemStack(stack);
         if (component != null)
         {
-            return Component.translatableEscape(COM_MINECOLONIES_COREMOD_ADVENTURE_TOKEN_NAME_GUI, component.entityType().getName());
+            return Component.translatableEscape(COM_MINECOLONIES_COREMOD_ADVENTURE_TOKEN_NAME_GUI, component.entityType().getDescription());
         }
         
         return super.getName(stack);

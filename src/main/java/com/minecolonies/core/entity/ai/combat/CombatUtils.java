@@ -86,9 +86,9 @@ public class CombatUtils
         final double zVector = target.getZ() - arrow.getZ();
         final double distance = Mth.sqrt((float) (xVector * xVector + zVector * zVector));
         final double dist3d = Mth.sqrt((float) (yVector * yVector + xVector * xVector + zVector * zVector));
-        final double distanceMultiplier = arrow.shotFromCrossbow() ? 0.05 : AIM_SLIGHTLY_HIGHER_MULTIPLIER;
+        final double distanceMultiplier = false /* shotFromCrossbow removed */ ? 0.05 : AIM_SLIGHTLY_HIGHER_MULTIPLIER;
         arrow.shoot(xVector, yVector + distance * distanceMultiplier, zVector, (float) (ARROW_SPEED * 1 + (dist3d / SPEED_FOR_DIST)), (float) hitChance);
-        if (arrow.shotFromCrossbow())
+        if (false /* shotFromCrossbow removed */)
         {
             target.playSound(SoundEvents.CROSSBOW_SHOOT, 1.0F, 1.0F / (target.level().getRandom().nextFloat() * 0.4F + 0.8F));
         }

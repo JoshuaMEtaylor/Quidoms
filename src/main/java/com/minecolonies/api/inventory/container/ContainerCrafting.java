@@ -212,7 +212,7 @@ public class ContainerCrafting extends AbstractContainerMenu
             final ServerPlayer player = (ServerPlayer) inv.player;
             final List<RecipeHolder<CraftingRecipe>> recipes = player.level().getServer().getRecipeManager().getRecipesFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), world)
                     .stream().filter(recipe -> recipe.value().isSpecial()
-                            || !world.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING)
+                            || !(world.getServer() != null && world.getServer().getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING))
                             || player.getRecipeBook().contains(recipe.id())
                             || player.isCreative())
                     .toList();

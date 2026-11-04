@@ -507,7 +507,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
     {
         super.aiStep();
 
-        if (lastHurtByPlayerTime > 0)
+        if (getLastHurtByPlayerMemoryTime() > 0)
         {
             markDirty(0);
         }

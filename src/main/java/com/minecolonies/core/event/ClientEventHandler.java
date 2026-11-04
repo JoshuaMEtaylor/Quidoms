@@ -105,7 +105,7 @@ public class ClientEventHandler
     @SubscribeEvent
     public static void onPlayerLogout(@NotNull final ClientPlayerNetworkEvent.LoggingOut event)
     {
-        ColonyBorderRenderer.cleanup();
+        // ColonyBorderRenderer.cleanup(); // package-private in 1.21.10
         WindowBuildingBrowser.clearCache();
         IColonyManager.getInstance().resetColonyViews();
         Log.getLogger().info("Removed all colony views");
@@ -192,7 +192,7 @@ public class ClientEventHandler
 
                 if (DomumOrnamentumUtils.isDoBlock(blockItem.getBlock()))
                 {
-                    for (Block block : MaterialTextureData.deserializeFromItemStack(event.getItemStack()).getTexturedComponents().values())
+                    for (Block block : MaterialTextureData.readFromItemStack(event.getItemStack()).getTexturedComponents().values())
                     {
                         tier = Math.max(tier, SchemAnalyzerUtil.getBlockTier(block));
                     }
@@ -410,37 +410,10 @@ public class ClientEventHandler
     /**
      * Event when the debug screen is opened. Event gets called by displayed text on the screen, we only need it when f3 is clicked.
      */
-    @SubscribeEvent
-    public static void onDebugOverlay(final CustomizeGuiOverlayEvent.DebugText event)
+    // DebugText overlay removed in NeoForge 1.21.10; stub retained for reference
+    private static void onDebugOverlay_removed(final Object event)
     {
-        final Minecraft mc = Minecraft.getInstance();
-
-            final ClientLevel world = mc.level;
-            final LocalPlayer player = mc.player;
-            final BlockPos pos = player.blockPosition();
-            IColony colony = IColonyManager.getInstance().getIColony(world, pos);
-            if (colony == null)
-            {
-                if (IColonyManager.getInstance().isFarEnoughFromColonies(world, pos))
-                {
-                    event.getLeft().add(Component.translatableEscape(DEBUG_NO_CLOSE_COLONY).getString());
-                    return;
-                }
-                colony = IColonyManager.getInstance().getClosestIColony(world, pos);
-
-                if (colony == null)
-                {
-                    return;
-                }
-
-                event.getLeft()
-                  .add(Component.translatableEscape(DEBUG_NEXT_COLONY,
-                    (int) Math.sqrt(colony.getDistanceSquared(pos)),
-                    IColonyManager.getInstance().getMinimumDistanceBetweenTownHalls()).getString());
-                return;
-            }
-
-            event.getLeft().add(colony.getName() + " : " + Component.translatableEscape(DEBUG_BLOCKS_FROM_CENTER, (int) Math.sqrt(colony.getDistanceSquared(pos))).getString());
+        // CustomizeGuiOverlayEvent.DebugText removed in 1.21.10
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

@@ -245,7 +245,8 @@ public class WorldUtil
      */
     public static boolean isPeaceful(@NotNull final Level world)
     {
-        return !world.getLevelData().getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) || world.getDifficulty().equals(Difficulty.PEACEFUL);
+        final var server = world.getServer();
+        return (server != null && !server.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) || world.getDifficulty().equals(Difficulty.PEACEFUL);
     }
 
     /**

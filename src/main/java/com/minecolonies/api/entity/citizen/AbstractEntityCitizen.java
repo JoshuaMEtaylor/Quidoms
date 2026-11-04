@@ -524,7 +524,7 @@ public abstract class AbstractEntityCitizen extends AbstractCivilianEntity imple
      */
     public int getRecentlyHit()
     {
-        return lastHurtByPlayerTime;
+        return getLastHurtByPlayerMemoryTime();
     }
 
     /**

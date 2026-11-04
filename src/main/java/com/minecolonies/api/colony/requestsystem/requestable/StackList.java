@@ -230,7 +230,7 @@ public class StackList implements IConcreteDeliverable, INonExhaustiveDeliverabl
         for (int i = 0; i < neededResTagList.size(); ++i)
         {
             final CompoundTag neededRes = neededResTagList.getCompoundOrEmpty(i);
-            stacks.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider));
+            stacks.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, neededRes));
         }
 
         final boolean matchMeta = compound.getBooleanOr(NBT_MATCHMETA, false);

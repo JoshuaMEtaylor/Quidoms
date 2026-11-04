@@ -405,7 +405,7 @@ public class BuildingFarmer extends AbstractBuilding
                 {
                     // regular crop
                     recipes.add(GenericRecipe.builder()
-                            .withInputs(List.of(List.of(crop.getCloneItemStack(world, BlockPos.ZERO, crop.defaultBlockState()))))
+                            .withInputs(List.of(List.of(crop.getCloneItemStack(world, BlockPos.ZERO, crop.defaultBlockState(), false))))
                             .withIntermediate(Blocks.FARMLAND)
                             .withLootTable(crop.getLootTable().orElse(null))
                             .withRequiredTool(ModEquipmentTypes.hoe.get())

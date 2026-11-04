@@ -149,7 +149,7 @@ public class EntityListModuleWindow extends AbstractModuleWindow<IEntityListModu
      */
     private void updateResources()
     {
-        final Predicate<ResourceLocation> filterPredicate = res -> filter.isEmpty() || BuiltInRegistries.ENTITY_TYPE.getValue(res).getName().getString().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US)) || res.toString().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US));
+        final Predicate<ResourceLocation> filterPredicate = res -> filter.isEmpty() || BuiltInRegistries.ENTITY_TYPE.getValue(res).getDescription().getString().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US)) || res.toString().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US));
         currentDisplayedList.clear();
         for (final ResourceLocation storage : groupedItemList)
         {
@@ -213,7 +213,7 @@ public class EntityListModuleWindow extends AbstractModuleWindow<IEntityListModu
             {
                 final ResourceLocation resource = currentDisplayedList.get(index);
                 final Text resourceLabel = rowPane.findPaneOfTypeByID(RESOURCE_NAME, Text.class);
-                resourceLabel.setText(BuiltInRegistries.ENTITY_TYPE.getValue(resource).getName());
+                resourceLabel.setText(BuiltInRegistries.ENTITY_TYPE.getValue(resource).getDescription());
                 resourceLabel.setColors(WHITE);
                 final boolean isAllowedItem  = buildingView.getModuleViewMatching(IEntityListModuleView.class, view -> view.getId().equals(id)).isAllowedEntity(resource);
                 final Button switchButton = rowPane.findPaneOfTypeByID(BUTTON_SWITCH, Button.class);

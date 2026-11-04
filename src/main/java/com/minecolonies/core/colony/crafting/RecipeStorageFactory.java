@@ -164,7 +164,7 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
             final CompoundTag inputTag = inputTagList.getCompoundOrEmpty(i);
             if(inputTag.contains(NEW_NBT_TYPE) || inputTag.contains(NBT_TYPE)) //Check to see if it's something the factorycontroller can handle
             {
-                input.add(StandardFactoryController.getInstance().deserializeTag(provider));
+                input.add(StandardFactoryController.getInstance().deserializeTag(provider, inputTag));
             }
             else
             {
@@ -190,7 +190,7 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
         for (int i = 0; i < altOutputTagList.size(); ++i)
         {
             final CompoundTag altOutputTag = altOutputTagList.getCompoundOrEmpty(i);
-            altOutputs.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider));
+            altOutputs.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, altOutputTag));
         }
 
         final ListTag secOutputTagList = nbt.getListOrEmpty(SECOUTPUT_TAG);
@@ -199,7 +199,7 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
         for (int i = 0; i < secOutputTagList.size(); ++i)
         {
             final CompoundTag secOutputTag = secOutputTagList.getCompoundOrEmpty(i);
-            secOutputs.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider));
+            secOutputs.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, secOutputTag));
         }
 
         final ResourceKey<LootTable> lootTable = nbt.contains(LOOT_TAG) ? ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(nbt.getStringOr(LOOT_TAG, ""))) : null;

@@ -423,7 +423,11 @@ public class TileEntityColonyBuilding extends AbstractTileEntityColonyBuilding i
         this.packMeta = packName;
         this.path = path;
 
-        input.getStringOr(TAG_BUILDING_TYPE, "").ifPresent(name -> registryName = ResourceLocation.parse(name));
+        final String buildingTypeName = input.getStringOr(TAG_BUILDING_TYPE, "");
+        if (!buildingTypeName.isEmpty())
+        {
+            registryName = ResourceLocation.parse(buildingTypeName);
+        }
         buildingPos = worldPosition;
     }
 

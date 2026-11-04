@@ -56,7 +56,7 @@ public class DruidCombatAI extends AttackMoveAI<EntityCitizen>
     /**
      * List of potential positive effects.
      */
-    private static final ImmutableList<Holder<MobEffect>> SUPPORT_EFFECTS = ImmutableList.of(MobEffects.DAMAGE_BOOST, MobEffects.SATURATION, MobEffects.HEAL, MobEffects.DAMAGE_RESISTANCE);
+    private static final ImmutableList<Holder<MobEffect>> SUPPORT_EFFECTS = ImmutableList.of(MobEffects.STRENGTH, MobEffects.SATURATION, MobEffects.INSTANT_HEALTH, MobEffects.RESISTANCE);
 
     /**
      * List of potential positive effects.
@@ -308,8 +308,8 @@ public class DruidCombatAI extends AttackMoveAI<EntityCitizen>
      */
     private boolean wasAffectedByDruid(final LivingEntity entity)
     {
-        return entity.hasEffect(MobEffects.SLOWNESS) || entity.hasEffect(MobEffects.SATURATION) || entity.hasEffect(MobEffects.DAMAGE_BOOST)
-                 || entity.hasEffect(MobEffects.WEAKNESS) || entity.hasEffect(MobEffects.DAMAGE_RESISTANCE) || entity.hasEffect(MobEffects.HEAL);
+        return entity.hasEffect(MobEffects.SLOWNESS) || entity.hasEffect(MobEffects.SATURATION) || entity.hasEffect(MobEffects.STRENGTH)
+                 || entity.hasEffect(MobEffects.WEAKNESS) || entity.hasEffect(MobEffects.RESISTANCE) || entity.hasEffect(MobEffects.INSTANT_HEALTH);
     }
 
     @Override

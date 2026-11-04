@@ -299,7 +299,7 @@ public class QuestInstance implements IQuestInstance
         final ListTag participantList = nbt.getListOrEmpty(TAG_PARTICIPANTS);
         for (final Tag tag : participantList)
         {
-            questParticipants.add(((IntTag) tag).getAsInt());
+            questParticipants.add(((IntTag) tag).intValue());
         }
 
         if (nbt.contains(TAG_OBJECTIVE))
