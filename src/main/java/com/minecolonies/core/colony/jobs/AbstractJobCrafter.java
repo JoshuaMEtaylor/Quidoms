@@ -118,7 +118,7 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
         final ListTag items = new ListTag();
         for (final Map.Entry<ItemStorage, Integer> item : secondaryOutputs.object2IntEntrySet())
         {
-            items.add(item.getKey().getItemStack().copyWithCount(item.getValue()).save(provider));
+            items.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(item.getKey().getItemStack().copyWithCount(item.getValue()), provider));
         }
         compound.put(NbtTagConstants.TAG_SECONDARY_OUTPUTS, items);
         return compound;
@@ -161,7 +161,7 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
             {
                 if (tag instanceof CompoundTag compoundTag)
                 {
-                    final ItemStorage item = new ItemStorage(ItemStackUtils.deserializeFromNBT(compoundTag));
+                    final ItemStorage item = new ItemStorage(ItemStackUtils.parseOptional(provider, compoundTag));
                     newItems.put(item, item.getAmount());
                 }
             }

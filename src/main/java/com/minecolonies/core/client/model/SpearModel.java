@@ -15,11 +15,11 @@ import net.neoforged.api.distmarker.OnlyIn;
  * Model for the Spear. The model is a long wooden rod with an iron head and leather handle.
  */
 @OnlyIn(Dist.CLIENT)
-public class SpearModel extends Model
+public class SpearModel extends Model<Object>
 {
     public SpearModel(ModelPart root)
     {
-        super(root, RenderType::entitySolid);
+        super(root, rl -> RenderType.entitySolid(rl));
     }
 
     public static LayerDefinition createLayer()

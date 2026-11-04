@@ -149,7 +149,7 @@ public final class StandardRequests
         public Component getShortDisplayString()
         {
             final MutableComponent result = Component.literal("");
-            result.append(Component.translatableEscape(Component.translatable(stackList.getDescriptionId())));
+            result.append(Component.translatableEscape(Component.translatable(stackList.toString())));
             return result;
         }
 
@@ -768,7 +768,7 @@ public final class StandardRequests
                                                           .getCompatibilityManager()
                                                           .getListOfAllItems()
                                                           .stream()
-                                                          .filter(FurnaceBlockEntity::isFuel)
+                                                          .filter(s -> !s.isEmpty()) // isFuel moved to FuelValues
                                                           .collect(Collectors.toList()));
             }
 

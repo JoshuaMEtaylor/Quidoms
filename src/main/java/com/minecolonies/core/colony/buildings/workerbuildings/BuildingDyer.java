@@ -124,7 +124,7 @@ public class BuildingDyer extends AbstractBuilding
 
                 for (final TagKey<Item> dyeTag : dyes)
                 {
-                    final List<ItemStack> dyeItems = BuiltInRegistries.ITEM.getTag(dyeTag).get()
+                    final List<ItemStack> dyeItems = BuiltInRegistries.ITEM.get(dyeTag).get()
                             .stream().map(ItemStack::new).toList();
                     if (dyeItems.isEmpty()) { continue; }
 
@@ -231,7 +231,7 @@ public class BuildingDyer extends AbstractBuilding
         {
             if (woolItems == null)
             {
-                woolItems = BuiltInRegistries.ITEM.getOrCreateTag(ItemTags.WOOL).stream()
+                woolItems = BuiltInRegistries.ITEM.get(ItemTags.WOOL).stream()
                   .filter(item -> !item.value().equals(Items.WHITE_WOOL))
                   .map(i -> new ItemStorage(new ItemStack(i))).collect(Collectors.toList());
             }

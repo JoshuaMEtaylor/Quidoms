@@ -796,7 +796,7 @@ public class Colony implements IColony
         {
             final CompoundTag blockAtPos = wayPointTagList.getCompoundOrEmpty(i);
             final BlockPos pos = BlockPosUtil.read(blockAtPos, TAG_WAYPOINT);
-            final BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), blockAtPos);
+            final BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK, blockAtPos);
             wayPoints.put(pos, state);
         }
 
@@ -880,7 +880,7 @@ public class Colony implements IColony
             @NotNull final CompoundTag chunkCompound = claimTagList.getCompoundOrEmpty(i);
             final ChunkClaimData chunkClaimData = new ChunkClaimData();
             chunkClaimData.deserializeNBT(provider, chunkCompound.getCompoundOrEmpty(TAG_CHUNK_CLAIM));
-            claimData.put(chunkCompound.getLong(TAG_CHUNK_POS), chunkClaimData);
+            claimData.put(chunkCompound.getLongOr(TAG_CHUNK_POS, 0L), chunkClaimData);
         }
         IColonyManager.getInstance().addClaimData(this, claimData);
 

@@ -635,7 +635,7 @@ public class ColonyConnectionManager implements IColonyConnectionManager
         for (final Tag tag : connectedColonyTagList)
         {
             final ColonyConnection colonyConnectionData = new ColonyConnection().deserializeNBT((CompoundTag) tag);
-            directlyConnectedColonies.put(colonyConnectionData.id);
+            directlyConnectedColonies.put(colonyConnectionData.id, colonyConnectionData);
         }
 
         gateHouses.clear();
@@ -650,7 +650,7 @@ public class ColonyConnectionManager implements IColonyConnectionManager
         for (final Tag tag : connectionEventList)
         {
             final ConnectionEvent connectionEventData = ConnectionEvent.deserializeNBT((CompoundTag) tag);
-            connectionEvents.put(connectionEventData.id());
+            connectionEvents.put(connectionEventData.id(), connectionEventData);
         }
 
         final ListTag pendingConnectionTagList = compound.getListOrEmpty(TAG_PENDING);

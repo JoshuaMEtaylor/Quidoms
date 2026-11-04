@@ -276,7 +276,7 @@ public final class EntityUtils
                 spawnPoint = new BlockPos(x, y, z);
             }
 
-            entitysnapTo(
+            entity.snapTo(
               spawnPoint.getX() + MIDDLE_BLOCK_OFFSET,
               spawnPoint.getY(),
               spawnPoint.getZ() + MIDDLE_BLOCK_OFFSET,

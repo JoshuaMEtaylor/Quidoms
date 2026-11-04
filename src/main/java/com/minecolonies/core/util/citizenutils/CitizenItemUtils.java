@@ -264,7 +264,7 @@ public class CitizenItemUtils
      */
     public static ItemEntity entityDropItem(@NotNull final AbstractEntityCitizen citizen, @NotNull final ItemStack itemstack)
     {
-        return citizen.spawnAtLocation(itemstack, 0.0F);
+        return citizen.spawnAtLocation((net.minecraft.server.level.ServerLevel) citizen.level(), itemstack, 0.0F);
     }
 
     /**

@@ -224,7 +224,7 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
     {
         final BlockPos.MutableBlockPos workPos = new BlockPos.MutableBlockPos();
         boolean areBlocksToBuildNearby = false;
-        player.getCooldowns().addCooldown(this, 5);
+        player.getCooldowns().addCooldown(new ItemStack(this), 5);
 
         for (int currentDistance = 0; currentDistance <= reach; currentDistance++)
         {

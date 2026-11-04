@@ -112,7 +112,7 @@ public class CropRecipeCategory implements IRecipeCategory<CropRecipeCategory.Cr
         builder.addSlot(RecipeIngredientRole.INPUT, 0, 0)
                 .setSlotName("block")
                 .setBackground(this.slot, -1, -1)
-                .addItemStack(recipe.source().getCloneItemStack(Minecraft.getInstance().level, BlockPos.ZERO, recipe.source().defaultBlockState(), false));
+                .addItemStack(new ItemStack(recipe.source().asItem()));
 
         final List<LootTableAnalyzer.LootDrop> drops = CustomRecipeManager.getInstance().getLootDrops(recipe.source().getLootTable().orElse(null));
         final int initialColumns = (WIDTH - 36) / this.slot.getWidth();

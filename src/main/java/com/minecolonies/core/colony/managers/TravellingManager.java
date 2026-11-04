@@ -131,7 +131,7 @@ public class TravellingManager implements ITravellingManager, INBTSerializable<C
         {
             if (travelerDatum instanceof final CompoundTag compoundTag)
             {
-                TravelerData data = new TravelerData(provider);
+                TravelerData data = new TravelerData(provider, compoundTag);
                 travelerDataMap.put(data.getCitizenId(), data);
             }
         }
@@ -206,7 +206,7 @@ public class TravellingManager implements ITravellingManager, INBTSerializable<C
         {
             final CompoundTag data = new CompoundTag();
             data.putInt(NbtTagConstants.TAG_CITIZEN, citizenId);
-            data.put(NbtTagConstants.TAG_TARGET, NbtUtils.writeBlockPos(target));
+            BlockPosUtil.write(data, NbtTagConstants.TAG_TARGET, target);
             data.putInt(NbtTagConstants.TAG_INITIAL_TRAVEL_TIME, initialTravelTime);
             data.putInt(NbtTagConstants.TAG_REMAINING_TRAVEL_TIME, remainingTravelTime);
             return data;

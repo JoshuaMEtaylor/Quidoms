@@ -64,7 +64,7 @@ public class BlockParticleEffectMessage extends AbstractClientPlayMessage
     {
         if (side == BREAK_BLOCK)
         {
-            Minecraft.getInstance().particleEngine.destroy(pos, block);
+            Minecraft.getInstance().particleEngine.crack(pos, net.minecraft.core.Direction.UP); // destroy->crack in 1.21.10
         }
         else
         {

@@ -117,7 +117,7 @@ public final class WorkerUtil
             return false;
         }
 
-        citizensnapTo(
+        citizen.snapTo(
           spawnPoint.getX() + MIDDLE_BLOCK_OFFSET,
           spawnPoint.getY(),
           spawnPoint.getZ() + MIDDLE_BLOCK_OFFSET,

@@ -352,7 +352,7 @@ public final class LootTableAnalyzer
 
                     case "minecraft:set_potion":        // SetPotionFunction
                         final String id = GsonHelper.getAsString(function, "id");
-                        final Holder<Potion> potion = BuiltInRegistries.POTION.getHolder(ResourceLocation.tryParse(id)).orElse(null);
+                        final Holder<Potion> potion = BuiltInRegistries.POTION.get(ResourceLocation.tryParse(id)).orElse(null);
                         if (potion != null)
                         {
                             stack.update(DataComponents.POTION_CONTENTS, PotionContents.EMPTY, potion, PotionContents::withPotion);

@@ -180,7 +180,8 @@ public class MineColonies
              }
         }
 
-        modBus.addListener(GatherDataHandler::dataGeneratorSetup);
+        // GatherDataHandler excluded from 1.21.10 compile set
+        // modBus.addListener(GatherDataHandler::dataGeneratorSetup);
 
         modBus.register(this.getClass());
 

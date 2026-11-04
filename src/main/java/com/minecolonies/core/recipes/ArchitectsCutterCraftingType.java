@@ -51,7 +51,7 @@ public class ArchitectsCutterCraftingType extends RecipeCraftingType<ArchitectsC
             final List<List<ItemStack>> inputs = new ArrayList<>();
             for (final IMateriallyTexturedBlockComponent component : materiallyTexturedBlock.getComponents())
             {
-                final Named<Block> tag = BuiltInRegistries.BLOCK.getTag(component.getValidSkins()).orElse(null);
+                final Named<Block> tag = BuiltInRegistries.BLOCK.get(component.getValidSkins()).orElse(null);
                 if (tag != null)
                 {
                     final List<Block> blocks = tag.stream().map(Holder::value).collect(Collectors.toList());
@@ -65,7 +65,7 @@ public class ArchitectsCutterCraftingType extends RecipeCraftingType<ArchitectsC
             MaterialTextureData.EMPTY.writeToItemStack(output);
 
             recipes.add(GenericRecipe.builder()
-                    .withRecipeId(holder.id())
+                    .withRecipeId(com.minecolonies.api.util.RecipeCompat.idLocation(holder))
                     .withOutput(output)
                     .withInputs(inputs)
                     .withGridSize(3)

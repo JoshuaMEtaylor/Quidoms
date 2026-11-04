@@ -11,7 +11,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.EffectCures;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +50,7 @@ public class ItemMilkyBread extends ItemFood
         
         if (!worldIn.isClientSide())
         {
-            entityLiving.removeEffectsCuredBy(EffectCures.MILK);
+            entityLiving.removeAllEffects(); // EffectCures.MILK removed in 1.21.10
         }
 
         return super.finishUsingItem(stack, worldIn, entityLiving);

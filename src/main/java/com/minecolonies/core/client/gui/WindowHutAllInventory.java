@@ -251,7 +251,7 @@ public class WindowHutAllInventory extends AbstractWindowSkeleton
         {
             allItems.addAll(filterItems.stream().filter(filterPredicate).collect(Collectors.toList()));
         }
-        allItems.sort(Comparator.comparingInt(s1 -> StringUtils.getLevenshteinDistance(s1.getItemStack().getHoverName().getString(), filter, "")));
+        allItems.sort(Comparator.comparingInt(s1 -> StringUtils.getLevenshteinDistance(s1.getItemStack().getHoverName().getString(), filter)));
 
         final Comparator<ItemStorage> compareByName = Comparator.comparing((ItemStorage o) -> o.getItemStack().getHoverName().getString());
         final Comparator<ItemStorage> compareByCount = Comparator.comparingInt(ItemStorage::getAmount);

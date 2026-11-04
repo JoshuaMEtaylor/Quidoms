@@ -1418,7 +1418,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
             }
         }
 
-        boolean result = super.hurtServer(level, damageSource, damageInc);
+        boolean result = super.hurtServer((ServerLevel) this.level(), damageSource, damageInc);
         if (!result)
         {
             LivingShieldBlockEvent ev;

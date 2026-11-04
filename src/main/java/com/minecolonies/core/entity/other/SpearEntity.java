@@ -111,7 +111,7 @@ public class SpearEntity extends ThrownTrident implements ICustomAttackSound
         }
 
         this.dealtDamage = true;
-        if (targetEntity.hurt(damageSource, damageAmount))
+        if (targetEntity.hurtServer((net.minecraft.server.level.ServerLevel) targetEntity.level(), damageSource, damageAmount))
         {
             if (targetEntity.getType() == EntityType.ENDERMAN)
             {

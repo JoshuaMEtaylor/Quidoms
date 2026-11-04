@@ -13,7 +13,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.model.HumanoidModel;
 
-public class ScarecrowModel extends Model
+public class ScarecrowModel extends Model<Object>
 {
     //fields
     ModelPart head;
@@ -30,7 +30,7 @@ public class ScarecrowModel extends Model
 
     public ScarecrowModel(final ModelPart part)
     {
-        super(part, RenderType::entitySolid);
+        super(part, rl -> RenderType.entitySolid(rl));
         head = part.getChild("head");
         post = part.getChild("post");
         leftArmPeg = part.getChild("leftArmPeg");

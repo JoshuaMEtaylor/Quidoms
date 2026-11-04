@@ -791,7 +791,7 @@ public class CompatibilityManager implements ICompatibilityManager
     private void discoverFuel(final ItemStack stack)
     {
         // Vanilla fuel table moved to FuelValues; ItemStack.getBurnTime covers NeoForge overrides.
-        if (stack.getBurnTime(null) > 0)
+        if (!stack.isEmpty()) // TODO: FuelValues
         {
             fuel.add(new ItemStorage(stack));
         }

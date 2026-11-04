@@ -294,7 +294,7 @@ public class ExpeditionLog
             final String key = stat.name().toLowerCase(Locale.US);
             if (stats.contains(key))
             {
-                this.stats.put(stat, stats.getDouble(key));
+                this.stats.put(stat, stats.getDouble(key).orElse(0.0));
             }
         }
 
@@ -314,7 +314,7 @@ public class ExpeditionLog
             final EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getValue(type);
             if (entityType != null)
             {
-                this.mobs.put(entityType, mob.getInt(TAG_COUNT));
+                this.mobs.put(entityType, mob.getInt(TAG_COUNT).orElse(0));
             }
         }
 

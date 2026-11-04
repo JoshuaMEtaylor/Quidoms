@@ -349,7 +349,7 @@ public class MeleeCombatAI extends AttackMoveAI<EntityCitizen>
         if (ColonyConstants.rand.nextDouble() > 1 / (1 + user.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(GUARD_CRIT)))
         {
             addDmg *= 1.5;
-            ((ServerLevel) user.level()).getChunkSource().broadcastAndSend(user, new ClientboundAnimatePacket(target, 4));
+            ((ServerLevel) user.level()).getChunkSource().sendToTrackingPlayersAndSelf(user, new ClientboundAnimatePacket(target, 4));
         }
 
         return addDmg * MineColonies.getConfig().getServer().guardDamageMultiplier.get();

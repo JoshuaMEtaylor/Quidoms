@@ -139,12 +139,12 @@ public class GlobalResearchFactory implements IGlobalResearchFactory
         NBTUtils.streamCompound(nbt.getListOrEmpty(TAG_REQS))
             .forEach(compound -> research.addRequirement(Objects.requireNonNull(IMinecoloniesAPI.getInstance()
                 .getResearchRequirementRegistry()
-                .get(ResourceLocation.tryParse(compound.getStringOr(TAG_REQ_TYPE, "")))).readFromNBT(compound.getCompoundOrEmpty(TAG_REQ_ITEM))));
+                .get(ResourceLocation.tryParse(compound.getStringOr(TAG_REQ_TYPE, ""))).map(net.minecraft.core.Holder::value).orElseThrow()).readFromNBT(compound.getCompoundOrEmpty(TAG_REQ_ITEM))));
 
         NBTUtils.streamCompound(nbt.getListOrEmpty(TAG_EFFECTS))
             .forEach(compound -> research.addEffect(Objects.requireNonNull(IMinecoloniesAPI.getInstance()
                 .getResearchEffectRegistry()
-                .get(ResourceLocation.tryParse(compound.getStringOr(TAG_EFFECT_TYPE, "")))).readFromNBT(compound.getCompoundOrEmpty(TAG_EFFECT_ITEM))));
+                .get(ResourceLocation.tryParse(compound.getStringOr(TAG_EFFECT_TYPE, ""))).map(net.minecraft.core.Holder::value).orElseThrow()).readFromNBT(compound.getCompoundOrEmpty(TAG_EFFECT_ITEM))));
 
         NBTUtils.streamCompound(nbt.getListOrEmpty(TAG_CHILDS)).forEach(compound -> research.addChild(ResourceLocation.parse(compound.getStringOr(TAG_RESEARCH_CHILD, ""))));
         return research;

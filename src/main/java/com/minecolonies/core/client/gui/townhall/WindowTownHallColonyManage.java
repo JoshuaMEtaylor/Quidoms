@@ -50,7 +50,7 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
         registerButton(BUTTON_CANCEL, this::close);
         registerButton(BUTTON_CREATE, this::onCreate);
 
-        this.findPaneOfTypeByID("colonyname", TextField.class).setText(preName.isEmpty() ? Component.translatable(DEFAULT_COLONY_NAME, mc.player.getName()).getString() : preName, "");
+        this.findPaneOfTypeByID("colonyname", TextField.class).setText(preName.isEmpty() ? Component.translatable(DEFAULT_COLONY_NAME, mc.player.getName()).getString() : preName);
         this.findPaneOfTypeByID("text1", Text.class).setText(Component.translatable("com.minecolonies.core.settlementcovenant1", Math.max(13, Minecraft.getInstance().level.getGameTime() / TICKS_SECOND / 60 / 100)));
         if (closestDistance < 1000)
         {

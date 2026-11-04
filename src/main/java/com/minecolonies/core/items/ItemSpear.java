@@ -29,7 +29,7 @@ public class ItemSpear extends TridentItem
     }
 
     @Override
-    public void releaseUsing(@NotNull ItemStack stack, @NotNull Level worldIn, @NotNull LivingEntity entityLiving, int timeLeft)
+    public boolean releaseUsing(@NotNull ItemStack stack, @NotNull Level worldIn, @NotNull LivingEntity entityLiving, int timeLeft)
     {
         if (entityLiving instanceof Player)
         {
@@ -58,8 +58,10 @@ public class ItemSpear extends TridentItem
                 SoundEvent soundEvent = SoundEvents.TRIDENT_THROW.value();
                 playerEntity.awardStat(Stats.ITEM_USED.get(this));
                 worldIn.playSound(null, playerEntity, soundEvent, SoundSource.PLAYERS, 1.0F, 1.0F);
+                return true;
             }
         }
+        return false;
     }
 
     @Override
@@ -86,7 +88,7 @@ public class ItemSpear extends TridentItem
     @Override
     public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility)
     {
-        return ItemAbilities.DEFAULT_SWORD_ACTIONS.contains(itemAbility);
+        return java.util.Set.of() /* DEFAULT_SWORD_ACTIONS removed */.contains(itemAbility);
     }
 
     /** Gets the base damage of the spear.

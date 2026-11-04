@@ -40,7 +40,7 @@ public record CountedIngredient(@NotNull Ingredient child, int count) implements
 
     public CountedIngredient
     {
-        if (child == Ingredient.EMPTY || count <= 0) throw new IllegalArgumentException("Counted ingredient must have a child");
+        if (child == Ingredient.of() /* EMPTY removed */ || count <= 0) throw new IllegalArgumentException("Counted ingredient must have a child");
     }
 
     /**

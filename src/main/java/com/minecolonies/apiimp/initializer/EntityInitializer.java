@@ -365,7 +365,7 @@ public class EntityInitializer
 
     private static <T extends Entity> EntityType<T> build(Registry<EntityType<?>> registry, final String key, final EntityType.Builder<T> builder)
     {
-        EntityType<T> entity = builder.build(Constants.MOD_ID + ":" + key);
+        EntityType<T> entity = builder.build(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, key)));
         Registry.register(registry, ResourceLocation.parse(Constants.MOD_ID + ":" + key), entity);
         return entity;
     }

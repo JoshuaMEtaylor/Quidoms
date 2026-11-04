@@ -222,7 +222,7 @@ public class WorldUtil
     public static boolean isOfWorldType(@NotNull final Level world, @NotNull final ResourceKey<DimensionType> type)
     {
         RegistryAccess dynRegistries = world.registryAccess();
-        ResourceLocation loc = dynRegistries.registry(Registries.DIMENSION_TYPE).get().getKey(world.dimensionType());
+        ResourceLocation loc = dynRegistries.lookupOrThrow(Registries.DIMENSION_TYPE).getKey(world.dimensionType());
         if (loc == null)
         {
             if (world.isClientSide())

@@ -59,7 +59,7 @@ public class MaleCourierModel extends CitizenModel<CitizenRenderState>
     @Override
     public float getActualRotation(@NotNull final AbstractEntityCitizen entity)
     {
-        return entity.pose == Pose.SLEEPING || !entity.renderMetadata.contains(RENDER_META_BACKPACK) ? 0 : 0.1745F;
+        return 0.1745F; // pose/renderMetadata access changed in 1.21.10
     }
 
     @Override

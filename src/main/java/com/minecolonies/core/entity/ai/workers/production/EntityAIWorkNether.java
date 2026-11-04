@@ -450,7 +450,7 @@ public class EntityAIWorkNether extends AbstractEntityAICrafting<JobNetherWorker
                                 }
 
                                 // Get hit by the mob
-                                if (takeDamage && !worker.hurt(source, incomingDamage))
+                                if (takeDamage && !worker.hurtServer((net.minecraft.server.level.ServerLevel) worker.level(), source, incomingDamage))
                                 {
                                     //Shouldn't get here, but if we do we can force the damage.
                                     incomingDamage = worker.calculateDamageAfterAbsorbs(source, incomingDamage);
@@ -678,7 +678,7 @@ public class EntityAIWorkNether extends AbstractEntityAICrafting<JobNetherWorker
             if (!block.is(Blocks.NETHER_PORTAL))
             {
                 useFlintAndSteel();
-                ps.get().createPortalBlocks();
+                ps.get().createPortalBlocks(world);
                 return NETHER_LEAVE;
             }
         }

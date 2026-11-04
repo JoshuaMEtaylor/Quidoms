@@ -12,7 +12,7 @@ import net.minecraft.util.Mth;
 /**
  * ModelPharaohMummy. Created using Tabula 7.0.0
  */
-public class ModelPharaoh extends EgyptianModel<AbstractEntityEgyptianRaider>
+public class ModelPharaoh extends EgyptianModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     private ModelPart bodyGoldenStrip;
     private ModelPart jaw;

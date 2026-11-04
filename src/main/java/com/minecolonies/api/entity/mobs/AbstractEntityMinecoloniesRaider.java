@@ -464,7 +464,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
                 }
 
                 final float raiderDamageEnchantLevel =
-                    player.getMainHandItem().getEnchantmentLevel(player.level().registryAccess().registry(Registries.ENCHANTMENT).get().getHolder(ModEnchants.raiderDamage).get());
+                    player.getMainHandItem().getEnchantmentLevel(player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getHolder(ModEnchants.raiderDamage).get());
 
                 // Up to 7 damage are converted to health scaling damage, 7 is the damage of a diamond sword
                 float baseScalingDamage = Math.min(damage, MAX_SCALED_DAMAGE);

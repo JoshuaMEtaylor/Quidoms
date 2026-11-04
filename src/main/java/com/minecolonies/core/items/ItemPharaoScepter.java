@@ -53,7 +53,7 @@ public class ItemPharaoScepter extends BowItem
     }
 
     @Override
-    public void releaseUsing(@NotNull final ItemStack stack, @NotNull final Level worldIn, LivingEntity entityLiving, int timeLeft)
+    public boolean releaseUsing(@NotNull final ItemStack stack, @NotNull final Level worldIn, LivingEntity entityLiving, int timeLeft)
     {
         if (entityLiving instanceof Player)
         {
@@ -62,7 +62,7 @@ public class ItemPharaoScepter extends BowItem
             useDuration = net.neoforged.neoforge.event.EventHooks.onArrowLoose(stack, worldIn, playerentity, useDuration, true);
             if (useDuration < 0)
             {
-                return;
+                return false;
             }
 
             ItemStack itemstack = playerentity.getProjectile(stack);
@@ -86,9 +86,11 @@ public class ItemPharaoScepter extends BowItem
                       1.0F,
                       1.0F / (entityLiving.getRandom().nextFloat() * 0.4F + 1.2F) + speed * 0.5F);
                     playerentity.awardStat(Stats.ITEM_USED.get(this));
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @NotNull

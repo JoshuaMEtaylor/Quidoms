@@ -20,4 +20,27 @@ public interface INorsemenEntity extends Enemy, CommandSource, IItemHandlerCapPr
         final var handler = Capabilities.Item.ENTITY.getCapability((LivingEntity) this, null);
         return handler == null ? null : IItemHandler.of(handler);
     }
+
+    @Override
+    default void sendSystemMessage(final net.minecraft.network.chat.Component component)
+    {
+    }
+
+    @Override
+    default boolean acceptsSuccess()
+    {
+        return false;
+    }
+
+    @Override
+    default boolean acceptsFailure()
+    {
+        return false;
+    }
+
+    @Override
+    default boolean shouldInformAdmins()
+    {
+        return false;
+    }
 }

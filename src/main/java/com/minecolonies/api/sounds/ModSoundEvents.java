@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.*;
 
-import static com.minecolonies.core.generation.SoundsJson.createSoundJson;
 
 /**
  * Registering of sound events for our colony.

@@ -940,7 +940,7 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
                     ? ((BaseRailBlock) blockstate.getBlock()).getRailDirection(blockstate, level, tempPos, null)
                     : RailShape.NORTH_SOUTH;
                 double yOffset = 0.0D;
-                if (railshape.isAscending())
+                if (railshape.isSlope())
                 {
                     yOffset = 0.5D;
                 }

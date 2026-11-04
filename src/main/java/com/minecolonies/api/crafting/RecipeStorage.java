@@ -337,7 +337,7 @@ public class RecipeStorage implements IRecipeStorage
         final ResourceLocation type = builder.recipeType != null ? builder.recipeType
                 : builder.alternateOutputs.isEmpty() ? ModRecipeTypes.CLASSIC_ID : ModRecipeTypes.MULTI_OUTPUT_ID;
         final Registry<RecipeTypeEntry> recipeTypes = MinecoloniesAPIProxy.getInstance().getRecipeTypeRegistry();
-        this.recipeType = recipeTypes.get(type).getHandlerProducer().apply(this);
+        this.recipeType = recipeTypes.get(type).map(net.minecraft.core.Holder::value).orElseThrow().getHandlerProducer().apply(this);
 
         this.processInputsAndTools(builder.secondaryOutputs);
     }

@@ -176,7 +176,7 @@ public class CitizenManager implements ICitizenManager
         citizens.clear();
         //  Citizens before Buildings, because Buildings track the Citizens
         citizens.putAll(NBTUtils.streamCompound(compound.getListOrEmpty(TAG_CITIZENS))
-                          .map(s -> deserializeCitizen(provider))
+                          .map(s -> deserializeCitizen(provider, s))
                           .collect(Collectors.toMap(ICitizenData::getId, Function.identity())));
 
         // Update child state after loading citizen data

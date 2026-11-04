@@ -12,7 +12,7 @@ import net.minecraft.util.Mth;
 /**
  * Archer mummy model. Created using Tabula 7.0.0
  */
-public class ModelArcherMummy extends EgyptianModel<AbstractEntityEgyptianRaider>
+public class ModelArcherMummy extends EgyptianModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     private ModelPart stripRightA;
     private ModelPart stripRightB;

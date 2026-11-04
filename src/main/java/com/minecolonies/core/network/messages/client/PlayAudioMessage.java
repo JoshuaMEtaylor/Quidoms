@@ -52,7 +52,7 @@ public class PlayAudioMessage extends AbstractClientPlayMessage
     public PlayAudioMessage(final SoundEvent event, final SoundSource category)
     {
         super(TYPE);
-        this.soundEvent = event.getLocation();
+        this.soundEvent = event.location();
         this.category = category;
     }
 

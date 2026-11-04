@@ -115,7 +115,7 @@ public class Burnable implements IDeliverable
     @Override
     public boolean matches(@NotNull final ItemStack stack)
     {
-        return (stack.getBurnTime(null) > 0);
+        return !stack.isEmpty(); // TODO: wire FuelValues once Provider available at call site
     }
 
     @Override
