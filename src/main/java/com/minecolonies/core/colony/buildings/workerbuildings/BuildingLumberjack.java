@@ -179,7 +179,7 @@ public class BuildingLumberjack extends AbstractBuilding
         final ListTag netherTreeBinTagList = compound.getListOrEmpty(TAG_NETHER_TREE_LIST);
         for (int i = 0; i < netherTreeBinTagList.size(); i++)
         {
-            netherTrees.add(BlockPosUtil.readFromListNBT(netherTreeBinTagList));
+            netherTrees.add(BlockPosUtil.readFromListNBT(netherTreeBinTagList, i));
         }
     }
 

@@ -293,7 +293,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             final ListTag buildingList = perColonyCompound.getListOrEmpty(TAG_BUILDING_CLAIM);
             for (int j = 0; j < buildingList.size(); j++)
             {
-                buildings.add(BlockPosUtil.readFromListNBT(buildingList));
+                buildings.add(BlockPosUtil.readFromListNBT(buildingList, j));
             }
         }
 

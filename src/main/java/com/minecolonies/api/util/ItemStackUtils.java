@@ -935,7 +935,7 @@ public final class ItemStackUtils
         final Set<ItemStorage> allItems = new HashSet<>(IColonyManager.getInstance().getCompatibilityManager().getSetOfAllItems());
 
         // plus all items from the player's inventory not already listed (adds items with extra NBT)
-        for (final ItemStack stack : player.getInventory().items)
+        for (final ItemStack stack : player.getInventory().getNonEquipmentItems())
         {
             if (stack.isEmpty())
             {

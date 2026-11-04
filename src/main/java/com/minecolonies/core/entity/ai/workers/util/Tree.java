@@ -532,14 +532,14 @@ public class Tree
         final ListTag logs = compound.getListOrEmpty(TAG_LOGS);
         for (int i = 0; i < logs.size(); i++)
         {
-            tree.woodBlocks.add(BlockPosUtil.readFromListNBT(logs));
+            tree.woodBlocks.add(BlockPosUtil.readFromListNBT(logs, i));
         }
 
         tree.stumpLocations = new ArrayList<>();
         final ListTag stumps = compound.getListOrEmpty(TAG_STUMPS);
         for (int i = 0; i < stumps.size(); i++)
         {
-            tree.stumpLocations.add(BlockPosUtil.readFromListNBT(stumps));
+            tree.stumpLocations.add(BlockPosUtil.readFromListNBT(stumps, i));
         }
 
         tree.topLog = BlockPosUtil.read(compound, TAG_TOP_LOG);
@@ -570,7 +570,7 @@ public class Tree
             final ListTag leavesBin = compound.getListOrEmpty(TAG_LEAVES);
             for (int i = 0; i < leavesBin.size(); i++)
             {
-                tree.leaves.add(BlockPosUtil.readFromListNBT(leavesBin));
+                tree.leaves.add(BlockPosUtil.readFromListNBT(leavesBin, i));
             }
         }
 

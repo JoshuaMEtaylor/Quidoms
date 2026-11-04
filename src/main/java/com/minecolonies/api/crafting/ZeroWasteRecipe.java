@@ -66,9 +66,10 @@ public class ZeroWasteRecipe extends ShapelessRecipe
 
     @NotNull
     @Override
-    public RecipeSerializer<? extends CraftingRecipe> getSerializer()
+    @SuppressWarnings("unchecked")
+    public RecipeSerializer<ShapelessRecipe> getSerializer()
     {
-        return ModRecipeSerializer.ZeroWasteRecipeSerializer.get();
+        return (RecipeSerializer<ShapelessRecipe>) (RecipeSerializer<?>) ModRecipeSerializer.ZeroWasteRecipeSerializer.get();
     }
 
     public static class Serializer implements RecipeSerializer<ZeroWasteRecipe>

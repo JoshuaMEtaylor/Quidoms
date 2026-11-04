@@ -3240,7 +3240,7 @@ public class InventoryUtils
     {
         final Inventory playerInv = player.getInventory();
 
-        for (int slot = 0; slot < playerInv.items.size(); slot++)
+        for (int slot = 0; slot < playerInv.getNonEquipmentItems().size(); slot++)
         {
             final ItemStack itemSlot = playerInv.getItem(slot);
             if (itemSlot.getItem() == item)

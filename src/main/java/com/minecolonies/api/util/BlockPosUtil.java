@@ -213,6 +213,15 @@ public final class BlockPosUtil
      * @param name     Tag name to read data from.
      * @return Chunk coordinates read from the compound.
      */
+    /**
+     * Reads a BlockPos from a compound that itself holds x/y/z (list-element form).
+     */
+    @NotNull
+    public static BlockPos read(@NotNull final CompoundTag compound)
+    {
+        return new BlockPos(compound.getIntOr("x", 0), compound.getIntOr("y", 0), compound.getIntOr("z", 0));
+    }
+
     @NotNull
     public static BlockPos read(@NotNull final CompoundTag compound, final String name)
     {
@@ -306,7 +315,7 @@ public final class BlockPosUtil
         ListTag listNBT = compoundNBT.getListOrEmpty(tagname);
         for (int i = 0; i < listNBT.size(); i++)
         {
-            result.add(readFromListNBT(listNBT));
+            result.add(readFromListNBT(listNBT, i));
         }
 
         return result;

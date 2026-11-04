@@ -287,7 +287,7 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
                             for (final ItemStack required : requiredItem)
                             {
                                 boolean found = false;
-                                for (final ItemStack stack : player.getInventory().items)
+                                for (final ItemStack stack : player.getInventory().getNonEquipmentItems())
                                 {
                                     if (ItemStackUtils.compareItemStacksIgnoreStackSize(required, stack))
                                     {
