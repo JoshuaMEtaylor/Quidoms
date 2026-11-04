@@ -189,7 +189,7 @@ public class JEIPlugin implements IModPlugin
         if (this.jei != null)
         {
             // defer recipe loading until after the compatibility manager is populated, because they use it
-            final IRecipeManager recipeManager = this.jei.recipeAccess();
+            final IRecipeManager recipeManager = this.jei.getRecipeManager();
             recipeManager.addRecipes(ModRecipeTypes.COMPOSTING, CompostRecipeCategory.findRecipes());
             recipeManager.addRecipes(ModRecipeTypes.FLOWERS, FloristRecipeCategory.findRecipes());
 
@@ -198,7 +198,12 @@ public class JEIPlugin implements IModPlugin
             recipeManager.addRecipes(ModRecipeTypes.FISHING, FishermanRecipeCategory.findRecipes());
 
             final ClientLevel level = Objects.requireNonNull(Minecraft.getInstance().level);
-            final Map<CraftingType, List<IGenericRecipe>> vanilla = RecipeAnalyzer.buildVanillaRecipesMap(level.recipeAccess(), level);
+            // 1.21.10: ClientLevel has no full RecipeManager; use empty vanilla map on pure client.
+            final net.minecraft.world.item.crafting.RecipeManager vanillaManager =
+                com.minecolonies.api.util.RecipeCompat.asRecipeManager(level);
+            final Map<CraftingType, List<IGenericRecipe>> vanilla = vanillaManager == null
+                ? java.util.Map.of()
+                : RecipeAnalyzer.buildVanillaRecipesMap(vanillaManager, level);
             final List<Animal> animals = RecipeAnalyzer.createAnimals(level);
 
             for (final JobBasedRecipeCategory<?> category : this.categories)

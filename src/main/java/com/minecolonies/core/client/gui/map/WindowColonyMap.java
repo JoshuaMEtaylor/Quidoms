@@ -333,14 +333,7 @@ public class WindowColonyMap extends AbstractWindowSkeleton
                     Image playerImage = findPaneOfTypeByID(player.getStringUUID(), Image.class);
                     if (playerImage == null)
                     {
-                        final ResourceLocation resourceLocation = Minecraft.getInstance().getSkinManager().getInsecureSkin(player.getGameProfile()).texture();
-                        if (resourceLocation == null)
-                        {
-                            continue;
-                        }
-
-
-                        OutOfJarResourceLocation.ofMinecraftSkin(Minecraft.getInstance(), player.getGameProfile(), PlayerSkin::texture)
+                        OutOfJarResourceLocation.ofMinecraftSkin(Minecraft.getInstance(), player.getGameProfile(), skin -> skin.body().texturePath())
                             .thenAccept(resLoc ->
                             {
                                 if (resLoc != null)

@@ -349,7 +349,6 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
         return getBuildingEntry().getRegistryName().getPath();
     }
 
-    @Override
     public void appendHoverText(@NotNull final ItemStack stack, @NotNull final net.minecraft.world.item.Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flags)
     {
         super.appendHoverText(stack, context, display, tooltip, flags);
