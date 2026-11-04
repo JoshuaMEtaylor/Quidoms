@@ -57,8 +57,8 @@ public class DataPackSyncEventHandler
         private static void discoverCompatLists(@NotNull final MinecraftServer server)
         {
             Log.getLogger().warn("Starting Compat Discovery");
-            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().getFurnaceRecipes().loadRecipes(server.getRecipeManager(), server.overworld());
-            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().discover(server.getRecipeManager(), server.overworld());
+            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().getFurnaceRecipes().loadRecipes(server.recipeAccess(), server.overworld());
+            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().discover(server.recipeAccess(), server.overworld());
             CustomRecipeManager.getInstance().resolveTemplates(server.registryAccess());
             CustomRecipeManager.getInstance().buildLootData(server.overworld());
         }
@@ -134,7 +134,7 @@ public class DataPackSyncEventHandler
         {
             if (!event.getEntity().level().isClientSide() && event.getEntity() instanceof ServerPlayer)
             {
-                final MinecraftServer server = event.getEntity().getServer();
+                final MinecraftServer server = event.getEntity().level().getServer();
                 sendPackets((ServerPlayer) event.getEntity(), new UpdateClientWithCompatibilityMessage(server.registryAccess()));
             }
         }
@@ -175,7 +175,7 @@ public class DataPackSyncEventHandler
         @SubscribeEvent
         public static void onRecipesLoaded(@NotNull final RecipesUpdatedEvent event)
         {
-            IColonyManager.getInstance().getCompatibilityManager().getFurnaceRecipes().loadRecipes(event.getRecipeManager(), Minecraft.getInstance().level);
+            IColonyManager.getInstance().getCompatibilityManager().getFurnaceRecipes().loadRecipes(event.recipeAccess(), Minecraft.getInstance().level);
         }
     }
 }

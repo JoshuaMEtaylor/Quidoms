@@ -41,6 +41,11 @@ public class CustomArrowEntity extends Arrow
     private float waterInertia = 0.6f;
 
     /**
+     * Tracked base damage — AbstractArrow.baseDamage is private without a getter in 1.21.10.
+     */
+    private double trackedBaseDamage = 2.0D;
+
+    /**
      * Callback on hitting an entity
      */
     private Predicate<EntityHitResult> onHitCallback = null;
@@ -48,6 +53,18 @@ public class CustomArrowEntity extends Arrow
     public CustomArrowEntity(final EntityType<? extends Arrow> type, final Level world)
     {
         super(type, world);
+    }
+
+    @Override
+    public void setBaseDamage(final double damage)
+    {
+        this.trackedBaseDamage = damage;
+        super.setBaseDamage(damage);
+    }
+
+    public double getBaseDamage()
+    {
+        return this.trackedBaseDamage;
     }
 
     @Override
@@ -135,7 +152,7 @@ public class CustomArrowEntity extends Arrow
     @Override
     public boolean shouldFall()
     {
-        if (this.inGround)
+        if (this.isInGround())
         {
             final AABB aabb = (new AABB(this.position(), this.position())).inflate(0.06D);
             for(VoxelShape voxelshape : this.level().getBlockCollisions(null, aabb)) {
@@ -149,13 +166,12 @@ public class CustomArrowEntity extends Arrow
         return false;
     }
 
-    @Override
+    /** Quidoms: arrows are ephemeral; refuse persistence. */
     public boolean save(@NotNull CompoundTag nbt)
     {
         return false;
     }
 
-    @Override
     public void load(@NotNull CompoundTag nbt)
     {
         discard();

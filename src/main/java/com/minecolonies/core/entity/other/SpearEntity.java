@@ -203,13 +203,11 @@ public class SpearEntity extends ThrownTrident implements ICustomAttackSound
         return SoundEvents.TRIDENT_THROW.value();
     }
 
-    @Override
     public boolean save(@NotNull CompoundTag nbt)
     {
         return false;
     }
 
-    @Override
     public void load(@NotNull CompoundTag nbt)
     {
         discard();

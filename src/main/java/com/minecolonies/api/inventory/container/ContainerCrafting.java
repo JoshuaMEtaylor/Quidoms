@@ -423,7 +423,7 @@ public class ContainerCrafting extends AbstractContainerMenu
      */
     public List<ItemStack> getRemainingItems()
     {
-        final Optional<RecipeHolder<CraftingRecipe>> iRecipe = this.world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), world);
+        final Optional<RecipeHolder<CraftingRecipe>> iRecipe = this.world.recipeAccess().getRecipeFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), world);
         if (iRecipe.isPresent())
         {
             List<ItemStack> ri = iRecipe.get().value().getRemainingItems(this.craftMatrix.asCraftInput());

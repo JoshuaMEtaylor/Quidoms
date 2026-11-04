@@ -278,7 +278,7 @@ public class CraftingTagAuditor
                                       @NotNull final CustomRecipeManager customRecipeManager) throws IOException
     {
         final Map<CraftingType, List<IGenericRecipe>> vanillaRecipesMap =
-                RecipeAnalyzer.buildVanillaRecipesMap(server.getRecipeManager(), server.overworld());
+                RecipeAnalyzer.buildVanillaRecipesMap(server.recipeAccess(), server.overworld());
         final List<Animal> animals = RecipeAnalyzer.createAnimals(server.overworld());
         final List<ICraftingBuildingModule> crafters = getCraftingModules()
                 .stream()
@@ -357,7 +357,7 @@ public class CraftingTagAuditor
     private static void doDomumAudit(@NotNull final BufferedWriter writer,
                                      @NotNull final MinecraftServer server) throws IOException
     {
-        final List<IGenericRecipe> cutterRecipes = new ArrayList<>(ModCraftingTypes.ARCHITECTS_CUTTER.get().findRecipes(server.getRecipeManager(), server.overworld()));
+        final List<IGenericRecipe> cutterRecipes = new ArrayList<>(ModCraftingTypes.ARCHITECTS_CUTTER.get().findRecipes(server.recipeAccess(), server.overworld()));
         cutterRecipes.sort(Comparator.comparing(r -> BuiltInRegistries.ITEM.getKey(r.getPrimaryOutput().getItem()).toString()));
         final List<ICraftingBuildingModule> crafters = getCraftingModules()
                 .stream()

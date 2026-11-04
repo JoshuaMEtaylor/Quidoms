@@ -133,4 +133,25 @@ public final class RecipeCompat
     {
         return holder.id().location();
     }
+
+    /**
+     * Full {@link RecipeManager} is server-side only on 1.21.10 (client has a limited {@link net.minecraft.world.item.crafting.RecipeAccess}).
+     */
+    @Nullable
+    public static RecipeManager asRecipeManager(@Nullable final Level level)
+    {
+        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel)
+        {
+            return serverLevel.recipeAccess();
+        }
+        return null;
+    }
+
+    @NotNull
+    public static Collection<RecipeHolder<?>> getRecipesOrEmpty(@Nullable final Level level)
+    {
+        final RecipeManager manager = asRecipeManager(level);
+        return manager == null ? java.util.List.of() : manager.getRecipes();
+    }
+
 }

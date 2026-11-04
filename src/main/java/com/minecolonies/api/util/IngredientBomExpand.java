@@ -53,7 +53,7 @@ public final class IngredientBomExpand
             return out;
         }
 
-        final RecipeManager recipes = serverLevel.getServer().getRecipeManager();
+        final RecipeManager recipes = serverLevel.getServer().recipeAccess();
         final Map<String, RecipeInputs> index = indexCrafting(recipes, serverLevel);
         final Map<String, Integer> raw = new LinkedHashMap<>();
         final ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());

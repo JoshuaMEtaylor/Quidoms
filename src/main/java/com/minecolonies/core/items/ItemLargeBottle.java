@@ -51,7 +51,7 @@ public class ItemLargeBottle extends Item
             return super.interactLivingEntity(stack, player, entity, hand);
         }
 
-        if (player.getCooldowns().isOnCooldown(this))
+        if (player.getCooldowns().isOnCooldown(stack))
         {
             return super.interactLivingEntity(stack, player, entity, hand);
         }
@@ -64,7 +64,7 @@ public class ItemLargeBottle extends Item
                 player.drop(ModItems.large_milk_bottle.getDefaultInstance(), false);
             }
             stack.shrink(1);
-            player.getCooldowns().addCooldown(this, TICKS_SECOND * 10);
+            player.getCooldowns().addCooldown(stack, TICKS_SECOND * 10);
             return InteractionResult.SUCCESS;
         }
         else if (entity instanceof final Goat goat && !entity.isBaby())
@@ -75,7 +75,7 @@ public class ItemLargeBottle extends Item
                 player.drop(ModItems.large_milk_bottle.getDefaultInstance(), false);
             }
             stack.shrink(1);
-            player.getCooldowns().addCooldown(this, TICKS_SECOND * 10);
+            player.getCooldowns().addCooldown(stack, TICKS_SECOND * 10);
             return InteractionResult.SUCCESS;
         }
 
@@ -111,7 +111,7 @@ public class ItemLargeBottle extends Item
                         player.drop(ModItems.large_water_bottle.getDefaultInstance(), false);
                     }
                     itemstack.shrink(1);
-                    player.getCooldowns().addCooldown(this, TICKS_SECOND);
+                    player.getCooldowns().addCooldown(itemstack, TICKS_SECOND);
                     return InteractionResult.SUCCESS;
                 }
             }

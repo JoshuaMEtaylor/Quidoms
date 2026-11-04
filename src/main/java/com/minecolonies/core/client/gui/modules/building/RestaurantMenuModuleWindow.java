@@ -406,14 +406,14 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
             return true;
         }
 
-        final Optional<RecipeHolder<?>> recipe = level.getRecipeManager().byKey(BuiltInRegistries.ITEM.getKey(dish.getItem()));
+        final Optional<RecipeHolder<?>> recipe = Optional.empty(); // client RecipeAccess has no byKey in 1.21.10
         if (recipe.isPresent())
         {
             if (depth == 0)
             {
                 dish.setAmount(com.minecolonies.api.util.RecipeCompat.getResultItem(recipe.get().value(), level).getCount());
             }
-            for (final Ingredient ingredient : recipe.get().value().getIngredients())
+            for (final Ingredient ingredient : com.minecolonies.api.util.RecipeCompat.getIngredients(recipe.get().value()))
             {
                 final ItemStack[] inputs = com.minecolonies.api.util.IngredientCompat.getItems(ingredient);
                 if (inputs.length >= 1)

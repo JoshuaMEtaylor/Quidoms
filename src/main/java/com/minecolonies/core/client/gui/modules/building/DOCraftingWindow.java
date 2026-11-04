@@ -163,7 +163,7 @@ public class DOCraftingWindow extends AbstractModuleWindow<DOCraftingModuleView>
 
     private void addRecipe()
     {
-        final List<RecipeHolder<ArchitectsCutterRecipe>> list = Minecraft.getInstance().level.getRecipeManager().getRecipesFor(ModRecipeTypes.ARCHITECTS_CUTTER.get(), new ArchitectsCutterRecipeInput(inputInventory), Minecraft.getInstance().level);
+        final List<RecipeHolder<ArchitectsCutterRecipe>> list = java.util.Collections.<RecipeHolder<ArchitectsCutterRecipe>>emptyList(); // client has no full RecipeManager in 1.21.10
         final Map<Integer, List<Integer>> map = new HashMap<>();
 
         if (inputInventory.isEmpty() || list.isEmpty())
@@ -233,7 +233,7 @@ public class DOCraftingWindow extends AbstractModuleWindow<DOCraftingModuleView>
         resourceList.enable();
         resourceList.show();
 
-        final List<RecipeHolder<ArchitectsCutterRecipe>> list = Minecraft.getInstance().level.getRecipeManager().getRecipesFor(ModRecipeTypes.ARCHITECTS_CUTTER.get(), new ArchitectsCutterRecipeInput(inputInventory), Minecraft.getInstance().level);
+        final List<RecipeHolder<ArchitectsCutterRecipe>> list = java.util.Collections.<RecipeHolder<ArchitectsCutterRecipe>>emptyList(); // client has no full RecipeManager in 1.21.10
         int inputCount = 0;
         for (int i = 0; i < inputInventory.getContainerSize(); i++)
         {

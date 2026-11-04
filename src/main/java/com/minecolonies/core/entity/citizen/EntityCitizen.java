@@ -1226,7 +1226,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
     }
 
     @Override
-    public boolean hurtServer(final ServerLevel level, @NotNull final DamageSource damageSource, final float damage)
+    public boolean hurtServer(final ServerLevel serverLevel, @NotNull final DamageSource damageSource, final float damage)
     {
         // TODO: temporary debug data
         if (damageSource.getEntity() instanceof Player player && player.isCreative() && player.getMainHandItem().getItem() == ModItems.scanAnalyzer)
@@ -1268,7 +1268,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
 
         if (getCitizenColonyHandler().getColonyOrRegister() == null)
         {
-            return super.hurtServer(level, damageSource, damage);
+            return super.hurtServer(serverLevel, damageSource, damage);
         }
 
         // Maxdmg cap so citizens need a certain amount of hits to die, so we get more gameplay value and less scaling issues.
@@ -1422,7 +1422,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
         if (!result)
         {
             LivingShieldBlockEvent ev;
-            if (damageInc > 0.0F && !this.damageContainers.empty() && (ev = CommonHooks.onDamageBlock(this, this.damageContainers.peek(), this.isBlocking())).getBlocked())
+            if (damageInc > 0.0F && !this.damageContainers.empty() && (ev = CommonHooks.onDamageBlock(this, this.damageContainers.peek(), damageInc, this.isBlocking())).getBlocked())
             {
                 final float blockedDamage = this.damageContainers.peek().getBlockedDamage();
                 if (blockedDamage > 0)
@@ -1943,7 +1943,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
      */
     private boolean decreaseIdleSaturation()
     {
-        if (citizenData != null && level() != null && !!level().isDay() && !citizenSleepHandler.isAsleep())
+        if (citizenData != null && level() != null && !!level().isBrightOutside() && !citizenSleepHandler.isAsleep())
         {
             final int buildingLevel = citizenData.getHomeBuilding() == null ? 0 :  citizenData.getHomeBuilding().getBuildingLevelEquivalent();
             double decrease = computeSaturationConsumptionFactor(buildingLevel);
