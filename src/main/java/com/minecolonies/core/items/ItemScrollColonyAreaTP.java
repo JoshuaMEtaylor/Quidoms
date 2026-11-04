@@ -110,10 +110,10 @@ public class ItemScrollColonyAreaTP extends AbstractItemScroll
             final ServerPlayer sPlayer = (ServerPlayer) entity;
             for (final Entity player : getAffectedPlayers(sPlayer))
             {
-                new VanillaParticleMessage(player.getX(), player.getY(), player.getZ(), ParticleTypes.INSTANT_EFFECT).sendToTrackingEntity(player);
+                new VanillaParticleMessage(player.getX(), player.getY(), player.getZ(), ParticleTypes.ENCHANT).sendToTrackingEntity(player);
             }
 
-            new VanillaParticleMessage(sPlayer.getX(), sPlayer.getY(), sPlayer.getZ(), ParticleTypes.INSTANT_EFFECT).sendToPlayer(sPlayer);
+            new VanillaParticleMessage(sPlayer.getX(), sPlayer.getY(), sPlayer.getZ(), ParticleTypes.ENCHANT).sendToPlayer(sPlayer);
         }
     }
 

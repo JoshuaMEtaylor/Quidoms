@@ -79,8 +79,8 @@ public class ItemScrollColonyTP extends AbstractItemScroll
 
             if (pos != null)
             {
-                player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, TICKS_SECOND * 7));
-                player.teleportTo((ServerLevel) world, pos.getX(), pos.getY(), pos.getZ(), player.getYRot(), player.getXRot());
+                player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, TICKS_SECOND * 7));
+                player.teleportTo((ServerLevel) world, pos.getX(), pos.getY(), pos.getZ(), java.util.Set.of(), player.getYRot(), player.getXRot(), true);
             }
 
             SoundUtils.playSoundForPlayer(player, SoundEvents.BAT_TAKEOFF, 0.4f, 1.0f);
@@ -119,8 +119,8 @@ public class ItemScrollColonyTP extends AbstractItemScroll
         if (!worldIn.isClientSide() && worldIn.getGameTime() % 5 == 0)
         {
             final Entity entity1 = entity;
-            new VanillaParticleMessage(entity.getX(), entity.getY(), entity.getZ(), ParticleTypes.INSTANT_EFFECT).sendToTrackingEntity(entity1);
-            new VanillaParticleMessage(entity.getX(), entity.getY(), entity.getZ(), ParticleTypes.INSTANT_EFFECT).sendToPlayer((ServerPlayer) entity);
+            new VanillaParticleMessage(entity.getX(), entity.getY(), entity.getZ(), ParticleTypes.ENCHANT).sendToTrackingEntity(entity1);
+            new VanillaParticleMessage(entity.getX(), entity.getY(), entity.getZ(), ParticleTypes.ENCHANT).sendToPlayer((ServerPlayer) entity);
         }
     }
 

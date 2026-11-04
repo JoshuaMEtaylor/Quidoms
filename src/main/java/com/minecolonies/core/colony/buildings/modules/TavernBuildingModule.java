@@ -110,7 +110,7 @@ public class TavernBuildingModule extends AbstractBuildingModule implements IDef
     {
         boolean musicToggle = building.getSettingValueOrDefault(PLAYMUSIC, true);
 
-        if (musicToggle && musicCooldown <= 0 && building.getBuildingLevel() > 0 && !building.getColony().isBrightOutside())
+        if (musicToggle && musicCooldown <= 0 && building.getBuildingLevel() > 0 && !building.getColony().isDay())
         {
             int count = 0;
             BlockPos avg = BlockPos.ZERO;

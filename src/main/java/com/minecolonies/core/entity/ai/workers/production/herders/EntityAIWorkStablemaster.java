@@ -129,7 +129,7 @@ public class EntityAIWorkStablemaster extends AbstractEntityAIHerder<JobStablema
                 Entity holder = horseToRetrieve.getLeashHolder();
                 if (holder != null && holder.equals(worker)) 
                 {
-                    horseToRetrievedropLeash();
+                    horseToRetrieve.dropLeash();
                 }
             }
         }
@@ -679,7 +679,7 @@ public class EntityAIWorkStablemaster extends AbstractEntityAIHerder<JobStablema
         // If leashed to somebody else, drop that leash first
         if (horse.isLeashed())
         {
-            horsedropLeash();
+            horse.dropLeash();
         }
 
         if (worker.getOffhandItem().isEmpty())
@@ -714,7 +714,7 @@ public class EntityAIWorkStablemaster extends AbstractEntityAIHerder<JobStablema
             return;
         } 
 
-        horsedropLeash();
+        horse.dropLeash();
 
         if (worker.getOffhandItem().is(Items.LEAD))
         {

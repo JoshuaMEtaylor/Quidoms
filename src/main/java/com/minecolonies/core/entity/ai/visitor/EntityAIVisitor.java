@@ -169,7 +169,7 @@ public class EntityAIVisitor implements IState
         }
 
         final int random = citizen.getRandom().nextInt(5);
-        if (tavern != null && (random == 0 || random == 1 && !citizen.getCitizenColonyHandler().getColonyOrRegister().isBrightOutside()) && tavern.hasModule(BuildingModules.TAVERN_VISITOR))
+        if (tavern != null && (random == 0 || random == 1 && !citizen.getCitizenColonyHandler().getColonyOrRegister().isDay()) && tavern.hasModule(BuildingModules.TAVERN_VISITOR))
         {
             final BlockPos pos = tavern.getModule(BuildingModules.TAVERN_VISITOR).getFreeSitPosition();
             if (pos != null)
@@ -183,7 +183,7 @@ public class EntityAIVisitor implements IState
         else if (random == 2)
         {
             EntityNavigationUtils.walkToRandomPos(citizen, 10, 0.6D);
-            actionTimeoutCounter = citizen.getCitizenColonyHandler().getColonyOrRegister().isBrightOutside() ? citizen.getRandom().nextInt(1000) + 1000 : 300;
+            actionTimeoutCounter = citizen.getCitizenColonyHandler().getColonyOrRegister().isDay() ? citizen.getRandom().nextInt(1000) + 1000 : 300;
             return VisitorState.WANDERING;
         }
 

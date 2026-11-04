@@ -16,7 +16,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.RecipesUpdatedEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
@@ -57,8 +56,8 @@ public class DataPackSyncEventHandler
         private static void discoverCompatLists(@NotNull final MinecraftServer server)
         {
             Log.getLogger().warn("Starting Compat Discovery");
-            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().getFurnaceRecipes().loadRecipes(server.recipeAccess(), server.overworld());
-            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().discover(server.recipeAccess(), server.overworld());
+            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().getFurnaceRecipes().loadRecipes(server.getRecipeManager(), server.overworld());
+            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().discover(server.getRecipeManager(), server.overworld());
             CustomRecipeManager.getInstance().resolveTemplates(server.registryAccess());
             CustomRecipeManager.getInstance().buildLootData(server.overworld());
         }
@@ -164,18 +163,10 @@ public class DataPackSyncEventHandler
 
     /**
      * Events subscribed on client-side only.
+     * <p>NeoForge 1.21.10 removed {@code RecipesUpdatedEvent}; furnace/compat discovery
+     * is server-driven via {@link OnDatapackSyncEvent} and custom sync packets instead.
      */
     public static class ClientEvents
     {
-        /**
-         * Fired when the recipes are synched to client.  This happens after the {@link OnDatapackSyncEvent}.
-         *
-         * @param event {@link RecipesUpdatedEvent}
-         */
-        @SubscribeEvent
-        public static void onRecipesLoaded(@NotNull final RecipesUpdatedEvent event)
-        {
-            IColonyManager.getInstance().getCompatibilityManager().getFurnaceRecipes().loadRecipes(event.recipeAccess(), Minecraft.getInstance().level);
-        }
     }
 }
