@@ -1,5 +1,7 @@
 package com.minecolonies.api.blocks.decorative;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.util.RandomSource;
 
@@ -73,7 +75,7 @@ public abstract class AbstractBlockGate extends DoorBlock implements LiquidBlock
 
     public AbstractBlockGate(final String name, final float hardness, final int maxWidth, final int maxHeight)
     {
-        super(BlockSetType.SPRUCE, Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(hardness, hardness * 5).noOcclusion());
+        super(BlockSetType.SPRUCE, MinecoloniesBlockIds.withPendingBlockId(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(hardness, hardness * 5).noOcclusion()));
         registerDefaultState(defaultBlockState());
         this.name = name;
         this.maxWidth = maxWidth;
@@ -505,7 +507,16 @@ public abstract class AbstractBlockGate extends DoorBlock implements LiquidBlock
      */
     public void registerBlockItem(final Registry<Item> registry, final Item.Properties properties)
     {
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, this.name), new BlockItem(this, properties));
+        MinecoloniesBlockIds.pushItem(new ResourceLocation(Constants.MOD_ID, this.name));
+        try
+        {
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, this.name),
+                new BlockItem(this, MinecoloniesBlockIds.withPendingItemId(properties)));
+        }
+        finally
+        {
+            MinecoloniesBlockIds.popItem();
+        }
     }
 
     @Override

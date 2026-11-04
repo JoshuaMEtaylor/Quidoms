@@ -21,7 +21,7 @@ public abstract class AbstractBlockBarrel<B extends AbstractBlockBarrel<B>> exte
 
     public AbstractBlockBarrel(final Properties properties)
     {
-        super(properties);
+        super(MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 
     public static BlockState changeStateOverFullness(@NotNull final AbstractTileEntityBarrel te, @NotNull final BlockState blockState)

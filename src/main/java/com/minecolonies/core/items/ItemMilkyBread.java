@@ -39,7 +39,7 @@ public class ItemMilkyBread extends ItemFood
      */
     public ItemMilkyBread(final Properties properties)
     {
-        super((new Item.Properties()).food(milkBread), 1);
+        super(properties.food(milkBread), 1);
     }
 
    /**

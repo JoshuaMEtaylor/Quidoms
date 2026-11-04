@@ -41,7 +41,7 @@ public class ItemGoldenBread extends ItemFood
      */
     public ItemGoldenBread(final Properties properties)
     {
-        super((new Item.Properties()).food(goldenBread), 1);
+        super(properties.food(goldenBread), 1);
     }
 
    /**

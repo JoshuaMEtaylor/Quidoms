@@ -1,5 +1,7 @@
 package com.minecolonies.core.blocks;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
 import com.minecolonies.api.blocks.AbstractBlockMinecolonies;
 import com.minecolonies.api.blocks.interfaces.ITickableBlockMinecolonies;
 import com.minecolonies.api.colony.IColony;
@@ -151,6 +153,14 @@ public class BlockColonySign extends AbstractBlockMinecolonies<BlockColonySign> 
     @Override
     public void registerBlockItem(final Registry<Item> registry, final Item.Properties properties)
     {
-        Registry.register(registry, getRegistryName(), new ItemColonySign(properties));
+        MinecoloniesBlockIds.pushItem(getRegistryName());
+        try
+        {
+            Registry.register(registry, getRegistryName(), new ItemColonySign(MinecoloniesBlockIds.withPendingItemId(properties)));
+        }
+        finally
+        {
+            MinecoloniesBlockIds.popItem();
+        }
     }
 }

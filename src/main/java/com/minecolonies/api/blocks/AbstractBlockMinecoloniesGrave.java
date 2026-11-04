@@ -18,7 +18,7 @@ public abstract class AbstractBlockMinecoloniesGrave<B extends AbstractBlockMine
 
     public AbstractBlockMinecoloniesGrave(final Properties properties)
     {
-        super(properties.noOcclusion());
+        super(MinecoloniesBlockIds.withPendingBlockId(properties.noOcclusion()));
     }
 
 }

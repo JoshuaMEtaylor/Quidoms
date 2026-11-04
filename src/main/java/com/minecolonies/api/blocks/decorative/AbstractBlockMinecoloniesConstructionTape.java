@@ -1,5 +1,7 @@
 package com.minecolonies.api.blocks.decorative;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
 import com.minecolonies.api.blocks.AbstractBlockMinecoloniesFalling;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,7 +43,7 @@ public abstract class AbstractBlockMinecoloniesConstructionTape<B extends Abstra
 
     public AbstractBlockMinecoloniesConstructionTape(final Properties properties)
     {
-        super(properties);
+        super(MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 
     @NotNull

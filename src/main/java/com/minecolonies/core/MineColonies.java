@@ -152,7 +152,8 @@ public class MineColonies
         if (dist.isClient())
         {
             forgeBus.register(ClientEventHandler.class);
-            forgeBus.register(DataPackSyncEventHandler.ClientEvents.class);
+            // DataPackSyncEventHandler.ClientEvents is intentionally empty on 1.21.10
+            // (RecipesUpdatedEvent removed); do not register an empty listener class.
             modBus.register(ClientRegistryHandler.class);
 
             TagManager.registerGlobalTagOption(TAG_WORK);

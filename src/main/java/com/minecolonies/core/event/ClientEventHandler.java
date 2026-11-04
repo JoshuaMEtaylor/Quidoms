@@ -56,6 +56,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
@@ -87,10 +88,59 @@ public class ClientEventHandler
      */
     private static final Lazy<Map<String, BuildingEntry>> crafterToBuilding = Lazy.of(ClientEventHandler::buildCrafterToBuildingMap);
 
+    // RenderLevelStageEvent is abstract on 1.21.10 — register concrete stage subclasses only.
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void renderWorldLastEvent(@NotNull final RenderLevelStageEvent event)
+    public static void renderAfterSky(@NotNull final RenderLevelStageEvent.AfterSky event)
     {
         WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterOpaque(@NotNull final RenderLevelStageEvent.AfterOpaqueBlocks event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterEntities(@NotNull final RenderLevelStageEvent.AfterEntities event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterTranslucent(@NotNull final RenderLevelStageEvent.AfterTranslucentBlocks event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterTripwire(@NotNull final RenderLevelStageEvent.AfterTripwireBlocks event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterParticles(@NotNull final RenderLevelStageEvent.AfterParticles event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterWeather(@NotNull final RenderLevelStageEvent.AfterWeather event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterLevel(@NotNull final RenderLevelStageEvent.AfterLevel event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(@NotNull final ClientTickEvent.Pre event)
+    {
+        IColonyManager.getInstance().onClientTick(Minecraft.getInstance().level != null);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

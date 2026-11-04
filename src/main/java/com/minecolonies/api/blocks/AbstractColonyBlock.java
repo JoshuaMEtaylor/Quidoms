@@ -13,8 +13,10 @@ import com.minecolonies.api.tileentities.AbstractTileEntityColonyBuilding;
 import com.minecolonies.api.tileentities.MinecoloniesTileEntities;
 import com.minecolonies.api.util.*;
 import com.minecolonies.api.util.constant.Constants;
+
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import net.minecraft.core.BlockPos;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -96,7 +98,7 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
      */
     public AbstractColonyBlock()
     {
-        super(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(HARDNESS, RESISTANCE).noOcclusion());
+        super(MinecoloniesBlockIds.withPendingBlockId(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(HARDNESS, RESISTANCE).noOcclusion()));
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
         this.name = getHutName();
     }
@@ -123,7 +125,7 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
      */
     public AbstractColonyBlock(final Properties properties)
     {
-        super(properties.noOcclusion());
+        super(MinecoloniesBlockIds.withPendingBlockId(properties.noOcclusion()));
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
         this.name = getHutName();
     }

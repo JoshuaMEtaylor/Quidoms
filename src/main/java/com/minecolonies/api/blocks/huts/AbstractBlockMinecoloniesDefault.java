@@ -1,5 +1,7 @@
 package com.minecolonies.api.blocks.huts;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
 import com.minecolonies.api.blocks.AbstractBlockMinecoloniesContainer;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BlockItem;
@@ -46,7 +48,7 @@ public abstract class AbstractBlockMinecoloniesDefault<B extends AbstractBlockMi
 
     public AbstractBlockMinecoloniesDefault(final Properties properties)
     {
-        super(properties);
+        super(MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 
     @Override
@@ -59,6 +61,14 @@ public abstract class AbstractBlockMinecoloniesDefault<B extends AbstractBlockMi
     @Override
     public void registerBlockItem(final Registry<Item> registry, final Item.Properties properties)
     {
-        Registry.register(registry, getRegistryName(), new BlockItem(this, properties));
+        MinecoloniesBlockIds.pushItem(getRegistryName());
+        try
+        {
+            Registry.register(registry, getRegistryName(), new BlockItem(this, MinecoloniesBlockIds.withPendingItemId(properties)));
+        }
+        finally
+        {
+            MinecoloniesBlockIds.popItem();
+        }
     }
 }

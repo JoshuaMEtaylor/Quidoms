@@ -1,5 +1,7 @@
 package com.minecolonies.core.items;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
@@ -24,6 +26,6 @@ public class ItemPirateGear extends Item
       @NotNull final ArmorType equipmentSlotIn,
       final int durability)
     {
-        super(new Item.Properties().humanoidArmor(materialIn, equipmentSlotIn).durability(durability));
+        super(MinecoloniesBlockIds.itemProps(name, new Item.Properties().humanoidArmor(materialIn, equipmentSlotIn).durability(durability)));
     }
 }

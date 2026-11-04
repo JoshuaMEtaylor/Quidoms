@@ -26,14 +26,12 @@ import com.minecolonies.api.util.ColonyUtils;
 import com.minecolonies.api.util.DamageSourceKeys;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.core.MineColonies;
-import com.minecolonies.core.client.gui.WindowReactivateBuilding;
 import com.minecolonies.core.colony.requestsystem.management.manager.StandardRecipeManager;
 import com.minecolonies.core.network.messages.client.colony.ColonyViewRemoveMessage;
 import com.minecolonies.core.util.BackUpHelper;
 import com.minecolonies.core.util.ChunkDataHelper;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -45,7 +43,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -436,7 +434,20 @@ public final class ColonyManager implements IColonyManager
     @Override
     public void openReactivationWindow(final BlockPos pos)
     {
-        new WindowReactivateBuilding(pos).open();
+        // Client-only UI — resolved by name so ColonyManager's constant pool stays server-safe.
+        if (FMLEnvironment.getDist().isClient())
+        {
+            try
+            {
+                Class.forName("com.minecolonies.core.colony.ClientColonyUi")
+                    .getMethod("openReactivationWindow", BlockPos.class)
+                    .invoke(null, pos);
+            }
+            catch (ReflectiveOperationException e)
+            {
+                Log.getLogger().error("Failed to open reactivation window", e);
+            }
+        }
     }
 
     @Override
@@ -643,14 +654,13 @@ public final class ColonyManager implements IColonyManager
     }
 
     @Override
-    public void onClientTick(@NotNull final ClientTickEvent.Pre event)
+    public void onClientTick(final boolean clientLevelPresent)
     {
-        if (Minecraft.getInstance().level == null && !colonyViews.isEmpty())
+        if (!clientLevelPresent && !colonyViews.isEmpty())
         {
             //  Player has left the game, clear the Colony View cache
             colonyViews.clear();
         }
-
 
         if (clientSoundManager == null)
         {

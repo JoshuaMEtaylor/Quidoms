@@ -1,5 +1,6 @@
 package com.minecolonies.apiimp.initializer;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
 import com.minecolonies.api.blocks.ModBlocks;
 import com.minecolonies.api.entity.ModEntities;
 import com.minecolonies.api.items.ModArmorMaterials;
@@ -32,7 +33,7 @@ public final class ModItemsInitializer
 
     private static Item spawnEgg(final EntityType<?> type)
     {
-        return new SpawnEggItem(new Item.Properties().spawnEgg(type));
+        return new SpawnEggItem(MinecoloniesBlockIds.itemProps(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath() + "_spawn_egg", new Item.Properties().spawnEgg(type)));
     }
 
     @SubscribeEvent
@@ -52,60 +53,60 @@ public final class ModItemsInitializer
     @SuppressWarnings("PMD.ExcessiveMethodLength")
     public static void init(final Registry<Item> registry)
     {
-        ModItems.scepterLumberjack = new ItemScepterLumberjack(new Item.Properties());
-        ModItems.supplyChest = new ItemSupplyChestDeployer(new Item.Properties());
-        ModItems.permTool = new ItemScepterPermission(new Item.Properties());
-        ModItems.scepterGuard = new ItemScepterGuard(new Item.Properties());
-        ModItems.assistantHammer_Gold = new ItemAssistantHammer("assistanthammer_gold", new Item.Properties().durability(200), 1);
-        ModItems.assistantHammer_Iron = new ItemAssistantHammer("assistanthammer_iron", new Item.Properties().durability(400), 2);
-        ModItems.assistantHammer_Diamond = new ItemAssistantHammer("assistanthammer_diamond", new Item.Properties().durability(1000), 3);
-        ModItems.bannerRallyGuards = new ItemBannerRallyGuards(new Item.Properties());
-        ModItems.supplyCamp = new ItemSupplyCampDeployer(new Item.Properties());
-        ModItems.ancientTome = new ItemAncientTome(new Item.Properties());
-        ModItems.chiefSword = new ItemChiefSword(new Item.Properties().durability(1500));
-        ModItems.scimitar = new ItemIronScimitar(new Item.Properties().durability(250));
-        ModItems.clipboard = new ItemClipboard(new Item.Properties());
-        ModItems.compost = new ItemCompost(new Item.Properties());
-        ModItems.resourceScroll = new ItemResourceScroll(new Item.Properties());
-        ModItems.pharaoscepter = new ItemPharaoScepter(new Item.Properties().durability(400));
-        ModItems.firearrow = new ItemFireArrow(new Item.Properties());
-        ModItems.scepterBeekeeper = new ItemScepterBeekeeper(new Item.Properties());
-        ModItems.mistletoe = new ItemMistletoe(new Item.Properties());
-        ModItems.spear = new ItemSpear(new Item.Properties());
-        ModItems.questLog = new ItemQuestLog(new Item.Properties());
+        ModItems.scepterLumberjack = new ItemScepterLumberjack(MinecoloniesBlockIds.itemProps("scepterlumberjack"));
+        ModItems.supplyChest = new ItemSupplyChestDeployer(MinecoloniesBlockIds.itemProps("supplychestdeployer"));
+        ModItems.permTool = new ItemScepterPermission(MinecoloniesBlockIds.itemProps("scepterpermission"));
+        ModItems.scepterGuard = new ItemScepterGuard(MinecoloniesBlockIds.itemProps("scepterguard"));
+        ModItems.assistantHammer_Gold = new ItemAssistantHammer("assistanthammer_gold", MinecoloniesBlockIds.itemProps("assistanthammer_gold", new Item.Properties().durability(200)), 1);
+        ModItems.assistantHammer_Iron = new ItemAssistantHammer("assistanthammer_iron", MinecoloniesBlockIds.itemProps("assistanthammer_iron", new Item.Properties().durability(400)), 2);
+        ModItems.assistantHammer_Diamond = new ItemAssistantHammer("assistanthammer_diamond", MinecoloniesBlockIds.itemProps("assistanthammer_diamond", new Item.Properties().durability(1000)), 3);
+        ModItems.bannerRallyGuards = new ItemBannerRallyGuards(MinecoloniesBlockIds.itemProps("banner_rally_guards"));
+        ModItems.supplyCamp = new ItemSupplyCampDeployer(MinecoloniesBlockIds.itemProps("supplycampdeployer"));
+        ModItems.ancientTome = new ItemAncientTome(MinecoloniesBlockIds.itemProps("ancienttome"));
+        ModItems.chiefSword = new ItemChiefSword(MinecoloniesBlockIds.itemProps("chiefsword", new Item.Properties().durability(1500)));
+        ModItems.scimitar = new ItemIronScimitar(MinecoloniesBlockIds.itemProps("iron_scimitar", new Item.Properties().durability(250)));
+        ModItems.clipboard = new ItemClipboard(MinecoloniesBlockIds.itemProps("clipboard"));
+        ModItems.compost = new ItemCompost(MinecoloniesBlockIds.itemProps("compost"));
+        ModItems.resourceScroll = new ItemResourceScroll(MinecoloniesBlockIds.itemProps("resourcescroll"));
+        ModItems.pharaoscepter = new ItemPharaoScepter(MinecoloniesBlockIds.itemProps("pharaoscepter", new Item.Properties().durability(400)));
+        ModItems.firearrow = new ItemFireArrow(MinecoloniesBlockIds.itemProps("firearrow"));
+        ModItems.scepterBeekeeper = new ItemScepterBeekeeper(MinecoloniesBlockIds.itemProps("scepterbeekeeper"));
+        ModItems.mistletoe = new ItemMistletoe(MinecoloniesBlockIds.itemProps("mistletoe"));
+        ModItems.spear = new ItemSpear(MinecoloniesBlockIds.itemProps("spear"));
+        ModItems.questLog = new ItemQuestLog(MinecoloniesBlockIds.itemProps("questlog"));
 
-        ModItems.breadDough = new ItemBreadDough(new Item.Properties());
-        ModItems.cookieDough = new ItemCookieDough(new Item.Properties());
-        ModItems.cakeBatter = new ItemCakeBatter(new Item.Properties());
-        ModItems.rawPumpkinPie = new ItemRawPumpkinPie(new Item.Properties());
+        ModItems.breadDough = new ItemBreadDough(MinecoloniesBlockIds.itemProps("bread_dough"));
+        ModItems.cookieDough = new ItemCookieDough(MinecoloniesBlockIds.itemProps("cookie_dough"));
+        ModItems.cakeBatter = new ItemCakeBatter(MinecoloniesBlockIds.itemProps("cake_batter"));
+        ModItems.rawPumpkinPie = new ItemRawPumpkinPie(MinecoloniesBlockIds.itemProps("raw_pumpkin_pie"));
 
-        ModItems.milkyBread = new ItemMilkyBread(new Item.Properties());
-        ModItems.sugaryBread = new ItemSugaryBread(new Item.Properties());
-        ModItems.goldenBread = new ItemGoldenBread(new Item.Properties());
-        ModItems.chorusBread = new ItemChorusBread(new Item.Properties());
+        ModItems.milkyBread = new ItemMilkyBread(MinecoloniesBlockIds.itemProps("milky_bread"));
+        ModItems.sugaryBread = new ItemSugaryBread(MinecoloniesBlockIds.itemProps("sugary_bread"));
+        ModItems.goldenBread = new ItemGoldenBread(MinecoloniesBlockIds.itemProps("golden_bread"));
+        ModItems.chorusBread = new ItemChorusBread(MinecoloniesBlockIds.itemProps("chorus_bread"));
 
-        ModItems.adventureToken = new ItemAdventureToken(new Item.Properties());
+        ModItems.adventureToken = new ItemAdventureToken(MinecoloniesBlockIds.itemProps("adventure_token"));
 
-        ModItems.scrollColonyTP = new ItemScrollColonyTP(new Item.Properties().stacksTo(16));
+        ModItems.scrollColonyTP = new ItemScrollColonyTP(MinecoloniesBlockIds.itemProps("scroll_tp", new Item.Properties().stacksTo(16)));
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "scroll_tp"), ModItems.scrollColonyTP);
 
-        ModItems.scrollColonyAreaTP = new ItemScrollColonyAreaTP(new Item.Properties().stacksTo(16));
+        ModItems.scrollColonyAreaTP = new ItemScrollColonyAreaTP(MinecoloniesBlockIds.itemProps("scroll_area_tp", new Item.Properties().stacksTo(16)));
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "scroll_area_tp"), ModItems.scrollColonyAreaTP);
 
-        ModItems.scrollBuff = new ItemScrollBuff(new Item.Properties().stacksTo(16));
+        ModItems.scrollBuff = new ItemScrollBuff(MinecoloniesBlockIds.itemProps("scroll_buff", new Item.Properties().stacksTo(16)));
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "scroll_buff"), ModItems.scrollBuff);
 
-        ModItems.scrollGuardHelp = new ItemScrollGuardHelp(new Item.Properties().stacksTo(16));
+        ModItems.scrollGuardHelp = new ItemScrollGuardHelp(MinecoloniesBlockIds.itemProps("scroll_guard_help", new Item.Properties().stacksTo(16)));
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "scroll_guard_help"), ModItems.scrollGuardHelp);
 
-        ModItems.scrollHighLight = new ItemScrollHighlight(new Item.Properties().stacksTo(16));
+        ModItems.scrollHighLight = new ItemScrollHighlight(MinecoloniesBlockIds.itemProps("scroll_highlight", new Item.Properties().stacksTo(16)));
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "scroll_highlight"), ModItems.scrollHighLight);
 
-        ModItems.santaHat = new ItemSantaHead("santa_hat", ModArmorMaterials.SANTA_HAT, ArmorType.HELMET, new Item.Properties());
-        ModItems.irongate = new ItemGate(IRON_GATE, ModBlocks.blockIronGate, new Item.Properties());
-        ModItems.woodgate = new ItemGate(WOODEN_GATE, ModBlocks.blockWoodenGate, new Item.Properties());
+        ModItems.santaHat = new ItemSantaHead("santa_hat", ModArmorMaterials.SANTA_HAT, ArmorType.HELMET, MinecoloniesBlockIds.itemProps("santa_hat"));
+        ModItems.irongate = new ItemGate(IRON_GATE, ModBlocks.blockIronGate, MinecoloniesBlockIds.itemProps(IRON_GATE));
+        ModItems.woodgate = new ItemGate(WOODEN_GATE, ModBlocks.blockWoodenGate, MinecoloniesBlockIds.itemProps(WOODEN_GATE));
 
-        ModItems.flagBanner = new ItemColonyFlagBanner("colony_banner", new Item.Properties());
+        ModItems.flagBanner = new ItemColonyFlagBanner("colony_banner", MinecoloniesBlockIds.itemProps("colony_banner"));
         ModItems.pirateHelmet_1 = new ItemPirateGear("pirate_hat", ModArmorMaterials.PIRATE_ARMOR_1, ArmorType.HELMET, 350);
         ModItems.pirateChest_1 = new ItemPirateGear("pirate_top", ModArmorMaterials.PIRATE_ARMOR_1, ArmorType.CHESTPLATE, 550);
         ModItems.pirateLegs_1 = new ItemPirateGear("pirate_leggins", ModArmorMaterials.PIRATE_ARMOR_1, ArmorType.LEGGINGS, 500);
@@ -121,120 +122,120 @@ public final class ModItemsInitializer
         ModItems.plateArmorLegs = new ItemPlateArmor("plate_armor_legs", ModArmorMaterials.PLATE_ARMOR, ArmorType.LEGGINGS, 450);
         ModItems.plateArmorBoots = new ItemPlateArmor("plate_armor_boots", ModArmorMaterials.PLATE_ARMOR, ArmorType.BOOTS, 400);
 
-        ModItems.sifterMeshString = new ItemSifterMesh("sifter_mesh_string", new Item.Properties().durability(500));
-        ModItems.sifterMeshFlint = new ItemSifterMesh("sifter_mesh_flint", new Item.Properties().durability(1000));
-        ModItems.sifterMeshIron = new ItemSifterMesh("sifter_mesh_iron", new Item.Properties().durability(1500));
-        ModItems.sifterMeshDiamond = new ItemSifterMesh("sifter_mesh_diamond", new Item.Properties().durability(2000));
+        ModItems.sifterMeshString = new ItemSifterMesh("sifter_mesh_string", MinecoloniesBlockIds.itemProps("sifter_mesh_string", new Item.Properties().durability(500)));
+        ModItems.sifterMeshFlint = new ItemSifterMesh("sifter_mesh_flint", MinecoloniesBlockIds.itemProps("sifter_mesh_flint", new Item.Properties().durability(1000)));
+        ModItems.sifterMeshIron = new ItemSifterMesh("sifter_mesh_iron", MinecoloniesBlockIds.itemProps("sifter_mesh_iron", new Item.Properties().durability(1500)));
+        ModItems.sifterMeshDiamond = new ItemSifterMesh("sifter_mesh_diamond", MinecoloniesBlockIds.itemProps("sifter_mesh_diamond", new Item.Properties().durability(2000)));
 
-        ModItems.magicpotion = new ItemMagicPotion("magicpotion", new Item.Properties());
-        ModItems.buildGoggles = new ItemBuildGoggles("build_goggles", new Item.Properties());
-        ModItems.scanAnalyzer = new ItemScanAnalyzer("scan_analyzer", new Item.Properties());
-        ModItems.colonyMap = new ItemColonyMap(new Item.Properties());
+        ModItems.magicpotion = new ItemMagicPotion("magicpotion", MinecoloniesBlockIds.itemProps("magicpotion"));
+        ModItems.buildGoggles = new ItemBuildGoggles("build_goggles", MinecoloniesBlockIds.itemProps("build_goggles"));
+        ModItems.scanAnalyzer = new ItemScanAnalyzer("scan_analyzer", MinecoloniesBlockIds.itemProps("scan_analyzer"));
+        ModItems.colonyMap = new ItemColonyMap(MinecoloniesBlockIds.itemProps("colonymap"));
 
         // All Biomes
         // Tier 1 Food Items
-        ModItems.cheddar_cheese = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.feta_cheese = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.cooked_rice = new ItemFood((new Item.Properties()).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.tofu = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.flatbread = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.cheese_ravioli = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
-        ModItems.chicken_broth = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.meat_ravioli = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
-        ModItems.mint_jelly = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
-        ModItems.mint_tea = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
-        ModItems.polenta = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.potato_soup = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.veggie_ravioli = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.yogurt = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
-        ModItems.manchet_bread = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.cheddar_cheese = new ItemFood((MinecoloniesBlockIds.itemProps("cheddar_cheese")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.feta_cheese = new ItemFood((MinecoloniesBlockIds.itemProps("feta_cheese")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.cooked_rice = new ItemFood((MinecoloniesBlockIds.itemProps("cooked_rice")).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.tofu = new ItemFood((MinecoloniesBlockIds.itemProps("tofu")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.flatbread = new ItemFood((MinecoloniesBlockIds.itemProps("flatbread")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.cheese_ravioli = new ItemFood((MinecoloniesBlockIds.itemProps("cheese_ravioli")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
+        ModItems.chicken_broth = new ItemFood((MinecoloniesBlockIds.itemProps("chicken_broth")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.meat_ravioli = new ItemFood((MinecoloniesBlockIds.itemProps("meat_ravioli")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
+        ModItems.mint_jelly = new ItemFood((MinecoloniesBlockIds.itemProps("mint_jelly")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
+        ModItems.mint_tea = new ItemFood((MinecoloniesBlockIds.itemProps("mint_tea")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
+        ModItems.polenta = new ItemFood((MinecoloniesBlockIds.itemProps("polenta")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.potato_soup = new ItemFood((MinecoloniesBlockIds.itemProps("potato_soup")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.veggie_ravioli = new ItemFood((MinecoloniesBlockIds.itemProps("veggie_ravioli")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.yogurt = new ItemFood((MinecoloniesBlockIds.itemProps("yogurt")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.manchet_bread = new ItemFood((MinecoloniesBlockIds.itemProps("manchet_bread")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
 
         // Tier 2 Food Items
-        ModItems.lembas_scone = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.25F).build()), 2);
-        ModItems.muffin = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.25F).build()), 2);
-        ModItems.pottage = new ItemFood((new Item.Properties()).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
-        ModItems.pasta_plain = new ItemFood((new Item.Properties()).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
-        ModItems.apple_pie = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.25F).build()), 2);
-        ModItems.plain_cheesecake = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
-        ModItems.baked_salmon = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
-        ModItems.eggdrop_soup = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 2);
-        ModItems.fish_n_chips = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 2);
-        ModItems.pierogi = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
-        ModItems.veggie_soup = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
-        ModItems.yogurt_with_berries = new ItemFood((new Item.Properties()).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
-        ModItems.borscht = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
+        ModItems.lembas_scone = new ItemFood((MinecoloniesBlockIds.itemProps("lembas_scone")).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.25F).build()), 2);
+        ModItems.muffin = new ItemFood((MinecoloniesBlockIds.itemProps("muffin")).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.25F).build()), 2);
+        ModItems.pottage = new ItemFood((MinecoloniesBlockIds.itemProps("pottage")).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
+        ModItems.pasta_plain = new ItemFood((MinecoloniesBlockIds.itemProps("pasta_plain")).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
+        ModItems.apple_pie = new ItemFood((MinecoloniesBlockIds.itemProps("apple_pie")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.25F).build()), 2);
+        ModItems.plain_cheesecake = new ItemFood((MinecoloniesBlockIds.itemProps("plain_cheesecake")).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
+        ModItems.baked_salmon = new ItemFood((MinecoloniesBlockIds.itemProps("baked_salmon")).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
+        ModItems.eggdrop_soup = new ItemFood((MinecoloniesBlockIds.itemProps("eggdrop_soup")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 2);
+        ModItems.fish_n_chips = new ItemFood((MinecoloniesBlockIds.itemProps("fish_n_chips")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 2);
+        ModItems.pierogi = new ItemFood((MinecoloniesBlockIds.itemProps("pierogi")).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
+        ModItems.veggie_soup = new ItemFood((MinecoloniesBlockIds.itemProps("veggie_soup")).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
+        ModItems.yogurt_with_berries = new ItemFood((MinecoloniesBlockIds.itemProps("yogurt_with_berries")).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
+        ModItems.borscht = new ItemFood((MinecoloniesBlockIds.itemProps("borscht")).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
 
         // Tier 3 Food items
-        ModItems.hand_pie = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.mintchoco_cheesecake = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.schnitzel = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.steak_dinner = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
+        ModItems.hand_pie = new ItemFood((MinecoloniesBlockIds.itemProps("hand_pie")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.mintchoco_cheesecake = new ItemFood((MinecoloniesBlockIds.itemProps("mintchoco_cheesecake")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.schnitzel = new ItemFood((MinecoloniesBlockIds.itemProps("schnitzel")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.steak_dinner = new ItemFood((MinecoloniesBlockIds.itemProps("steak_dinner")).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
 
         // Cold Biomes
         // Tier 1
-        ModItems.squash_soup = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.squash_soup = new ItemFood((MinecoloniesBlockIds.itemProps("squash_soup")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
         // Tier 2
-        ModItems.cabochis = new ItemFood((new Item.Properties()).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
-        ModItems.veggie_quiche = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.25F).build()), 2);
+        ModItems.cabochis = new ItemFood((MinecoloniesBlockIds.itemProps("cabochis")).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
+        ModItems.veggie_quiche = new ItemFood((MinecoloniesBlockIds.itemProps("veggie_quiche")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.25F).build()), 2);
         // Tier 3
-        ModItems.lamb_stew = new ItemFood((new Item.Properties()).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.fish_dinner = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
+        ModItems.lamb_stew = new ItemFood((MinecoloniesBlockIds.itemProps("lamb_stew")).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.fish_dinner = new ItemFood((MinecoloniesBlockIds.itemProps("fish_dinner")).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
 
         // Hot Humid Biomes
         // Tier 1
-        ModItems.pea_soup = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
+        ModItems.pea_soup = new ItemFood((MinecoloniesBlockIds.itemProps("pea_soup")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
         // Tier 2
-        ModItems.rice_ball = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
-        ModItems.mutton_dinner = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.25F).build()), 2);
+        ModItems.rice_ball = new ItemFood((MinecoloniesBlockIds.itemProps("rice_ball")).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
+        ModItems.mutton_dinner = new ItemFood((MinecoloniesBlockIds.itemProps("mutton_dinner")).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.25F).build()), 2);
         // Tier 3
-        ModItems.sushi_roll = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.ramen = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.fried_rice = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.sushi_roll = new ItemFood((MinecoloniesBlockIds.itemProps("sushi_roll")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.ramen = new ItemFood((MinecoloniesBlockIds.itemProps("ramen")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.fried_rice = new ItemFood((MinecoloniesBlockIds.itemProps("fried_rice")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
 
         // Temperate Biomes
         // Tier 1
-        ModItems.corn_chowder = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
-        ModItems.tortillas = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
+        ModItems.corn_chowder = new ItemFood((MinecoloniesBlockIds.itemProps("corn_chowder")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
+        ModItems.tortillas = new ItemFood((MinecoloniesBlockIds.itemProps("tortillas")).food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.1F).build()), 1);
         // Tier 2
-        ModItems.pasta_tomato = new ItemFood((new Item.Properties()).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
-        ModItems.cheese_pizza = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 2);
+        ModItems.pasta_tomato = new ItemFood((MinecoloniesBlockIds.itemProps("pasta_tomato")).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
+        ModItems.cheese_pizza = new ItemFood((MinecoloniesBlockIds.itemProps("cheese_pizza")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 2);
         // Tier 3
-        ModItems.eggplant_dolma = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
-        ModItems.stuffed_pita = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.mushroom_pizza = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
+        ModItems.eggplant_dolma = new ItemFood((MinecoloniesBlockIds.itemProps("eggplant_dolma")).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
+        ModItems.stuffed_pita = new ItemFood((MinecoloniesBlockIds.itemProps("stuffed_pita")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.mushroom_pizza = new ItemFood((MinecoloniesBlockIds.itemProps("mushroom_pizza")).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
 
         // Hot Dry Biomes
         // Tier 1
-        ModItems.spicy_grilled_chicken = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
+        ModItems.spicy_grilled_chicken = new ItemFood((MinecoloniesBlockIds.itemProps("spicy_grilled_chicken")).food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.1F).build()), 1);
         // Tier 2
-        ModItems.pepper_hummus = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
-        ModItems.kebab = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.25F).build()), 2);
+        ModItems.pepper_hummus = new ItemFood((MinecoloniesBlockIds.itemProps("pepper_hummus")).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
+        ModItems.kebab = new ItemFood((MinecoloniesBlockIds.itemProps("kebab")).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.25F).build()), 2);
         // Tier 3
-        ModItems.pita_hummus = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
-        ModItems.spicy_eggplant = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
+        ModItems.pita_hummus = new ItemFood((MinecoloniesBlockIds.itemProps("pita_hummus")).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
+        ModItems.spicy_eggplant = new ItemFood((MinecoloniesBlockIds.itemProps("spicy_eggplant")).food(new FoodProperties.Builder().nutrition(12).saturationModifier(0.25F).build()), 3);
 
         // Require trading
         // Tier 2
-        ModItems.congee = new ItemFood((new Item.Properties()).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
-        ModItems.kimchi = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
+        ModItems.congee = new ItemFood((MinecoloniesBlockIds.itemProps("congee")).usingConvertsTo(Items.BOWL).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.25F).build()), 2);
+        ModItems.kimchi = new ItemFood((MinecoloniesBlockIds.itemProps("kimchi")).food(new FoodProperties.Builder().nutrition(11).saturationModifier(0.25F).build()), 2);
         // Tier 3
-        ModItems.stew_trencher = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.stuffed_pepper = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
-        ModItems.tacos = new ItemFood((new Item.Properties()).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.stew_trencher = new ItemFood((MinecoloniesBlockIds.itemProps("stew_trencher")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.stuffed_pepper = new ItemFood((MinecoloniesBlockIds.itemProps("stuffed_pepper")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
+        ModItems.tacos = new ItemFood((MinecoloniesBlockIds.itemProps("tacos")).food(new FoodProperties.Builder().nutrition(13).saturationModifier(0.25F).build()), 3);
 
         // Just dough
-        ModItems.muffin_dough = new Item((new Item.Properties()));
-        ModItems.manchet_dough = new Item((new Item.Properties()));
-        ModItems.raw_noodle = new Item((new Item.Properties()));
-        ModItems.butter = new Item((new Item.Properties()));
-        ModItems.cornmeal = new Item((new Item.Properties()));
-        ModItems.creamcheese = new Item((new Item.Properties()));
-        ModItems.soysauce = new Item((new Item.Properties()));
+        ModItems.muffin_dough = new Item((MinecoloniesBlockIds.itemProps("muffin_dough")));
+        ModItems.manchet_dough = new Item((MinecoloniesBlockIds.itemProps("manchet_dough")));
+        ModItems.raw_noodle = new Item((MinecoloniesBlockIds.itemProps("raw_noodle")));
+        ModItems.butter = new Item((MinecoloniesBlockIds.itemProps("butter")));
+        ModItems.cornmeal = new Item((MinecoloniesBlockIds.itemProps("cornmeal")));
+        ModItems.creamcheese = new Item((MinecoloniesBlockIds.itemProps("creamcheese")));
+        ModItems.soysauce = new Item((MinecoloniesBlockIds.itemProps("soysauce")));
 
-        ModItems.large_empty_bottle = new ItemLargeBottle((new Item.Properties()));
-        ModItems.large_milk_bottle = new ItemLargeBottle((new Item.Properties().craftRemainder(ModItems.large_empty_bottle)));
-        ModItems.large_water_bottle = new ItemLargeBottle((new Item.Properties().craftRemainder(ModItems.large_empty_bottle)));
-        ModItems.large_soy_milk_bottle = new ItemLargeBottle((new Item.Properties().craftRemainder(ModItems.large_empty_bottle)));
+        ModItems.large_empty_bottle = new ItemLargeBottle((MinecoloniesBlockIds.itemProps("large_empty_bottle")));
+        ModItems.large_milk_bottle = new ItemLargeBottle((MinecoloniesBlockIds.itemProps("large_milk_bottle", new Item.Properties().craftRemainder(ModItems.large_empty_bottle))));
+        ModItems.large_water_bottle = new ItemLargeBottle((MinecoloniesBlockIds.itemProps("large_water_bottle", new Item.Properties().craftRemainder(ModItems.large_empty_bottle))));
+        ModItems.large_soy_milk_bottle = new ItemLargeBottle((MinecoloniesBlockIds.itemProps("large_soy_milk_bottle", new Item.Properties().craftRemainder(ModItems.large_empty_bottle))));
 
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "supplychestdeployer"), ModItems.supplyChest);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "scan_analyzer"), ModItems.scanAnalyzer);

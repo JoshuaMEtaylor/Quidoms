@@ -43,7 +43,7 @@ public class ItemChorusBread extends ItemFood
      */
     public ItemChorusBread(final Properties properties)
     {
-        super((new Item.Properties()).food(chorusBread), 2);
+        super(properties.food(chorusBread), 2);
     }
 
    /**

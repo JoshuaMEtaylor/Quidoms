@@ -20,7 +20,7 @@ public abstract class AbstractBlockMinecoloniesRack<B extends AbstractBlockMinec
 
     public AbstractBlockMinecoloniesRack(final Properties properties)
     {
-        super(properties.noOcclusion());
+        super(MinecoloniesBlockIds.withPendingBlockId(properties.noOcclusion()));
     }
 
     /**

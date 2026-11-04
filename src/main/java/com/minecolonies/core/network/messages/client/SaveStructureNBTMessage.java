@@ -2,13 +2,10 @@ package com.minecolonies.core.network.messages.client;
 
 import com.ldtteam.common.network.AbstractClientPlayMessage;
 import com.ldtteam.common.network.PlayMessageType;
-import com.ldtteam.structurize.storage.StructurePacks;
-import com.ldtteam.structurize.storage.rendering.RenderingCache;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.constant.Constants;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
@@ -19,10 +16,6 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.io.IOException;
-import java.util.Locale;
-
-import static com.ldtteam.structurize.api.constants.Constants.BLUEPRINT_FOLDER;
-import static com.ldtteam.structurize.api.constants.Constants.SCANS_FOLDER;
 
 /**
  * Handles sendScanMessages.
@@ -97,12 +90,16 @@ public class SaveStructureNBTMessage extends AbstractClientPlayMessage
     {
         if (compoundNBT != null)
         {
-            final String packName = Minecraft.getInstance().getUser().getName().toLowerCase(Locale.US);
-            RenderingCache.getOrCreateBlueprintPreviewData("blueprint").setBlueprintFuture(
-              StructurePacks.storeBlueprint(packName, compoundNBT, Minecraft.getInstance().gameDirectory.toPath()
-                                                                  .resolve(BLUEPRINT_FOLDER)
-                                                                  .resolve(Minecraft.getInstance().getUser().getName().toLowerCase(Locale.US))
-                                                                  .resolve(SCANS_FOLDER).resolve(fileName), player.registryAccess()));
+            try
+            {
+                Class.forName("com.minecolonies.core.network.messages.client.ClientNetworkAccess")
+                  .getMethod("saveStructureNbt", CompoundTag.class, String.class, Player.class)
+                  .invoke(null, compoundNBT, fileName, player);
+            }
+            catch (ReflectiveOperationException e)
+            {
+                Log.getLogger().error("Failed to save structure nbt on client", e);
+            }
             player.displayClientMessage(Component.translatableEscape("Scan successfully saved as %s", fileName), false);
         }
     }

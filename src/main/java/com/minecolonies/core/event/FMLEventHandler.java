@@ -6,7 +6,6 @@ import com.minecolonies.core.entity.pathfinding.Pathfinding;
 import com.minecolonies.core.util.BackUpHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.minecraft.resources.ResourceLocation;
 import com.minecolonies.api.util.constant.Constants;
@@ -28,12 +27,6 @@ public class FMLEventHandler
     {
         IColonyManager.getInstance().onServerTick(event);
         DataPackSyncEventHandler.ServerEvents.load(event.getServer());
-    }
-
-    @SubscribeEvent
-    public static void onClientTick(final ClientTickEvent.Pre event)
-    {
-        IColonyManager.getInstance().onClientTick(event);
     }
 
     @SubscribeEvent
