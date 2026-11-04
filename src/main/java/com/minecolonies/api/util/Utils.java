@@ -261,6 +261,10 @@ public final class Utils
 
     public static <T extends Object> void serializeCodecMess(final StreamCodec<RegistryFriendlyByteBuf, T> codec, RegistryFriendlyByteBuf buf, final T obj)
     {
+        if (obj == null)
+        {
+            throw new IllegalArgumentException("Refusing to encode null value with stream codec (would crash player login sync)");
+        }
         codec.encode(buf, obj);
     }
 

@@ -1523,7 +1523,7 @@
   },
   {
     "checkednbtkeys": [
-      "minecraft:fire_resistant"
+      "minecraft:damage_resistant"
     ],
     "item": "minecraft:ancient_debris"
   },
@@ -4372,7 +4372,7 @@
     "checkednbtkeys": [
       "minecraft:attribute_modifiers",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost",
       "minecraft:tool"
@@ -4381,7 +4381,7 @@
   },
   {
     "checkednbtkeys": [
-      "minecraft:fire_resistant"
+      "minecraft:damage_resistant"
     ],
     "item": "minecraft:netherite_block"
   },
@@ -4390,7 +4390,7 @@
       "minecraft:attribute_modifiers",
       "minecraft:dyed_color",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost"
     ],
@@ -4401,7 +4401,7 @@
       "minecraft:attribute_modifiers",
       "minecraft:dyed_color",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost"
     ],
@@ -4412,7 +4412,7 @@
       "minecraft:attribute_modifiers",
       "minecraft:dyed_color",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost"
     ],
@@ -4422,7 +4422,7 @@
     "checkednbtkeys": [
       "minecraft:attribute_modifiers",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost",
       "minecraft:tool"
@@ -4431,7 +4431,7 @@
   },
   {
     "checkednbtkeys": [
-      "minecraft:fire_resistant"
+      "minecraft:damage_resistant"
     ],
     "item": "minecraft:netherite_ingot"
   },
@@ -4440,7 +4440,7 @@
       "minecraft:attribute_modifiers",
       "minecraft:dyed_color",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost"
     ],
@@ -4450,7 +4450,7 @@
     "checkednbtkeys": [
       "minecraft:attribute_modifiers",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost",
       "minecraft:tool"
@@ -4459,7 +4459,7 @@
   },
   {
     "checkednbtkeys": [
-      "minecraft:fire_resistant"
+      "minecraft:damage_resistant"
     ],
     "item": "minecraft:netherite_scrap"
   },
@@ -4467,7 +4467,7 @@
     "checkednbtkeys": [
       "minecraft:attribute_modifiers",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost",
       "minecraft:tool"
@@ -4478,7 +4478,7 @@
     "checkednbtkeys": [
       "minecraft:attribute_modifiers",
       "minecraft:enchantments",
-      "minecraft:fire_resistant",
+      "minecraft:damage_resistant",
       "minecraft:max_damage",
       "minecraft:repair_cost",
       "minecraft:tool"
@@ -6092,7 +6092,7 @@
   {
     "checkednbtkeys": [
       "minecraft:banner_patterns",
-      "minecraft:hide_additional_tooltip",
+      "minecraft:tooltip_display",
       "minecraft:item_name"
     ],
     "item": "minecraft:white_banner"

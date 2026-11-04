@@ -1,11 +1,14 @@
 {
   "type": "minecolonies:composting",
-  "input": [
-    {
-      "type": "minecolonies:food",
-      "min-saturation": 1.0
-    },
-    "#minecolonies:compostables_rich"
-  ],
+  "input": {
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "type": "minecolonies:food",
+        "min-saturation": 1.0
+      },
+      "#minecolonies:compostables_rich"
+    ]
+  },
   "strength": 8
 }

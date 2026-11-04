@@ -127,5 +127,8 @@
         "domum_ornamentum:door_type": 3.0
       }
     }
-  ]
+  ],
+  "textures": {
+    "particle": "minecraft:block/oak_planks"
+  }
 }

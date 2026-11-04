@@ -194,8 +194,23 @@ public class CompatibilityManager implements ICompatibilityManager
     @Override
     public void serialize(@NotNull final RegistryFriendlyByteBuf buf)
     {
-        buf.writeInt(CHECKED_NBT_KEYS.size());
+        // Filter null DataComponentType keys — BuiltInRegistries can yield null for legacy ids from
+        // itemnbtmatching.json; encoding null throws IllegalArgumentException and aborts player join.
+        final List<Map.Entry<Item, Set<DataComponentType<?>>>> safeEntries = new ArrayList<>();
         for (final var entry : CHECKED_NBT_KEYS.entrySet())
+        {
+            if (entry.getKey() == null)
+            {
+                continue;
+            }
+            final Set<DataComponentType<?>> cleaned = entry.getValue() == null
+              ? Set.of()
+              : entry.getValue().stream().filter(Objects::nonNull).collect(Collectors.toSet());
+            safeEntries.add(Map.entry(entry.getKey(), cleaned));
+        }
+
+        buf.writeInt(safeEntries.size());
+        for (final var entry : safeEntries)
         {
             buf.writeInt(BuiltInRegistries.ITEM.getId(entry.getKey()));
             buf.writeInt(entry.getValue().size());
@@ -230,7 +245,11 @@ public class CompatibilityManager implements ICompatibilityManager
             Set<DataComponentType<?>> nbtKeys = new HashSet<>();
             for (int j = 0, children = buf.readInt(); j < children; j++)
             {
-                nbtKeys.add(Utils.deserializeCodecMess(DataComponentType.STREAM_CODEC, buf));
+                final DataComponentType<?> key = Utils.deserializeCodecMess(DataComponentType.STREAM_CODEC, buf);
+                if (key != null)
+                {
+                    nbtKeys.add(key);
+                }
             }
 
             CHECKED_NBT_KEYS.put(item, nbtKeys);

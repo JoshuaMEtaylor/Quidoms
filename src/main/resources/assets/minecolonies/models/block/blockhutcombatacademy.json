@@ -18,7 +18,7 @@
         "2_1": "block/iron_block",
         "3": "block/red_concrete",
         "3_3": "block/polished_andesite",
-        "transp": "minecolonies:map/map_icons",
+        "transp": "minecraft:block/white_wool",
         "3_1": "block/spruce_planks",
         "all": "minecraft:block/oak_planks"
       },

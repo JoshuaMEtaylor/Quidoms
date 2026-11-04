@@ -116,5 +116,8 @@
         "domum_ornamentum:trapdoor_type": 1.0
       }
     }
-  ]
+  ],
+  "textures": {
+    "particle": "minecraft:block/oak_planks"
+  }
 }

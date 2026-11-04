@@ -37,5 +37,8 @@
         "domum_ornamentum:post_type": 5.0
       }
     }
-  ]
+  ],
+  "textures": {
+    "particle": "minecraft:block/oak_planks"
+  }
 }

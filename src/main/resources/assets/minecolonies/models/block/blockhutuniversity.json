@@ -24,7 +24,7 @@
         "17": "block/cauldron_side",
         "18": "block/cauldron_top",
         "20": "block/gold_block",
-        "transp": "minecolonies:map/map_icons",
+        "transp": "minecraft:block/white_wool",
         "particle": "block/oak_planks"
       },
       "elements": [

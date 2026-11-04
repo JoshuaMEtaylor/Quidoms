@@ -26,7 +26,16 @@ public class UpdateClientWithCompatibilityMessage extends AbstractClientPlayMess
     {
         super(TYPE);
         this.buffer = new RegistryFriendlyByteBuf(new FriendlyByteBuf(Unpooled.buffer()), provider);
-        IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().serialize(this.buffer);
+        try
+        {
+            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().serialize(this.buffer);
+        }
+        catch (final Exception ex)
+        {
+            // Never fail player join over a compatibility sync serialization bug.
+            Log.getLogger().error("Failed to serialize compatibility manager for client sync; sending empty payload", ex);
+            this.buffer.clear();
+        }
     }
 
     protected UpdateClientWithCompatibilityMessage(final RegistryFriendlyByteBuf buf, final PlayMessageType<?> type)
