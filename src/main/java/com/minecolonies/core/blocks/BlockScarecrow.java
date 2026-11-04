@@ -172,7 +172,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos, final Block block, final BlockPos fromPos, final boolean isMoving)
+    public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos, final Block block, net.minecraft.world.level.redstone.Orientation orientation, final boolean isMoving)
     {
         super.neighborChanged(state, worldIn, pos, block, fromPos, isMoving);
         final DoubleBlockHalf half = state.getValue(HALF);
@@ -200,7 +200,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
     }
 
     @Override
-    public void wasExploded(final Level worldIn, final BlockPos pos, final Explosion explosionIn)
+    public void wasExploded(final net.minecraft.server.level.ServerLevel worldIn, final BlockPos pos, final Explosion explosionIn)
     {
         notifyColonyAboutDestruction(worldIn, pos);
         super.wasExploded(worldIn, pos, explosionIn);

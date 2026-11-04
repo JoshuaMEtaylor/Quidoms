@@ -589,7 +589,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
     }
 
     @Override
-    protected void dropEquipment()
+    protected void dropEquipment(net.minecraft.server.level.ServerLevel level)
     {
         //Drop actual inventory
         for (int i = 0; i < getInventoryCitizen().getSlots(); i++)

@@ -145,14 +145,14 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
     }
 
     @Override
-    public void onRemove(final @NotNull BlockState blockState, final @NotNull Level level, final @NotNull BlockPos pos, final @NotNull BlockState newBlockState, final boolean p_60519_)
+    protected void affectNeighborsAfterRemoval(final @NotNull BlockState blockState, final @NotNull net.minecraft.server.level.ServerLevel level, final @NotNull BlockPos pos, final boolean movedByPiston)
     {
         final BlockEntity tileentity = level.getBlockEntity(pos);
         if (tileentity instanceof AbstractTileEntityColonyBuilding tileEntityColonyBuilding)
         {
             InventoryUtils.dropItemHandler(tileEntityColonyBuilding.getInventory(), level, pos.getX(), pos.getY(), pos.getZ());
         }
-        super.onRemove(blockState, level, pos, newBlockState, p_60519_);
+        super.affectNeighborsAfterRemoval(blockState, level, pos, movedByPiston);
     }
 
     /**

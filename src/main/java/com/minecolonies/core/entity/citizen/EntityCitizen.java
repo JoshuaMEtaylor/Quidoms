@@ -1688,7 +1688,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
     }
 
     @Override
-    protected void dropEquipment()
+    protected void dropEquipment(net.minecraft.server.level.ServerLevel level)
     {
         //Drop actual inventory
         for (int i = 0; i < getInventoryCitizen().getSlots(); i++)
@@ -1797,7 +1797,7 @@ public class EntityCitizen extends AbstractEntityCitizen implements IThreatTable
     }
 
     @Override
-    protected void pickUpItem(final ItemEntity itemEntity)
+    protected void pickUpItem(net.minecraft.server.level.ServerLevel level, final ItemEntity itemEntity)
     {
         /*
          * Intentionally left empty.

@@ -115,10 +115,10 @@ public class BlockColonySign extends AbstractBlockMinecolonies<BlockColonySign> 
     }
 
     @Override
-    public void onRemove(final BlockState currentState, final Level level, final BlockPos pos, final BlockState p_60518_, final boolean p_60519_)
+    protected void affectNeighborsAfterRemoval(final BlockState currentState, final net.minecraft.server.level.ServerLevel level, final BlockPos pos, final boolean movedByPiston)
     {
         BlockEntity tileEntity = level.getBlockEntity(pos);
-        if (!level.isClientSide() && tileEntity instanceof TileEntityColonySign tileEntityColonySign)
+        if (tileEntity instanceof TileEntityColonySign tileEntityColonySign)
         {
             final IColony colony = IColonyManager.getInstance().getColonyByDimension(tileEntityColonySign.getColonyId(), level.dimension());
             if (colony != null)
@@ -126,7 +126,7 @@ public class BlockColonySign extends AbstractBlockMinecolonies<BlockColonySign> 
                 colony.getConnectionManager().removeConnectionNode(pos);
             }
         }
-        super.onRemove(currentState, level, pos, p_60518_, p_60519_);
+        super.affectNeighborsAfterRemoval(currentState, level, pos, movedByPiston);
     }
 
     @Override

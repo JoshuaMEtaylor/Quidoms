@@ -75,7 +75,7 @@ public class BlockMinecoloniesGrave extends AbstractBlockMinecoloniesGrave<Block
     }
 
     @Override
-    public boolean propagatesSkylightDown(final BlockState state, @NotNull final BlockGetter reader, @NotNull final BlockPos pos)
+    public boolean propagatesSkylightDown(BlockState state)
     {
         return false;
     }
@@ -199,22 +199,19 @@ public class BlockMinecoloniesGrave extends AbstractBlockMinecoloniesGrave<Block
     }
 
     @Override
-    public void onRemove(BlockState state, @NotNull Level worldIn, @NotNull BlockPos pos, BlockState newState, boolean isMoving)
+    protected void affectNeighborsAfterRemoval(BlockState state, @NotNull net.minecraft.server.level.ServerLevel worldIn, @NotNull BlockPos pos, boolean movedByPiston)
     {
-        if (state.getBlock() != newState.getBlock())
+        BlockEntity tileEntity = worldIn.getBlockEntity(pos);
+        if (tileEntity instanceof TileEntityGrave tileEntityGrave)
         {
-            BlockEntity tileEntity = worldIn.getBlockEntity(pos);
-            if (tileEntity instanceof TileEntityGrave tileEntityGrave)
-            {
-                InventoryUtils.dropItemHandler(tileEntityGrave.getInventory(),
-                    worldIn,
-                    tileEntityGrave.getBlockPos().getX(),
-                    tileEntityGrave.getBlockPos().getY(),
-                    tileEntityGrave.getBlockPos().getZ());
-                worldIn.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            super.onRemove(state, worldIn, pos, newState, isMoving);
+            InventoryUtils.dropItemHandler(tileEntityGrave.getInventory(),
+                worldIn,
+                tileEntityGrave.getBlockPos().getX(),
+                tileEntityGrave.getBlockPos().getY(),
+                tileEntityGrave.getBlockPos().getZ());
+            worldIn.updateNeighbourForOutputSignal(pos, this);
         }
+
+        super.affectNeighborsAfterRemoval(state, worldIn, pos, movedByPiston);
     }
 }

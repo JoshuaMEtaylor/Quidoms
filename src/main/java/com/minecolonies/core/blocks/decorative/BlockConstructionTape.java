@@ -243,7 +243,7 @@ public class BlockConstructionTape extends AbstractBlockMinecoloniesConstruction
     }
 
     @Override
-    public boolean propagatesSkylightDown(final BlockState state, @NotNull final BlockGetter reader, @NotNull final BlockPos pos)
+    public boolean propagatesSkylightDown(BlockState state)
     {
         return true;
     }

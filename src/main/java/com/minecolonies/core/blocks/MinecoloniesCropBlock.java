@@ -207,7 +207,7 @@ public class MinecoloniesCropBlock extends AbstractBlockMinecolonies<Minecolonie
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos)
+    public boolean propagatesSkylightDown(BlockState state)
     {
         return state.getFluidState().isEmpty();
     }

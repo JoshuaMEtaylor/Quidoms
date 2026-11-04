@@ -189,7 +189,7 @@ public abstract class AbstractFastMinecoloniesEntity extends PathfinderMob imple
      */
     @Nullable
     @Override
-    public Entity changeDimension(final TeleportTransition dimensionTransition)
+    public Entity teleport(final TeleportTransition dimensionTransition)
     {
         return null;
     }
@@ -254,12 +254,12 @@ public abstract class AbstractFastMinecoloniesEntity extends PathfinderMob imple
     }
 
     @Override
-    public boolean isInWaterRainOrBubble()
+    public boolean isInWaterOrRain()
     {
         // Used to extinguish fire, only check if on fire
         if (getRemainingFireTicks() > 0 || level().isClientSide())
         {
-            return super.isInWaterRainOrBubble();
+            return super.isInWaterOrRain();
         }
 
         return false;
@@ -280,7 +280,6 @@ public abstract class AbstractFastMinecoloniesEntity extends PathfinderMob imple
         }
     }
 
-    @Override
     protected void sendDebugPackets()
     {
     }

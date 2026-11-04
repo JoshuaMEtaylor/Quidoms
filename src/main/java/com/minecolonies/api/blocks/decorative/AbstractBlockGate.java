@@ -349,7 +349,7 @@ public abstract class AbstractBlockGate extends DoorBlock implements LiquidBlock
     }
 
     @Override
-    public VoxelShape getOcclusionShape(BlockState state, BlockGetter worldIn, BlockPos pos)
+    public VoxelShape getOcclusionShape(BlockState state)
     {
         return getShapeForState(state);
     }
@@ -460,7 +460,7 @@ public abstract class AbstractBlockGate extends DoorBlock implements LiquidBlock
      * Mostly redstone stuff for opening
      */
     @Override
-    public void neighborChanged(final BlockState state, final Level worldIn, @NotNull final BlockPos pos, Block blockIn, final BlockPos fromPos, boolean isMoving)
+    public void neighborChanged(final BlockState state, final Level worldIn, @NotNull final BlockPos pos, Block blockIn, net.minecraft.world.level.redstone.Orientation orientation, boolean isMoving)
     {
         boolean powered = worldIn.hasNeighborSignal(pos);
         if (powered != state.getValue(OPEN))
