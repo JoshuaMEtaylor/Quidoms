@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench",
 	"ambientocclusion": false,
 	"textures": {
-		"6": "entity/chicken",
+		"6": "minecraft:entity/chicken/temperate_chicken",
 		"7": "item/egg",
 		"15": "item/bucket",
 		"16": "block/oak_planks",

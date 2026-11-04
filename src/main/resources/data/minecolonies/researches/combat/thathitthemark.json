@@ -2,8 +2,8 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 5,
-      "item": "minecraft:crossbow"
+      "ingredient": "minecraft:crossbow",
+      "count": 5
     }
   ],
   "effects": [

@@ -2,8 +2,8 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 6,
-      "item": "minecraft:iron_block"
+      "ingredient": "minecraft:iron_block",
+      "count": 6
     }
   ],
   "effects": [

@@ -3,12 +3,8 @@
   "category": "misc",
   "key": {
     "H": [
-      {
-        "item": "minecraft:hay_block"
-      },
-      {
-        "item": "minecraft:pumpkin"
-      }
+      "minecraft:hay_block",
+      "minecraft:pumpkin"
     ],
     "L": "minecraft:leather",
     "S": "minecraft:stick"

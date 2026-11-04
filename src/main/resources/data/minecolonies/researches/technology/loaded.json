@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 128,
-      "item": "minecraft:emerald"
+      "ingredient": "minecraft:emerald",
+      "count": 128
     }
   ],
   "effects": [

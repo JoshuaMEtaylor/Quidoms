@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 27,
-      "item": "minecraft:salmon_bucket"
+      "ingredient": "minecraft:salmon_bucket",
+      "count": 27
     }
   ],
   "effects": [

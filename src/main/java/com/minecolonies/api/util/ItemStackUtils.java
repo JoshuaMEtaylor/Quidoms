@@ -869,7 +869,11 @@ public final class ItemStackUtils
         {
             try
             {
-                stack.applyComponents(Utils.deserializeCodecMessFromJson(DataComponentPatch.CODEC, provider, JsonParser.parseString(tag)));
+                final DataComponentPatch patch = Utils.deserializeCodecMessFromJson(DataComponentPatch.CODEC, provider, JsonParser.parseString(tag));
+                if (patch != null)
+                {
+                    stack.applyComponents(patch);
+                }
             }
             catch (Throwable t)
             {

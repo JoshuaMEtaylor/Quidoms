@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 1,
-      "item": "minecraft:iron_boots"
+      "ingredient": "minecraft:iron_boots",
+      "count": 1
     }
   ],
   "effects": [

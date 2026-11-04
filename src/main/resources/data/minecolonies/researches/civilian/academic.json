@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 128,
-      "item": "minecraft:book"
+      "ingredient": "minecraft:book",
+      "count": 128
     }
   ],
   "effects": [

@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 8,
-      "item": "minecraft:bone"
+      "ingredient": "minecraft:bone",
+      "count": 8
     }
   ],
   "effects": [

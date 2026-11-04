@@ -2,12 +2,12 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 8,
-      "item": "minecraft:red_mushroom"
+      "ingredient": "minecraft:red_mushroom",
+      "count": 8
     },
     {
-      "count": 8,
-      "item": "minecraft:warped_fungus"
+      "ingredient": "minecraft:warped_fungus",
+      "count": 8
     }
   ],
   "effects": [

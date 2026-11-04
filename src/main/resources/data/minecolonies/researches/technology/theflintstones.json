@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "item": "minecraft:brick"
+      "ingredient": "minecraft:brick",
+      "count": 64
     }
   ],
   "effects": [

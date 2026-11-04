@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 3,
-      "item": "minecraft:gilded_blackstone"
+      "ingredient": "minecraft:gilded_blackstone",
+      "count": 3
     }
   ],
   "effects": [

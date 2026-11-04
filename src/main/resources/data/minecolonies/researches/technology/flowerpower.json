@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "item": "minecolonies:compost"
+      "ingredient": "minecolonies:compost",
+      "count": 64
     }
   ],
   "effects": [

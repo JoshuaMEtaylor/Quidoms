@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 64,
-      "item": "minecraft:cooked_beef"
+      "ingredient": "minecraft:cooked_beef",
+      "count": 64
     }
   ],
   "effects": [

@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 32,
-      "item": "minecraft:white_wool"
+      "ingredient": "minecraft:white_wool",
+      "count": 32
     }
   ],
   "effects": [

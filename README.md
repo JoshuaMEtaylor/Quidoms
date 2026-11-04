@@ -44,7 +44,7 @@ Quidoms must **not** ship classes under `net.neoforged.*`. The old `INBTSerializ
 ```bash
 ./gradlew build
 # or, when only refreshing META-INF / JPMS strip on an existing dist jar:
-./scripts/repack-meta.sh dist/quidoms-0.0.15-1.21.10.jar
+./scripts/repack-meta.sh dist/quidoms-0.0.16-1.21.10.jar
 ```
 
 Playable 1.21.10 jar: `dist/quidoms-*-1.21.10.jar`.

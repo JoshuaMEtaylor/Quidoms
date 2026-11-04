@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 128,
-      "item": "minecraft:wheat_seeds"
+      "ingredient": "minecraft:wheat_seeds",
+      "count": 128
     }
   ],
   "effects": [

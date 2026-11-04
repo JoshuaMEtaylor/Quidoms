@@ -2,16 +2,16 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 16,
-      "item": "minecraft:kelp"
+      "ingredient": "minecraft:kelp",
+      "count": 16
     },
     {
-      "count": 16,
-      "item": "minecraft:seagrass"
+      "ingredient": "minecraft:seagrass",
+      "count": 16
     },
     {
-      "count": 16,
-      "item": "minecraft:sea_pickle"
+      "ingredient": "minecraft:sea_pickle",
+      "count": 16
     }
   ],
   "effects": [

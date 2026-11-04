@@ -5,7 +5,8 @@
   "loader": "neoforge:composite",
   "textures": {
     "particle": "block/oak_planks",
-    "0": "minecraft:block/oak_planks"
+    "0": "minecraft:block/oak_planks",
+    "all": "minecraft:block/oak_planks"
   },
   "children": {
     "first": {
@@ -17,8 +18,9 @@
         "2_1": "block/iron_block",
         "3": "block/red_concrete",
         "3_3": "block/polished_andesite",
-        "transp": "map/map_icons",
-        "3_1": "block/spruce_planks"
+        "transp": "minecolonies:map/map_icons",
+        "3_1": "block/spruce_planks",
+        "all": "minecraft:block/oak_planks"
       },
       "elements": [
         {
@@ -4832,7 +4834,8 @@
       "render_type": "cutout",
       "parent": "block/cube_all",
       "textures": {
-        "3": "minecolonies:block/books/map1"
+        "3": "minecolonies:block/books/map1",
+        "all": "minecraft:block/oak_planks"
       },
       "elements": [
         {

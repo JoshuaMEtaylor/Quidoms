@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 1024,
-      "item": "minecraft:redstone"
+      "ingredient": "minecraft:redstone",
+      "count": 1024
     }
   ],
   "effects": [

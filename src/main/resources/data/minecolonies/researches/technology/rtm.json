@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 256,
-      "item": "minecraft:paper"
+      "ingredient": "minecraft:paper",
+      "count": 256
     }
   ],
   "effects": [

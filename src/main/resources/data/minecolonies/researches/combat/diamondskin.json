@@ -2,8 +2,8 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 64,
-      "item": "minecraft:diamond"
+      "ingredient": "minecraft:diamond",
+      "count": 64
     }
   ],
   "effects": [

@@ -2,12 +2,12 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 1,
-      "item": "minecolonies:clipboard"
+      "ingredient": "minecolonies:clipboard",
+      "count": 1
     },
     {
-      "count": 16,
-      "item": "minecraft:book"
+      "ingredient": "minecraft:book",
+      "count": 16
     }
   ],
   "effects": [

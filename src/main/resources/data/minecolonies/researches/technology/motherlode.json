@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "tag": "minecraft:diamond_ores"
+      "ingredient": "#minecraft:diamond_ores",
+      "count": 64
     }
   ],
   "effects": [

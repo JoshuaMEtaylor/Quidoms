@@ -9,9 +9,7 @@
     {
       "type": "minecolonies:plant"
     },
-    {
-      "tag": "minecolonies:compostables"
-    }
+    "#minecolonies:compostables"
   ],
   "strength": 4
 }

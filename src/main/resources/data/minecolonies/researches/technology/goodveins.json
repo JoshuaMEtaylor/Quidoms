@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "tag": "minecraft:iron_ores"
+      "ingredient": "#minecraft:iron_ores",
+      "count": 64
     }
   ],
   "effects": [

@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "item": "minecraft:poppy"
+      "ingredient": "minecraft:poppy",
+      "count": 64
     }
   ],
   "effects": [

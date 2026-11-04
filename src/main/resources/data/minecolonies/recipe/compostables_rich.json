@@ -5,9 +5,7 @@
       "type": "minecolonies:food",
       "min-saturation": 1.0
     },
-    {
-      "tag": "minecolonies:compostables_rich"
-    }
+    "#minecolonies:compostables_rich"
   ],
   "strength": 8
 }

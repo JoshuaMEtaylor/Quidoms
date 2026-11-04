@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 32,
-      "item": "minecraft:cookie"
+      "ingredient": "minecraft:cookie",
+      "count": 32
     }
   ],
   "effects": [

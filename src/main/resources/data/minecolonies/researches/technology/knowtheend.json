@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "item": "minecraft:chorus_fruit"
+      "ingredient": "minecraft:chorus_fruit",
+      "count": 64
     }
   ],
   "effects": [

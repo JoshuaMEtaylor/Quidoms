@@ -9,9 +9,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:aqua_affinity": 1
-                  }
+                  "minecraft:aqua_affinity": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -26,9 +24,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:bane_of_arthropods": 3
-                  }
+                  "minecraft:bane_of_arthropods": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -43,9 +39,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:blast_protection": 3
-                  }
+                  "minecraft:blast_protection": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -60,9 +54,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:depth_strider": 3
-                  }
+                  "minecraft:depth_strider": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -77,9 +69,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:efficiency": 3
-                  }
+                  "minecraft:efficiency": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -94,9 +84,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:feather_falling": 3
-                  }
+                  "minecraft:feather_falling": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -111,9 +99,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fire_aspect": 2
-                  }
+                  "minecraft:fire_aspect": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -128,9 +114,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fire_protection": 3
-                  }
+                  "minecraft:fire_protection": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -145,9 +129,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:flame": 1
-                  }
+                  "minecraft:flame": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -162,9 +144,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:frost_walker": 2
-                  }
+                  "minecraft:frost_walker": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -179,9 +159,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:knockback": 2
-                  }
+                  "minecraft:knockback": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -196,9 +174,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:looting": 3
-                  }
+                  "minecraft:looting": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -213,9 +189,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:power": 3
-                  }
+                  "minecraft:power": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -230,9 +204,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:projectile_protection": 3
-                  }
+                  "minecraft:projectile_protection": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -247,9 +219,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:protection": 3
-                  }
+                  "minecraft:protection": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -264,9 +234,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:punch": 2
-                  }
+                  "minecraft:punch": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -281,9 +249,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:quick_charge": 3
-                  }
+                  "minecraft:quick_charge": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -298,9 +264,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:respiration": 3
-                  }
+                  "minecraft:respiration": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -315,9 +279,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:sharpness": 3
-                  }
+                  "minecraft:sharpness": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -332,9 +294,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:smite": 3
-                  }
+                  "minecraft:smite": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -349,9 +309,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:sweeping_edge": 3
-                  }
+                  "minecraft:sweeping_edge": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -366,9 +324,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:unbreaking": 3
-                  }
+                  "minecraft:unbreaking": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -383,9 +339,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecolonies:raider_damage_enchant": 1
-                  }
+                  "minecolonies:raider_damage_enchant": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -400,9 +354,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fortune": 1
-                  }
+                  "minecraft:fortune": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -416,9 +368,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:aqua_affinity": 1
-                  }
+                  "minecraft:aqua_affinity": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -433,9 +383,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:bane_of_arthropods": 4
-                  }
+                  "minecraft:bane_of_arthropods": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -450,9 +398,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:blast_protection": 4
-                  }
+                  "minecraft:blast_protection": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -467,9 +413,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:depth_strider": 3
-                  }
+                  "minecraft:depth_strider": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -484,9 +428,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:efficiency": 4
-                  }
+                  "minecraft:efficiency": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -501,9 +443,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:feather_falling": 4
-                  }
+                  "minecraft:feather_falling": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -518,9 +458,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fire_aspect": 2
-                  }
+                  "minecraft:fire_aspect": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -535,9 +473,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fire_protection": 4
-                  }
+                  "minecraft:fire_protection": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -552,9 +488,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:flame": 1
-                  }
+                  "minecraft:flame": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -569,9 +503,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:frost_walker": 2
-                  }
+                  "minecraft:frost_walker": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -586,9 +518,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:infinity": 1
-                  }
+                  "minecraft:infinity": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -603,9 +533,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:knockback": 2
-                  }
+                  "minecraft:knockback": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -620,9 +548,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:looting": 3
-                  }
+                  "minecraft:looting": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -637,9 +563,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:power": 4
-                  }
+                  "minecraft:power": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -654,9 +578,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:projectile_protection": 4
-                  }
+                  "minecraft:projectile_protection": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -671,9 +593,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:punch": 2
-                  }
+                  "minecraft:punch": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -688,9 +608,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:quick_charge": 3
-                  }
+                  "minecraft:quick_charge": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -705,9 +623,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:respiration": 3
-                  }
+                  "minecraft:respiration": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -722,9 +638,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:sharpness": 4
-                  }
+                  "minecraft:sharpness": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -739,9 +653,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:smite": 4
-                  }
+                  "minecraft:smite": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -756,9 +668,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:sweeping_edge": 3
-                  }
+                  "minecraft:sweeping_edge": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -773,9 +683,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:unbreaking": 3
-                  }
+                  "minecraft:unbreaking": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -790,9 +698,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fortune": 2
-                  }
+                  "minecraft:fortune": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -806,9 +712,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:aqua_affinity": 1
-                  }
+                  "minecraft:aqua_affinity": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -822,9 +726,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:bane_of_arthropods": 5
-                  }
+                  "minecraft:bane_of_arthropods": 5
                 }
               },
               "function": "minecraft:set_components"
@@ -838,9 +740,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:blast_protection": 4
-                  }
+                  "minecraft:blast_protection": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -854,9 +754,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:depth_strider": 3
-                  }
+                  "minecraft:depth_strider": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -870,9 +768,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:efficiency": 5
-                  }
+                  "minecraft:efficiency": 5
                 }
               },
               "function": "minecraft:set_components"
@@ -886,9 +782,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:feather_falling": 4
-                  }
+                  "minecraft:feather_falling": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -902,9 +796,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fire_aspect": 2
-                  }
+                  "minecraft:fire_aspect": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -918,9 +810,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fire_protection": 4
-                  }
+                  "minecraft:fire_protection": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -934,9 +824,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:flame": 1
-                  }
+                  "minecraft:flame": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -950,9 +838,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:frost_walker": 2
-                  }
+                  "minecraft:frost_walker": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -966,9 +852,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:infinity": 1
-                  }
+                  "minecraft:infinity": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -982,9 +866,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:knockback": 2
-                  }
+                  "minecraft:knockback": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -998,9 +880,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:looting": 3
-                  }
+                  "minecraft:looting": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -1014,9 +894,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:mending": 1
-                  }
+                  "minecraft:mending": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -1030,9 +908,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:multishot": 1
-                  }
+                  "minecraft:multishot": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -1046,9 +922,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:power": 5
-                  }
+                  "minecraft:power": 5
                 }
               },
               "function": "minecraft:set_components"
@@ -1062,9 +936,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:projectile_protection": 4
-                  }
+                  "minecraft:projectile_protection": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -1078,9 +950,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:protection": 4
-                  }
+                  "minecraft:protection": 4
                 }
               },
               "function": "minecraft:set_components"
@@ -1094,9 +964,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:punch": 2
-                  }
+                  "minecraft:punch": 2
                 }
               },
               "function": "minecraft:set_components"
@@ -1110,9 +978,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:quick_charge": 3
-                  }
+                  "minecraft:quick_charge": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -1126,9 +992,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:respiration": 3
-                  }
+                  "minecraft:respiration": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -1142,9 +1006,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:sharpness": 5
-                  }
+                  "minecraft:sharpness": 5
                 }
               },
               "function": "minecraft:set_components"
@@ -1158,9 +1020,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:silk_touch": 1
-                  }
+                  "minecraft:silk_touch": 1
                 }
               },
               "function": "minecraft:set_components"
@@ -1174,9 +1034,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:smite": 5
-                  }
+                  "minecraft:smite": 5
                 }
               },
               "function": "minecraft:set_components"
@@ -1190,9 +1048,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:sweeping_edge": 3
-                  }
+                  "minecraft:sweeping_edge": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -1206,9 +1062,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:unbreaking": 3
-                  }
+                  "minecraft:unbreaking": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -1222,9 +1076,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecraft:fortune": 3
-                  }
+                  "minecraft:fortune": 3
                 }
               },
               "function": "minecraft:set_components"
@@ -1238,9 +1090,7 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "levels": {
-                    "minecolonies:raider_damage_enchant": 2
-                  }
+                  "minecolonies:raider_damage_enchant": 2
                 }
               },
               "function": "minecraft:set_components"

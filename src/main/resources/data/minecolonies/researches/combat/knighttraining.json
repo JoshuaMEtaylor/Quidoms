@@ -2,8 +2,8 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 8,
-      "item": "minecraft:shield"
+      "ingredient": "minecraft:shield",
+      "count": 8
     }
   ],
   "effects": [

@@ -361,7 +361,10 @@ public final class LootTableAnalyzer
 
                     case "minecraft:set_components":    // SetComponentsFunction
                         final DataComponentPatch patch = Utils.deserializeCodecMessFromJson(DataComponentPatch.CODEC, provider, function.get("components"));
-                        stack.applyComponentsAndValidate(patch);
+                        if (patch != null)
+                        {
+                            stack.applyComponentsAndValidate(patch);
+                        }
                         break;
 
                     case "minecraft:enchant_with_levels":   // EnchantWithLevelsFunction

@@ -282,7 +282,8 @@ public class CustomRecipe
 
         if (recipeJson.has(RECIPE_RESULT_PROP))
         {
-            recipe.result = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, recipeJson.get(RECIPE_RESULT_PROP));
+            final ItemStack parsed = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, recipeJson.get(RECIPE_RESULT_PROP));
+            recipe.result = parsed != null ? parsed : ItemStack.EMPTY;
         }
         else
         {
@@ -307,7 +308,7 @@ public class CustomRecipe
                 if (e.isJsonObject())
                 {
                     ItemStack stack = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, e);
-                    if (!stack.isEmpty())
+                    if (stack != null && !stack.isEmpty())
                     {
                         recipe.secondary.add(stack);
                     }
@@ -322,7 +323,7 @@ public class CustomRecipe
                 if (e.isJsonObject())
                 {
                     ItemStack stack = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, e);
-                    if (!stack.isEmpty())
+                    if (stack != null && !stack.isEmpty())
                     {
                         recipe.altOutputs.add(stack);
                     }

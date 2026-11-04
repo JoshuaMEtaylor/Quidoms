@@ -2,8 +2,8 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 18,
-      "item": "minecraft:bow"
+      "ingredient": "minecraft:bow",
+      "count": 18
     }
   ],
   "effects": [

@@ -1,6 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "domum_ornamentum:item/barreldeco_onside"
+    "layer0": "domum_ornamentum:item/barreldeco_onside",
+    "particle": "minecraft:block/oak_planks"
   }
 }

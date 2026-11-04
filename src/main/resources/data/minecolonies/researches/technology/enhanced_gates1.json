@@ -2,16 +2,16 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "item": "minecolonies:gate_wood"
+      "ingredient": "minecolonies:gate_wood",
+      "count": 64
     },
     {
-      "count": 2,
-      "item": "minecolonies:ancienttome"
+      "ingredient": "minecolonies:ancienttome",
+      "count": 2
     },
     {
-      "count": 5,
-      "item": "minecraft:iron_block"
+      "ingredient": "minecraft:iron_block",
+      "count": 5
     }
   ],
   "effects": [

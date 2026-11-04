@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 1,
-      "item": "minecraft:heart_of_the_sea"
+      "ingredient": "minecraft:heart_of_the_sea",
+      "count": 1
     }
   ],
   "effects": [

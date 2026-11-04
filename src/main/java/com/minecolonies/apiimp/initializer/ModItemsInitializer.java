@@ -390,15 +390,17 @@ public final class ModItemsInitializer
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camppharao_spawn_egg"), spawnEgg(ModEntities.CAMP_PHARAO));
 
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campshieldmaiden_spawn_egg"), spawnEgg(ModEntities.CAMP_SHIELDMAIDEN));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemen_archer_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_ARCHER));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemen_chief_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_CHIEF));
+        // Entity IDs are campnorsemenarcher / campnorsemenchief (no mid-underscore) — egg IDs must match path + _spawn_egg.
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemenarcher_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_ARCHER));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemenchief_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_CHIEF));
 
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazon_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZON));
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazonspearman_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZONSPEARMAN));
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazonchief_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZONCHIEF));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrowned_pirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_PIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrowned_archerpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_ARCHERPIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrowned_chiefpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_CHIEFPIRATE));
+        // Entity IDs are campdrownedpirate / campdrownedarcherpirate / campdrownedchiefpirate — egg IDs must match.
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_PIRATE));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedarcherpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_ARCHERPIRATE));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedchiefpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_CHIEFPIRATE));
     }
 }

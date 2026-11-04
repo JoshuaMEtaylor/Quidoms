@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 8,
-      "item": "minecraft:rabbit_foot"
+      "ingredient": "minecraft:rabbit_foot",
+      "count": 8
     }
   ],
   "effects": [

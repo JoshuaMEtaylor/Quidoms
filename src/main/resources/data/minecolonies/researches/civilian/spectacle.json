@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 18,
-      "item": "minecraft:cake"
+      "ingredient": "minecraft:cake",
+      "count": 18
     }
   ],
   "effects": [

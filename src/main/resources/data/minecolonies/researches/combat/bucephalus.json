@@ -2,12 +2,12 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 1,
-      "item": "minecraft:nether_star"
+      "ingredient": "minecraft:nether_star",
+      "count": 1
     },
     {
-      "count": 1,
-      "item": "minecraft:black_banner"
+      "ingredient": "minecraft:black_banner",
+      "count": 1
     }
   ],
   "effects": [

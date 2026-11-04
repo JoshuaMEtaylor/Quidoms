@@ -2,12 +2,12 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 32,
-      "item": "minecraft:leather"
+      "ingredient": "minecraft:leather",
+      "count": 32
     },
     {
-      "count": 16,
-      "item": "minecraft:iron_ingot"
+      "ingredient": "minecraft:iron_ingot",
+      "count": 16
     }
   ],
   "effects": [

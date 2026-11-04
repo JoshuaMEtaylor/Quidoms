@@ -2,12 +2,12 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 32,
-      "item": "minecraft:sugar_cane"
+      "ingredient": "minecraft:sugar_cane",
+      "count": 32
     },
     {
-      "count": 32,
-      "item": "minecraft:cactus"
+      "ingredient": "minecraft:cactus",
+      "count": 32
     }
   ],
   "effects": [

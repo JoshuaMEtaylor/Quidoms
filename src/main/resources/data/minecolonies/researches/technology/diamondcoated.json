@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 128,
-      "item": "minecraft:diamond"
+      "ingredient": "minecraft:diamond",
+      "count": 128
     }
   ],
   "effects": [

@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 32,
-      "item": "minecolonies:blockminecoloniesrack"
+      "ingredient": "minecolonies:blockminecoloniesrack",
+      "count": 32
     }
   ],
   "effects": [

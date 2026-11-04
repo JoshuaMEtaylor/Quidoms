@@ -5,7 +5,8 @@
   "loader": "neoforge:composite",
   "textures": {
     "particle": "block/cobblestone",
-    "1": "minecraft:block/oak_planks"
+    "1": "minecraft:block/oak_planks",
+    "all": "minecraft:block/cobblestone"
   },
   "children": {
     "base": {},

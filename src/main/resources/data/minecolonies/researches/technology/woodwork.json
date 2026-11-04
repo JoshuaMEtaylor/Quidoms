@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "tag": "minecraft:planks"
+      "ingredient": "#minecraft:planks",
+      "count": 64
     }
   ],
   "effects": [

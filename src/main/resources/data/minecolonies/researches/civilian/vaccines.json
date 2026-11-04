@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 64,
-      "item": "minecraft:egg"
+      "ingredient": "minecraft:egg",
+      "count": 64
     }
   ],
   "effects": [

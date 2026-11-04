@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 1,
-      "item": "minecraft:anvil"
+      "ingredient": "minecraft:anvil",
+      "count": 1
     }
   ],
   "effects": [

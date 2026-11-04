@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 16,
-      "item": "minecraft:golden_carrot"
+      "ingredient": "minecraft:golden_carrot",
+      "count": 16
     }
   ],
   "effects": [

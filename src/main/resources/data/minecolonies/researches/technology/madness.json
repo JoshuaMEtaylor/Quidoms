@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 1024,
-      "item": "minecraft:iron_ingot"
+      "ingredient": "minecraft:iron_ingot",
+      "count": 1024
     }
   ],
   "effects": [

@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 64,
-      "item": "minecraft:glass"
+      "ingredient": "minecraft:glass",
+      "count": 64
     }
   ],
   "effects": [

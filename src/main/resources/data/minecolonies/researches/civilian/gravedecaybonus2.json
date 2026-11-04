@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 8,
-      "item": "minecraft:nether_wart_block"
+      "ingredient": "minecraft:nether_wart_block",
+      "count": 8
     }
   ],
   "effects": [

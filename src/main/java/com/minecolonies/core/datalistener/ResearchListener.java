@@ -273,32 +273,40 @@ public class ResearchListener extends GsonEventReloadListener
                 continue;
             }
 
-            final ResourceLocation parent = GsonHelper.getAsResourceLocation(researchJson, RESEARCH_PARENT_PROP, null);
-            final TranslatableContents name =
-                new TranslatableContents(GsonHelper.getAsString(researchJson, RESEARCH_NAME_PROP, DEFAULT_RESEARCH_NAME, researchId), null, TranslatableContents.NO_ARGS);
-            final TranslatableContents subtitle = new TranslatableContents(GsonHelper.getAsString(researchJson, RESEARCH_SUBTITLE_PROP, ""), null, TranslatableContents.NO_ARGS);
-            final int depth = GsonHelper.getAsInt(researchJson, RESEARCH_LEVEL_PROP, 1);
-            final int sortOrder = GsonHelper.getAsInt(researchJson, RESEARCH_SORT_PROP, 1000);
-            final boolean onlyChild = GsonHelper.getAsBoolean(researchJson, RESEARCH_EXCLUSIVE_CHILD_PROP, false);
-            final boolean hidden = GsonHelper.getAsBoolean(researchJson, RESEARCH_HIDDEN_PROP, false);
-            final boolean instant = GsonHelper.getAsBoolean(researchJson, RESEARCH_INSTANT_PROP, false);
-            final boolean autostart = GsonHelper.getAsBoolean(researchJson, RESEARCH_AUTOSTART_PROP, false);
-            final boolean immutable = GsonHelper.getAsBoolean(researchJson, RESEARCH_NO_RESET_PROP, false);
+            try
+            {
+                final ResourceLocation parent = GsonHelper.getAsResourceLocation(researchJson, RESEARCH_PARENT_PROP, null);
+                final TranslatableContents name =
+                    new TranslatableContents(GsonHelper.getAsString(researchJson, RESEARCH_NAME_PROP, DEFAULT_RESEARCH_NAME, researchId), null, TranslatableContents.NO_ARGS);
+                final TranslatableContents subtitle = new TranslatableContents(GsonHelper.getAsString(researchJson, RESEARCH_SUBTITLE_PROP, ""), null, TranslatableContents.NO_ARGS);
+                final int depth = GsonHelper.getAsInt(researchJson, RESEARCH_LEVEL_PROP, 1);
+                final int sortOrder = GsonHelper.getAsInt(researchJson, RESEARCH_SORT_PROP, 1000);
+                final boolean onlyChild = GsonHelper.getAsBoolean(researchJson, RESEARCH_EXCLUSIVE_CHILD_PROP, false);
+                final boolean hidden = GsonHelper.getAsBoolean(researchJson, RESEARCH_HIDDEN_PROP, false);
+                final boolean instant = GsonHelper.getAsBoolean(researchJson, RESEARCH_INSTANT_PROP, false);
+                final boolean autostart = GsonHelper.getAsBoolean(researchJson, RESEARCH_AUTOSTART_PROP, false);
+                final boolean immutable = GsonHelper.getAsBoolean(researchJson, RESEARCH_NO_RESET_PROP, false);
 
-            final List<IResearchRequirement> requirements =
-                parseResearchRequirements(researchId, GsonHelper.getAsJsonArray(researchJson, RESEARCH_REQUIREMENTS_PROP, new JsonArray()));
-            final List<SizedIngredient> costs = parseResearchCosts(researchId,
-                GsonHelper.getAsJsonArray(researchJson, RESEARCH_COSTS_PROP, new JsonArray()),
-                GsonHelper.getAsJsonArray(researchJson, RESEARCH_REQUIREMENTS_PROP, new JsonArray()));
-            final List<GlobalResearchEffect> effects =
-                parseResearchEffects(researchId, GsonHelper.getAsJsonArray(researchJson, RESEARCH_EFFECTS_PROP, new JsonArray()), effectCategories);
+                final List<IResearchRequirement> requirements =
+                    parseResearchRequirements(researchId, GsonHelper.getAsJsonArray(researchJson, RESEARCH_REQUIREMENTS_PROP, new JsonArray()));
+                final List<SizedIngredient> costs = parseResearchCosts(researchId,
+                    GsonHelper.getAsJsonArray(researchJson, RESEARCH_COSTS_PROP, new JsonArray()),
+                    GsonHelper.getAsJsonArray(researchJson, RESEARCH_REQUIREMENTS_PROP, new JsonArray()));
+                final List<GlobalResearchEffect> effects =
+                    parseResearchEffects(researchId, GsonHelper.getAsJsonArray(researchJson, RESEARCH_EFFECTS_PROP, new JsonArray()), effectCategories);
 
-            final GlobalResearch research = new GlobalResearch(researchId, parent, branch, name, subtitle, depth, sortOrder, onlyChild, hidden, autostart, instant, immutable);
-            requirements.forEach(research::addRequirement);
-            costs.forEach(research::addCost);
-            effects.forEach(research::addEffect);
+                final GlobalResearch research = new GlobalResearch(researchId, parent, branch, name, subtitle, depth, sortOrder, onlyChild, hidden, autostart, instant, immutable);
+                requirements.forEach(research::addRequirement);
+                costs.forEach(research::addCost);
+                effects.forEach(research::addEffect);
 
-            researchMap.put(researchId, research);
+                researchMap.put(researchId, research);
+            }
+            catch (final Exception ex)
+            {
+                // Bad research JSON must not hard-crash Create World / client resource reload.
+                Log.getLogger().error("Research '{}' failed to load and was skipped: {}", researchId, ex.getMessage(), ex);
+            }
         }
         return researchMap;
     }
@@ -355,7 +363,23 @@ public class ResearchListener extends GsonEventReloadListener
         for (int index = 0; index < jsonCosts.size(); index++)
         {
             final JsonElement jsonCost = jsonCosts.get(index);
-            costs.add(Utils.deserializeCodecMessFromJson(SizedIngredient.NESTED_CODEC, getRegistryLookup(), jsonCost));
+            try
+            {
+                // SizedIngredient.NESTED_CODEC expects {"ingredient":"<id|#tag>","count":N} — never legacy {"item":...}.
+                final SizedIngredient cost = Utils.deserializeCodecMessFromJson(SizedIngredient.NESTED_CODEC, getRegistryLookup(), jsonCost);
+                if (cost != null)
+                {
+                    costs.add(cost);
+                }
+                else
+                {
+                    Log.getLogger().error("Research '{}' cost #{} failed to parse; skipping cost so Create World can continue.", researchId, index);
+                }
+            }
+            catch (final Exception ex)
+            {
+                Log.getLogger().error("Research '{}' cost #{} is invalid and was skipped: {}", researchId, index, ex.getMessage());
+            }
         }
 
         // TODO: 1.22 remove the json requirements array as a potential input here, costs should move to a separate list to get them mixed out with requirements
@@ -365,7 +389,18 @@ public class ResearchListener extends GsonEventReloadListener
             if (jsonRequirement.has("items"))
             {
                 Log.getLogger().warn("Research '{}' requirement #{} is deprecated. Cost requirements should be put in the 'costs' array.", researchId, index);
-                costs.add(Utils.deserializeCodecMessFromJson(SizedIngredient.NESTED_CODEC, getRegistryLookup(), jsonRequirement.get("items")));
+                try
+                {
+                    final SizedIngredient cost = Utils.deserializeCodecMessFromJson(SizedIngredient.NESTED_CODEC, getRegistryLookup(), jsonRequirement.get("items"));
+                    if (cost != null)
+                    {
+                        costs.add(cost);
+                    }
+                }
+                catch (final Exception ex)
+                {
+                    Log.getLogger().error("Research '{}' deprecated cost requirement #{} is invalid and was skipped: {}", researchId, index, ex.getMessage());
+                }
             }
         }
 

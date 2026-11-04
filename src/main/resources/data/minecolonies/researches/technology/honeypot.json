@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 16,
-      "item": "minecraft:beehive"
+      "ingredient": "minecraft:beehive",
+      "count": 16
     }
   ],
   "effects": [

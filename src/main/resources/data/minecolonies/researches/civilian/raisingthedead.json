@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 1,
-      "item": "minecraft:totem_of_undying"
+      "ingredient": "minecraft:totem_of_undying",
+      "count": 1
     }
   ],
   "effects": [

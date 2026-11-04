@@ -2,16 +2,16 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 16,
-      "item": "minecraft:bamboo"
+      "ingredient": "minecraft:bamboo",
+      "count": 16
     },
     {
-      "count": 16,
-      "item": "minecraft:cocoa_beans"
+      "ingredient": "minecraft:cocoa_beans",
+      "count": 16
     },
     {
-      "count": 16,
-      "item": "minecraft:vine"
+      "ingredient": "minecraft:vine",
+      "count": 16
     }
   ],
   "effects": [

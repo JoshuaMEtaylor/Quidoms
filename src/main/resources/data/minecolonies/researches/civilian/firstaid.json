@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 8,
-      "item": "minecraft:hay_block"
+      "ingredient": "minecraft:hay_block",
+      "count": 8
     }
   ],
   "effects": [

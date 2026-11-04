@@ -2,8 +2,8 @@
   "branch": "minecolonies:technology",
   "costs": [
     {
-      "count": 32,
-      "tag": "minecraft:gold_ores"
+      "ingredient": "#minecraft:gold_ores",
+      "count": 32
     }
   ],
   "effects": [

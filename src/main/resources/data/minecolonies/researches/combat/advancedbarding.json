@@ -2,12 +2,12 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 1,
-      "item": "minecraft:golden_horse_armor"
+      "ingredient": "minecraft:golden_horse_armor",
+      "count": 1
     },
     {
-      "count": 5,
-      "item": "minecraft:diamond"
+      "ingredient": "minecraft:diamond",
+      "count": 5
     }
   ],
   "effects": [

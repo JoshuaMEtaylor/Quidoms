@@ -2,8 +2,8 @@
   "branch": "minecolonies:civilian",
   "costs": [
     {
-      "count": 16,
-      "item": "minecraft:enchanted_golden_apple"
+      "ingredient": "minecraft:enchanted_golden_apple",
+      "count": 16
     }
   ],
   "effects": [

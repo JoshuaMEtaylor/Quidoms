@@ -2,8 +2,8 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 8,
-      "item": "minecraft:emerald"
+      "ingredient": "minecraft:emerald",
+      "count": 8
     }
   ],
   "effects": [

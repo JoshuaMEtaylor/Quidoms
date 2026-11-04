@@ -2,12 +2,12 @@
   "branch": "minecolonies:combat",
   "costs": [
     {
-      "count": 8,
-      "item": "minecraft:leather_horse_armor"
+      "ingredient": "minecraft:leather_horse_armor",
+      "count": 8
     },
     {
-      "count": 5,
-      "item": "minecraft:iron_ingot"
+      "ingredient": "minecraft:iron_ingot",
+      "count": 5
     }
   ],
   "effects": [
