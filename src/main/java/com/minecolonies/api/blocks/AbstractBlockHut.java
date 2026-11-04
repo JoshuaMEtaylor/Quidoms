@@ -183,6 +183,26 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
         return Component.translatableEscape(getBuildingEntry().getTranslationKey());
     }
 
+    /**
+     * Prefer building translation keys (e.g. "Town Hall") over raw registry description ids.
+     */
+    @Override
+    public MutableComponent getName()
+    {
+        try
+        {
+            if (getBuildingEntry() != null)
+            {
+                return Component.translatable(getBuildingEntry().getTranslationKey());
+            }
+        }
+        catch (final Exception ignored)
+        {
+            // Fall through.
+        }
+        return super.getName();
+    }
+
     @Override
     public int getLevel(final CompoundTag beData)
     {

@@ -32,6 +32,26 @@ public class ItemBlockHut extends BlockItem
         this.block = block;
     }
 
+    /**
+     * Prefer building translation keys (e.g. "Town Hall") over raw registry/description ids.
+     */
+    @Override
+    public @NotNull Component getName(@NotNull final ItemStack stack)
+    {
+        try
+        {
+            if (block.getBuildingEntry() != null)
+            {
+                return Component.translatable(block.getBuildingEntry().getTranslationKey());
+            }
+        }
+        catch (final Exception ignored)
+        {
+            // Fall through to block/item description id.
+        }
+        return super.getName(stack);
+    }
+
     @Override
     public void appendHoverText(@NotNull final ItemStack stack, @NotNull final TooltipContext context, @NotNull final TooltipDisplay display, @NotNull final Consumer<Component> tooltip, @NotNull final TooltipFlag flags)
     {

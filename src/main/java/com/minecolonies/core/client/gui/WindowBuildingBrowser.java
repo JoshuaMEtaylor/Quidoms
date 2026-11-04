@@ -178,7 +178,11 @@ public class WindowBuildingBrowser extends AbstractWindowSkeleton
                 final Text levelLabel = rowPane.findPaneOfTypeByID("buildingLevel", Text.class);
 
                 packLabel.setText(Component.literal(building.pack().getName()));
-                nameLabel.setText(Component.literal(building.path()));
+                // Prefer a readable schematic name over raw blueprint path ("mod directory" style).
+                final String path = building.path();
+                final String leaf = path.contains("/") ? path.substring(path.lastIndexOf('/') + 1) : path;
+                final String pretty = leaf.replace('_', ' ').replace(".blueprint", "");
+                nameLabel.setText(Component.literal(pretty.isEmpty() ? path : pretty));
                 nameLabel.setColors(building.isParent() ? building.isInvisible() ? COLOR_INVISIBLE_CHILD : COLOR_CHILD
                         : building.isInvisible() ? COLOR_INVISIBLE : COLOR_NORMAL);
                 sizeLabel.setText(Component.literal(String.format("%d x %d x %d",

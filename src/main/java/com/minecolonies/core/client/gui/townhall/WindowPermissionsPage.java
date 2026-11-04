@@ -504,7 +504,8 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
                 if (index < freeBlocks.size())
                 {
                     final Block block = freeBlocks.get(index);
-                    final MutableComponent text = Component.literal(BuiltInRegistries.BLOCK.getKey(block).toString());
+                    // Show localized block name (e.g. "Oak Planks"), not registry id.
+                final MutableComponent text = block.getName().copy();
                     text.append(Component.literal("\n")).append(block.getName().withStyle(ChatFormatting.DARK_GRAY));
                     rowPane.findPaneOfTypeByID(NAME_LABEL, Text.class).setText(text);
                 }
