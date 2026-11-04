@@ -56,11 +56,9 @@ sourceSets.main.java {
 
 sourceSets.main.resources {
     srcDirs(vendorResources.findAll { it.exists() })
-    // Prefer Quidoms mods.toml / AT over vendor copies
-    exclude 'META-INF/neoforge.mods.toml'
-    exclude 'META-INF/mods.toml'
-    exclude 'META-INF/accesstransformer.cfg'
-    exclude 'pack.mcmeta'
+    // Keep Quidoms META-INF / pack.mcmeta — do NOT globally exclude them
+    // (that previously stripped Quidoms's own mods.toml from the jar).
+    // Vendor duplicates are dropped via processResources duplicatesStrategy.
     exclude '**/datagen/**'
     exclude '**/.cache/**'
 }
@@ -134,6 +132,8 @@ dependencies {
 }
 
 tasks.named('processResources', ProcessResources).configure {
+    // Quidoms src/main/resources is first — keep those over vendor copies
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     var replaceProperties = [
         minecraft_version      : minecraft_version,
         minecraft_version_range: minecraft_version_range,
