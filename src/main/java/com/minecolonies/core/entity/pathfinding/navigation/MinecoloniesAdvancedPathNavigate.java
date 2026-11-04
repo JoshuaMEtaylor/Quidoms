@@ -570,9 +570,15 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
     }
 
     @Override
-    protected PathFinder createPathFinder(final int p_179679_1_)
+    protected PathFinder createPathFinder(final int maxVisitedNodes)
     {
-        return null;
+        // PathNavigation.<init> requires a non-null PathFinder (visitor/mercenary/cavalry_horse NPE in 1.21.10).
+        // Quidoms uses async path jobs instead of vanilla PathFinder, but construction still needs a valid instance.
+        this.nodeEvaluator = new WalkNodeEvaluator();
+        this.nodeEvaluator.setCanPassDoors(true);
+        this.nodeEvaluator.setCanOpenDoors(true);
+        this.nodeEvaluator.setCanFloat(true);
+        return new PathFinder(this.nodeEvaluator, maxVisitedNodes);
     }
 
     @Override

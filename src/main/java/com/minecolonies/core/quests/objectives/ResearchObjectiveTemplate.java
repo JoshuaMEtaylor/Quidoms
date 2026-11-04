@@ -56,8 +56,11 @@ public class ResearchObjectiveTemplate extends DialogueObjectiveTemplateTemplate
     private static DialogueElement buildDialogueTree(final ResourceLocation researchId)
     {
         final IGlobalResearch research = IGlobalResearchTree.getInstance().getResearch(researchId);
+        final Component researchName = research != null
+          ? MutableComponent.create(research.getName())
+          : Component.literal(researchId.toString());
 
-        final Component text  = Component.translatable("com.minecolonies.coremod.questobjectives.research", MutableComponent.create((research.getName())));
+        final Component text = Component.translatable("com.minecolonies.coremod.questobjectives.research", researchName);
 
         final AnswerElement answer1 = new AnswerElement(Component.translatable("com.minecolonies.coremod.questobjectives.answer.later"),
           new IQuestDialogueAnswer.CloseUIDialogueAnswer());
@@ -137,8 +140,11 @@ public class ResearchObjectiveTemplate extends DialogueObjectiveTemplateTemplate
     public Component getProgressText(final IQuestInstance quest, final Style style)
     {
         final IGlobalResearch research = IGlobalResearchTree.getInstance().getResearch(this.researchId);
+        final Component researchName = research != null
+          ? MutableComponent.create(research.getName())
+          : Component.literal(this.researchId.toString());
 
-        return Component.translatable("com.minecolonies.coremod.questobjectives.research.progress", MutableComponent.create(research.getName()));
+        return Component.translatable("com.minecolonies.coremod.questobjectives.research.progress", researchName);
     }
 
     @Override
