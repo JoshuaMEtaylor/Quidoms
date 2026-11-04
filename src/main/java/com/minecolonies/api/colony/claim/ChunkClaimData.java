@@ -13,7 +13,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import com.minecolonies.api.compat.INBTSerializable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

@@ -26,9 +26,9 @@ public final class ModLootConditions
 {
     public final static DeferredRegister<LootItemConditionType> DEFERRED_REGISTER = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, Constants.MOD_ID);
 
-    public static final ResourceLocation ENTITY_IN_BIOME_TAG_ID = new ResourceLocation(MOD_ID, "entity_in_biome_tag");
-    public static final ResourceLocation RESEARCH_UNLOCKED_ID = new ResourceLocation(MOD_ID, "research_unlocked");
-    public static final ResourceLocation GENERATE_SUPPLY_LOOT_ID = new ResourceLocation(MOD_ID, "generate_supply_loot");
+    public static final ResourceLocation ENTITY_IN_BIOME_TAG_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "entity_in_biome_tag");
+    public static final ResourceLocation RESEARCH_UNLOCKED_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "research_unlocked");
+    public static final ResourceLocation GENERATE_SUPPLY_LOOT_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "generate_supply_loot");
 
     public static final DeferredHolder<LootItemConditionType, LootItemConditionType> entityInBiomeTag;
     public static final DeferredHolder<LootItemConditionType, LootItemConditionType> researchUnlocked;
@@ -41,7 +41,8 @@ public final class ModLootConditions
     public static final LootItemCondition.Builder HAS_DIAMOND_HOE   = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, Items.DIAMOND_HOE));
     public static final LootItemCondition.Builder HAS_IRON_HOE      = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, Items.IRON_HOE));
     public static final LootItemCondition.Builder HAS_GOLDEN_HOE    = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, Items.GOLDEN_HOE));
-    public static final LootItemCondition.Builder HAS_HOE = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, ItemTags.HOES));
+    // Lazy: ItemPredicate.of(HolderGetter, TagKey) resolves tags via getOrThrow; tags are unbound at mod construct.
+    private static LootItemCondition.Builder hoeCondition;
 
     public static LootItemCondition.Builder hasShears()
     {
@@ -50,7 +51,11 @@ public final class ModLootConditions
 
     public static LootItemCondition.Builder hasHoe()
     {
-        return HAS_HOE;
+        if (hoeCondition == null)
+        {
+            hoeCondition = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, ItemTags.HOES));
+        }
+        return hoeCondition;
     }
 
     public static LootItemCondition.Builder hasSilkTouch(@NotNull final HolderLookup.RegistryLookup<Enchantment> enchantments)
