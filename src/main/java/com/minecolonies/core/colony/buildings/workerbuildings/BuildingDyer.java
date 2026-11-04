@@ -231,9 +231,9 @@ public class BuildingDyer extends AbstractBuilding
         {
             if (woolItems == null)
             {
-                woolItems = BuiltInRegistries.ITEM.get(ItemTags.WOOL).stream()
+                woolItems = BuiltInRegistries.ITEM.get(ItemTags.WOOL).orElseThrow().stream()
                   .filter(item -> !item.value().equals(Items.WHITE_WOOL))
-                  .map(i -> new ItemStorage(new ItemStack(i))).collect(Collectors.toList());
+                  .map(i -> new ItemStorage(new ItemStack(i.value()))).collect(Collectors.toList());
             }
             return woolItems;
         }

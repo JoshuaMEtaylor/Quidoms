@@ -70,7 +70,7 @@ public final class RecipeCompat
             final ItemStack[] stacks = IngredientCompat.getItems(single.input());
             if (stacks.length > 0)
             {
-                return recipe.assemble(new SingleRecipeInput(stacks[0]), registries);
+                return ((SingleItemRecipe) recipe).assemble(new SingleRecipeInput(stacks[0]), registries);
             }
         }
 
@@ -121,11 +121,12 @@ public final class RecipeCompat
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public static <T extends Recipe<?>> Collection<RecipeHolder<T>> getAllRecipesFor(
       @NotNull final RecipeManager manager,
       @NotNull final RecipeType<T> type)
     {
-        return manager.recipeMap().byType(type);
+        return (Collection<RecipeHolder<T>>) (Collection<?>) manager.recipeMap().byType((RecipeType) type);
     }
 
     @Nullable

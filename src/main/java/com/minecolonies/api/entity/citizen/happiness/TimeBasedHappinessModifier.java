@@ -135,7 +135,7 @@ public final class TimeBasedHappinessModifier extends AbstractHappinessModifier 
             for (int i = 0; i < listTag.size(); i++)
             {
                 final CompoundTag entryTag = listTag.getCompoundOrEmpty(i);
-                list.add(new Tuple<>(entryTag.getIntOr(TAG_DAY, 0), entryTag.getDouble(TAG_VALUE)));
+                list.add(new Tuple<>(entryTag.getIntOr(TAG_DAY, 0), entryTag.getDoubleOr(TAG_VALUE, 0.0D)));
             }
             this.timeBasedFactor = list;
         }

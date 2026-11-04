@@ -243,7 +243,7 @@ public class CraftingTagAuditor
         writer.write("biome,name,tags...");
         writer.newLine();
 
-        final Registry<Biome> biomes = server.registryAccess().registry(Registries.BIOME).orElse(null);
+        final Registry<Biome> biomes = server.registryAccess().lookup(Registries.BIOME).orElse(null);
         if (biomes == null) { return; }
 
         for (final ResourceLocation id : biomes.keySet().stream().sorted().toList())
@@ -253,7 +253,7 @@ public class CraftingTagAuditor
             writer.write('"');
             writer.write(Component.translatable(id.toLanguageKey("biome")).getString().replace("\"", "\"\""));
             writer.write('"');
-            biomes.getHolder(ResourceKey.create(biomes.key(), id)).ifPresent(holder ->
+            biomes.get(ResourceKey.create(biomes.key(), id)).ifPresent(holder ->
                     holder.tags()
                         .map(t -> t.location().toString())
                         .sorted()

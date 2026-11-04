@@ -16,6 +16,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import org.jetbrains.annotations.NotNull;
 
@@ -533,7 +534,7 @@ public abstract class AbstractResearchProvider implements DataProvider
          */
         public Research addItemCost(final TagKey<Item> tag, final int count, final HolderLookup.Provider provider)
         {
-            return addItemCost(SizedIngredient.of(tag, count), provider);
+            return addItemCost(new SizedIngredient(Ingredient.of(provider.lookupOrThrow(net.minecraft.core.registries.Registries.ITEM).getOrThrow(tag)), count), provider);
         }
 
         /**

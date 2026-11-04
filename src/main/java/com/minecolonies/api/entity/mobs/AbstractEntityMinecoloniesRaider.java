@@ -234,7 +234,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
      */
     @Nullable
     @Override
-    public Entity changeDimension(final TeleportTransition dimensionTransition)
+    public Entity teleport(final TeleportTransition dimensionTransition)
     {
         return null;
     }
@@ -464,7 +464,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
                 }
 
                 final float raiderDamageEnchantLevel =
-                    player.getMainHandItem().getEnchantmentLevel(player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getHolder(ModEnchants.raiderDamage).get());
+                    player.getMainHandItem().getEnchantmentLevel(player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ModEnchants.raiderDamage));
 
                 // Up to 7 damage are converted to health scaling damage, 7 is the damage of a diamond sword
                 float baseScalingDamage = Math.min(damage, MAX_SCALED_DAMAGE);

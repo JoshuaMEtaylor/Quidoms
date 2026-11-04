@@ -10,6 +10,7 @@ import com.minecolonies.core.colony.buildings.workerbuildings.BuildingLumberjack
 import com.minecolonies.core.entity.ai.workers.production.EntityAIWorkLumberjack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -61,8 +62,12 @@ public class ItemScepterLumberjack extends AbstractItemMinecolonies implements I
     }
 
     @Override
-    public boolean canAttackBlock(@NotNull final BlockState state, @NotNull final Level world, @NotNull final BlockPos pos, @NotNull final Player player)
+    public boolean canDestroyBlock(@NotNull final ItemStack stack, @NotNull final BlockState state, @NotNull final Level world, @NotNull final BlockPos pos, @NotNull final LivingEntity entity)
     {
+        if (!(entity instanceof final Player player))
+        {
+            return false;
+        }
         if (!world.isClientSide())
         {
             final ItemStack scepter = player.getMainHandItem();

@@ -74,7 +74,7 @@ public class ItemCompost extends AbstractItemMinecolonies
                 ctx.getLevel().levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, ctx.getClickedPos(), 0);
             }
 
-            return InteractionResult.sidedSuccess(ctx.getLevel().isClientSide());
+            return ctx.getLevel().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
         return InteractionResult.PASS;
     }

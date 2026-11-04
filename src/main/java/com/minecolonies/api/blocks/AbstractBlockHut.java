@@ -351,10 +351,8 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
 
     public void appendHoverText(@NotNull final ItemStack stack, @NotNull final net.minecraft.world.item.Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flags)
     {
-        super.appendHoverText(stack, context, display, tooltip, flags);
-
-        stack.addToTooltip(ModDataComponents.HUT_COMPONENT, context, tooltip::add, flags);
-        stack.addToTooltip(ModDataComponents.COLONY_ID_COMPONENT, context, tooltip::add, flags);
+        stack.addToTooltip(ModDataComponents.HUT_COMPONENT, context, tooltip, flags);
+        stack.addToTooltip(ModDataComponents.COLONY_ID_COMPONENT, context, tooltip, flags);
     }
 
     @Override

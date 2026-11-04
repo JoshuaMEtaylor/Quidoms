@@ -66,8 +66,6 @@ public class ItemColonyFlagBanner extends BannerItem
     public void appendHoverText(ItemStack stack, @Nullable net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn)
     {
         super.appendHoverText(stack, ctx, display, tooltip, flagIn);
-
-        // Remove the base, as they have no translations (Mojang were lazy. Or maybe saving space?)
-        if (tooltip.size() > 1) tooltip.remove(1);
+        // Base banner lore stripping skipped: TooltipDisplay consumer is not a List in 1.21.10
     }
 }

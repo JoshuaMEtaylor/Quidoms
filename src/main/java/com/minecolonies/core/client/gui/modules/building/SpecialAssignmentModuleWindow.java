@@ -89,7 +89,7 @@ public class SpecialAssignmentModuleWindow extends AbstractModuleWindow<IAssignm
         {
             for (final int worker : module.getAssignedCitizens())
             {
-                workers.add(new Tuple<>(Component.translatableEscape(module.getJobEntry().getTranslationKey()).getString(), worker, ""));
+                workers.add(new Tuple<>(Component.translatableEscape(module.getJobEntry().getTranslationKey()).getString(), worker));
             }
         }
 

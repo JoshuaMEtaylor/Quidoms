@@ -185,12 +185,14 @@ public abstract class AbstractEntityCitizen extends AbstractCivilianEntity imple
     }
 
     /**
-     * Disable vanilla steering logic for villagers
+     * Disable vanilla steering logic for villagers.
+     * 1.21.10: isControlledByLocalInstance became final isLocalInstanceAuthoritative();
+     * isEffectiveAi() remains the authoritative AI check for non-player control.
      */
     @Override
-    public boolean isControlledByLocalInstance()
+    public boolean isEffectiveAi()
     {
-        return this.isEffectiveAi();
+        return super.isEffectiveAi();
     }
 
     /**

@@ -274,9 +274,9 @@ public class ContainerCitizenInventory extends AbstractContainerMenu
             }
 
             @Override
-            public Pair<ResourceLocation, ResourceLocation> getNoItemIcon()
+            public ResourceLocation getNoItemIcon()
             {
-                final ResourceLocation icon = switch (equipmentSlot)
+                return switch (equipmentSlot)
                 {
                     case HEAD -> InventoryMenu.EMPTY_ARMOR_SLOT_HELMET;
                     case CHEST -> InventoryMenu.EMPTY_ARMOR_SLOT_CHESTPLATE;
@@ -284,7 +284,6 @@ public class ContainerCitizenInventory extends AbstractContainerMenu
                     case FEET -> InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS;
                     default -> null;
                 };
-                return icon == null ? null : Pair.of(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS, icon);
             }
         });
     }

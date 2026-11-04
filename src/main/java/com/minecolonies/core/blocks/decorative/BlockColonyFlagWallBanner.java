@@ -72,8 +72,7 @@ public class BlockColonyFlagWallBanner extends AbstractColonyFlagBanner<BlockCol
         return CODEC;
     }
 
-    @Override
-    public String getDescriptionId() { return this.asItem().getDescriptionId(); }
+    // getDescriptionId() is final on BlockBehaviour in 1.21.10
 
     @Override
     public boolean canSurvive(BlockState state, LevelReader worldIn, BlockPos pos)

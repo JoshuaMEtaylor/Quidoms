@@ -1,5 +1,7 @@
 package com.minecolonies.core.colony.managers;
 
+import com.minecolonies.api.util.BlockPosUtil;
+
 import com.google.common.collect.Maps;
 import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
@@ -216,7 +218,7 @@ public class TravellingManager implements ITravellingManager, INBTSerializable<C
         public void deserializeNBT(HolderLookup.@NotNull Provider provider, final CompoundTag nbt)
         {
             this.citizenId = nbt.getIntOr(NbtTagConstants.TAG_CITIZEN, 0);
-            this.target = NbtUtils.readBlockPos(nbt, NbtTagConstants.TAG_TARGET).orElse(BlockPos.ZERO);
+            this.target = BlockPosUtil.read(nbt, NbtTagConstants.TAG_TARGET);
             this.initialTravelTime = nbt.getIntOr(NbtTagConstants.TAG_INITIAL_TRAVEL_TIME, 0);
             this.remainingTravelTime = nbt.getIntOr(NbtTagConstants.TAG_REMAINING_TRAVEL_TIME, 0);
         }

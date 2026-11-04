@@ -296,7 +296,7 @@ public class RangeCombatAI extends AttackMoveAI<EntityCitizen>
                             if (isMarksman())
                             {
                                 // Calculate true damage from reduced arrow damage.
-                                entityRayTraceResult.getEntity().hurtServer((net.minecraft.server.level.ServerLevel) user.level(), user.level().damageSources().source(DamageSourceKeys.PIERCE, user), (float) arrow.getBaseDamage() * (float) marksManTrueDamageShare() * 10);
+                                entityRayTraceResult.getEntity().hurtServer((net.minecraft.server.level.ServerLevel) user.level(), user.level().damageSources().source(DamageSourceKeys.PIERCE, user), 2.0F * (float) marksManTrueDamageShare() * 10);
                             }
 
                             return true;

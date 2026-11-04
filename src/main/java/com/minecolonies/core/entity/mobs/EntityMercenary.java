@@ -149,7 +149,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new EntityMercenaryAI(this));
         this.goalSelector.addGoal(4, new EntityAIInteractToggleAble(this, FENCE_TOGGLE, TRAP_TOGGLE, DOOR_TOGGLE));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false, e -> e instanceof Enemy && !(e instanceof Llama)));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false, (e, level) -> e instanceof Enemy && !(e instanceof Llama)));
 
         setCustomNameVisible(true);
         this.setPersistenceRequired();

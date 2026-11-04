@@ -45,7 +45,7 @@ public class WorldEventContext extends WorldRenderMacros
         }
         else if (stage == RenderLevelStageEvent.AfterTripwireBlocks.class)
         {
-            TileEntityColonySignRenderer.renderSignHover(this);
+            // Sign hover rendering deferred for 1.21.10 EntityRenderState pipeline
         }
     }
 

@@ -57,7 +57,7 @@ public class BlockMinecoloniesRack extends AbstractBlockMinecoloniesRack<BlockMi
      * Normal translation we use.
      */
     private static final Long2ObjectMap<Direction> BY_NORMAL = Arrays.stream(Direction.values()).collect(Collectors.toMap((p_235679_) -> {
-        return (new BlockPos(p_235679_.getNormal())).asLong();
+        return (new BlockPos(p_235679_.getUnitVec3i())).asLong();
     }, (p_235675_) -> {
         return p_235675_;
     }, (p_235670_, p_235671_) -> {
@@ -191,9 +191,12 @@ public class BlockMinecoloniesRack extends AbstractBlockMinecoloniesRack<BlockMi
 
             boolean isEmpty = hereRack.isEmpty() && neighborRack.isEmpty();
 
-            level.setBlock(neighbourPos,
-              neighbourState.setValue(FACING, BY_NORMAL.get(neighbourPos.subtract(pos).asLong()).getOpposite()).setValue(VARIANT, RackType.NO_RENDER),
-              1);
+            if (level instanceof Level writableLevel)
+            {
+                writableLevel.setBlock(neighbourPos,
+                  neighbourState.setValue(FACING, BY_NORMAL.get(neighbourPos.subtract(pos).asLong()).getOpposite()).setValue(VARIANT, RackType.NO_RENDER),
+                  1);
+            }
             return state.setValue(VARIANT, isEmpty ? RackType.EMPTY_DOUBLE : RackType.FULL_DOUBLE)
                      .setValue(FACING, BY_NORMAL.get(neighbourPos.subtract(pos).asLong()));
         }

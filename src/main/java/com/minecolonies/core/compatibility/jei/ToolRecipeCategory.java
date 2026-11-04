@@ -88,7 +88,7 @@ public class ToolRecipeCategory extends AbstractRecipeCategory<ToolUsage>
 
         final int scale = 2;
         stack.pose().pushMatrix();
-        stack.pose().scale(1F / scale, 1F / scale, 1.0F);
+        stack.pose().scale(1F / scale, 1F / scale);
         int x = SLOT_X;
         for (int i = 0; i <= MAX_BUILDING_LEVEL; ++i)
         {

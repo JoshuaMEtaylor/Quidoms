@@ -258,7 +258,7 @@ public class ScanCommand extends AbstractCommand
         {
             final ResourceLocation location = new ResourceLocation(Constants.MOD_ID, fileName.replace(".blueprint", "").replace(" ", "").toLowerCase(Locale.US));
             structuretemplate = structuretemplatemanager.getOrCreate(location);
-            structuretemplate.fillFromWorld(world, newZero, new BlockPos(box.getXSpan(), box.getYSpan() - yDif, box.getZSpan()), false, Blocks.STRUCTURE_VOID);
+            structuretemplate.fillFromWorld(world, newZero, new BlockPos(box.getXSpan(), box.getYSpan() - yDif, box.getZSpan()), false, java.util.List.of(Blocks.STRUCTURE_VOID));
             new SaveStructureNBTMessage(structuretemplate.save(new CompoundTag()), fileName.replace(".blueprint", ".nbt").toLowerCase(Locale.US)).sendToPlayer((ServerPlayer) player);
         }
         catch (final ResourceLocationException resLocEx)

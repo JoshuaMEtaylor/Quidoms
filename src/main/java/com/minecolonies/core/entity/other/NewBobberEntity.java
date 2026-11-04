@@ -141,14 +141,16 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     }
 
     @OnlyIn(Dist.CLIENT)
-    @Override
     public void lerpTo(
       final double x,
       final double y,
       final double z,
       final float yaw,
       final float pitch,
-      final int posRotationIncrements) { }
+      final int posRotationIncrements)
+    {
+        this.absSnapTo(x, y, z, yaw, pitch);
+    }
 
     @Override
     public void tick() {

@@ -75,6 +75,6 @@ public class FemaleKnightModel extends CitizenModel<CitizenRenderState>
     {
         super.setupAnim(entity);
         head.getChild("FancyHat").visible = displayHat(entity);
-        body.getChild("breast").visible = !entity.hasItemInSlot(EquipmentSlot.CHEST);
+        body.getChild("breast").visible = entity.chestSlotEmpty;
     }
 }

@@ -186,7 +186,7 @@ public class Tool implements IDeliverable
         }
         catch (final Exception e)
         {
-            Log.getLogger().warn("Got exception for Itemstack when trying to match equipment level: " + stack.getDisplayName() + " - " + stack.getItem().getCreatorModId(stack), e);
+            Log.getLogger().warn("Got exception for Itemstack when trying to match equipment level: " + stack.getDisplayName() + " - " + net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()), e);
             return false;
         }
     }

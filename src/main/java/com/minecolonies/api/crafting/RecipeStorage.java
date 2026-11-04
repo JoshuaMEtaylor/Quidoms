@@ -685,7 +685,7 @@ public class RecipeStorage implements IRecipeStorage
             return null;
         }
 
-        final AbstractEntityCitizen citizen = (AbstractEntityCitizen) context.getOptionalParameter(LootContextParams.THIS_ENTITY);
+        final AbstractEntityCitizen citizen = (AbstractEntityCitizen) context.contextMap().getOptional(LootContextParams.THIS_ENTITY);
 
         for (final ItemStorage storage : getCleanedInput())
         {

@@ -16,6 +16,7 @@ public class CitizenRenderState extends HumanoidRenderState
     public Pose pose = Pose.STANDING;
     public boolean mainHandEmpty = true;
     public boolean headSlotEmpty = true;
+    public boolean chestSlotEmpty = true;
     public boolean displayHeadArmorEmpty = true;
     @Nullable
     public UUID customTextureUUID = null;

@@ -395,7 +395,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
                     continue;
                 }
                 else if (input.getItem() instanceof ItemLargeBottle
-                    || input.is(net.minecraft.world.item.Items.HONEY_BOTTLE)
+                    || input.getItem() == net.minecraft.world.item.Items.HONEY_BOTTLE
                     || input.getItem() == Items.DRIED_KELP
                     || !processRecipe(input, ingredients, depth + 1, level, maxDepth))
                 {
@@ -424,7 +424,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
                         continue;
                     }
                     if (input.getItem() instanceof ItemLargeBottle
-                        || input.is(net.minecraft.world.item.Items.HONEY_BOTTLE)
+                        || input.getItem() == net.minecraft.world.item.Items.HONEY_BOTTLE
                         || input.getItem() == Items.DRIED_KELP
                         || !processRecipe(input, ingredients, depth + 1, level, maxDepth))
                     {

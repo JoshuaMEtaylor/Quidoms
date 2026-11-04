@@ -154,7 +154,7 @@ public class ZeroWasteRecipe extends ShapelessRecipe
 
         public Builder requires(@NotNull final TagKey<Item> tag)
         {
-            return this.requires(Ingredient.of(tag));
+            return this.requires(Ingredient.of(net.minecraft.core.registries.BuiltInRegistries.ITEM.getOrThrow(tag)));
         }
 
         public Builder requires(@NotNull final ItemLike item)

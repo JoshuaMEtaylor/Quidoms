@@ -132,7 +132,7 @@ public class BlockColonySign extends AbstractBlockMinecolonies<BlockColonySign> 
     @Override
     public RenderShape getRenderShape(final BlockState p_60550_)
     {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE; // ENTITYBLOCK_ANIMATED removed in 1.21.10; TE renderer still draws
     }
 
     @Override

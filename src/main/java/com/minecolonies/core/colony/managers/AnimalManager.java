@@ -306,7 +306,7 @@ public class AnimalManager implements IAnimalManager
 
                 try
                 {
-                    final IAnimalData data = AnimalData.loadAnimalFromNBT(colony);
+                    final IAnimalData data = AnimalData.loadAnimalFromNBT(colony, animalTag, provider);
                     if (data == null)
                     {
                         Log.getLogger().warn("Skipped null animal data at index {} while reading animal manager.", i);

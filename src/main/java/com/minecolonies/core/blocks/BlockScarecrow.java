@@ -103,7 +103,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
             worldIn.setBlock(pos, state.setValue(LANTERN, true), 3);
             worldIn.playSound(player, pos, SoundEvents.LANTERN_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             InventoryUtils.reduceStackInItemHandler(new InvWrapper(player.getInventory()), player.getItemInHand(hand));
-            return InteractionResult.CONSUME_PARTIAL;
+            return InteractionResult.CONSUME;
         }
 
         // If the world is client, open the inventory of the field.
@@ -174,13 +174,10 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
     @Override
     public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos, final Block block, net.minecraft.world.level.redstone.Orientation orientation, final boolean isMoving)
     {
-        super.neighborChanged(state, worldIn, pos, block, fromPos, isMoving);
+        super.neighborChanged(state, worldIn, pos, block, orientation, isMoving);
         final DoubleBlockHalf half = state.getValue(HALF);
         final BlockPos otherPos = half == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
-        if (!fromPos.equals(otherPos))
-        {
-            return;
-        }
+        // 1.21.10: neighborChanged uses Orientation instead of fromPos; always sync lantern from the other half.
         final BlockState otherState = worldIn.getBlockState(otherPos);
         if (otherState.getBlock() == this && otherState.getValue(HALF) != half && otherState.getValue(LANTERN) != state.getValue(LANTERN))
         {

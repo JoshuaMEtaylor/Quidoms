@@ -147,7 +147,7 @@ public class RegisteredStructureManager implements IRegisteredStructureManager
             try
             {
                 final CompoundTag extensionCompound = extensionsTagList.getCompoundOrEmpty(i);
-                final IBuildingExtension extension = BuildingExtensionDataManager.compoundToExtension(provider);
+                final IBuildingExtension extension = BuildingExtensionDataManager.compoundToExtension(provider, extensionCompound);
                 if (extension != null)
                 {
                     addBuildingExtension(extension);
@@ -164,7 +164,7 @@ public class RegisteredStructureManager implements IRegisteredStructureManager
         for (int i = 0; i < buildingTagList.size(); ++i)
         {
             final CompoundTag buildingCompound = buildingTagList.getCompoundOrEmpty(i);
-            @Nullable final IBuilding b = IBuildingDataManager.getInstance().createFrom(colony);
+            @Nullable final IBuilding b = IBuildingDataManager.getInstance().createFrom(colony, buildingCompound, provider);
             if (b != null)
             {
                 addBuilding(b);

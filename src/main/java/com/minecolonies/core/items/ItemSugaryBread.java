@@ -32,8 +32,7 @@ public class ItemSugaryBread extends ItemFood
     private static FoodProperties sweetBread = (new FoodProperties.Builder())
                                         .nutrition(6)
                                         .saturationModifier(0.7F)
-                                        .effect(() -> new MobEffectInstance(MobEffects.SPEED, 600), 1.0F)
-                                        .build(); 
+                                        .build();
 
     /**
      * Sets the name, creative tab, and registers the Sweet Bread item.

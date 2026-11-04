@@ -173,7 +173,7 @@ public class MinecoloniesFarmland extends AbstractBlockMinecolonies<Minecolonies
     @Override
     public void fallOn(Level level, @NotNull BlockState state, @NotNull BlockPos pos, @NotNull Entity entity, double light)
     {
-        if (!level.isClientSide() && CommonHooks.onFarmlandTrample(level, pos, Blocks.DIRT.defaultBlockState(), light, entity))
+        if (!level.isClientSide() && CommonHooks.onFarmlandTrample((net.minecraft.server.level.ServerLevel) level, pos, Blocks.DIRT.defaultBlockState(), light, entity))
         {
             turnToDirt(entity, state, level, pos);
         }

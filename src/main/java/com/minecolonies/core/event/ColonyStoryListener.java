@@ -250,7 +250,7 @@ public class ColonyStoryListener extends SimplePreparableReloadListener<java.uti
             {
                 final RegistryAccess registryAccess = ServerLifecycleHooks.getCurrentServer().registryAccess();
                 final ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, ResourceLocation.parse(value));
-                final Holder<Biome> biome = registryAccess.lookupOrThrow(Registries.BIOME).getHolderOrThrow(key);
+                final Holder<Biome> biome = registryAccess.lookupOrThrow(Registries.BIOME).getOrThrow(key);
                 return new BiomeFilter(b -> b.equals(biome));
             }
         }

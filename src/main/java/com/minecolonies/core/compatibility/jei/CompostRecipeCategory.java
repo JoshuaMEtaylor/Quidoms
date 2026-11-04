@@ -31,7 +31,7 @@ public class CompostRecipeCategory extends AbstractRecipeCategory<CompostRecipe>
     {
         super(
             ModRecipeTypes.COMPOSTING,
-            Component.translatableEscape(ModBlocks.blockBarrel.getItem().getDescriptionId()),
+            Component.translatableEscape(ModBlocks.blockBarrel.asItem().getDescriptionId()),
             guiHelper.createDrawableItemLike(ModBlocks.blockBarrel),
             80,
             50

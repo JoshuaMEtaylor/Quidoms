@@ -40,6 +40,12 @@ public class BlockConstructionTape extends AbstractBlockMinecoloniesConstruction
 {
     public static final MapCodec<BlockConstructionTape> CODEC = simpleCodec(BlockConstructionTape::new);
 
+    @Override
+    public int getDustColor(final BlockState state, final BlockGetter level, final BlockPos pos)
+    {
+        return state.getMapColor(level, pos).col;
+    }
+
     /**
      * This blocks name.
      */

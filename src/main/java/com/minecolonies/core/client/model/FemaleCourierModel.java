@@ -64,7 +64,7 @@ public class FemaleCourierModel extends CitizenModel<CitizenRenderState>
     }
 
     @Override
-    public float getActualRotation(@NotNull final AbstractEntityCitizen entity)
+    public float getActualRotation(@NotNull final CitizenRenderState entity)
     {
         return 0.1745F; // pose/renderMetadata access changed in 1.21.10
     }

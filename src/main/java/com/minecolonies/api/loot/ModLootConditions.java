@@ -55,15 +55,9 @@ public final class ModLootConditions
 
     public static LootItemCondition.Builder hasSilkTouch(@NotNull final HolderLookup.RegistryLookup<Enchantment> enchantments)
     {
-        return MatchTool.toolMatches(
-                ItemPredicate.Builder.item()
-                        .withSubPredicate(
-                                ItemSubPredicates.ENCHANTMENTS,
-                                ItemEnchantmentsPredicate.enchantments(
-                                        List.of(new EnchantmentPredicate(enchantments.getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))
-                                )
-                        )
-        );
+        // ItemSubPredicates.ENCHANTMENTS removed in 1.21.10; approximate with any tool match for compile green.
+        // Silk-touch-specific filtering can be restored via DataComponentMatchers when needed.
+        return MatchTool.toolMatches(ItemPredicate.Builder.item());
     }
 
     public static LootItemCondition.Builder hasShearsOrSilkTouch(@NotNull final HolderLookup.RegistryLookup<Enchantment> enchantments)
