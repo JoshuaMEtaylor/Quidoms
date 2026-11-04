@@ -921,7 +921,7 @@ public class WindowResearchTree extends AbstractWindowSkeleton
                 Log.getLogger().error("Found Empty list requirement for: " + research.getId() + ". Please report this to the developers.");
                 continue;
             }
-            icon.setItems(List.of(com.minecolonies.api.util.IngredientCompat.getItems(cost)));
+            icon.setItems(java.util.Arrays.asList(com.minecolonies.api.util.IngredientCompat.getItems(cost)));
             view.addChild(icon);
             storageXOffset += COST_OFFSET;
         }

@@ -200,16 +200,22 @@ public final class ItemStackUtils
             }
             else if (entity instanceof ArmorStand)
             {
-                request.add(new ItemStorage(entity.getPickedResult(new EntityHitResult(placer))));
-                ((ArmorStand) entity).getArmorSlots().forEach(item -> request.add(new ItemStorage(item)));
-                ((ArmorStand) entity).getHandSlots().forEach(item -> request.add(new ItemStorage(item)));
+                request.add(new ItemStorage(entity.getPickResult()));
+                for (final EquipmentSlot slot : EquipmentSlot.values())
+                {
+                    final ItemStack equipped = ((ArmorStand) entity).getItemBySlot(slot);
+                    if (!equipped.isEmpty())
+                    {
+                        request.add(new ItemStorage(equipped.copy()));
+                    }
+                }
             }
 
             /*
             todo: deactivated until forge fixes this problem.
             else if (!(entity instanceof MobEntity))
             {
-                request.add(new ItemStorage(entity.getPickedResult(new EntityRayTraceResult(placer))));
+                request.add(new ItemStorage(entity.getPickResult()));
             }*/
 
             return request.stream().filter(stack -> !stack.getItemStack().isEmpty()).collect(Collectors.toList());
@@ -902,9 +908,11 @@ public final class ItemStackUtils
         itemId = itemId.replace("[NS]", baseItemId.getNamespace());
         itemId = TEMPLATE_PATH_PATTERN.matcher(itemId).replaceAll(m ->
         {
-            if (m.group(1, "") != null && m.group(2) != null)
+            final String from = m.group(1);
+            final String to = m.group(2);
+            if (from != null && to != null)
             {
-                return baseItemId.getPath().replace(m.group(1), m.group(2));
+                return baseItemId.getPath().replace(from, to);
             }
             return baseItemId.getPath();
         });
@@ -1025,12 +1033,12 @@ public final class ItemStackUtils
     @OnlyIn(Dist.CLIENT)
     public static Component getTranslatedName(@NotNull final SizedIngredient ingredient)
     {
-        if (ingredient.ingredient().hasNoItems())
+        if (ingredient.ingredient().isEmpty() || IngredientCompat.isEmpty(ingredient))
         {
             return Component.empty();
         }
 
-        final ItemStack[] items = com.minecolonies.api.util.IngredientCompat.getItems(ingredient);
+        final ItemStack[] items = IngredientCompat.getItems(ingredient);
         final Optional<TagKey<Item>> tag = getTagEquivalent(items);
 
         return Component.translatable("%sx %s", ingredient.count(), tag.map(t ->
@@ -1048,7 +1056,7 @@ public final class ItemStackUtils
                 return items[0].getItem().getName();
             }
             return Component.translatable(String.join("/", Collections.nCopies(items.length, "%s")),
-                    Arrays.stream(items).map(ItemStack::getItem).map(Item::getDescription).toArray());
+                    Arrays.stream(items).map(ItemStack::getItem).map(Item::getName).toArray());
         }));
     }
 
@@ -1069,12 +1077,8 @@ public final class ItemStackUtils
         }
 
         return BuiltInRegistries.ITEM.getTags()
-                .filter(e ->
-                {
-                    HolderSet.Named<Item> tag = e.getSecond();
-                    return areEquivalent(tag, values);
-                })
-                .map(Pair::getFirst)
+                .filter(tag -> areEquivalent(tag, values))
+                .map(HolderSet.Named::key)
                 .findFirst();
     }
 

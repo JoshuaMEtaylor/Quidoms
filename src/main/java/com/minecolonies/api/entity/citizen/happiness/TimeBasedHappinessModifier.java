@@ -130,7 +130,7 @@ public final class TimeBasedHappinessModifier extends AbstractHappinessModifier 
         this.days = compoundNBT.getIntOr(TAG_DAY, 0);
         if (!persist)
         {
-            final ListTag listTag = compoundNBT.getList(TAG_LIST, Constants.TAG_COMPOUND);
+            final ListTag listTag = compoundNBT.getListOrEmpty(TAG_LIST);
             final List<Tuple<Integer, Double>> list = new ArrayList<>();
             for (int i = 0; i < listTag.size(); i++)
             {

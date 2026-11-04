@@ -52,7 +52,7 @@ public class DefaultCropsLootProvider implements LootTableSubProvider
         {
             for (final Block source : crop.getDroppedFrom())
             {
-                cropDrops.computeIfAbsent(source.getLootTable().location(), t -> new ArrayList<>()).add(crop);
+                cropDrops.computeIfAbsent(source.getLootTable().orElse(null).location(), t -> new ArrayList<>()).add(crop);
             }
         }
 

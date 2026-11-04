@@ -10,13 +10,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -342,13 +338,13 @@ public class GenericRecipe implements IGenericRecipe
         if (holder == null) return null;
 
         final Recipe<?> recipe = holder.value();
-        final List<List<ItemStack>> inputs = compactInputs(recipe.getIngredients().stream()
+        final List<List<ItemStack>> inputs = compactInputs(com.minecolonies.api.util.RecipeCompat.getIngredients(recipe).stream()
                 .map(ingredient -> Arrays.asList(com.minecolonies.api.util.IngredientCompat.getItems(ingredient)))
                 .toList());
 
         final Builder builder = builder()
-                .withRecipeId(holder.id())
-                .withOutput(recipe.getResultItem(world.registryAccess()))
+                .withRecipeId(com.minecolonies.api.util.RecipeCompat.idLocation(holder))
+                .withOutput(com.minecolonies.api.util.RecipeCompat.getResultItem(recipe, world))
                 .withAdditionalOutputs(calculateSecondaryOutputs(recipe, world))
                 .withInputs(inputs);
 
@@ -358,7 +354,7 @@ public class GenericRecipe implements IGenericRecipe
         }
         else
         {
-            builder.withGridSize(recipe.canCraftInDimensions(2, 2) ? 2 : 3);
+            builder.withGridSize(com.minecolonies.api.util.RecipeCompat.canCraftInDimensions(recipe, 2, 2) ? 2 : 3);
         }
 
         return builder.build();
@@ -510,33 +506,20 @@ public class GenericRecipe implements IGenericRecipe
     {
         if (recipe instanceof final CraftingRecipe craftingRecipe)
         {
-            final List<Ingredient> inputs = recipe.getIngredients();
-            final CraftingContainer inv = new TransientCraftingContainer(new AbstractContainerMenu(MenuType.CRAFTING, 0)
+            final List<Ingredient> inputs = com.minecolonies.api.util.RecipeCompat.getIngredients(recipe);
+            final List<ItemStack> stacks = new ArrayList<>(Collections.nCopies(9, ItemStack.EMPTY));
+            for (int slot = 0; slot < inputs.size() && slot < 9; ++slot)
             {
-                @Override
-                public @NotNull ItemStack quickMoveStack(final @NotNull Player player, final int slot)
+                final ItemStack[] options = com.minecolonies.api.util.IngredientCompat.getItems(inputs.get(slot));
+                if (options.length > 0)
                 {
-                    return ItemStack.EMPTY;
-                }
-
-                @Override
-                public boolean stillValid(@NotNull final Player playerIn)
-                {
-                    return false;
-                }
-
-            }, 3, 3);
-            for (int slot = 0; slot < inputs.size(); ++slot)
-            {
-                final ItemStack[] stacks = inputs.get(slot).getItems();
-                if (stacks.length > 0)
-                {
-                    inv.setItem(slot, stacks[0].copy());
+                    stacks.set(slot, options[0].copy());
                 }
             }
-            if (craftingRecipe.matches(inv.asCraftInput(), world))
+            final CraftingInput craftInput = CraftingInput.of(3, 3, stacks);
+            if (world != null && craftingRecipe.matches(craftInput, world))
             {
-                return craftingRecipe.getRemainingItems(inv.asCraftInput()).stream()
+                return craftingRecipe.getRemainingItems(craftInput).stream()
                         .filter(ItemStackUtils::isNotEmpty)
                         .filter(stack -> stack.getItem() != buildTool.get())  // this is filtered out of the inputs too
                         .collect(Collectors.toList());

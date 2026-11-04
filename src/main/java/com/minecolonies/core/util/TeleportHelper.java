@@ -15,6 +15,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
+
 import static com.minecolonies.api.util.constant.translation.CommandTranslationConstants.COMMAND_COLONY_ID_NOT_FOUND;
 import static com.minecolonies.api.util.constant.translation.CommandTranslationConstants.COMMAND_TELEPORT_SUCCESS;
 
@@ -53,7 +55,7 @@ public final class TeleportHelper
 
         citizen.getNavigation().stop();
         citizen.stopRiding();
-        citizensnapTo(
+        citizen.snapTo(
           spawnPoint.getX() + MIDDLE_BLOCK_OFFSET,
           spawnPoint.getY(),
           spawnPoint.getZ() + MIDDLE_BLOCK_OFFSET,
@@ -86,17 +88,17 @@ public final class TeleportHelper
     {
         BlockPos position = BlockPos.containing(player.getX(), 250, player.getZ()); //start at current position
 
-        position = BlockPosUtil.findLand(position, player.serverLevel());
+        position = BlockPosUtil.findLand(position, player.level());
 
         ChunkPos chunkpos = new ChunkPos(position);
-        player.serverLevel().getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, chunkpos, 1, player.getId());
+        player.level().getChunkSource().addTicketWithRadius(TicketType.PORTAL, chunkpos, 1);
         player.stopRiding();
         if (player.isSleeping())
         {
             player.stopSleepInBed(true, true);
         }
 
-        player.teleportTo(player.serverLevel(), position.getX(), position.getY() + 2.0, position.getZ(), player.getYRot(), player.getXRot());
+        player.teleportTo(player.level(), position.getX(), position.getY() + 2.0, position.getZ(), Set.of(), player.getYRot(), player.getXRot(), false);
     }
 
     /**
@@ -151,7 +153,11 @@ public final class TeleportHelper
             }
         }
 
-        final ServerLevel world = player.getServer().getLevel(colony.getDimension());
+        final ServerLevel world = player.level().getServer().getLevel(colony.getDimension());
+        if (world == null)
+        {
+            return;
+        }
 
         position = BlockPosUtil.findAround(world,
           position,
@@ -165,14 +171,14 @@ public final class TeleportHelper
         }
 
         ChunkPos chunkpos = new ChunkPos(position);
-        world.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, chunkpos, 1, player.getId());
+        world.getChunkSource().addTicketWithRadius(TicketType.PORTAL, chunkpos, 1);
         player.stopRiding();
         if (player.isSleeping())
         {
             player.stopSleepInBed(true, true);
         }
 
-        player.teleportTo(world, position.getX(), position.getY(), position.getZ(), player.getYRot(), player.getXRot());
+        player.teleportTo(world, position.getX(), position.getY(), position.getZ(), Set.of(), player.getYRot(), player.getXRot(), false);
         MessageUtils.format(COMMAND_TELEPORT_SUCCESS, colony.getName()).sendTo(player);
     }
 }

@@ -396,7 +396,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
     protected void addPassenger(@Nonnull Entity passenger)
     {
         super.addPassenger(passenger);
-        dropLeash(true, false);
+        dropLeash();
         lastDismountTime = -1;
     }
 
@@ -426,15 +426,12 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
     }
 
     /**
-     * Drops the leash for this horse, optionally sending a packet to clients and dropping the lead item.
-     * 
-     * @param broadcastPacket whether to send a packet to clients
-     * @param dropLeadItem whether to drop the lead item
+     * Drops the leash for this horse (NeoForge 1.21.10: no-arg {@link net.minecraft.world.entity.Leashable#dropLeash()}).
      */
     @Override
-    public void dropLeash(boolean broadcastPacket, boolean dropLeadItem)
+    public void dropLeash()
     {
-        super.dropLeash(broadcastPacket, dropLeadItem);
+        super.dropLeash();
     }
 
     /**

@@ -39,7 +39,7 @@ public class ArchitectsCutterCraftingType extends RecipeCraftingType<ArchitectsC
     {
         final Random rnd = new Random();
         final List<IGenericRecipe> recipes = new ArrayList<>();
-        for (final RecipeHolder<ArchitectsCutterRecipe> holder : recipeManager.getAllRecipesFor(ModRecipeTypes.ARCHITECTS_CUTTER.get()))
+        for (final RecipeHolder<ArchitectsCutterRecipe> holder : com.minecolonies.api.util.RecipeCompat.getAllRecipesFor(recipeManager, ModRecipeTypes.ARCHITECTS_CUTTER.get()))
         {
             final ArchitectsCutterRecipe recipe = holder.value();
             // cutter recipes don't implement getIngredients(), so we have to work around it
@@ -60,7 +60,7 @@ public class ArchitectsCutterCraftingType extends RecipeCraftingType<ArchitectsC
                 }
             }
 
-            final ItemStack output = recipe.getResultItem(world.registryAccess()).copy();
+            final ItemStack output = com.minecolonies.api.util.RecipeCompat.getResultItem(recipe, world).copy();
             output.setCount(Math.max(recipe.getCount(), inputs.size()));
             MaterialTextureData.EMPTY.writeToItemStack(output);
 

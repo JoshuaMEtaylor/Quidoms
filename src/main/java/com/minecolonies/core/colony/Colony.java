@@ -573,7 +573,7 @@ public class Colony implements IColony
                         if (world instanceof ServerLevel)
                         {
                             final ChunkPos pos = new ChunkPos(chunkX, chunkZ);
-                            ((ServerChunkCache) world.getChunkSource()).removeRegionTicket(KEEP_LOADED_TYPE, pos, 2, pos);
+                            ((ServerChunkCache) world.getChunkSource()).removeTicketWithRadius(KEEP_LOADED_TYPE, pos, 2);
                             pendingToUnloadChunks.add(chunkPos);
                         }
                     }
@@ -597,7 +597,7 @@ public class Colony implements IColony
             {
                 ticketedChunks.add(chunkPos);
                 ticketedChunksDirty = true;
-                world.getChunkSource().addRegionTicket(KEEP_LOADED_TYPE, chunk.getPos(), 2, chunk.getPos(), true);
+                world.getChunkSource().addTicketWithRadius(KEEP_LOADED_TYPE, chunk.getPos(), 2);
             }
         }
     }

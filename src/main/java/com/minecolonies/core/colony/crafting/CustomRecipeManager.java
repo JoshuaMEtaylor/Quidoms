@@ -327,7 +327,7 @@ public class CustomRecipeManager
         {
             for (final Block source : crop.getDroppedFrom())
             {
-                lootIds.add(source.getLootTable());
+                lootIds.add(source.getLootTable().orElse(null));
             }
         }
 

@@ -114,7 +114,7 @@ public class CropRecipeCategory implements IRecipeCategory<CropRecipeCategory.Cr
                 .setBackground(this.slot, -1, -1)
                 .addItemStack(recipe.source().getCloneItemStack(Minecraft.getInstance().level, BlockPos.ZERO, recipe.source().defaultBlockState()));
 
-        final List<LootTableAnalyzer.LootDrop> drops = CustomRecipeManager.getInstance().getLootDrops(recipe.source().getLootTable());
+        final List<LootTableAnalyzer.LootDrop> drops = CustomRecipeManager.getInstance().getLootDrops(recipe.source().getLootTable().orElse(null));
         final int initialColumns = (WIDTH - 36) / this.slot.getWidth();
         final int rows = Math.max(1, (drops.size() + initialColumns - 1) / initialColumns);
         final int columns = (drops.size() + rows - 1) / rows;
@@ -128,7 +128,7 @@ public class CropRecipeCategory implements IRecipeCategory<CropRecipeCategory.Cr
             final IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
                     .setBackground(this.chanceSlot, -1, -1)
                     .addItemStacks(drop.getItemStacks());
-            slot.addRichTooltipCallback(new JobBasedRecipeCategory.LootTableTooltipCallback(drop, recipe.source().getLootTable()));
+            slot.addRichTooltipCallback(new JobBasedRecipeCategory.LootTableTooltipCallback(drop, recipe.source().getLootTable().orElse(null)));
             if (++c >= columns)
             {
                 c = 0;

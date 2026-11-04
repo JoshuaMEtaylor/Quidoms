@@ -34,26 +34,27 @@ public class FurnaceRecipes implements IFurnaceRecipes
     {
         recipes.clear();
         reverseRecipes.clear();
-        recipeManager.getAllRecipesFor(RecipeType.SMELTING).forEach(holder -> {
+        com.minecolonies.api.util.RecipeCompat.getAllRecipesFor(recipeManager, RecipeType.SMELTING).forEach(holder -> {
             final SmeltingRecipe recipe = holder.value();
-            final NonNullList<Ingredient> list = recipe.getIngredients();
+            final java.util.List<Ingredient> list = com.minecolonies.api.util.RecipeCompat.getIngredients(recipe);
             if (list.size() == 1)
             {
                 for(final ItemStack smeltable: com.minecolonies.api.util.IngredientCompat.getItems(list.get(0)))
                 {
                     if (!smeltable.isEmpty())
                     {
+                        final ItemStack result = com.minecolonies.api.util.RecipeCompat.getResultItem(recipe, level);
                         final RecipeStorage storage = RecipeStorage.builder()
                                 .withInputs(ImmutableList.of(new ItemStorage(smeltable)))
-                                .withPrimaryOutput(recipe.getResultItem(level.registryAccess()))
+                                .withPrimaryOutput(result)
                                 .withGridSize(1)
                                 .withIntermediate(Blocks.FURNACE)
-                                .withRecipeId(holder.id())
+                                .withRecipeId(com.minecolonies.api.util.RecipeCompat.idLocation(holder))
                                 .build();
 
                         recipes.put(storage.getCleanedInput().get(0), storage);
 
-                        final ItemStack output = recipe.getResultItem(level.registryAccess()).copy();
+                        final ItemStack output = result.copy();
                         output.setCount(1);
                         reverseRecipes.put(new ItemStorage(output), storage);
                     }

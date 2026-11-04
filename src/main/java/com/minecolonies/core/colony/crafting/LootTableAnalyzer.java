@@ -289,7 +289,7 @@ public final class LootTableAnalyzer
         final AdventureData component = AdventureData.readFromItemStack(token);
         if (component != null)
         {
-            return toDrops(provider, component.entityType().getDefaultLootTable());
+            return toDrops(provider, component.entityType().getDefaultLootTable().orElse(null));
         }
         return Collections.emptyList();
     }

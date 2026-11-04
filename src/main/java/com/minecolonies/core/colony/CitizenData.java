@@ -69,6 +69,8 @@ import static com.minecolonies.api.util.constant.CitizenConstants.*;
 import static com.minecolonies.api.util.constant.ColonyConstants.UPDATE_SUBSCRIBERS_INTERVAL;
 import static com.minecolonies.api.util.constant.Constants.TAG_STRING;
 import static com.minecolonies.api.util.constant.Constants.TICKS_SECOND;
+import com.minecolonies.api.util.constant.NbtTagConstants;
+
 import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_ID;
 import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_NAME;
 import static com.minecolonies.api.util.constant.NbtTagConstants.*;
@@ -1342,7 +1344,7 @@ public class CitizenData implements ICitizenData
 
         nbtTagCompound.put(TAG_NEW_SKILLS, citizenSkillHandler.write());
 
-        BlockPosUtil.write(nbtTagCompound, TAG_POS, getEntity().isPresent() ? getEntity().get().blockPosition() : lastPosition);
+        BlockPosUtil.write(nbtTagCompound, NbtTagConstants.TAG_POS, getEntity().isPresent() ? getEntity().get().blockPosition() : lastPosition);
         if (nextRespawnPos != null)
         {
             BlockPosUtil.write(nbtTagCompound, TAG_RESPAWN_POS, nextRespawnPos);
@@ -1461,7 +1463,7 @@ public class CitizenData implements ICitizenData
             voiceProfile = random.nextInt(NUM_SOUND_PROFILES);
         }
 
-        lastPosition = BlockPosUtil.read(nbtTagCompound, TAG_POS);
+        lastPosition = BlockPosUtil.read(nbtTagCompound, NbtTagConstants.TAG_POS);
 
         if (nbtTagCompound.contains(TAG_RESPAWN_POS))
         {
@@ -1535,7 +1537,7 @@ public class CitizenData implements ICitizenData
             {
                 final CompoundTag levelExperienceAtJob = levelTagList.getCompoundOrEmpty(i);
                 final String jobName = levelExperienceAtJob.getStringOr(TAG_NAME, "");
-                final int level = Math.min(levelExperienceAtJob.getInt(TAG_LEVEL), MAX_CITIZEN_LEVEL);
+                final int level = Math.min(levelExperienceAtJob.getIntOr(TAG_LEVEL, 0), MAX_CITIZEN_LEVEL);
                 levels.put(jobName, level);
             }
 
@@ -1578,25 +1580,25 @@ public class CitizenData implements ICitizenData
         this.isWorking = nbtTagCompound.getBooleanOr(TAG_ACTIVE, false);
         this.leisureTime = nbtTagCompound.getIntOr(TAG_LEISURE, 0);
 
-        @NotNull final ListTag availQuestNbt = nbtTagCompound.getList(TAG_AV_QUESTS, TAG_STRING);
+        @NotNull final ListTag availQuestNbt = nbtTagCompound.getListOrEmpty(TAG_AV_QUESTS);
         for (int i = 0; i < availQuestNbt.size(); i++)
         {
             availableQuests.add(ResourceLocation.parse(availQuestNbt.getStringOr(i, "")));
         }
 
-        @NotNull final ListTag partQuestsNbt = nbtTagCompound.getList(TAG_PART_QUESTS, TAG_STRING);
+        @NotNull final ListTag partQuestsNbt = nbtTagCompound.getListOrEmpty(TAG_PART_QUESTS);
         for (int i = 0; i < partQuestsNbt.size(); i++)
         {
             participatingQuests.add(ResourceLocation.parse(partQuestsNbt.getStringOr(i, "")));
         }
 
-        @NotNull final ListTag finQuestNbt = nbtTagCompound.getList(TAG_FINISHED_AV_QUESTS, TAG_STRING);
+        @NotNull final ListTag finQuestNbt = nbtTagCompound.getListOrEmpty(TAG_FINISHED_AV_QUESTS);
         for (int i = 0; i < finQuestNbt.size(); i++)
         {
             finishedQuests.add(ResourceLocation.parse(finQuestNbt.getStringOr(i, "")));
         }
 
-        @NotNull final ListTag finPartQuestsNbt = nbtTagCompound.getList(TAG_FINISHED_PART_QUESTS, TAG_STRING);
+        @NotNull final ListTag finPartQuestsNbt = nbtTagCompound.getListOrEmpty(TAG_FINISHED_PART_QUESTS);
         for (int i = 0; i < finPartQuestsNbt.size(); i++)
         {
             finishedQuestParticipation.add(ResourceLocation.parse(finPartQuestsNbt.getStringOr(i, "")));

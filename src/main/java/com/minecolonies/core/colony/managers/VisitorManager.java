@@ -254,7 +254,7 @@ public class VisitorManager implements IVisitorManager
                 BlockPos calculatedSpawn = EntityUtils.getSpawnPoint(world, spawnLocation);
                 if (calculatedSpawn != null)
                 {
-                    VisitorCitizen citizenEntity = (VisitorCitizen) ModEntities.VISITOR.create(colony.getWorld());
+                    VisitorCitizen citizenEntity = (VisitorCitizen) ModEntities.VISITOR.create(colony.getWorld(), net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
 
                     if (citizenEntity == null)
                     {

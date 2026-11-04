@@ -91,10 +91,10 @@ public final class IngredientBomExpand
     private static Map<String, RecipeInputs> indexCrafting(final RecipeManager recipes, final ServerLevel level)
     {
         final Map<String, RecipeInputs> index = new HashMap<>();
-        for (final RecipeHolder<CraftingRecipe> holder : recipes.getAllRecipesFor(RecipeType.CRAFTING))
+        for (final RecipeHolder<CraftingRecipe> holder : com.minecolonies.api.util.RecipeCompat.getAllRecipesFor(recipes, RecipeType.CRAFTING))
         {
             final CraftingRecipe crafting = holder.value();
-            final ItemStack result = crafting.getResultItem(level.registryAccess());
+            final ItemStack result = com.minecolonies.api.util.RecipeCompat.getResultItem(crafting, level);
             if (result.isEmpty())
             {
                 continue;
@@ -105,7 +105,7 @@ public final class IngredientBomExpand
                 continue;
             }
             final List<Map.Entry<String, Integer>> inputs = new ArrayList<>();
-            for (final Ingredient ingredient : crafting.getIngredients())
+            for (final Ingredient ingredient : com.minecolonies.api.util.RecipeCompat.getIngredients(crafting))
             {
                 final ItemStack[] stacks = com.minecolonies.api.util.IngredientCompat.getItems(ingredient);
                 if (stacks.length == 0 || stacks[0].isEmpty() || stacks[0].getItem() == Items.AIR)

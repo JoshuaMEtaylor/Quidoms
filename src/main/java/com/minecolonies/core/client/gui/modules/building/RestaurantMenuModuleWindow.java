@@ -395,7 +395,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
                     continue;
                 }
                 else if (input.getItem() instanceof ItemLargeBottle
-                    || input.getItem() instanceof HoneyBottleItem
+                    || input.is(net.minecraft.world.item.Items.HONEY_BOTTLE)
                     || input.getItem() == Items.DRIED_KELP
                     || !processRecipe(input, ingredients, depth + 1, level, maxDepth))
                 {
@@ -411,7 +411,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
         {
             if (depth == 0)
             {
-                dish.setAmount(recipe.get().value().getResultItem(level.registryAccess()).getCount());
+                dish.setAmount(com.minecolonies.api.util.RecipeCompat.getResultItem(recipe.get().value(), level).getCount());
             }
             for (final Ingredient ingredient : recipe.get().value().getIngredients())
             {
@@ -424,7 +424,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
                         continue;
                     }
                     if (input.getItem() instanceof ItemLargeBottle
-                        || input.getItem() instanceof HoneyBottleItem
+                        || input.is(net.minecraft.world.item.Items.HONEY_BOTTLE)
                         || input.getItem() == Items.DRIED_KELP
                         || !processRecipe(input, ingredients, depth + 1, level, maxDepth))
                     {

@@ -13,7 +13,6 @@ import com.minecolonies.core.tileentities.TileEntityRack;
 import com.minecolonies.api.items.ModTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.HoneyBottleItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -409,7 +408,7 @@ public class FoodUtils
             {
                 return returned.get().copy();
             }
-            else if (foodStack.getItem() instanceof HoneyBottleItem)
+            else if (foodStack.is(net.minecraft.world.item.Items.HONEY_BOTTLE))
             {
                 // Special handling because vanilla doesn't use usingConvertsTo since it's stackable
                 return new ItemStack(Items.GLASS_BOTTLE);

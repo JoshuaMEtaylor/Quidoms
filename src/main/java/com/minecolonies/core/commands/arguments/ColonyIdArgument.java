@@ -243,7 +243,7 @@ public class ColonyIdArgument extends MultipleOptionsArgument<Integer>
             final Optional<NameAndId> profile = Optional.ofNullable(source.getServer().services().nameToIdCache()).flatMap(m -> m.get(value));
             if (profile.isPresent())
             {
-                return resolveByOwner(source, profile.get().getId());
+                return resolveByOwner(source, profile.get().id());
             }
             throw ERROR_UNKNOWN_PLAYER.create();
         }

@@ -218,7 +218,7 @@ public class SittingEntity extends Entity
         }
         existingSittingEntities.computeIfAbsent(entity.level().dimension(), k -> new HashSet<>()).add(pos);
 
-        final SittingEntity sittingEntity = (SittingEntity) ModEntities.SITTINGENTITY.create(entity.level());
+        final SittingEntity sittingEntity = (SittingEntity) ModEntities.SITTINGENTITY.create(entity.level(), net.minecraft.world.entity.EntitySpawnReason.LOAD);
 
         // Find the lowest box and sit on that
         final BlockState state = entity.level().getBlockState(pos);

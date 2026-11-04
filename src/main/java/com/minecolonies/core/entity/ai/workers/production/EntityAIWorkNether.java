@@ -496,7 +496,7 @@ public class EntityAIWorkNether extends AbstractEntityAICrafting<JobNetherWorker
                             {
                                 // Generate loot for this mob, with all the right modifiers
                                 LootParams context = this.getLootContext();
-                                LootTable loot = world.getServer().reloadableRegistries().getLootTable(mob.getLootTable());
+                                LootTable loot = world.getServer().reloadableRegistries().getLootTable(mob.getLootTable().orElse(null));
                                 List<ItemStack> mobLoot = loot.getRandomItems(context);
                                 job.addProcessedResultsList(mobLoot);
 
@@ -526,7 +526,7 @@ public class EntityAIWorkNether extends AbstractEntityAICrafting<JobNetherWorker
                             for (int i = 0; i < currStack.getCount() && !tool.isEmpty(); i++)
                             {
                                 LootParams context = this.getLootContext();
-                                LootTable loot = world.getServer().reloadableRegistries().getLootTable(block.getLootTable());
+                                LootTable loot = world.getServer().reloadableRegistries().getLootTable(block.getLootTable().orElse(null));
                                 List<ItemStack> mobLoot = loot.getRandomItems(context);
 
                                 job.addProcessedResultsList(mobLoot);

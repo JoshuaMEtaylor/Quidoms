@@ -537,7 +537,7 @@ public class CompatibilityManager implements ICompatibilityManager
             final Block block = Block.byItem(stack.getItem());
             if (!block.defaultBlockState().isAir())
             {
-                final List<LootTableAnalyzer.LootDrop> drops = CustomRecipeManager.getInstance().getLootDrops(block.getLootTable());
+                final List<LootTableAnalyzer.LootDrop> drops = CustomRecipeManager.getInstance().getLootDrops(block.getLootTable().orElse(null));
                 for (final LootTableAnalyzer.LootDrop drop : drops)
                 {
                     for (final ItemStack dropStack : drop.getItemStacks())
@@ -570,7 +570,7 @@ public class CompatibilityManager implements ICompatibilityManager
     public void read(@NotNull final HolderLookup.Provider provider, @NotNull final CompoundTag compound)
     {
         NBTUtils.streamCompound(compound.getListOrEmpty(TAG_SAP_LEAF))
-          .map(nbt -> CompatibilityManager.readLeafSaplingEntryFromNBT(provider))
+          .map(nbt -> CompatibilityManager.readLeafSaplingEntryFromNBT(provider, nbt))
           .filter(key -> !key.getA().isAir() && !leavesToSaplingMap.containsKey(key.getA().getBlock()) && !leavesToSaplingMap.containsValue(key.getB()))
           .forEach(key -> leavesToSaplingMap.put(key.getA().getBlock(), key.getB()));
     }
@@ -753,7 +753,7 @@ public class CompatibilityManager implements ICompatibilityManager
     {
         if (compostRecipes.isEmpty())
         {
-            discoverCompostRecipes(recipeManager.getAllRecipesFor(ModRecipeSerializer.CompostRecipeType.get()));
+            discoverCompostRecipes(new ArrayList<>(RecipeCompat.getAllRecipesFor(recipeManager, ModRecipeSerializer.CompostRecipeType.get())));
             Log.getLogger().info("Finished discovering compostables " + compostRecipes.size());
         }
     }
@@ -762,7 +762,7 @@ public class CompatibilityManager implements ICompatibilityManager
     {
         for (final RecipeHolder<CompostRecipe> recipe : recipes)
         {
-            for (final ItemStack stack : recipe.value().getInput().getItems())
+            for (final ItemStack stack : IngredientCompat.getItems(recipe.value().getInput()))
             {
                 // there can be duplicates due to overlapping tags.  weakest one wins.
                 compostRecipes.merge(stack.getItem(), recipe,
@@ -790,7 +790,8 @@ public class CompatibilityManager implements ICompatibilityManager
      */
     private void discoverFuel(final ItemStack stack)
     {
-        if (FurnaceBlockEntity.isFuel(stack))
+        // Vanilla fuel table moved to FuelValues; ItemStack.getBurnTime covers NeoForge overrides.
+        if (stack.getBurnTime(null) > 0)
         {
             fuel.add(new ItemStorage(stack));
         }

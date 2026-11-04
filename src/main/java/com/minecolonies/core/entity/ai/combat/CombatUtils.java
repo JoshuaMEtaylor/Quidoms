@@ -45,7 +45,7 @@ public class CombatUtils
      */
     public static AbstractArrow createArrowForShooter(final LivingEntity shooter)
     {
-        AbstractArrow arrowEntity = ModEntities.MC_NORMAL_ARROW.create(shooter.level());
+        AbstractArrow arrowEntity = ModEntities.MC_NORMAL_ARROW.create(shooter.level(), net.minecraft.world.entity.EntitySpawnReason.SPAWN_ITEM_USE);
 
         final ItemStack rangedWeapon = shooter.getItemInHand(InteractionHand.MAIN_HAND);
         final Item rangedWeaponItem = rangedWeapon.getItem();
@@ -59,11 +59,11 @@ public class CombatUtils
         }
         else if (rangedWeaponItem instanceof ItemSpear)
         {
-            arrowEntity = ModEntities.SPEAR.create(shooter.level());
+            arrowEntity = ModEntities.SPEAR.create(shooter.level(), net.minecraft.world.entity.EntitySpawnReason.SPAWN_ITEM_USE);
         }
         else if (rangedWeaponItem instanceof TridentItem)
         {
-            arrowEntity = EntityType.TRIDENT.create(shooter.level());
+            arrowEntity = EntityType.TRIDENT.create(shooter.level(), net.minecraft.world.entity.EntitySpawnReason.SPAWN_ITEM_USE);
         }
 
         arrowEntity.setOwner(shooter);

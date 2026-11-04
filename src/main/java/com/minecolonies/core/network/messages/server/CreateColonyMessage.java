@@ -92,7 +92,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
     @Override
     protected void onExecute(final IPayloadContext ctxIn, final ServerPlayer sender)
     {
-        final ServerLevel world = sender.serverLevel();
+        final ServerLevel world = sender.level();
 
         final IColony colony = IColonyManager.getInstance().getClosestColony(world, townHall);
 

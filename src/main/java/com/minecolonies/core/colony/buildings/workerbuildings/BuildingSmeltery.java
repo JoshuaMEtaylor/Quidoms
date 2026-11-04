@@ -254,7 +254,7 @@ public class BuildingSmeltery extends AbstractBuilding
             if (item instanceof BlockItem)
             {
                 Block itemBlock = Block.byItem(item);
-                return itemBlock.getLootTable();
+                return itemBlock.getLootTable().orElse(null);
             }
             return null;
         }

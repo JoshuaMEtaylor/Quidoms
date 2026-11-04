@@ -115,7 +115,7 @@ public class Burnable implements IDeliverable
     @Override
     public boolean matches(@NotNull final ItemStack stack)
     {
-        return FurnaceBlockEntity.isFuel(stack);
+        return (stack.getBurnTime(null) > 0);
     }
 
     @Override
