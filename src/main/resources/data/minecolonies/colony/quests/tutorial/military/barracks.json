@@ -1,10 +1,141 @@
 {
-  "name": "Assemble an Army",
   "max-occurrences": 1,
+  "name": "minecolonies.quests.tutorial.military.barracks",
+  "objectives": [
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.tutorial.military.barracks.obj0.answer0",
+          "result": {
+            "type": "minecolonies:dialogue",
+            "options": [
+              {
+                "answer": "minecolonies.quests.tutorial.military.barracks.obj0.answer0.reply.answer0",
+                "result": {
+                  "type": "minecolonies:advanceobjective",
+                  "go-to": 1
+                }
+              },
+              {
+                "answer": "minecolonies.quests.tutorial.military.barracks.obj0.answer0.reply.answer1",
+                "result": {
+                  "type": "minecolonies:dialogue",
+                  "options": [
+                    {
+                      "answer": "minecolonies.quests.tutorial.military.barracks.obj0.answer0.reply.answer1.reply.answer0",
+                      "result": {
+                        "type": "minecolonies:advanceobjective",
+                        "go-to": 2
+                      }
+                    }
+                  ],
+                  "text": "minecolonies.quests.tutorial.military.barracks.obj0.answer0.reply.answer1.reply"
+                }
+              }
+            ],
+            "text": "minecolonies.quests.tutorial.military.barracks.obj0.answer0.reply"
+          }
+        },
+        {
+          "answer": "minecolonies.quests.tutorial.military.barracks.obj0.answer1",
+          "result": {
+            "type": "minecolonies:return"
+          }
+        },
+        {
+          "answer": "minecolonies.quests.tutorial.military.barracks.obj0.answer2",
+          "result": {
+            "type": "minecolonies:dialogue",
+            "options": [
+              {
+                "answer": "minecolonies.quests.tutorial.military.barracks.obj0.answer2.reply.answer0",
+                "result": {
+                  "type": "minecolonies:advanceobjective",
+                  "go-to": 10
+                }
+              }
+            ],
+            "text": "minecolonies.quests.tutorial.military.barracks.obj0.answer2.reply"
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.tutorial.military.barracks.obj0"
+    },
+    {
+      "type": "minecolonies:research",
+      "details": {
+        "type": "minecolonies:combat/tactictraining",
+        "next-objective": 2,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.tutorial.military.barracks.obj2.answer0",
+          "result": {
+            "type": "minecolonies:advanceobjective",
+            "go-to": 3
+          }
+        },
+        {
+          "answer": "minecolonies.quests.tutorial.military.barracks.obj2.answer1",
+          "result": {
+            "type": "minecolonies:return"
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.tutorial.military.barracks.obj2"
+    },
+    {
+      "type": "minecolonies:buildbuilding",
+      "details": {
+        "type": "minecolonies:barracks",
+        "count-existing": true,
+        "lvl": 1,
+        "next-objective": 4,
+        "qty": 1,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.tutorial.military.barracks.obj4.answer0",
+          "result": {
+            "type": "minecolonies:advanceobjective",
+            "go-to": 5
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.tutorial.military.barracks.obj4",
+      "unlocks-rewards": [
+        0
+      ]
+    }
+  ],
   "parents": [
     "minecolonies:tutorial/military/guards2",
     "minecolonies:tutorial/university"
   ],
+  "rewards": [
+    {
+      "type": "minecolonies:item",
+      "details": {
+        "item": {
+          "count": 2,
+          "id": "minecraft:iron_sword"
+        }
+      }
+    }
+  ],
+  "triggerOrder": "1 || 2",
   "triggers": [
     {
       "type": "minecolonies:citizen",
@@ -18,136 +149,7 @@
     },
     {
       "type": "minecolonies:citizen",
-      "state": { }
-    }
-  ],
-  "triggerOrder": "1 || 2",
-  "objectives": [
-    {
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "The defences are starting to look good. But we're still lacking some offensive power in the case of a large scale invasion. We should get some barracks up and running!",
-      "options": [
-        {
-          "answer": "Yes!",
-          "result": {
-            "type": "minecolonies:dialogue",
-            "text": "Barracks come with up to 4 barrack towers (at level 4+) where each tower can house up to 5 guards (at level 5) giving you a whopping 20 guards! But before we do that, we need to first research it at the university!'",
-            "options": [
-              {
-                "answer": "On it!",
-                "result": {
-                  "type": "minecolonies:advanceobjective",
-                  "go-to": 1
-                }
-              },
-              {
-                "answer": "Already done!",
-                "result": {
-                  "type": "minecolonies:dialogue",
-                  "text": "Alrighty then! You know the drill, craft the barracks hut block in a crafting bench. This time surround a block of iron with planks and the build tool at the top.",
-                  "options": [
-                    {
-                      "answer": "Consider it done!",
-                      "result": {
-                        "type": "minecolonies:advanceobjective",
-                        "go-to": 2
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "answer": "Not right now. I will come back to you later!",
-          "result": {
-            "type": "minecolonies:return"
-          }
-        },
-        {
-          "answer": "Already done!",
-          "result": {
-            "type": "minecolonies:dialogue",
-            "text": "Oh nice, then we are done here and I will have more information on the next steps soon!",
-            "options": [
-              {
-                "answer": "Nice!",
-                "result": {
-                  "type": "minecolonies:advanceobjective",
-                  "go-to": 10
-                }
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "type": "minecolonies:research",
-      "details": {
-        "type": "minecolonies:combat/tactictraining",
-        "target": 0,
-        "next-objective": 2
-      }
-    },
-    {
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Now that the research is done, the process is the same. Craft and place the hut, then let the builder build it! You know the drill, craft the barracks hut block in a crafting bench. This time surround a block of iron with planks and the build tool at the top.",
-      "options": [
-        {
-          "answer": "On it!",
-          "result": {
-            "type": "minecolonies:advanceobjective",
-            "go-to": 3
-          }
-        },
-        {
-          "answer": "Not right now. I will come back to you later!",
-          "result": {
-            "type": "minecolonies:return"
-          }
-        }
-      ]
-    },
-    {
-      "type": "minecolonies:buildbuilding",
-      "details": {
-        "type": "minecolonies:barracks",
-        "count-existing": true,
-        "lvl": 1,
-        "qty": 1,
-        "target": 0,
-        "next-objective": 4
-      }
-    },
-    {
-      "unlocks-rewards": [0],
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Great. If you want to start having guards you should also build and upgrade the barracks towers. I will leave this to you. Here, some equipment to get your guards going!",
-      "options": [
-        {
-          "answer": "Thank you!",
-          "result": {
-            "type": "minecolonies:advanceobjective",
-            "go-to": 5
-          }
-        }
-      ]
-    }
-  ],
-  "rewards": [
-    {
-      "type": "minecolonies:item",
-      "details": {
-        "item": {
-          "id": "minecraft:iron_sword",
-          "count": 2
-        }
-      }
+      "state": {}
     }
   ]
 }

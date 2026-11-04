@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "minecolonies:block/colony_wall_banner"
+    "model": "minecolonies:item/colony_wall_banner"
   }
 }

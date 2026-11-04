@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "minecraft:bone",
+    "T": "structurize:sceptergold",
+    "X": "minecraft:stone"
+  },
+  "pattern": [
+    "XTX",
+    "XBX",
+    "XXX"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:blockhutgraveyard"
+  }
+}

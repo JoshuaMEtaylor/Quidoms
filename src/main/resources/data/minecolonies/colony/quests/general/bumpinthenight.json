@@ -1,7 +1,179 @@
 {
-  "name": "Things That Go Bump in the Night",
-  "parents": [],
   "max-occurrences": 1,
+  "name": "minecolonies.quests.general.bumpinthenight",
+  "objectives": [
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.general.bumpinthenight.obj0.answer0",
+          "result": {
+            "type": "minecolonies:dialogue",
+            "options": [
+              {
+                "answer": "minecolonies.quests.general.bumpinthenight.obj0.answer0.reply.answer0",
+                "result": {
+                  "type": "minecolonies:advanceobjective",
+                  "go-to": 1
+                }
+              }
+            ],
+            "text": "minecolonies.quests.general.bumpinthenight.obj0.answer0.reply"
+          }
+        },
+        {
+          "answer": "minecolonies.quests.general.bumpinthenight.obj0.answer1",
+          "result": {
+            "type": "minecolonies:cancel"
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.general.bumpinthenight.obj0"
+    },
+    {
+      "type": "minecolonies:delivery",
+      "details": {
+        "item": {
+          "count": 1,
+          "id": "minecolonies:scroll_tp"
+        },
+        "next-objective": 2,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:delivery",
+      "details": {
+        "item": {
+          "count": 5,
+          "id": "minecraft:lapis_lazuli"
+        },
+        "next-objective": 3,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:delivery",
+      "details": {
+        "item": {
+          "count": 1,
+          "id": "minecraft:ender_pearl"
+        },
+        "next-objective": 4,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:delivery",
+      "details": {
+        "item": {
+          "count": 1,
+          "id": "minecraft:paper"
+        },
+        "next-objective": 5,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.general.bumpinthenight.obj5.answer0",
+          "result": {
+            "type": "minecolonies:advanceobjective",
+            "go-to": 6
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.general.bumpinthenight.obj5"
+    },
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.general.bumpinthenight.obj6.answer0",
+          "result": {
+            "type": "minecolonies:advanceobjective",
+            "go-to": 7
+          }
+        },
+        {
+          "answer": "minecolonies.quests.general.bumpinthenight.obj6.answer1",
+          "result": {
+            "type": "minecolonies:dialogue",
+            "options": [
+              {
+                "answer": "minecolonies.quests.general.bumpinthenight.obj6.answer1.reply.answer0",
+                "result": {
+                  "type": "minecolonies:advanceobjective",
+                  "go-to": 7
+                }
+              }
+            ],
+            "text": "minecolonies.quests.general.bumpinthenight.obj6.answer1.reply"
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.general.bumpinthenight.obj6",
+      "unlocks-rewards": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "parents": [],
+  "rewards": [
+    {
+      "type": "minecolonies:item",
+      "details": {
+        "item": {
+          "count": 3,
+          "id": "minecolonies:scroll_guard_help"
+        }
+      }
+    },
+    {
+      "type": "minecolonies:item",
+      "details": {
+        "item": {
+          "count": 5,
+          "id": "minecraft:lapis_lazuli"
+        }
+      }
+    },
+    {
+      "type": "minecolonies:item",
+      "details": {
+        "item": {
+          "count": 1,
+          "id": "minecraft:ender_pearl"
+        }
+      }
+    },
+    {
+      "type": "minecolonies:item",
+      "details": {
+        "item": {
+          "count": 1,
+          "id": "minecraft:paper"
+        }
+      }
+    },
+    {
+      "type": "minecolonies:happiness",
+      "details": {
+        "days": 7,
+        "qty": 1,
+        "target": 0
+      }
+    }
+  ],
   "triggers": [
     {
       "type": "minecolonies:random",
@@ -10,11 +182,11 @@
     {
       "type": "minecolonies:state",
       "state": {
-        "path": "buildingManager/buildings",
         "match": {
           "type": "minecolonies:enchanter",
           "level": 2
-        }
+        },
+        "path": "buildingManager/buildings"
       }
     },
     {
@@ -25,172 +197,6 @@
             "type": "minecolonies:enchanter"
           }
         }
-      }
-    }
-  ],
-  "objectives": [
-    {
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Oh! I am so glad you stopped by. I have been hearing the most unsettling noises near the tower at night - rustling, thumping, all manner of things. Could be animals. Could be something worse. I would feel much safer if I had a Spatial Guard Reinforcements Scroll on hand, just in case. Could you help me gather the ingredients?",
-      "options": [
-        {
-          "answer": "Of course! What do you need?",
-          "result": {
-            "type": "minecolonies:dialogue",
-            "text": "Wonderful, thank you! I will need one Teleport Scroll, five Lapis Lazuli, one Ender Pearl, and one sheet of Paper. I have the enchanting setup ready - I just need the raw materials. Once I have them I can get to work tonight.",
-            "options": [
-              {
-                "answer": "Leave it to me, I will gather those right away!",
-                "result": {
-                  "type": "minecolonies:advanceobjective",
-                  "go-to": 1
-                }
-              }
-            ]
-          }
-        },
-        {
-          "answer": "Sorry, I am a bit busy right now.",
-          "result": {
-            "type": "minecolonies:cancel"
-          }
-        }
-      ]
-    },
-    {
-      "type": "minecolonies:delivery",
-      "details": {
-        "target": 0,
-        "item": {
-          "id": "minecolonies:scroll_tp",
-          "count": 1
-        },
-        "next-objective": 2
-      }
-    },
-    {
-      "type": "minecolonies:delivery",
-      "details": {
-        "target": 0,
-        "item": {
-          "id": "minecraft:lapis_lazuli",
-          "count": 5
-        },
-        "next-objective": 3
-      }
-    },
-    {
-      "type": "minecolonies:delivery",
-      "details": {
-        "target": 0,
-        "item": {
-          "id": "minecraft:ender_pearl",
-          "count": 1
-        },
-        "next-objective": 4
-      }
-    },
-    {
-      "type": "minecolonies:delivery",
-      "details": {
-        "target": 0,
-        "item": {
-          "id": "minecraft:paper",
-          "count": 1
-        },
-        "next-objective": 5
-      }
-    },
-    {
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Perfect! This is everything I need. I will get to work on the scroll tonight and have a proper listen around the tower while I am at it. Come back and check in with me tomorrow - I will let you know what I found!",
-      "options": [
-        {
-          "answer": "Of course! I will stop by tomorrow.",
-          "result": {
-            "type": "minecolonies:advanceobjective",
-            "go-to": 6
-          }
-        }
-      ]
-    },
-    {
-      "unlocks-rewards": [0, 1, 2, 3, 4],
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Oh! You are back! Ha - you will not believe this. I stayed up half the night, peered out every window, and do you know what was making all that noise? Squirrels! A whole family of squirrels had made a nest in the woodpile outside. Completely harmless. I feel a little foolish, I will admit. The good news is I used the time productively and made not one but three scrolls! Here, take them - and the leftover materials. Thank you for humoring a nervous enchanter.",
-      "options": [
-        {
-          "answer": "Ha! I am glad it was not something worse. Stay safe!",
-          "result": {
-            "type": "minecolonies:advanceobjective",
-            "go-to": 7
-          }
-        },
-        {
-          "answer": "Three scrolls? You really went all out!",
-          "result": {
-            "type": "minecolonies:dialogue",
-            "text": "Well, I had to do something with all that nervous energy! Besides, you never know when guards might come in handy. Now go on, and do not hesitate to visit if you need more enchanting work done.",
-            "options": [
-              {
-                "answer": "Will do. Thanks!",
-                "result": {
-                  "type": "minecolonies:advanceobjective",
-                  "go-to": 7
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
-  ],
-  "rewards": [
-    {
-      "type": "minecolonies:item",
-      "details": {
-        "item": {
-          "id": "minecolonies:scroll_guard_help",
-          "count": 3
-        }
-      }
-    },
-    {
-      "type": "minecolonies:item",
-      "details": {
-        "item": {
-          "id": "minecraft:lapis_lazuli",
-          "count": 5
-        }
-      }
-    },
-    {
-      "type": "minecolonies:item",
-      "details": {
-        "item": {
-          "id": "minecraft:ender_pearl",
-          "count": 1
-        }
-      }
-    },
-    {
-      "type": "minecolonies:item",
-      "details": {
-        "item": {
-          "id": "minecraft:paper",
-          "count": 1
-        }
-      }
-    },
-    {
-      "type": "minecolonies:happiness",
-      "details": {
-        "target": 0,
-        "qty": 1,
-        "days": 7
       }
     }
   ]

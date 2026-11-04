@@ -1,5 +1,6 @@
 {
   "values": [
-    "minecraft:farmland"
+    "minecolonies:farmland",
+    "minecolonies:floodedfarmland"
   ]
 }

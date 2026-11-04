@@ -108,6 +108,8 @@ public class MineColonies
         final IEventBus forgeBus = NeoForge.EVENT_BUS;
 
         LanguageHandler.loadLangPath("assets/minecolonies/lang/%s.json");
+        // Extract style packs to gameDir/blueprints so Structurize can discover them when jar FS listing fails on 1.21.10.
+        com.minecolonies.core.util.BlueprintPackBootstrap.ensureExtracted();
         config = new Configurations<>(modContainer, modBus, ClientConfiguration::new, ServerConfiguration::new, CommonConfiguration::new);
 
         ModArgumentTypes.ARGUMENT_TYPES.register(modBus);

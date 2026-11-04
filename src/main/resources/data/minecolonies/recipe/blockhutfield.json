@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": [
+      {
+        "item": "minecraft:hay_block"
+      },
+      {
+        "item": "minecraft:pumpkin"
+      }
+    ],
+    "L": "minecraft:leather",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    " H ",
+    "SLS",
+    " S "
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:blockhutfield"
+  }
+}

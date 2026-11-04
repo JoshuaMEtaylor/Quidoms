@@ -4,11 +4,11 @@
   "ambientocclusion": false,
   "loader": "neoforge:composite",
   "textures": {
-    "particle": "block/cobblestone"
+    "particle": "block/cobblestone",
+    "1": "minecraft:block/oak_planks"
   },
   "children": {
-    "base": {
-    },
+    "base": {},
     "first": {
       "render_type": "solid",
       "textures": {

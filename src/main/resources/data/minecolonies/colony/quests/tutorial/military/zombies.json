@@ -1,71 +1,59 @@
 {
-  "name": "Dawn of the Undead",
   "max-occurrences": 1,
-  "parents": [
-    "minecolonies:tutorial/military/torches"
-  ],
-  "triggers": [
-    {
-      "type": "minecolonies:citizen",
-      "state": {
-        "notmatch": {
-          "finavquests": [
-            "minecolonies:tutorial/military/torches"
-          ]
-        }
-      }
-    },
-    {
-      "type": "minecolonies:citizen",
-      "state": { }
-    }
-  ],
-  "triggerOrder": "1 || 2",
+  "name": "minecolonies.quests.tutorial.military.zombies",
   "objectives": [
     {
       "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Hi, there seem to be a lot of dangerous mobs around here! Would you mind killing some zombies to make us feel more at ease?",
       "options": [
         {
-          "answer": "Consider it done!",
+          "answer": "minecolonies.quests.tutorial.military.zombies.obj0.answer0",
           "result": {
             "type": "minecolonies:advanceobjective",
             "go-to": 1
           }
         },
         {
-          "answer": "Not right now. I will come back to you later!",
+          "answer": "minecolonies.quests.tutorial.military.zombies.obj0.answer1",
           "result": {
             "type": "minecolonies:return"
           }
         }
-      ]
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.tutorial.military.zombies.obj0"
     },
     {
-      "unlocks-rewards": [0,1,2,3],
       "type": "minecolonies:killentity",
       "details": {
         "entity-type": "minecraft:zombie",
         "next-objective": 2,
         "qty": 10,
         "target": 0
-      }
+      },
+      "unlocks-rewards": [
+        0,
+        1,
+        2,
+        3
+      ]
     },
     {
       "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Great, thanks! I feel more at ease already. Here, have some leather armor!",
       "options": [
         {
-          "answer": "Thanks!",
+          "answer": "minecolonies.quests.tutorial.military.zombies.obj2.answer0",
           "result": {
             "type": "minecolonies:advanceobjective",
             "go-to": 5
           }
         }
-      ]
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.tutorial.military.zombies.obj2"
     }
+  ],
+  "parents": [
+    "minecolonies:tutorial/military/torches"
   ],
   "rewards": [
     {
@@ -99,6 +87,23 @@
           "id": "minecraft:leather_leggings"
         }
       }
+    }
+  ],
+  "triggerOrder": "1 || 2",
+  "triggers": [
+    {
+      "type": "minecolonies:citizen",
+      "state": {
+        "notmatch": {
+          "finavquests": [
+            "minecolonies:tutorial/military/torches"
+          ]
+        }
+      }
+    },
+    {
+      "type": "minecolonies:citizen",
+      "state": {}
     }
   ]
 }

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:peas",
+    "minecolonies:garlic",
+    "minecraft:mutton",
+    "minecraft:potato"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:mutton_dinner"
+  }
+}

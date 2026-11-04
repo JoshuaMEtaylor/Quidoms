@@ -377,28 +377,28 @@ public final class ModItemsInitializer
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "large_milk_bottle"), ModItems.large_milk_bottle);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "large_soy_milk_bottle"), ModItems.large_soy_milk_bottle);
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "barbarianegg"), spawnEgg(ModEntities.CAMP_BARBARIAN));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "barbarcheregg"), spawnEgg(ModEntities.CAMP_ARCHERBARBARIAN));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "barbchiefegg"), spawnEgg(ModEntities.CAMP_CHIEFBARBARIAN));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campbarbarian_spawn_egg"), spawnEgg(ModEntities.CAMP_BARBARIAN));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparcherbarbarian_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERBARBARIAN));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campchiefbarbarian_spawn_egg"), spawnEgg(ModEntities.CAMP_CHIEFBARBARIAN));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirateegg"), spawnEgg(ModEntities.CAMP_PIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "piratearcheregg"), spawnEgg(ModEntities.CAMP_ARCHERPIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "piratecaptainegg"), spawnEgg(ModEntities.CAMP_CHIEFPIRATE));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camppirate_spawn_egg"), spawnEgg(ModEntities.CAMP_PIRATE));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparcherpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERPIRATE));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campchiefpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_CHIEFPIRATE));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "mummyegg"), spawnEgg(ModEntities.CAMP_MUMMY));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "mummyarcheregg"), spawnEgg(ModEntities.CAMP_ARCHERMUMMY));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pharaoegg"), spawnEgg(ModEntities.CAMP_PHARAO));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campmummy_spawn_egg"), spawnEgg(ModEntities.CAMP_MUMMY));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparchermummy_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERMUMMY));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camppharao_spawn_egg"), spawnEgg(ModEntities.CAMP_PHARAO));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "shieldmaidenegg"), spawnEgg(ModEntities.CAMP_SHIELDMAIDEN));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "norsemenarcheregg"), spawnEgg(ModEntities.CAMP_NORSEMEN_ARCHER));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "norsemenchiefegg"), spawnEgg(ModEntities.CAMP_NORSEMEN_CHIEF));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campshieldmaiden_spawn_egg"), spawnEgg(ModEntities.CAMP_SHIELDMAIDEN));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemen_archer_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_ARCHER));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemen_chief_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_CHIEF));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "amazonegg"), spawnEgg(ModEntities.CAMP_AMAZON));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "amazonspearmanegg"), spawnEgg(ModEntities.CAMP_AMAZONSPEARMAN));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "amazonchiefegg"), spawnEgg(ModEntities.CAMP_AMAZONCHIEF));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazon_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZON));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazonspearman_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZONSPEARMAN));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazonchief_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZONCHIEF));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "drownedpirateegg"), spawnEgg(ModEntities.CAMP_DROWNED_PIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "drownedpiratearcheregg"), spawnEgg(ModEntities.CAMP_DROWNED_ARCHERPIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "drownedpiratecaptainegg"), spawnEgg(ModEntities.CAMP_DROWNED_CHIEFPIRATE));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrowned_pirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_PIRATE));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrowned_archerpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_ARCHERPIRATE));
+        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrowned_chiefpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_CHIEFPIRATE));
     }
 }

@@ -1,6 +1,8 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecolonies:item/spear"
+    "layer0": "minecolonies:item/spear",
+    "spear": "minecolonies:item/spear",
+    "particle": "minecolonies:item/spear"
   }
 }
