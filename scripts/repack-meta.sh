@@ -5,7 +5,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-JAR="${1:-dist/quidoms-0.0.17-1.21.10.jar}"
+JAR="${1:-dist/quidoms-0.0.18-1.21.10.jar}"
 test -f "$JAR"
 
 STAGE=$(mktemp -d)
