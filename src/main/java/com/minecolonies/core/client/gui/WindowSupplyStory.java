@@ -75,7 +75,7 @@ public class WindowSupplyStory extends AbstractWindowSkeleton
         if (currentComponent.instantPlacement()) // if free dungeon loot nbt tag on item.
         {
             final Random random = new Random(currentComponent.randomKey());
-            final List<Holder.Reference<Biome>> biomes = mc.level.registryAccess().registryOrThrow(Registries.BIOME).holders().toList();
+            final List<Holder.Reference<Biome>> biomes = mc.level.registryAccess().lookupOrThrow(Registries.BIOME).holders().toList();
             final Holder<Biome> biome = biomes.get(random.nextInt(biomes.size()));
             if (stack.getItem() == ModItems.supplyCamp)
             {

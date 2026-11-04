@@ -87,7 +87,7 @@ public class ToolRecipeCategory extends AbstractRecipeCategory<ToolUsage>
         final Minecraft mc = Minecraft.getInstance();
 
         final int scale = 2;
-        stack.pose().pushPose();
+        stack.pose().pushMatrix();
         stack.pose().scale(1F / scale, 1F / scale, 1.0F);
         int x = SLOT_X;
         for (int i = 0; i <= MAX_BUILDING_LEVEL; ++i)
@@ -96,7 +96,7 @@ public class ToolRecipeCategory extends AbstractRecipeCategory<ToolUsage>
             stack.drawString(mc.font, text, (x + (18 - mc.font.width(text)/scale) / 2) * scale, scale, 0, false);
             x += 18;
         }
-        stack.pose().popPose();
+        stack.pose().popMatrix();
     }
 
     @Override

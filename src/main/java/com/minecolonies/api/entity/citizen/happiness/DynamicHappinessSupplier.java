@@ -62,7 +62,7 @@ public class DynamicHappinessSupplier implements IHappinessSupplierWrapper
     @Override
     public double getValue(final ICitizenData citizenData)
     {
-        HappinessRegistry.HappinessFunctionEntry function = IMinecoloniesAPI.getInstance().getHappinessFunctionRegistry().get(key);
+        HappinessRegistry.HappinessFunctionEntry function = IMinecoloniesAPI.getInstance().getHappinessFunctionRegistry().getValue(key);
         if (function == null)
         {
             return lastValue;

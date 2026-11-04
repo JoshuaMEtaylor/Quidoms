@@ -867,7 +867,7 @@ public class WindowResearchTree extends AbstractWindowSkeleton
             final List<ItemStack> stacks = new ArrayList<>();
             for (final ResourceLocation building : requirement.getBuildings())
             {
-                stacks.add(Optional.ofNullable(IBuildingRegistry.getInstance().get(building))
+                stacks.add(Optional.ofNullable(IBuildingRegistry.getInstance().getValue(building))
                     .map(entry -> new ItemStack(entry.getBuildingBlock().asItem(), requirement.getBuildingLevel()))
                     .orElse(Items.AIR.getDefaultInstance()));
             }
@@ -890,7 +890,7 @@ public class WindowResearchTree extends AbstractWindowSkeleton
 
         for (final BuildingResearchRequirement requirement : buildingRequirements)
         {
-            final ItemStack stack = Optional.ofNullable(IBuildingRegistry.getInstance().get(requirement.getBuilding()))
+            final ItemStack stack = Optional.ofNullable(IBuildingRegistry.getInstance().getValue(requirement.getBuilding()))
                 .map(entry -> new ItemStack(entry.getBuildingBlock().asItem(), requirement.getBuildingLevel()))
                 .orElse(Items.AIR.getDefaultInstance());
             final ItemIcon icon = new ItemIcon();

@@ -123,7 +123,7 @@ public class BuildingResearchRequirement implements IResearchRequirement
     @Override
     public MutableComponent getDesc()
     {
-        final BuildingEntry buildingEntry = IBuildingRegistry.getInstance().get(building);
+        final BuildingEntry buildingEntry = IBuildingRegistry.getInstance().getValue(building);
         final MutableComponent buildingName = buildingEntry != null ? Component.translatable(buildingEntry.getTranslationKey()) : Component.empty();
 
         if (singleBuilding)

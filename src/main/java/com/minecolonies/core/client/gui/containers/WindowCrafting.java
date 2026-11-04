@@ -246,7 +246,7 @@ public class WindowCrafting extends AbstractContainerScreen<ContainerCrafting>
     @Override
     protected void renderLabels(@NotNull final GuiGraphics stack, final int mouseX, final int mouseY)
     {
-        stack.drawString(this.font, Component.translatableEscape("container.crafting").getString(), X_OFFSET, Y_OFFSET, GUI_COLOR, false, "");
+        stack.drawString(this.font, Component.translatableEscape("container.crafting").getString(), X_OFFSET, Y_OFFSET, GUI_COLOR, false);
     }
 
     /**
@@ -264,7 +264,7 @@ public class WindowCrafting extends AbstractContainerScreen<ContainerCrafting>
         {
             texture = CRAFTING_TABLE_GUI_TEXTURES;
         }
-        stack.blit(texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, texture, this.leftPos, this.topPos, 0f, 0f, this.imageWidth, this.imageHeight, 256, 256);
     }
 
     @Override

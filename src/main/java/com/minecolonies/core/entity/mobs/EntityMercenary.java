@@ -25,6 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -392,13 +393,13 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
     }
 
     @Override
-    public boolean hurt(final DamageSource source, final float damage)
+    public boolean hurtServer(final ServerLevel level, final DamageSource source, final float damage)
     {
         if (source.getEntity() instanceof LivingEntity)
         {
             this.setTarget((LivingEntity) source.getEntity());
         }
-        return super.hurt(source, damage);
+        return super.hurtServer(level, source, damage);
     }
 
     @Override

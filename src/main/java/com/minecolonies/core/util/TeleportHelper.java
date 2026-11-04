@@ -53,7 +53,7 @@ public final class TeleportHelper
 
         citizen.getNavigation().stop();
         citizen.stopRiding();
-        citizen.moveTo(
+        citizensnapTo(
           spawnPoint.getX() + MIDDLE_BLOCK_OFFSET,
           spawnPoint.getY(),
           spawnPoint.getZ() + MIDDLE_BLOCK_OFFSET,

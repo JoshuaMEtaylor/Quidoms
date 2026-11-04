@@ -18,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -421,7 +422,7 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
     }
 
     @Override
-    public boolean hurt(@NotNull final DamageSource damageSource, final float damage)
+    public boolean hurtServer(final ServerLevel level, @NotNull final DamageSource damageSource, final float damage)
     {
         if (!(damageSource.getEntity() instanceof LivingEntity) || damageSource.getEntity() instanceof FakePlayer)
         {
@@ -469,11 +470,11 @@ public abstract class AbstractEntityMinecoloniesRaider extends AbstractEntityMin
                 float baseScalingDamage = Math.min(damage, MAX_SCALED_DAMAGE);
                 float totalWithScaled =
                     Math.max(damage, (damage - baseScalingDamage) + baseScalingDamage * HP_PERCENT_PER_DMG * this.getMaxHealth() * (1 + (raiderDamageEnchantLevel / 5)));
-                return super.hurt(damageSource, totalWithScaled);
+                return super.hurtServer(level, damageSource, totalWithScaled);
             }
         }
 
-        return super.hurt(damageSource, damage);
+        return super.hurtServer(level, damageSource, damage);
     }
 
     /**

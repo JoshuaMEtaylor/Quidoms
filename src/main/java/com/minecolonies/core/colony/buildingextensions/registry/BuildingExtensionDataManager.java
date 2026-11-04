@@ -55,7 +55,7 @@ public final class BuildingExtensionDataManager
      */
     public static IBuildingExtension resourceLocationToExtension(final @NotNull ResourceLocation registryName, final @NotNull BlockPos position)
     {
-        final BuildingExtensionEntry entry = BuildingExtensionRegistries.getBuildingExtensionRegistry().get(registryName);
+        final BuildingExtensionEntry entry = BuildingExtensionRegistries.getBuildingExtensionRegistry().getValue(registryName);
 
         if (entry == null)
         {

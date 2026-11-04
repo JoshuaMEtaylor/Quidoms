@@ -10,6 +10,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.model.geom.ModelLayers;
 import com.mojang.blaze3d.platform.Lighting;
@@ -106,7 +108,7 @@ public class WindowBannerPicker extends Screen
     private final AbstractWindowTownHall window;
 
     /** The assigned renderer for the banner models */
-    private final ModelPart modelRender;
+    private final ModelPart modelRender; // may be null if banner layer missing
 
     /**
      * Local reference of feature unlocked flag.
@@ -136,7 +138,8 @@ public class WindowBannerPicker extends Screen
 
         this.colony = colony;
         this.window = hallWindow;
-        this.modelRender = Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.BANNER).getChild("flag");
+        // Banner ModelLayers.BANNER removed/renamed on 1.21.10; 3D preview stubbed.
+        this.modelRender = null;
 
         /* Get all patterns, then remove excluded and item-required patterns */
         List<Holder<BannerPattern>> exclusion = new ArrayList<>();
@@ -148,7 +151,7 @@ public class WindowBannerPicker extends Screen
             }
         }
 
-        this.patterns = colony.getWorld().registryAccess().registry(Registries.BANNER_PATTERN).get().holders().collect(Collectors.toCollection(LinkedList::new));
+        this.patterns = colony.getWorld().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).listElements().collect(Collectors.toCollection(LinkedList::new));
         this.patterns.removeAll(exclusion);
         this.isFeatureUnlocked = isFeatureUnlocked;
 
@@ -302,11 +305,7 @@ public class WindowBannerPicker extends Screen
 
 
         // Render the instructions
-        stack.drawCenteredString(this.font,
-                Component.translatableEscape("com.minecolonies.coremod.gui.flag.choose").getString(), this.width /2,
-                16,
-                0xFFFFFF /* white */
-        , "");
+        stack.drawCenteredString(this.font, Component.translatableEscape("com.minecolonies.coremod.gui.flag.choose").getString(), this.width / 2, 16, 0xFFFFFF);
     }
 
     /**
@@ -314,17 +313,14 @@ public class WindowBannerPicker extends Screen
      */
     private void drawFlag(final GuiGraphics stack)
     {
-        Lighting.setupForFlatItems();
-        double posX = (this.width + PATTERN_HEIGHT/2.0 * PATTERN_COLUMNS) / 2 + SIDE *2;
-        double posY = (this.height) / 2.0;
-
-        PoseStack transform = new PoseStack();
-        transform.translate(posX, posY + 40, 0.0D);
-        transform.scale(40.0F, -40.0F, 1.0F);
-        transform.translate(0.5D, 0.5D, 0.5D);
-        transform.scale(1F, -1F, -1F);
-
-        renderBanner(transform, this.layers, stack);
+        // 1.21.10: GuiGraphics is 2D (Matrix3x2fStack); 3D banner preview deferred.
+        final int posX = (int) ((this.width + PATTERN_HEIGHT / 2.0 * PATTERN_COLUMNS) / 2 + SIDE * 2);
+        final int posY = this.height / 2;
+        stack.fill(posX - 20, posY - 40, posX + 20, posY + 40, 0xFF888888);
+        for (int i = 0; i < layers.size(); i++)
+        {
+            stack.fill(posX - 18, posY - 38 + i * 6, posX + 18, posY - 34 + i * 6, 0xFF000000 | layers.get(i).color().getTextColor());
+        }
     }
 
     /**
@@ -336,27 +332,12 @@ public class WindowBannerPicker extends Screen
      */
     private void drawBannerPattern(Holder<BannerPattern> pattern, int x, int y, GuiGraphics stack)
     {
-        Lighting.setupForFlatItems();
-
-        List<BannerPatternLayers.Layer> list = new ArrayList<>();
-        list.add(new BannerPatternLayers.Layer(Utils.getRegistryValue(BannerPatterns.BASE, colony.getWorld()), DyeColor.GRAY));
-        if (!isFeatureUnlocked.get() && pattern.unwrapKey().get().location().getNamespace().equals(Constants.MOD_ID))
-        {
-            list.add(new BannerPatternLayers.Layer(pattern, DyeColor.BLACK));
-        }
-        else
-        {
-            list.add(new BannerPatternLayers.Layer(pattern, DyeColor.WHITE));
-        }
-
-        PoseStack transform = new PoseStack();
-        transform.pushPose();
-        transform.translate(x+2.5, y + 29, 0.0D);
-        transform.scale(10.0F, -11.0F, 1.0F);
-        transform.translate(0.5D, 0.5D, 0.5D);
-        transform.scale(1F, -1F, -1F);
-
-        renderBanner(transform, list, stack);
+        // 2D stand-in for pattern preview
+        final DyeColor dye = (!isFeatureUnlocked.get() && pattern.unwrapKey().isPresent()
+            && pattern.unwrapKey().get().location().getNamespace().equals(Constants.MOD_ID))
+            ? DyeColor.BLACK : DyeColor.WHITE;
+        stack.fill(x, y, x + PATTERN_WIDTH, y + PATTERN_HEIGHT, 0xFF777777);
+        stack.fill(x + 2, y + 2, x + PATTERN_WIDTH - 2, y + PATTERN_HEIGHT - 2, 0xFF000000 | dye.getTextColor());
     }
 
     /**
@@ -366,25 +347,7 @@ public class WindowBannerPicker extends Screen
      */
     public void renderBanner(PoseStack transform, List<BannerPatternLayers.Layer> layers, GuiGraphics stack)
     {
-        this.modelRender.xRot= 0.0F;
-        this.modelRender.y = -32.0F;
-        final BannerPatternLayers.Builder builder = new BannerPatternLayers.Builder();
-        for (BannerPatternLayers.Layer layer : layers)
-        {
-            builder.add(layer);
-        }
-
-        BannerRenderer.renderPatterns(transform,
-            stack.bufferSource(),
-            15728880,
-            OverlayTexture.NO_OVERLAY,
-            this.modelRender,
-            ModelBakery.BANNER_BASE,
-            true,
-            colors.getSelectedItem(),
-            builder.build());
-        transform.popPose();
-        stack.flush();
+        // no-op: 3D banner rendering deferred on 1.21.10 GuiGraphics
     }
 
     @Override
@@ -402,9 +365,11 @@ public class WindowBannerPicker extends Screen
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int p_231044_5_)
+    public boolean mouseClicked(final MouseButtonEvent event, final boolean isDoubleClick)
     {
         this.scrolling = false;
+        final double mouseX = event.x();
+        final double mouseY = event.y();
 
         int trackX = center(this.width, PATTERN_COLUMNS, PATTERN_WIDTH, PATTERN_COLUMNS, PATTERN_MARGIN);
         int trackY = center(this.height, PATTERN_ROWS, PATTERN_HEIGHT, 0, PATTERN_MARGIN);
@@ -412,11 +377,11 @@ public class WindowBannerPicker extends Screen
         if (mouseX > trackX + 2 && mouseX < trackX + 8 && mouseY > trackY && mouseY < trackEnd)
             this.scrolling = true;
         
-        return super.mouseClicked(mouseX, mouseY, p_231044_5_);
+        return super.mouseClicked(event, isDoubleClick);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY)
+    public boolean mouseDragged(final MouseButtonEvent event, final double deltaX, final double deltaY)
     {
         if (this.scrolling && this.activeLayer > 0) {
 
@@ -424,14 +389,14 @@ public class WindowBannerPicker extends Screen
             int trackLength = PATTERN_ROWS*(PATTERN_HEIGHT + PATTERN_MARGIN);
 
             double scrollRatio = Mth.clamp(
-                    (mouseY - trackStart) / trackLength,
+                    (event.y() - trackStart) / trackLength,
                     0, 1
             );
             this.scrollRow = (int) Math.round(scrollRatio * (Math.ceil(this.patterns.size() / PATTERN_COLUMNS) - PATTERN_ROWS + 1));
 
             return true;
         } else {
-            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+            return super.mouseDragged(event, deltaX, deltaY);
         }
     }
 
@@ -464,7 +429,7 @@ public class WindowBannerPicker extends Screen
         }
 
         @Override
-        public void onPress()
+        public void onPress(final InputWithModifiers input)
         {
             activeLayer = this.layer;
 
@@ -517,11 +482,11 @@ public class WindowBannerPicker extends Screen
         }
 
         @Override
-        public void onPress()
+        public void onPress(final InputWithModifiers input)
         {
             if (!this.blocked)
             {
-                setLayer(this.pattern, colors.getSelectedItem());
+                setLayer(this.pattern, colors.getSelected());
             }
         }
 

@@ -320,11 +320,11 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
                     if (ourEntity instanceof AbstractEntityCitizen citizen)
                     {
                         final BlockPos tpPos = citizen.getCitizenData().getHomePosition();
-                        ourEntity.moveTo(tpPos.getX(), tpPos.getY(), tpPos.getZ());
+                        ourEntity.snapTo(tpPos.getX(), tpPos.getY(), tpPos.getZ());
                         return null;
                     }
 
-                    ourEntity.moveTo(dest.getX(), dest.getY(), dest.getZ());
+                    ourEntity.snapTo(dest.getX(), dest.getY(), dest.getZ());
                 }
 
                 pauseTicks = 20 * 300;

@@ -57,7 +57,7 @@ public class MinecraftMap extends Pane
     {
         if (mapData != null)
         {
-            ms.pose().pushPose();
+            ms.pose().pushMatrix();
             ms.pose().translate(x, y, 0.01f);
             ms.pose().scale(getWidth() / MAP_SIZE, getHeight() / MAP_SIZE, 1);
 
@@ -65,7 +65,7 @@ public class MinecraftMap extends Pane
             Minecraft.getInstance().gameRenderer.getMapRenderer().render(ms.pose(), ms.bufferSource(), mapId, mapData, true, 15728880);
 
             ms.flush();
-            ms.pose().popPose();
+            ms.pose().popMatrix();
         }
     }
 }

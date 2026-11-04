@@ -66,7 +66,7 @@ public class PublicWorkerCraftingProductionResolverFactory implements IRequestRe
     {
         final IToken<?> token = controller.deserializeTag(provider, nbt.getCompoundOrEmpty(NBT_TOKEN));
         final ILocation location = controller.deserializeTag(provider, nbt.getCompoundOrEmpty(NBT_LOCATION));
-        final JobEntry entry = IJobRegistry.getInstance().get(ResourceLocation.parse(nbt.getStringOr(NBT_JOB, "")));
+        final JobEntry entry = IJobRegistry.getInstance().getValue(ResourceLocation.parse(nbt.getStringOr(NBT_JOB, "")));
         return new PublicWorkerCraftingProductionResolver(location, token, entry);
     }
 

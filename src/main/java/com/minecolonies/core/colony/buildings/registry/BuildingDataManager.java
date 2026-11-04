@@ -80,7 +80,7 @@ public class BuildingDataManager implements IBuildingDataManager
     public IBuildingView createViewFrom(final IColonyView colony, final BlockPos position, final RegistryFriendlyByteBuf networkBuffer)
     {
         final ResourceLocation buildingName = ResourceLocation.parse(networkBuffer.readUtf(32767));
-        final BuildingEntry entry = IBuildingRegistry.getInstance().get(buildingName);
+        final BuildingEntry entry = IBuildingRegistry.getInstance().getValue(buildingName);
 
         if (entry == null)
         {

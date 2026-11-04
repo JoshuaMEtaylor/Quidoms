@@ -467,7 +467,7 @@ public class StackList implements IConcreteDeliverable, INonExhaustiveDeliverabl
                                                final int perStackCount)
     {
         // 1.21: RegistryAccess#registryOrThrow and Registries.ITEM are still valid.
-        final Registry<Item> itemReg = registryAccess.registryOrThrow(Registries.ITEM);
+        final Registry<Item> itemReg = registryAccess.lookupOrThrow(Registries.ITEM);
 
         // Use getTagOrEmpty so we don't have to deal with Optional<HolderSet.Named<Item>>.
         final Iterable<Holder<Item>> holders = itemReg.getTagOrEmpty(tag);

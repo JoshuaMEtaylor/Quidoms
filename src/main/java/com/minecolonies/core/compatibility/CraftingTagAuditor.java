@@ -186,7 +186,7 @@ public class CraftingTagAuditor
         writer.write("block,name,path,climbable,dangerous");
         writer.newLine();
 
-        for (final Map.Entry<ResourceKey<Block>, Block> entry : server.registryAccess().registryOrThrow(Registries.BLOCK).entrySet()
+        for (final Map.Entry<ResourceKey<Block>, Block> entry : server.registryAccess().lookupOrThrow(Registries.BLOCK).entrySet()
                 .stream().sorted(Comparator.comparing(e -> e.getKey().location().toString())).toList())
         {
             writer.write(entry.getKey().location().toString());
@@ -219,7 +219,7 @@ public class CraftingTagAuditor
         writer.write("block,name,score,tier0,tier1,tier2,tier3,tier4,tier5,tier6");
         writer.newLine();
 
-        for (final Map.Entry<ResourceKey<Block>, Block> entry : server.registryAccess().registryOrThrow(Registries.BLOCK).entrySet()
+        for (final Map.Entry<ResourceKey<Block>, Block> entry : server.registryAccess().lookupOrThrow(Registries.BLOCK).entrySet()
             .stream().sorted(Comparator.comparing(e -> e.getKey().location().toString())).toList())
         {
             writer.write(entry.getKey().location().toString());

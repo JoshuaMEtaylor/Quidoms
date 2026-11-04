@@ -3,6 +3,7 @@ package com.minecolonies.core.client.gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 import net.neoforged.api.distmarker.Dist;
@@ -104,10 +105,13 @@ public class ColorPalette
         }
 
         @Override
-        public void onPress ()
+        public void onPress(final InputWithModifiers input)
         {
             selected = this.color;
-            onchange.onChange(selected);
+            if (onchange != null)
+            {
+                onchange.onChange(selected);
+            }
         }
 
         /**

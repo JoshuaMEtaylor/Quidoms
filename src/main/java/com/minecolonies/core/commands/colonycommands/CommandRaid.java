@@ -97,7 +97,7 @@ public class CommandRaid implements IMCOPCommand
     {
         final ResourceLocation raidType =
             ResourceKeyArgument.resolveKey(context, RAID_TYPE_ARG, CommonMinecoloniesAPIImpl.COLONY_EVENT_TYPES, ERROR_INVALID_COLONY_EVENT_TYPE).getKey().location();
-        final ColonyEventTypeRegistryEntry colonyEventTypeRegistryEntry = IMinecoloniesAPI.getInstance().getColonyEventRegistry().get(raidType);
+        final ColonyEventTypeRegistryEntry colonyEventTypeRegistryEntry = IMinecoloniesAPI.getInstance().getColonyEventRegistry().getValue(raidType);
         if (colonyEventTypeRegistryEntry != null && colonyEventTypeRegistryEntry.isRaidEvent())
         {
             return raidType.getPath();

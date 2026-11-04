@@ -128,7 +128,7 @@ public class Tool implements IDeliverable
     {
         //API:Map the given strings a proper way.
         String resLoc = nbt.getStringOr(NBT_TYPE, "");
-        final EquipmentTypeEntry type = ModEquipmentTypes.getRegistry().get(EquipmentTypeEntry.parseResourceLocation(resLoc));
+        final EquipmentTypeEntry type = ModEquipmentTypes.getRegistry().getValue(EquipmentTypeEntry.parseResourceLocation(resLoc));
         final Integer minLevel = nbt.getIntOr(NBT_MIN_LEVEL, 0);
         final Integer maxLevel = nbt.getIntOr(NBT_MAX_LEVEL, 0);
         final ItemStack result = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, nbt.getCompoundOrEmpty(NBT_RESULT));
@@ -164,7 +164,7 @@ public class Tool implements IDeliverable
      */
     public static Tool deserialize(final IFactoryController controller, final RegistryFriendlyByteBuf buffer)
     {
-        final EquipmentTypeEntry type = ModEquipmentTypes.getRegistry().get(buffer.readResourceLocation());
+        final EquipmentTypeEntry type = ModEquipmentTypes.getRegistry().getValue(buffer.readResourceLocation());
         final int minLevel = buffer.readInt();
         final int maxLevel = buffer.readInt();
         final ItemStack result = buffer.readBoolean() ? Utils.deserializeCodecMess(buffer) : ItemStack.EMPTY;

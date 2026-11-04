@@ -40,6 +40,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -160,9 +161,9 @@ public class VisitorCitizen extends AbstractEntityCitizen
     }
 
     @Override
-    public boolean hurt(@NotNull final DamageSource damageSource, final float damage)
+    public boolean hurtServer(final ServerLevel level, @NotNull final DamageSource damageSource, final float damage)
     {
-        if (!(damageSource.getEntity() instanceof EntityCitizen) && super.hurt(damageSource, damage))
+        if (!(damageSource.getEntity() instanceof EntityCitizen) && super.hurtServer(level, damageSource, damage))
         {
             if (damageSource.getEntity() instanceof LivingEntity && damage > 1.01f)
             {

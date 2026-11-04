@@ -48,6 +48,9 @@ sourceSets.main.java {
     exclude '**/domumornamentum/client/model/utils/ModelSpriteQuadTransformer.java'
     exclude '**/domumornamentum/jei/**'
     exclude '**/domumornamentum/network/IServerboundDistributor.java'
+    // Domum client screen / network still mid-port (JEI + ModBus handlers already excluded)
+    exclude '**/domumornamentum/client/screens/ArchitectsCutterScreen.java'
+    exclude '**/domumornamentum/network/messages/CreativeSetArchitectCutterSlotMessage.java'
 }
 
 

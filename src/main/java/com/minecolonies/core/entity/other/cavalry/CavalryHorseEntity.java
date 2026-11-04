@@ -46,6 +46,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -854,7 +855,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
      * @return true if the damage was applied, false otherwise
      */
     @Override
-    public boolean hurt(@Nonnull DamageSource damageSource, float damageAmount)
+    public boolean hurtServer(final ServerLevel level, @Nonnull DamageSource damageSource, float damageAmount)
     {
        
         if (level().isClientSide())
@@ -896,7 +897,7 @@ public class CavalryHorseEntity extends Horse implements IManagedAnimal<CavalryH
             animalData.markDirty();
         }
         
-        return super.hurt(damageSource, damageAmount);
+        return super.hurtServer(level, damageSource, damageAmount);
     }
 
     /**

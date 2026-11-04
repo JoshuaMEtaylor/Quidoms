@@ -93,7 +93,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
         double d0 = citizen.getX() - (double)f3 * 0.3;
         double d1 = citizen.getEyeY();
         double d2 = citizen.getZ() - (double)f2 * 0.3;
-        this.moveTo(d0, d1, d2, f1, f);
+        thissnapTo(d0, d1, d2, f1, f);
         Vec3 vec3 = new Vec3((double)(-f3), (double)Mth.clamp(-(f5 / f4), -5.0F, 5.0F), (double)(-f2));
         double d3 = vec3.length();
         vec3 = vec3.multiply(

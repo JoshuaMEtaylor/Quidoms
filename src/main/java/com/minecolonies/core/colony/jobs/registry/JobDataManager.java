@@ -73,7 +73,7 @@ public final class JobDataManager implements IJobDataManager
       final IColonyView colony, final ICitizenDataView citizenDataView, final RegistryFriendlyByteBuf networkBuffer)
     {
         final ResourceLocation jobName = ResourceLocation.parse(networkBuffer.readUtf(32767));
-        final JobEntry entry = IJobRegistry.getInstance().get(jobName);
+        final JobEntry entry = IJobRegistry.getInstance().getValue(jobName);
 
         if (entry == null)
         {

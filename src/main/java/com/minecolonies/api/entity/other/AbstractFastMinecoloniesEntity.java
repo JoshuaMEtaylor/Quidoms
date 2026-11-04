@@ -333,13 +333,13 @@ public abstract class AbstractFastMinecoloniesEntity extends PathfinderMob imple
     }
 
     @Override
-    public boolean hurt(final DamageSource dmgSource, final float dmg)
+    public boolean hurtServer(final ServerLevel level, final DamageSource dmgSource, final float dmg)
     {
         if (dmgSource.getEntity() instanceof AbstractFastMinecoloniesEntity otherFastMinecolEntity && otherFastMinecolEntity.getTeamId() == getTeamId())
         {
             return false;
         }
-        return super.hurt(dmgSource, dmg);
+        return super.hurtServer(level, dmgSource, dmg);
     }
 
     /**

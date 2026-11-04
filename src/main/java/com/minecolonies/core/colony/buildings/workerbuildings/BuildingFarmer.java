@@ -444,7 +444,7 @@ public class BuildingFarmer extends AbstractBuilding
 
             final Biome currentBiome = mc.level.getBiome(mc.player.blockPosition()).value();
 
-            final Registry<Biome> biomeRegistry = mc.level.registryAccess().registryOrThrow(preferredBiome.registry());
+            final Registry<Biome> biomeRegistry = mc.level.registryAccess().lookupOrThrow(preferredBiome.registry());
             final Object[] biomes = StreamSupport.stream(biomeRegistry.getTagOrEmpty(preferredBiome).spliterator(), false)
                     .map(b -> {
                         final MutableComponent name = Component.translatable(b.unwrapKey().get().location().toLanguageKey("biome"));

@@ -10,6 +10,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -65,7 +66,8 @@ public class SittingEntity extends Entity
     /**
      * Do not let the entity be destroyed
      */
-    public boolean hurt(DamageSource source, float amount)
+    @Override
+    public boolean hurtServer(final ServerLevel level, DamageSource source, float amount)
     {
         return false;
     }

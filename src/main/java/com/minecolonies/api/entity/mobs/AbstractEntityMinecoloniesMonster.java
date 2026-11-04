@@ -20,6 +20,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -271,7 +272,7 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
     }
 
     @Override
-    public boolean hurt(@NotNull final DamageSource damageSource, final float damage)
+    public boolean hurtServer(final ServerLevel level, @NotNull final DamageSource damageSource, final float damage)
     {
         if (damageSource.getEntity() instanceof AbstractEntityMinecoloniesMonster)
         {
@@ -290,7 +291,7 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
             threatTable.addThreat(attacker, (int) damage);
         }
 
-        return super.hurt(damageSource, damage);
+        return super.hurtServer(level, damageSource, damage);
     }
 
     /**

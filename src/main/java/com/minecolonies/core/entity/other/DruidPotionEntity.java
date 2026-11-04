@@ -3,23 +3,27 @@ package com.minecolonies.core.entity.other;
 import com.minecolonies.api.entity.ModEntities;
 import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
 import com.minecolonies.core.colony.jobs.guard.JobDruid;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractThrownPotion;
+import net.minecraft.world.entity.projectile.ThrownSplashPotion;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.component.DataComponents;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiPredicate;
 
-public class DruidPotionEntity extends ThrownPotion
+public class DruidPotionEntity extends ThrownSplashPotion
 {
     /**
      * The X and Z size of the splash area
@@ -37,11 +41,6 @@ public class DruidPotionEntity extends ThrownPotion
     public static final double MAX_DISTANCE = 16.0D;
 
     /**
-     * The minimum duration to get affected
-     */
-    public static final int                         MIN_DURATION = 20;
-
-    /**
      * The bi-predicate to check if an effect should be applied to an entity
      */
     @Nullable
@@ -52,7 +51,7 @@ public class DruidPotionEntity extends ThrownPotion
      * @param type entity type.
      * @param world world to spawn it in.
      */
-    public DruidPotionEntity(final EntityType<? extends ThrownPotion> type, final Level world)
+    public DruidPotionEntity(final EntityType<? extends ThrownSplashPotion> type, final Level world)
     {
         super(type, world);
     }
@@ -67,11 +66,13 @@ public class DruidPotionEntity extends ThrownPotion
     }
 
     @Override
-    public void applySplash(Iterable<MobEffectInstance> effects, @Nullable Entity entity)
+    public void onHitAsPotion(final ServerLevel level, final ItemStack stack, final HitResult result)
     {
         final AbstractEntityCitizen citizen = this.getOwner();
         if (citizen != null && citizen.getCitizenData() != null && citizen.getCitizenData().getJob() instanceof JobDruid)
         {
+            final PotionContents potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+            final Iterable<MobEffectInstance> effects = potionContents.getAllEffects();
             final AABB axisalignedbb = this.getBoundingBox().inflate(SPLASH_SIZE, SPLASH_HEIGTH, SPLASH_SIZE);
             final List<LivingEntity> list = this.level().getEntitiesOfClass(LivingEntity.class, axisalignedbb);
             if (!list.isEmpty())
@@ -84,10 +85,6 @@ public class DruidPotionEntity extends ThrownPotion
                         if (distanceSq < MAX_DISTANCE)
                         {
                             double d1 = 1.0D - Math.sqrt(distanceSq) / 4.0D;
-                            if (livingentity == entity)
-                            {
-                                d1 = 1.0D;
-                            }
                             for (final MobEffectInstance effectinstance : effects)
                             {
                                 final MobEffect effect = effectinstance.getEffect().value();
@@ -95,16 +92,19 @@ public class DruidPotionEntity extends ThrownPotion
                                 {
                                     if (effect.isInstantenous())
                                     {
-                                        effect.applyInstantenousEffect(this, this.getOwner(), livingentity, effectinstance.getAmplifier(), d1);
+                                        effect.applyInstantenousEffect(level, this, this.getOwner(), livingentity, effectinstance.getAmplifier(), d1);
                                     }
                                     else
                                     {
-                                        final int duration = (int) (d1 * (double) effectinstance.getDuration());
-                                        livingentity.addEffect(new MobEffectInstance(effectinstance.getEffect(),
-                                          duration,
-                                          effectinstance.getAmplifier(),
-                                          effectinstance.isAmbient(),
-                                          effectinstance.isVisible()));
+                                        final int duration = (int) (d1 * (double) effectinstance.getDuration() + 0.5D);
+                                        if (duration > 20)
+                                        {
+                                            livingentity.addEffect(new MobEffectInstance(effectinstance.getEffect(),
+                                              duration,
+                                              effectinstance.getAmplifier(),
+                                              effectinstance.isAmbient(),
+                                              effectinstance.isVisible()));
+                                        }
                                     }
                                 }
                             }

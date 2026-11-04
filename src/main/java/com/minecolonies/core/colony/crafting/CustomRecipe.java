@@ -297,7 +297,7 @@ public class CustomRecipe
         if (recipeJson.has(RECIPE_TOOL_PROP))
         {
             String resLoc = recipeJson.get(RECIPE_TOOL_PROP).getAsString();
-            recipe.requiredTool = ModEquipmentTypes.getRegistry().get(EquipmentTypeEntry.parseResourceLocation(resLoc));
+            recipe.requiredTool = ModEquipmentTypes.getRegistry().getValue(EquipmentTypeEntry.parseResourceLocation(resLoc));
         }
 
         if (recipeJson.has(RECIPE_SECONDARY_PROP))
@@ -336,7 +336,7 @@ public class CustomRecipe
         }
         if (recipeJson.has(RECIPE_INTERMEDIATE_PROP))
         {
-            recipe.intermediate = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(recipeJson.get(RECIPE_INTERMEDIATE_PROP).getAsString()));
+            recipe.intermediate = BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(recipeJson.get(RECIPE_INTERMEDIATE_PROP).getAsString()));
         }
         else
         {
@@ -931,7 +931,7 @@ public class CustomRecipe
         {
             lootTable = null;
         }
-        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().get(buffer.readResourceLocation());
+        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().getValue(buffer.readResourceLocation());
         final int minBldgLevel = buffer.readVarInt();
         final int maxBldgLevel = buffer.readVarInt();
         final boolean mustExist = buffer.readBoolean();

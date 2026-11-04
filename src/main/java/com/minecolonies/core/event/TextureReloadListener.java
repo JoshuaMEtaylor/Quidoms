@@ -18,12 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static net.neoforged.fml.common.EventBusSubscriber.Bus.MOD;
 
 /**
  * Specific texture reload listener.
  */
-@EventBusSubscriber(value= Dist.CLIENT, modid= Constants.MOD_ID, bus=MOD)
+@EventBusSubscriber(value= Dist.CLIENT, modid= Constants.MOD_ID)
 public class TextureReloadListener extends SimplePreparableReloadListener<TextureReloadListener.TexturePacks>
 {
     /**

@@ -203,7 +203,7 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
         }
 
         final ResourceKey<LootTable> lootTable = nbt.contains(LOOT_TAG) ? ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(nbt.getStringOr(LOOT_TAG, ""))) : null;
-        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().get(EquipmentTypeEntry.parseResourceLocation(nbt.getStringOr(TOOL_TAG, "")));
+        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().getValue(EquipmentTypeEntry.parseResourceLocation(nbt.getStringOr(TOOL_TAG, "")));
 
         return RecipeStorage.builder()
                 .withToken(token)
@@ -291,7 +291,7 @@ public class RecipeStorageFactory implements IRecipeStorageFactory
         }
 
         final ResourceLocation resLoc = EquipmentTypeEntry.parseResourceLocation(buffer.readResourceLocation());
-        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().get(resLoc);
+        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().getValue(resLoc);
 
         ResourceKey<LootTable> lootTable = null;
         if(buffer.readBoolean())
