@@ -145,7 +145,7 @@ public class RaidManager implements IRaiderManager
     /**
      * Initial value for having barb events
      */
-    private static final boolean INITIAL_CAN_HAVE_BARB_EVENTS = true;
+    private static final boolean INITIAL_CAN_HAVE_BARB_EVENTS = false;
 
     /**
      * Whether this colony may have Raider events. (set via command)

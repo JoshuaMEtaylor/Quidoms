@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  */
 public final class BlueprintPackBootstrap
 {
-    private static final String MARKER = ".quidoms-blueprints-0.0.21-1.21.10";
+    private static final String MARKER = ".quidoms-blueprints-0.0.22-1.21.10";
 
     private BlueprintPackBootstrap()
     {

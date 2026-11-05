@@ -275,7 +275,7 @@ public class ClientRegistryHandler
         event.registerEntityRenderer(ModEntities.CITIZEN, RenderBipedCitizen::new);
         event.registerEntityRenderer(ModEntities.VISITOR, RenderBipedCitizen::new);
         event.registerEntityRenderer(ModEntities.FISHHOOK, RenderFishHook::new);
-        event.registerEntityRenderer(ModEntities.FIREARROW, FireArrowRenderer::new);
+        if (ModEntities.FIREARROW != null) event.registerEntityRenderer(ModEntities.FIREARROW, FireArrowRenderer::new);
         event.registerEntityRenderer(ModEntities.SPEAR, RendererSpear::new);
 
         event.registerEntityRenderer(ModEntities.MC_NORMAL_ARROW, TippableArrowRenderer::new);
@@ -283,55 +283,55 @@ public class ClientRegistryHandler
 
         // Raiders
 
-        event.registerEntityRenderer(ModEntities.BARBARIAN, RendererBarbarian::new);
-        event.registerEntityRenderer(ModEntities.ARCHERBARBARIAN, RendererBarbarian::new);
-        event.registerEntityRenderer(ModEntities.CHIEFBARBARIAN, RendererChiefBarbarian::new);
+        if (ModEntities.BARBARIAN != null) event.registerEntityRenderer(ModEntities.BARBARIAN, RendererBarbarian::new);
+        if (ModEntities.ARCHERBARBARIAN != null) event.registerEntityRenderer(ModEntities.ARCHERBARBARIAN, RendererBarbarian::new);
+        if (ModEntities.CHIEFBARBARIAN != null) event.registerEntityRenderer(ModEntities.CHIEFBARBARIAN, RendererChiefBarbarian::new);
 
-        event.registerEntityRenderer(ModEntities.PIRATE, RendererPirate::new);
-        event.registerEntityRenderer(ModEntities.ARCHERPIRATE, RendererArcherPirate::new);
-        event.registerEntityRenderer(ModEntities.CHIEFPIRATE, RendererChiefPirate::new);
+        if (ModEntities.PIRATE != null) event.registerEntityRenderer(ModEntities.PIRATE, RendererPirate::new);
+        if (ModEntities.ARCHERPIRATE != null) event.registerEntityRenderer(ModEntities.ARCHERPIRATE, RendererArcherPirate::new);
+        if (ModEntities.CHIEFPIRATE != null) event.registerEntityRenderer(ModEntities.CHIEFPIRATE, RendererChiefPirate::new);
 
-        event.registerEntityRenderer(ModEntities.MUMMY, RendererMummy::new);
-        event.registerEntityRenderer(ModEntities.ARCHERMUMMY, RendererArcherMummy::new);
-        event.registerEntityRenderer(ModEntities.PHARAO, RendererPharao::new);
+        if (ModEntities.MUMMY != null) event.registerEntityRenderer(ModEntities.MUMMY, RendererMummy::new);
+        if (ModEntities.ARCHERMUMMY != null) event.registerEntityRenderer(ModEntities.ARCHERMUMMY, RendererArcherMummy::new);
+        if (ModEntities.PHARAO != null) event.registerEntityRenderer(ModEntities.PHARAO, RendererPharao::new);
 
-        event.registerEntityRenderer(ModEntities.SHIELDMAIDEN, RendererShieldmaidenNorsemen::new);
-        event.registerEntityRenderer(ModEntities.NORSEMEN_ARCHER, RendererArcherNorsemen::new);
-        event.registerEntityRenderer(ModEntities.NORSEMEN_CHIEF, RendererChiefNorsemen::new);
+        if (ModEntities.SHIELDMAIDEN != null) event.registerEntityRenderer(ModEntities.SHIELDMAIDEN, RendererShieldmaidenNorsemen::new);
+        if (ModEntities.NORSEMEN_ARCHER != null) event.registerEntityRenderer(ModEntities.NORSEMEN_ARCHER, RendererArcherNorsemen::new);
+        if (ModEntities.NORSEMEN_CHIEF != null) event.registerEntityRenderer(ModEntities.NORSEMEN_CHIEF, RendererChiefNorsemen::new);
 
-        event.registerEntityRenderer(ModEntities.AMAZON, RendererAmazon::new);
-        event.registerEntityRenderer(ModEntities.AMAZONCHIEF, RendererChiefAmazon::new);
-        event.registerEntityRenderer(ModEntities.AMAZONSPEARMAN, RendererAmazonSpearman::new);
+        if (ModEntities.AMAZON != null) event.registerEntityRenderer(ModEntities.AMAZON, RendererAmazon::new);
+        if (ModEntities.AMAZONCHIEF != null) event.registerEntityRenderer(ModEntities.AMAZONCHIEF, RendererChiefAmazon::new);
+        if (ModEntities.AMAZONSPEARMAN != null) event.registerEntityRenderer(ModEntities.AMAZONSPEARMAN, RendererAmazonSpearman::new);
 
-        event.registerEntityRenderer(ModEntities.DROWNED_PIRATE, RendererDrownedPirate::new);
-        event.registerEntityRenderer(ModEntities.DROWNED_ARCHERPIRATE, RendererDrownedArcherPirate::new);
-        event.registerEntityRenderer(ModEntities.DROWNED_CHIEFPIRATE, RendererDrownedChiefPirate::new);
+        if (ModEntities.DROWNED_PIRATE != null) event.registerEntityRenderer(ModEntities.DROWNED_PIRATE, RendererDrownedPirate::new);
+        if (ModEntities.DROWNED_ARCHERPIRATE != null) event.registerEntityRenderer(ModEntities.DROWNED_ARCHERPIRATE, RendererDrownedArcherPirate::new);
+        if (ModEntities.DROWNED_CHIEFPIRATE != null) event.registerEntityRenderer(ModEntities.DROWNED_CHIEFPIRATE, RendererDrownedChiefPirate::new);
 
         // Camp Raiders
 
-        event.registerEntityRenderer(ModEntities.CAMP_BARBARIAN, RendererBarbarian::new);
-        event.registerEntityRenderer(ModEntities.CAMP_ARCHERBARBARIAN, RendererBarbarian::new);
-        event.registerEntityRenderer(ModEntities.CAMP_CHIEFBARBARIAN, RendererChiefBarbarian::new);
+        if (ModEntities.CAMP_BARBARIAN != null) event.registerEntityRenderer(ModEntities.CAMP_BARBARIAN, RendererBarbarian::new);
+        if (ModEntities.CAMP_ARCHERBARBARIAN != null) event.registerEntityRenderer(ModEntities.CAMP_ARCHERBARBARIAN, RendererBarbarian::new);
+        if (ModEntities.CAMP_CHIEFBARBARIAN != null) event.registerEntityRenderer(ModEntities.CAMP_CHIEFBARBARIAN, RendererChiefBarbarian::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_PIRATE, RendererPirate::new);
-        event.registerEntityRenderer(ModEntities.CAMP_ARCHERPIRATE, RendererArcherPirate::new);
-        event.registerEntityRenderer(ModEntities.CAMP_CHIEFPIRATE, RendererChiefPirate::new);
+        if (ModEntities.CAMP_PIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_PIRATE, RendererPirate::new);
+        if (ModEntities.CAMP_ARCHERPIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_ARCHERPIRATE, RendererArcherPirate::new);
+        if (ModEntities.CAMP_CHIEFPIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_CHIEFPIRATE, RendererChiefPirate::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_MUMMY, RendererMummy::new);
-        event.registerEntityRenderer(ModEntities.CAMP_ARCHERMUMMY, RendererArcherMummy::new);
-        event.registerEntityRenderer(ModEntities.CAMP_PHARAO, RendererPharao::new);
+        if (ModEntities.CAMP_MUMMY != null) event.registerEntityRenderer(ModEntities.CAMP_MUMMY, RendererMummy::new);
+        if (ModEntities.CAMP_ARCHERMUMMY != null) event.registerEntityRenderer(ModEntities.CAMP_ARCHERMUMMY, RendererArcherMummy::new);
+        if (ModEntities.CAMP_PHARAO != null) event.registerEntityRenderer(ModEntities.CAMP_PHARAO, RendererPharao::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_SHIELDMAIDEN, RendererShieldmaidenNorsemen::new);
-        event.registerEntityRenderer(ModEntities.CAMP_NORSEMEN_ARCHER, RendererArcherNorsemen::new);
-        event.registerEntityRenderer(ModEntities.CAMP_NORSEMEN_CHIEF, RendererChiefNorsemen::new);
+        if (ModEntities.CAMP_SHIELDMAIDEN != null) event.registerEntityRenderer(ModEntities.CAMP_SHIELDMAIDEN, RendererShieldmaidenNorsemen::new);
+        if (ModEntities.CAMP_NORSEMEN_ARCHER != null) event.registerEntityRenderer(ModEntities.CAMP_NORSEMEN_ARCHER, RendererArcherNorsemen::new);
+        if (ModEntities.CAMP_NORSEMEN_CHIEF != null) event.registerEntityRenderer(ModEntities.CAMP_NORSEMEN_CHIEF, RendererChiefNorsemen::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_AMAZON, RendererAmazon::new);
-        event.registerEntityRenderer(ModEntities.CAMP_AMAZONCHIEF, RendererChiefAmazon::new);
-        event.registerEntityRenderer(ModEntities.CAMP_AMAZONSPEARMAN, RendererAmazonSpearman::new);
+        if (ModEntities.CAMP_AMAZON != null) event.registerEntityRenderer(ModEntities.CAMP_AMAZON, RendererAmazon::new);
+        if (ModEntities.CAMP_AMAZONCHIEF != null) event.registerEntityRenderer(ModEntities.CAMP_AMAZONCHIEF, RendererChiefAmazon::new);
+        if (ModEntities.CAMP_AMAZONSPEARMAN != null) event.registerEntityRenderer(ModEntities.CAMP_AMAZONSPEARMAN, RendererAmazonSpearman::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_DROWNED_PIRATE, RendererDrownedPirate::new);
-        event.registerEntityRenderer(ModEntities.CAMP_DROWNED_ARCHERPIRATE, RendererDrownedArcherPirate::new);
-        event.registerEntityRenderer(ModEntities.CAMP_DROWNED_CHIEFPIRATE, RendererDrownedChiefPirate::new);
+        if (ModEntities.CAMP_DROWNED_PIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_DROWNED_PIRATE, RendererDrownedPirate::new);
+        if (ModEntities.CAMP_DROWNED_ARCHERPIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_DROWNED_ARCHERPIRATE, RendererDrownedArcherPirate::new);
+        if (ModEntities.CAMP_DROWNED_CHIEFPIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_DROWNED_CHIEFPIRATE, RendererDrownedChiefPirate::new);
 
         // Misc
 

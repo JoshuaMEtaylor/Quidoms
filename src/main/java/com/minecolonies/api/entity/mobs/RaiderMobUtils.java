@@ -160,7 +160,7 @@ public final class RaiderMobUtils
         }
         else if (mob instanceof IPharaoEntity)
         {
-            mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.pharaoscepter));
+            mob.setItemSlot(EquipmentSlot.MAINHAND, (ModItems.pharaoscepter == null ? ItemStack.EMPTY : new ItemStack(ModItems.pharaoscepter)));
         }
         else if (mob instanceof IArcherMobEntity)
         {
@@ -172,7 +172,7 @@ public final class RaiderMobUtils
         }
         else if (mob instanceof IChiefBarbarianEntity)
         {
-            mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.chiefSword));
+            mob.setItemSlot(EquipmentSlot.MAINHAND, (ModItems.chiefSword == null ? ItemStack.EMPTY : new ItemStack(ModItems.chiefSword)));
             mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.CHAINMAIL_HELMET));
             mob.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.CHAINMAIL_CHESTPLATE));
             mob.setItemSlot(EquipmentSlot.LEGS, new ItemStack(Items.CHAINMAIL_LEGGINGS));
@@ -180,22 +180,22 @@ public final class RaiderMobUtils
         }
         else if (mob instanceof IPirateEntity)
         {
-            mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.scimitar));
+            mob.setItemSlot(EquipmentSlot.MAINHAND, (ModItems.scimitar == null ? ItemStack.EMPTY : new ItemStack(ModItems.scimitar)));
             if (mob instanceof ICaptainPirateEntity)
             {
                 if (new Random().nextBoolean())
                 {
-                    mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.pirateHelmet_1));
-                    mob.setItemSlot(EquipmentSlot.CHEST, new ItemStack(ModItems.pirateChest_1));
-                    mob.setItemSlot(EquipmentSlot.LEGS, new ItemStack(ModItems.pirateLegs_1));
-                    mob.setItemSlot(EquipmentSlot.FEET, new ItemStack(ModItems.pirateBoots_1));
+                    mob.setItemSlot(EquipmentSlot.HEAD, (ModItems.pirateHelmet_1 == null ? ItemStack.EMPTY : new ItemStack(ModItems.pirateHelmet_1)));
+                    mob.setItemSlot(EquipmentSlot.CHEST, (ModItems.pirateChest_1 == null ? ItemStack.EMPTY : new ItemStack(ModItems.pirateChest_1)));
+                    mob.setItemSlot(EquipmentSlot.LEGS, (ModItems.pirateLegs_1 == null ? ItemStack.EMPTY : new ItemStack(ModItems.pirateLegs_1)));
+                    mob.setItemSlot(EquipmentSlot.FEET, (ModItems.pirateBoots_1 == null ? ItemStack.EMPTY : new ItemStack(ModItems.pirateBoots_1)));
                 }
                 else
                 {
-                    mob.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ModItems.pirateHelmet_2));
-                    mob.setItemSlot(EquipmentSlot.CHEST, new ItemStack(ModItems.pirateChest_2));
-                    mob.setItemSlot(EquipmentSlot.LEGS, new ItemStack(ModItems.pirateLegs_2));
-                    mob.setItemSlot(EquipmentSlot.FEET, new ItemStack(ModItems.pirateBoots_2));
+                    mob.setItemSlot(EquipmentSlot.HEAD, (ModItems.pirateHelmet_2 == null ? ItemStack.EMPTY : new ItemStack(ModItems.pirateHelmet_2)));
+                    mob.setItemSlot(EquipmentSlot.CHEST, (ModItems.pirateChest_2 == null ? ItemStack.EMPTY : new ItemStack(ModItems.pirateChest_2)));
+                    mob.setItemSlot(EquipmentSlot.LEGS, (ModItems.pirateLegs_2 == null ? ItemStack.EMPTY : new ItemStack(ModItems.pirateLegs_2)));
+                    mob.setItemSlot(EquipmentSlot.FEET, (ModItems.pirateBoots_2 == null ? ItemStack.EMPTY : new ItemStack(ModItems.pirateBoots_2)));
                 }
             }
         }

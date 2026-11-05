@@ -26,6 +26,9 @@ import static com.minecolonies.api.blocks.decorative.AbstractBlockGate.WOODEN_GA
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public final class ModItemsInitializer
 {
+    /** Quidoms: raid loot items and camp spawn eggs are not registered. */
+    private static final boolean QUIDOMS_REGISTER_RAID_ITEMS = false;
+
     private ModItemsInitializer()
     {
         throw new IllegalStateException("Tried to initialize: ModItemsInitializer but this is a Utility class.");
@@ -63,13 +66,21 @@ public final class ModItemsInitializer
         ModItems.bannerRallyGuards = new ItemBannerRallyGuards(MinecoloniesBlockIds.itemProps("banner_rally_guards"));
         ModItems.supplyCamp = new ItemSupplyCampDeployer(MinecoloniesBlockIds.itemProps("supplycampdeployer"));
         ModItems.ancientTome = new ItemAncientTome(MinecoloniesBlockIds.itemProps("ancienttome"));
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.chiefSword = new ItemChiefSword(MinecoloniesBlockIds.itemProps("chiefsword", new Item.Properties().durability(1500)));
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.scimitar = new ItemIronScimitar(MinecoloniesBlockIds.itemProps("iron_scimitar", new Item.Properties().durability(250)));
+        }
         ModItems.clipboard = new ItemClipboard(MinecoloniesBlockIds.itemProps("clipboard"));
         ModItems.compost = new ItemCompost(MinecoloniesBlockIds.itemProps("compost"));
         ModItems.resourceScroll = new ItemResourceScroll(MinecoloniesBlockIds.itemProps("resourcescroll"));
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pharaoscepter = new ItemPharaoScepter(MinecoloniesBlockIds.itemProps("pharaoscepter", new Item.Properties().durability(400)));
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.firearrow = new ItemFireArrow(MinecoloniesBlockIds.itemProps("firearrow"));
+        }
         ModItems.scepterBeekeeper = new ItemScepterBeekeeper(MinecoloniesBlockIds.itemProps("scepterbeekeeper"));
         ModItems.mistletoe = new ItemMistletoe(MinecoloniesBlockIds.itemProps("mistletoe"));
         ModItems.spear = new ItemSpear(MinecoloniesBlockIds.itemProps("spear"));
@@ -107,15 +118,31 @@ public final class ModItemsInitializer
         ModItems.woodgate = new ItemGate(WOODEN_GATE, ModBlocks.blockWoodenGate, MinecoloniesBlockIds.itemProps(WOODEN_GATE));
 
         ModItems.flagBanner = new ItemColonyFlagBanner("colony_banner", MinecoloniesBlockIds.itemProps("colony_banner"));
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pirateHelmet_1 = new ItemPirateGear("pirate_hat", ModArmorMaterials.PIRATE_ARMOR_1, ArmorType.HELMET, 350);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pirateChest_1 = new ItemPirateGear("pirate_top", ModArmorMaterials.PIRATE_ARMOR_1, ArmorType.CHESTPLATE, 550);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pirateLegs_1 = new ItemPirateGear("pirate_leggins", ModArmorMaterials.PIRATE_ARMOR_1, ArmorType.LEGGINGS, 500);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pirateBoots_1 = new ItemPirateGear("pirate_boots", ModArmorMaterials.PIRATE_ARMOR_1, ArmorType.BOOTS, 400);
+        }
 
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pirateHelmet_2 = new ItemPirateGear("pirate_cap", ModArmorMaterials.PIRATE_ARMOR_2, ArmorType.HELMET, 200);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pirateChest_2 = new ItemPirateGear("pirate_chest", ModArmorMaterials.PIRATE_ARMOR_2, ArmorType.CHESTPLATE, 350);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pirateLegs_2 = new ItemPirateGear("pirate_legs", ModArmorMaterials.PIRATE_ARMOR_2, ArmorType.LEGGINGS, 300);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         ModItems.pirateBoots_2 = new ItemPirateGear("pirate_shoes", ModArmorMaterials.PIRATE_ARMOR_2, ArmorType.BOOTS, 250);
+        }
 
         ModItems.plateArmorHelmet = new ItemPlateArmor("plate_armor_helmet", ModArmorMaterials.PLATE_ARMOR, ArmorType.HELMET, 350);
         ModItems.plateArmorChest = new ItemPlateArmor("plate_armor_chest", ModArmorMaterials.PLATE_ARMOR, ArmorType.CHESTPLATE, 500);
@@ -244,14 +271,22 @@ public final class ModItemsInitializer
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "banner_rally_guards"), ModItems.bannerRallyGuards);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "supplycampdeployer"), ModItems.supplyCamp);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "ancienttome"), ModItems.ancientTome);
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "chiefsword"), ModItems.chiefSword);
+        }
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "clipboard"), ModItems.clipboard);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "compost"), ModItems.compost);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "resourcescroll"), ModItems.resourceScroll);
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "iron_scimitar"), ModItems.scimitar);
+        }
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "scepterlumberjack"), ModItems.scepterLumberjack);
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pharaoscepter"), ModItems.pharaoscepter);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "firearrow"), ModItems.firearrow);
+        }
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "scepterbeekeeper"), ModItems.scepterBeekeeper);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "mistletoe"), ModItems.mistletoe);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "spear"), ModItems.spear);
@@ -273,15 +308,31 @@ public final class ModItemsInitializer
 
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "adventure_token"), ModItems.adventureToken);
 
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirate_hat"), ModItems.pirateHelmet_1);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirate_top"), ModItems.pirateChest_1);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirate_leggins"), ModItems.pirateLegs_1);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirate_boots"), ModItems.pirateBoots_1);
+        }
 
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirate_cap"), ModItems.pirateHelmet_2);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirate_chest"), ModItems.pirateChest_2);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirate_legs"), ModItems.pirateLegs_2);
+        }
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "pirate_shoes"), ModItems.pirateBoots_2);
+        }
 
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "plate_armor_helmet"), ModItems.plateArmorHelmet);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "plate_armor_chest"), ModItems.plateArmorChest);
@@ -377,30 +428,32 @@ public final class ModItemsInitializer
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "large_milk_bottle"), ModItems.large_milk_bottle);
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "large_soy_milk_bottle"), ModItems.large_soy_milk_bottle);
 
+        if (QUIDOMS_REGISTER_RAID_ITEMS) {
         Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campbarbarian_spawn_egg"), spawnEgg(ModEntities.CAMP_BARBARIAN));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparcherbarbarian_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERBARBARIAN));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campchiefbarbarian_spawn_egg"), spawnEgg(ModEntities.CAMP_CHIEFBARBARIAN));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparcherbarbarian_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERBARBARIAN));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campchiefbarbarian_spawn_egg"), spawnEgg(ModEntities.CAMP_CHIEFBARBARIAN));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camppirate_spawn_egg"), spawnEgg(ModEntities.CAMP_PIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparcherpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERPIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campchiefpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_CHIEFPIRATE));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camppirate_spawn_egg"), spawnEgg(ModEntities.CAMP_PIRATE));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparcherpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERPIRATE));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campchiefpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_CHIEFPIRATE));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campmummy_spawn_egg"), spawnEgg(ModEntities.CAMP_MUMMY));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparchermummy_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERMUMMY));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camppharao_spawn_egg"), spawnEgg(ModEntities.CAMP_PHARAO));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campmummy_spawn_egg"), spawnEgg(ModEntities.CAMP_MUMMY));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camparchermummy_spawn_egg"), spawnEgg(ModEntities.CAMP_ARCHERMUMMY));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "camppharao_spawn_egg"), spawnEgg(ModEntities.CAMP_PHARAO));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campshieldmaiden_spawn_egg"), spawnEgg(ModEntities.CAMP_SHIELDMAIDEN));
-        // Entity IDs are campnorsemenarcher / campnorsemenchief (no mid-underscore) — egg IDs must match path + _spawn_egg.
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemenarcher_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_ARCHER));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemenchief_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_CHIEF));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campshieldmaiden_spawn_egg"), spawnEgg(ModEntities.CAMP_SHIELDMAIDEN));
+            // Entity IDs are campnorsemenarcher / campnorsemenchief (no mid-underscore) — egg IDs must match path + _spawn_egg.
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemenarcher_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_ARCHER));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campnorsemenchief_spawn_egg"), spawnEgg(ModEntities.CAMP_NORSEMEN_CHIEF));
 
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazon_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZON));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazonspearman_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZONSPEARMAN));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazonchief_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZONCHIEF));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazon_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZON));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazonspearman_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZONSPEARMAN));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campamazonchief_spawn_egg"), spawnEgg(ModEntities.CAMP_AMAZONCHIEF));
 
-        // Entity IDs are campdrownedpirate / campdrownedarcherpirate / campdrownedchiefpirate — egg IDs must match.
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_PIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedarcherpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_ARCHERPIRATE));
-        Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedchiefpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_CHIEFPIRATE));
+            // Entity IDs are campdrownedpirate / campdrownedarcherpirate / campdrownedchiefpirate — egg IDs must match.
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_PIRATE));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedarcherpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_ARCHERPIRATE));
+            Registry.register(registry, new ResourceLocation(Constants.MOD_ID, "campdrownedchiefpirate_spawn_egg"), spawnEgg(ModEntities.CAMP_DROWNED_CHIEFPIRATE));
+        }
     }
 }
