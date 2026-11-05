@@ -18,4 +18,3 @@
                 label="$(com.minecolonies.coremod.gui.citizen.requestscancel)" source="minecolonies:textures/gui/citizen/colonist_button_small.png"/>
     </box>
 </list>
-

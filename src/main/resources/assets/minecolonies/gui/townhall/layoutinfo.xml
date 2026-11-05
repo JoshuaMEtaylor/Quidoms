@@ -1,17 +1,9 @@
-<window size="524 243" >
+<window size="524 243">
 
     <layout source="minecolonies:gui/townhall/windowtownhall.xml"/>
 
-    <dropdown id="intervals"
-              size="129 17"
-              pos="116 62"
-              maxContentHeight="75"
-              dropDownSize="140 75"
-              source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-              textcolor="black">
-        <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" textcolor="black"
-                label="$(com.minecolonies.coremod.gui.interval.alltime)"/>
-    </dropdown>
+    <text size="148 11" pos="106 65" color="black" textalign="MIDDLE"
+           label="$(com.minecolonies.coremod.gui.townhall.events):"/>
 
     <list id="eventsList" size="148 140" pos="106 80">
         <box size="100% 36" linewidth="1">
@@ -27,14 +19,14 @@
     <list id="workOrderList" size="148 166" pos="276 50">
         <view size="100% 30">
             <box size="100% 30" linewidth="1">
-                <button id="plus" label="↥" pos="0 0" size="14 15" textcolor="black"
+                <button id="plus" label="↥" pos="0 0" size="14 15" color="black"
                              source="minecolonies:textures/gui/builderhut/builder_button_mini.png"/>
-                <button id="minus" label="↧" pos="0 15" size="14 15" textcolor="black"
+                <button id="minus" label="↧" pos="0 15" size="14 15" color="black"
                              source="minecolonies:textures/gui/builderhut/builder_button_mini.png"/>
                 <text id="assignee" size="80 8" pos="25 20" textalign="MIDDLE_LEFT" color="gray"/>
 
                 <text id="work" size="105 17" pos="17 2" textalign="MIDDLE_LEFT" color="black"/>
-                <button id="delete" label="X" textcolor="red" pos="122 8" size="14 15"
+                <button id="delete" label="X" color="red" pos="122 8" size="14 15"
                              source="minecolonies:textures/gui/builderhut/builder_button_mini.png"/>
                 <text id="hiddenId" size="1 1" pos="100 100"/>
             </box>

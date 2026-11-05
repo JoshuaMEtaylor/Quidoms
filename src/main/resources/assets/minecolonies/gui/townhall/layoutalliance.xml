@@ -1,4 +1,4 @@
-<window size="524 243" >
+<window size="524 243">
     <layout source="minecolonies:gui/townhall/windowtownhall.xml"/>
 
     <view id="missingconnections" size="374 243" pos="100 0">

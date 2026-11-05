@@ -357,44 +357,30 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
                 for (final StructurePacks.Category category : categoryFutures.get())
                 {
                     final ButtonImage img = new ButtonImage();
-                    final String id = category.subPath;
-                    final String pretty = prettyCategoryName(id);
-                    boolean usedPackIcon = false;
                     if (category.hasIcon)
                     {
                         try
                         {
                             img.setImage(OutOfJarResourceLocation.of(MOD_ID, category.packMeta.getPath().resolve(category.subPath).resolve("icon.png")));
                             img.setImageDisabled(OutOfJarResourceLocation.of(MOD_ID, category.packMeta.getPath().resolve(category.subPath).resolve("icon_disabled.png")));
-                            usedPackIcon = true;
                         }
                         catch (final Exception ex)
                         {
-                            usedPackIcon = false;
+                            img.setImage(Constants.resLocStruct(DEFAULT_ICON));
                         }
-                    }
-
-                    if (usedPackIcon)
-                    {
-                        img.setSize(19, 19);
-                        img.setPosition(index * 20, 0);
                     }
                     else
                     {
-                        // Iconless categories: labeled parchment buttons (not identical default hut icons).
-                        img.setImage(Constants.resLocStruct("textures/gui/buildtool/button_medium.png"));
-                        img.setText(Component.literal(pretty));
-                        img.setTextColor(ChatFormatting.BLACK.getColor());
-                        img.setTextRenderBox(80, 15);
-                        img.setSize(86, 17);
-                        img.setPosition((index % 3) * 90, (index / 3) * 20);
-                        categoryView.setSize(270, Math.max(20, ((index / 3) + 1) * 20));
+                        img.setImage(Constants.resLocStruct(DEFAULT_ICON));
                     }
 
+                    final String id = category.subPath;
+                    img.setSize(19, 19);
+                    img.setPosition(index * 20, 0);
                     img.setID(id);
+
                     categoryView.addChild(img);
-                    categoryView.setVisible(true);
-                    PaneBuilders.tooltipBuilder().hoverPane(img).build().setText(Component.literal(pretty));
+                    PaneBuilders.tooltipBuilder().hoverPane(img).build().setText(Component.literal(id.substring(0, 1).toUpperCase(Locale.US) + id.substring(1)));
 
                     if (category.isTerminal)
                     {
@@ -589,13 +575,6 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
         blueprintList.show();
         folderList.disable();
         folderList.hide();
-        // Blueprint row owns the lower chrome — hide the category icon strip so names are visible.
-        final View categoryView = findPaneOfTypeByID("categories", View.class);
-        if (categoryView != null)
-        {
-            categoryView.hide();
-            categoryView.disable();
-        }
         hidePlacementGui();
 
         final List<ButtonData> blueprints = new ArrayList<>();
@@ -864,9 +843,6 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
                 img.setText(Component.literal(name));
                 toolTip.add(Component.literal(name));
             }
-            // XML default textcolor is white on pale blueprint chrome — force readable names.
-            img.setTextColor(ChatFormatting.BLACK.getColor());
-            img.setTextRenderBox(Math.max(1, img.getWidth() - 6), Math.max(1, img.getHeight() - 2));
             img.setVisible(true);
             boolean allInvis = true;
             boolean isCurrentlySelected = false;
@@ -929,16 +905,6 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
         return nameTag.map(s -> s.substring(5)).orElse(defaultName);
     }
 
-    private static String prettyCategoryName(final String id)
-    {
-        final String leaf = id.contains("/") ? id.substring(id.lastIndexOf('/') + 1) : id;
-        if (leaf.isEmpty())
-        {
-            return id;
-        }
-        return leaf.substring(0, 1).toUpperCase(Locale.US) + leaf.substring(1);
-    }
-
     private void handleSubCat(final ButtonData buttonData, final Pane rowPane, final int index)
     {
         ButtonImage img = rowPane.findPaneOfTypeByID(Integer.toString(index), ButtonImage.class);
@@ -988,12 +954,9 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
             updateFolders(Collections.emptyList(), null);
             updateBlueprints(Collections.emptyList(), "");
             depth = nextDepth;
-            final View cats = findPaneOfTypeByID("categories", View.class);
-            if (depth.isEmpty() && cats != null)
+            if (depth.isEmpty())
             {
-                cats.show();
-                cats.enable();
-                for (final Pane pane : cats.getChildren())
+                for (final Pane pane : findPaneOfTypeByID("categories", View.class).getChildren())
                 {
                     pane.enable();
                 }
@@ -1021,15 +984,9 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
             }
             else
             {
-                final View cats = findPaneOfTypeByID("categories", View.class);
-                if (cats != null)
+                for (final Pane pane : findPaneOfTypeByID("categories", View.class).getChildren())
                 {
-                    cats.show();
-                    cats.enable();
-                    for (final Pane pane : cats.getChildren())
-                    {
-                        pane.enable();
-                    }
+                    pane.enable();
                 }
                 button.disable();
             }
@@ -1048,15 +1005,9 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
             }
             else
             {
-                final View cats = findPaneOfTypeByID("categories", View.class);
-                if (cats != null)
+                for (final Pane pane : findPaneOfTypeByID("categories", View.class).getChildren())
                 {
-                    cats.show();
-                    cats.enable();
-                    for (final Pane pane : cats.getChildren())
-                    {
-                        pane.enable();
-                    }
+                    pane.enable();
                 }
                 button.disable();
             }

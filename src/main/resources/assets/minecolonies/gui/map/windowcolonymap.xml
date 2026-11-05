@@ -1,6 +1,5 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/1.20.1/src/main/resources/assets/blockui/gui/block_ui.xsd"
-        >
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
     <button id="prestige" size="34 34" pos="-10 45" color="black"
             source="minecolonies:textures/gui/modules/tab_left_side1.png"
             label="" tooltip="$(com.minecolonies.coremod.gui.townhall.prestige)"/>
