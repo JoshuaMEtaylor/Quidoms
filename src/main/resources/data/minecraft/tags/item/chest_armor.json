@@ -1,8 +1,6 @@
 {
   "replace": false,
   "values": [
-    "minecolonies:pirate_top",
-    "minecolonies:pirate_chest",
     "minecolonies:plate_armor_chest"
   ]
 }

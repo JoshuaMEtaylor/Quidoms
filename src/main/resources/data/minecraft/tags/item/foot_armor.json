@@ -1,8 +1,6 @@
 {
   "replace": false,
   "values": [
-    "minecolonies:pirate_boots",
-    "minecolonies:pirate_shoes",
     "minecolonies:plate_armor_boots"
   ]
 }
