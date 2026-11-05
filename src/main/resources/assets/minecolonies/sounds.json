@@ -146184,45 +146184,6 @@
       }
     ]
   },
-  "mob.egyptian.death": {
-    "category": "hostile",
-    "sounds": [
-      {
-        "name": "minecolonies:mob/barbarian/death",
-        "stream": false
-      }
-    ]
-  },
-  "mob.egyptian.hurt": {
-    "category": "hostile",
-    "sounds": [
-      {
-        "name": "minecolonies:mob/barbarian/hurt1",
-        "stream": false
-      },
-      {
-        "name": "minecolonies:mob/barbarian/hurt2",
-        "stream": false
-      },
-      {
-        "name": "minecolonies:mob/barbarian/hurt3",
-        "stream": false
-      },
-      {
-        "name": "minecolonies:mob/barbarian/hurt4",
-        "stream": false
-      }
-    ]
-  },
-  "mob.egyptian.say": {
-    "category": "hostile",
-    "sounds": [
-      {
-        "name": "minecolonies:mob/barbarian/say",
-        "stream": false
-      }
-    ]
-  },
   "mob.mercenary.attack": {
     "category": "neutral",
     "sounds": [
@@ -146317,45 +146278,6 @@
       },
       {
         "name": "minecolonies:mob/mercenary/step/step4",
-        "stream": false
-      }
-    ]
-  },
-  "mob.norseman.death": {
-    "category": "hostile",
-    "sounds": [
-      {
-        "name": "minecolonies:mob/barbarian/death",
-        "stream": false
-      }
-    ]
-  },
-  "mob.norseman.hurt": {
-    "category": "hostile",
-    "sounds": [
-      {
-        "name": "minecolonies:mob/barbarian/hurt1",
-        "stream": false
-      },
-      {
-        "name": "minecolonies:mob/barbarian/hurt2",
-        "stream": false
-      },
-      {
-        "name": "minecolonies:mob/barbarian/hurt3",
-        "stream": false
-      },
-      {
-        "name": "minecolonies:mob/barbarian/hurt4",
-        "stream": false
-      }
-    ]
-  },
-  "mob.norseman.say": {
-    "category": "hostile",
-    "sounds": [
-      {
-        "name": "minecolonies:mob/barbarian/say",
         "stream": false
       }
     ]
