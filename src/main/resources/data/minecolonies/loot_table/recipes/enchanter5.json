@@ -339,21 +339,6 @@
             {
               "components": {
                 "minecraft:stored_enchantments": {
-                  "minecolonies:raider_damage_enchant": 1
-                }
-              },
-              "function": "minecraft:set_components"
-            }
-          ],
-          "name": "minecraft:enchanted_book",
-          "weight": 15
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "components": {
-                "minecraft:stored_enchantments": {
                   "minecraft:fortune": 1
                 }
               },
@@ -1077,20 +1062,6 @@
               "components": {
                 "minecraft:stored_enchantments": {
                   "minecraft:fortune": 3
-                }
-              },
-              "function": "minecraft:set_components"
-            }
-          ],
-          "name": "minecraft:enchanted_book"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "components": {
-                "minecraft:stored_enchantments": {
-                  "minecolonies:raider_damage_enchant": 2
                 }
               },
               "function": "minecraft:set_components"

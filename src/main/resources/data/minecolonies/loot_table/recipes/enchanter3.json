@@ -1006,21 +1006,6 @@
             }
           ],
           "name": "minecraft:enchanted_book"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "components": {
-                "minecraft:stored_enchantments": {
-                  "minecolonies:raider_damage_enchant": 1
-                }
-              },
-              "function": "minecraft:set_components"
-            }
-          ],
-          "name": "minecraft:enchanted_book",
-          "weight": 15
         }
       ],
       "rolls": 1.0
