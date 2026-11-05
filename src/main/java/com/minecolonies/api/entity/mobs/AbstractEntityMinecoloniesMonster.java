@@ -10,7 +10,6 @@ import com.minecolonies.api.entity.ai.statemachine.tickratestatemachine.ITickRat
 import com.minecolonies.api.entity.ai.statemachine.tickratestatemachine.TickRateStateMachine;
 import com.minecolonies.api.entity.other.AbstractFastMinecoloniesEntity;
 import com.minecolonies.api.entity.pathfinding.registry.IPathNavigateRegistry;
-import com.minecolonies.api.sounds.RaiderSounds;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.MathUtils;
 import com.minecolonies.core.entity.pathfinding.navigation.AbstractAdvancedPathNavigate;
@@ -20,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -204,20 +204,21 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
     @Override
     protected SoundEvent getHurtSound(final DamageSource damageSourceIn)
     {
-        return RaiderSounds.raiderSounds.get(getRaiderType()).get(RaiderSounds.RaiderSoundTypes.HURT);
+        // RaiderSounds removed with raid content; keep entity hierarchy loadable.
+        return SoundEvents.HOSTILE_HURT;
     }
 
     @Override
     protected SoundEvent getDeathSound()
     {
-        return RaiderSounds.raiderSounds.get(getRaiderType()).get(RaiderSounds.RaiderSoundTypes.DEATH);
+        return SoundEvents.HOSTILE_DEATH;
     }
 
     @Nullable
     @Override
     protected SoundEvent getAmbientSound()
     {
-        return RaiderSounds.raiderSounds.get(getRaiderType()).get(RaiderSounds.RaiderSoundTypes.SAY);
+        return null;
     }
 
     /**

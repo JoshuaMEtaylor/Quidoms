@@ -1,7 +1,6 @@
 package com.minecolonies.api.sounds;
 
 import com.minecolonies.api.colony.jobs.ModJobs;
-import com.minecolonies.api.entity.mobs.RaiderType;
 import com.minecolonies.api.util.Tuple;
 import com.minecolonies.api.util.constant.Constants;
 import net.minecraft.core.registries.Registries;
@@ -97,36 +96,11 @@ public final class ModSoundEvents
 
         SOUND_EVENTS.register(TavernSounds.tavernTheme.location().getPath(), () -> TavernSounds.tavernTheme);
 
-        for (final RaiderType raiderType : RaiderType.values())
-        {
-            final SoundEvent raiderHurt = ModSoundEvents.getSoundID("mob." + raiderType.name().toLowerCase(Locale.US) + ".hurt");
-            final SoundEvent raiderDeath = ModSoundEvents.getSoundID("mob." + raiderType.name().toLowerCase(Locale.US) + ".death");
-            final SoundEvent raiderSay = ModSoundEvents.getSoundID("mob." + raiderType.name().toLowerCase(Locale.US) + ".say");
-
-            SOUND_EVENTS.register(raiderHurt.location().getPath(), () ->  raiderHurt);
-            SOUND_EVENTS.register(raiderDeath.location().getPath(), () ->  raiderDeath);
-            SOUND_EVENTS.register(raiderSay.location().getPath(), () ->  raiderSay);
-
-            final Map<RaiderSounds.RaiderSoundTypes, SoundEvent> sounds = new HashMap<>();
-            sounds.put(RaiderSounds.RaiderSoundTypes.HURT, raiderHurt);
-            sounds.put(RaiderSounds.RaiderSoundTypes.DEATH, raiderDeath);
-            sounds.put(RaiderSounds.RaiderSoundTypes.SAY, raiderSay);
-
-            RaiderSounds.raiderSounds.put(raiderType, sounds);
-        }
+        // Raid/raider sound registration removed with raid gameplay (0.0.22+).
+        // Do not reference RaiderSounds / RaidSounds here — those classes are not shipped.
 
         SAW = ModSoundEvents.getSoundID("tile.sawmill.saw");
         SOUND_EVENTS.register(SAW.location().getPath(), () -> SAW);
-
-        SOUND_EVENTS.register(RaidSounds.WARNING.location().getPath(), () -> RaidSounds.WARNING);
-        SOUND_EVENTS.register(RaidSounds.WARNING_EARLY.location().getPath(), () -> RaidSounds.WARNING_EARLY);
-        SOUND_EVENTS.register(RaidSounds.VICTORY.location().getPath(), () -> RaidSounds.VICTORY);
-        SOUND_EVENTS.register(RaidSounds.VICTORY_EARLY.location().getPath(), () -> RaidSounds.VICTORY_EARLY);
-
-        SOUND_EVENTS.register(RaidSounds.AMAZON_RAID.location().getPath(), () -> RaidSounds.AMAZON_RAID);
-
-        SOUND_EVENTS.register(RaidSounds.DESERT_RAID.location().getPath(), () -> RaidSounds.DESERT_RAID);
-        SOUND_EVENTS.register(RaidSounds.DESERT_RAID_WARNING.location().getPath(), () -> RaidSounds.DESERT_RAID_WARNING);
 
         SOUND_EVENTS.register(MercenarySounds.mercenaryAttack.location().getPath(), () -> MercenarySounds.mercenaryAttack);
         SOUND_EVENTS.register(MercenarySounds.mercenaryCelebrate.location().getPath(), () -> MercenarySounds.mercenaryCelebrate);
