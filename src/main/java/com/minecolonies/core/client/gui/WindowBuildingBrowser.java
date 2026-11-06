@@ -50,10 +50,10 @@ public class WindowBuildingBrowser extends AbstractWindowSkeleton
      * Number of worker threads to spawn to scan blueprints (each pack on a separate thread); higher reduces total search time.
      */
     private static final int WORKER_THREADS = 4;
-    @SuppressWarnings("ConstantConditions") private static final int COLOR_NORMAL          = ChatFormatting.BLACK.getColor();
-    @SuppressWarnings("ConstantConditions") private static final int COLOR_CHILD           = ChatFormatting.DARK_GREEN.getColor();
-    @SuppressWarnings("ConstantConditions") private static final int COLOR_INVISIBLE       = ChatFormatting.DARK_BLUE.getColor();
-    @SuppressWarnings("ConstantConditions") private static final int COLOR_INVISIBLE_CHILD = ChatFormatting.BLUE.getColor();
+    @SuppressWarnings("ConstantConditions") private static final int COLOR_NORMAL          = ChatFormatting.BLACK.getColor() | 0xFF000000;
+    @SuppressWarnings("ConstantConditions") private static final int COLOR_CHILD           = ChatFormatting.DARK_GREEN.getColor() | 0xFF000000;
+    @SuppressWarnings("ConstantConditions") private static final int COLOR_INVISIBLE       = ChatFormatting.DARK_BLUE.getColor() | 0xFF000000;
+    @SuppressWarnings("ConstantConditions") private static final int COLOR_INVISIBLE_CHILD = ChatFormatting.BLUE.getColor() | 0xFF000000;
 
     private static final Map<Block, List<BuildingInfo>> buildingCache = new HashMap<>();
 
@@ -178,11 +178,7 @@ public class WindowBuildingBrowser extends AbstractWindowSkeleton
                 final Text levelLabel = rowPane.findPaneOfTypeByID("buildingLevel", Text.class);
 
                 packLabel.setText(Component.literal(building.pack().getName()));
-                // Prefer a readable schematic name over raw blueprint path ("mod directory" style).
-                final String path = building.path();
-                final String leaf = path.contains("/") ? path.substring(path.lastIndexOf('/') + 1) : path;
-                final String pretty = leaf.replace('_', ' ').replace(".blueprint", "");
-                nameLabel.setText(Component.literal(pretty.isEmpty() ? path : pretty));
+                nameLabel.setText(Component.literal(building.path()));
                 nameLabel.setColors(building.isParent() ? building.isInvisible() ? COLOR_INVISIBLE_CHILD : COLOR_CHILD
                         : building.isInvisible() ? COLOR_INVISIBLE : COLOR_NORMAL);
                 sizeLabel.setText(Component.literal(String.format("%d x %d x %d",

@@ -58,15 +58,15 @@ public abstract class AbstractTextElement extends Pane {
       boolean defaultTextWrap
    ) {
       this.textAlignment = defaultTextAlignment;
-      this.textColor = defaultTextColor;
-      this.textHoverColor = defaultTextHoverColor;
-      this.textDisabledColor = defaultTextDisabledColor;
+      this.textColor = ensureOpaque(defaultTextColor);
+      this.textHoverColor = ensureOpaque(defaultTextHoverColor);
+      this.textDisabledColor = ensureOpaque(defaultTextDisabledColor);
       this.textShadow = defaultTextShadow;
       this.textWrap = defaultTextWrap;
    }
 
    public AbstractTextElement(PaneParams params) {
-      this(params, DEFAULT_TEXT_ALIGNMENT, 16777215, 16777215, 16777215, false, false);
+      this(params, DEFAULT_TEXT_ALIGNMENT, DEFAULT_TEXT_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_TEXT_COLOR, false, false);
    }
 
    public AbstractTextElement(
@@ -83,9 +83,9 @@ public abstract class AbstractTextElement extends Pane {
       if (params.hasAttribute("color")) {
          this.setColors(params.getColor("color", defaultTextColor));
       } else {
-         this.textColor = params.getColor("textcolor", defaultTextColor);
-         this.textHoverColor = params.getColor("texthovercolor", defaultTextHoverColor);
-         this.textDisabledColor = params.getColor("textdisabledcolor", defaultTextDisabledColor);
+         this.textColor = ensureOpaque(params.getColor("textcolor", defaultTextColor));
+         this.textHoverColor = ensureOpaque(params.getColor("texthovercolor", defaultTextHoverColor));
+         this.textDisabledColor = ensureOpaque(params.getColor("textdisabledcolor", defaultTextDisabledColor));
       }
 
       this.textShadow = params.getBoolean("shadow", defaultTextShadow);
