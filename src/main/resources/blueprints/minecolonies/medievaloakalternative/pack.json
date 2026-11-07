@@ -1,0 +1,15 @@
+{
+  "icon": "",
+  "name": "Medieval Oak Alternative",
+  "authors": [
+    "MineColonies",
+    "Quidoms"
+  ],
+  "desc": "Legacy MineColonies style pack 'medievaloakalternative' restored for Quidoms.",
+  "mods": [
+    "structurize",
+    "minecolonies"
+  ],
+  "version": "1",
+  "pack-format": "1"
+}

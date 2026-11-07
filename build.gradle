@@ -14,60 +14,45 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-// Vendored LDT libraries compiled into Quidoms for NeoForge 1.21.10.
-def vendorMods = [
-    file('vendor/blockui/src/main/java'),
-    file('vendor/structurize/src/main/java'),
-    file('vendor/Domum-Ornamentum/src/api/java'),
-    file('vendor/Domum-Ornamentum/src/main/java'),
-    file('vendor/multipiston/src/main/java'),
-]
-def vendorResources = [
-    file('vendor/blockui/src/main/resources'),
-    file('vendor/structurize/src/main/resources'),
-    file('vendor/Domum-Ornamentum/src/main/resources'),
-    file('vendor/Domum-Ornamentum/src/api/resources'),
-    file('vendor/multipiston/src/main/resources'),
-]
-
+// Quidoms is a normal MineColonies-derived mod: LDT libraries are EXTERNAL jars
+// under libs/ (also mirrored to dist/). Do NOT vendor / class-merge / multi-mods bake them.
 sourceSets.main.java {
-    srcDirs(vendorMods.findAll { it.exists() })
-    // Datagen / recipe providers need ExistingFileHelper etc. — skip for game jar
+    exclude 'com/ldtteam/**'
+    // Datagen needs ExistingFileHelper / older APIs — skip for game jar
     exclude '**/datagen/**'
     exclude '**/generation/**'
     exclude '**/GatherDataHandler.java'
-    // Domum pieces still on pre-1.21.10 client model / network APIs
-    exclude '**/domumornamentum/event/handlers/ModBusEventHandler.java'
-    exclude '**/domumornamentum/client/event/handlers/ModBusEventHandler.java'
-    exclude '**/domumornamentum/client/event/handlers/MateriallyTexturedBlockPreviewRenderHandler.java'
-    exclude '**/domumornamentum/client/render/ModRenderTypes.java'
-    exclude '**/domumornamentum/client/render/ModelGhostRenderer.java'
-    exclude '**/domumornamentum/client/model/baked/**'
-    exclude '**/domumornamentum/client/model/geometry/**'
-    exclude '**/domumornamentum/client/model/loader/MateriallyTexturedModelLoader.java'
-    exclude '**/domumornamentum/client/model/utils/ModelSpriteQuadTransformer.java'
-    exclude '**/domumornamentum/jei/**'
-    exclude '**/domumornamentum/network/IServerboundDistributor.java'
-    // Domum client screen / network still mid-port (JEI + ModBus handlers already excluded)
-    exclude '**/domumornamentum/client/screens/ArchitectsCutterScreen.java'
-    exclude '**/domumornamentum/network/messages/CreativeSetArchitectCutterSlotMessage.java'
 }
 
-
 sourceSets.main.resources {
-    srcDirs(vendorResources.findAll { it.exists() })
-    // Keep Quidoms META-INF / pack.mcmeta — do NOT globally exclude them
-    // (that previously stripped Quidoms's own mods.toml from the jar).
-    // Vendor duplicates are dropped via processResources duplicatesStrategy.
     exclude '**/datagen/**'
     exclude '**/.cache/**'
+    // LDT-owned namespaces ship in the standalone dependency jars
+    exclude 'assets/blockui/**'
+    exclude 'assets/structurize/**'
+    exclude 'assets/domum_ornamentum/**'
+    exclude 'assets/multipiston/**'
+    exclude 'assets/placementpreview/**'
+    exclude 'data/blockui/**'
+    exclude 'data/structurize/**'
+    exclude 'data/domum_ornamentum/**'
+    exclude 'data/multipiston/**'
+    exclude 'structurize.png'
 }
 
 repositories {
     maven { url = 'https://ldtteam.jfrog.io/ldtteam/modding/' }
     maven { url = 'https://maven.blamejared.com/' }
     maven { url = 'https://jm.gserv.me/repository/maven-public/' }
+    flatDir { dirs 'libs' }
 }
+
+def ldtJars = [
+    file("libs/blockui-${blockUI_version}.jar"),
+    file("libs/structurize-${structurize_version}.jar"),
+    file("libs/domum_ornamentum-${domumOrnamentumVersion}.jar"),
+    file("libs/multipiston-${multiPistonVersion}.jar"),
+]
 
 neoForge {
     version = project.neo_version
@@ -97,18 +82,6 @@ neoForge {
         minecolonies {
             sourceSet(sourceSets.main)
         }
-        structurize {
-            sourceSet(sourceSets.main)
-        }
-        blockui {
-            sourceSet(sourceSets.main)
-        }
-        domum_ornamentum {
-            sourceSet(sourceSets.main)
-        }
-        multipiston {
-            sourceSet(sourceSets.main)
-        }
     }
 }
 
@@ -117,7 +90,17 @@ configurations {
 }
 
 dependencies {
-    // Optional compat — compileOnly so missing 1.21.10 artifacts do not fail the build
+    // Required LDT stack — separate NeoForge mods, not merged into Quidoms.
+    // compileOnly for APIs; runtime comes from run/mods via prepareRunMods (avoids
+    // double-loading the same mod from classpath + mods folder).
+    ldtJars.each { jar ->
+        if (!jar.exists()) {
+            throw new GradleException(
+                "Missing LDT dependency jar: ${jar}. Run ./scripts/package-ldt-standalone.sh first.")
+        }
+        compileOnly files(jar)
+    }
+
     compileOnly "mezz.jei:jei-${project.jei_mcversion}-neoforge-api:${project.jei_version}"
     compileOnly "info.journeymap:journeymap-api-neoforge:${project.jmapApiVersion}"
     if (project.hasProperty('dynamicTreesVersion')) {
@@ -125,14 +108,9 @@ dependencies {
             transitive = false
         }
     }
-    // LDT datagen helpers used by Domum / Structurize when present
-    compileOnly("com.ldtteam:datagenerators:${project.dataGeneratorsVersion}:universal") {
-        transitive = false
-    }
 }
 
 tasks.named('processResources', ProcessResources).configure {
-    // Quidoms src/main/resources is first — keep those over vendor copies
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     var replaceProperties = [
         minecraft_version      : minecraft_version,
@@ -173,12 +151,23 @@ idea {
     }
 }
 
-// Never ship NeoForge packages inside the Quidoms/minecolonies jar — doing so
-// makes the automatic module export e.g. net.neoforged.neoforge.common.util and
-// clashes with NeoForge (JPMS ResolutionException with other mods).
 tasks.named('jar', Jar).configure {
     exclude 'net/neoforged/**'
     exclude '**/module-info.class'
+    // Belt-and-suspenders: never ship LDT packages inside Quidoms
+    exclude 'com/ldtteam/blockui/**'
+    exclude 'com/ldtteam/structurize/**'
+    exclude 'com/ldtteam/domumornamentum/**'
+    exclude 'com/ldtteam/multipiston/**'
+    exclude 'com/ldtteam/common/**'
+    exclude 'assets/blockui/**'
+    exclude 'assets/structurize/**'
+    exclude 'assets/domum_ornamentum/**'
+    exclude 'assets/multipiston/**'
+    exclude 'data/blockui/**'
+    exclude 'data/structurize/**'
+    exclude 'data/domum_ornamentum/**'
+    exclude 'data/multipiston/**'
     manifest {
         attributes([
             'Implementation-Title'   : 'Quidoms',
@@ -189,7 +178,24 @@ tasks.named('jar', Jar).configure {
     }
 }
 
-// Copy the primary jar into dist/ after build
+tasks.register('prepareRunMods', Copy) {
+    from ldtJars
+    into layout.projectDirectory.dir('run/mods')
+    doFirst {
+        def modsDir = layout.projectDirectory.dir('run/mods').asFile
+        modsDir.mkdirs()
+        // Drop any previous Quidoms fat jar so only the separate stack loads
+        modsDir.listFiles()?.each { f ->
+            if (f.name.startsWith('quidoms-') || f.name.startsWith('minecolonies-')) {
+                f.delete()
+            }
+        }
+    }
+}
+
+tasks.named('runServer').configure { dependsOn prepareRunMods }
+tasks.named('runClient').configure { dependsOn prepareRunMods }
+
 tasks.register('copyDist', Copy) {
     dependsOn jar
     from jar.archiveFile
@@ -200,17 +206,30 @@ tasks.register('copyDist', Copy) {
         def bad = new java.util.zip.ZipFile(out).withCloseable { z ->
             z.entries().iterator().findAll { e ->
                 def n = e.name
-                (n.startsWith('net/neoforged/') && n.endsWith('.class')) || n == 'module-info.class' || n.endsWith('/module-info.class')
+                (n.startsWith('net/neoforged/') && n.endsWith('.class')) ||
+                    n.endsWith('module-info.class') ||
+                    n.startsWith('com/ldtteam/blockui/') ||
+                    n.startsWith('com/ldtteam/structurize/') ||
+                    n.startsWith('com/ldtteam/domumornamentum/') ||
+                    n.startsWith('com/ldtteam/multipiston/') ||
+                    n.startsWith('com/ldtteam/common/')
             }.collect { it.name }
         }
         if (!bad.isEmpty()) {
-            throw new GradleException("JPMS clash risk: jar still contains NeoForge/module-info entries: ${bad}")
+            throw new GradleException("Quidoms jar still contains baked LDT/NeoForge entries: ${bad.take(20)}")
         }
-        def hasShim = new java.util.zip.ZipFile(out).withCloseable { z ->
-            z.getEntry('com/minecolonies/api/compat/INBTSerializable.class') != null
+        def toml = new java.util.zip.ZipFile(out).withCloseable { z ->
+            new String(z.getInputStream(z.getEntry('META-INF/neoforge.mods.toml')).bytes)
         }
-        if (!hasShim) {
-            throw new GradleException('Missing com.minecolonies.api.compat.INBTSerializable shim in dist jar')
+        // Only a single [[mods]] entry (minecolonies) is allowed — LDT must be dependencies only.
+        def modBlocks = (toml =~ /(?ms)\[\[mods\]\].*?(?=\[\[|\z)/).collect { it.toString() }
+        if (modBlocks.size() != 1 || !modBlocks[0].contains('modId="minecolonies"')) {
+            throw new GradleException("Quidoms mods.toml must declare exactly one [[mods]] (minecolonies); found ${modBlocks.size()}")
+        }
+        for (id in ['blockui', 'structurize', 'domum_ornamentum', 'multipiston']) {
+            if (modBlocks[0].contains("modId=\"${id}\"")) {
+                throw new GradleException("Quidoms mods.toml still bakes [[mods]] modId=${id}")
+            }
         }
     }
 }

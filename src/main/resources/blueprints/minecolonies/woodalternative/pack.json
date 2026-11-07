@@ -1,0 +1,15 @@
+{
+  "icon": "",
+  "name": "Wood Alternative",
+  "authors": [
+    "MineColonies",
+    "Quidoms"
+  ],
+  "desc": "Legacy MineColonies style pack 'woodalternative' restored for Quidoms.",
+  "mods": [
+    "structurize",
+    "minecolonies"
+  ],
+  "version": "1",
+  "pack-format": "1"
+}

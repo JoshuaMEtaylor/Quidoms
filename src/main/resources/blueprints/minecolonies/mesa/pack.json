@@ -1,0 +1,15 @@
+{
+  "icon": "",
+  "name": "Mesa",
+  "authors": [
+    "MineColonies",
+    "Quidoms"
+  ],
+  "desc": "Legacy MineColonies style pack 'mesa' restored for Quidoms.",
+  "mods": [
+    "structurize",
+    "minecolonies"
+  ],
+  "version": "1",
+  "pack-format": "1"
+}

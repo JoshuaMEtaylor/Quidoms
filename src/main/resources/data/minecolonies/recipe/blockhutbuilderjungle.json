@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XTX",
+    "XDX",
+    "XXX"
+  ],
+  "key": {
+    "X": "#minecraft:planks",
+    "D": "minecraft:jungle_door",
+    "T": "structurize:sceptergold"
+  },
+  "result": {
+    "id": "minecolonies:blockhutbuilder"
+  }
+}
