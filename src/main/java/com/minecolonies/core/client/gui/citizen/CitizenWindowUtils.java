@@ -56,9 +56,9 @@ public class CitizenWindowUtils
      */
     private enum SmileyEnum
     {
-        EMPTY(new ResourceLocation(Constants.MOD_ID, "citizen/smiley/empty"), EMPTY_HEART_VALUE, null, null),
-        HALF_RED(new ResourceLocation(Constants.MOD_ID, "citizen/smiley/half"), RED_HEART_VALUE - 1, null, EMPTY),
-        RED(new ResourceLocation(Constants.MOD_ID, "citizen/smiley/full"), RED_HEART_VALUE, HALF_RED, EMPTY);
+        EMPTY(new ResourceLocation(Constants.MOD_ID, "textures/gui/citizen/smiley_empty.png"), EMPTY_HEART_VALUE, null, null),
+        HALF_RED(new ResourceLocation(Constants.MOD_ID, "textures/gui/citizen/smiley_half.png"), RED_HEART_VALUE - 1, null, EMPTY),
+        RED(new ResourceLocation(Constants.MOD_ID, "textures/gui/citizen/smiley_full.png"), RED_HEART_VALUE, HALF_RED, EMPTY);
 
         public final int happinessValue;
         public final SmileyEnum prevSmiley;
@@ -86,19 +86,19 @@ public class CitizenWindowUtils
      */
     private enum HeartsEnum
     {
-        EMPTY(ResourceLocation.withDefaultNamespace("hud/heart/container"), EMPTY_HEART_VALUE, null, null),
+        EMPTY(new ResourceLocation(Constants.MOD_ID, "textures/gui/hud/heart/container.png"), EMPTY_HEART_VALUE, null, null),
 
-        HALF_RED(ResourceLocation.withDefaultNamespace("hud/heart/half"), RED_HEART_VALUE - 1, null, EMPTY),
-        RED(ResourceLocation.withDefaultNamespace("hud/heart/full"), RED_HEART_VALUE, HALF_RED, EMPTY),
+        HALF_RED(new ResourceLocation(Constants.MOD_ID, "textures/gui/hud/heart/half.png"), RED_HEART_VALUE - 1, null, EMPTY),
+        RED(new ResourceLocation(Constants.MOD_ID, "textures/gui/hud/heart/full.png"), RED_HEART_VALUE, HALF_RED, EMPTY),
 
-        HALF_GOLDEN(ResourceLocation.withDefaultNamespace("hud/heart/absorbing_half"), GOLDEN_HEART_VALUE - 1, null, RED),
-        GOLDEN(ResourceLocation.withDefaultNamespace("hud/heart/absorbing_full"), GOLDEN_HEART_VALUE, HALF_GOLDEN, RED),
+        HALF_GOLDEN(new ResourceLocation(Constants.MOD_ID, "textures/gui/hud/heart/absorbing_half.png"), GOLDEN_HEART_VALUE - 1, null, RED),
+        GOLDEN(new ResourceLocation(Constants.MOD_ID, "textures/gui/hud/heart/absorbing_full.png"), GOLDEN_HEART_VALUE, HALF_GOLDEN, RED),
 
-        HALF_GREEN(new ResourceLocation(Constants.MOD_ID, "citizen/heart/green_half"), GREEN_HEART_VALUE - 1, null, GOLDEN),
-        GREEN(new ResourceLocation(Constants.MOD_ID, "citizen/heart/green"), GREEN_HEART_VALUE, HALF_GREEN, GOLDEN),
+        HALF_GREEN(new ResourceLocation(Constants.MOD_ID, "textures/gui/citizen/heart/green_half.png"), GREEN_HEART_VALUE - 1, null, GOLDEN),
+        GREEN(new ResourceLocation(Constants.MOD_ID, "textures/gui/citizen/heart/green.png"), GREEN_HEART_VALUE, HALF_GREEN, GOLDEN),
 
-        HALF_BLUE(new ResourceLocation(Constants.MOD_ID, "citizen/heart/blue_half"), BLUE_HEART_VALUE - 1, null, GREEN),
-        BLUE(new ResourceLocation(Constants.MOD_ID, "citizen/heart/blue"), BLUE_HEART_VALUE, HALF_BLUE, GREEN);
+        HALF_BLUE(new ResourceLocation(Constants.MOD_ID, "textures/gui/citizen/heart/blue_half.png"), BLUE_HEART_VALUE - 1, null, GREEN),
+        BLUE(new ResourceLocation(Constants.MOD_ID, "textures/gui/citizen/heart/blue.png"), BLUE_HEART_VALUE, HALF_BLUE, GREEN);
 
         public final int              hpValue;
         public final HeartsEnum       prevHeart;
