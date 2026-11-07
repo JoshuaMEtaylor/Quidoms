@@ -353,8 +353,10 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
             }
             try
             {
+                final List<StructurePacks.Category> loadedCategories = categoryFutures.get();
                 int index = 0;
-                for (final StructurePacks.Category category : categoryFutures.get())
+                StructurePacks.Category soleCurrent = null;
+                for (final StructurePacks.Category category : loadedCategories)
                 {
                     final ButtonImage img = new ButtonImage();
                     if (category.hasIcon)
@@ -380,18 +382,40 @@ public final class WindowExtendedBuildTool extends AbstractBlueprintManipulation
                     img.setID(id);
 
                     categoryView.addChild(img);
-                    PaneBuilders.tooltipBuilder().hoverPane(img).build().setText(Component.literal(id.substring(0, 1).toUpperCase(Locale.US) + id.substring(1)));
+                    final String tip = (id.isEmpty() || ".".equals(id))
+                      ? currentStructurePack
+                      : id.substring(0, 1).toUpperCase(Locale.US) + id.substring(1);
+                    PaneBuilders.tooltipBuilder().hoverPane(img).build().setText(Component.literal(tip));
 
                     if (category.isTerminal)
                     {
-                        blueprintsAtDepth.put(id, StructurePacks.getBlueprintsFuture(currentStructurePack, id, provider));
+                        // isCurrent terminal uses id "." but blueprints are listed from the real folder ("" at pack root).
+                        final String blueprintPath = category.isCurrent
+                          ? (".".equals(id) ? "" : id.replaceAll("/\\.$", ""))
+                          : id;
+                        blueprintsAtDepth.put(id, StructurePacks.getBlueprintsFuture(currentStructurePack, blueprintPath, provider));
                     }
                     else
                     {
                         nextDepthMeta.put(id, StructurePacks.getCategoriesFuture(currentStructurePack, id));
                     }
 
+                    if (category.isCurrent)
+                    {
+                        soleCurrent = category;
+                    }
                     index++;
+                }
+
+                // Flat pack: only the synthetic current-folder terminal — open its blueprint list in the XML slot
+                // (list#blueprints at pos 100,160) without requiring an extra click on the DEFAULT_ICON.
+                if (loadedCategories.size() == 1 && soleCurrent != null)
+                {
+                    nextDepth = soleCurrent.subPath;
+                    for (final Pane pane : categoryView.getChildren())
+                    {
+                        pane.disable();
+                    }
                 }
             }
             catch (InterruptedException | ExecutionException e)
