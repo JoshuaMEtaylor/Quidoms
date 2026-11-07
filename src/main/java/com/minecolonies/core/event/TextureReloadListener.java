@@ -10,7 +10,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -18,12 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static net.neoforged.fml.common.EventBusSubscriber.Bus.MOD;
 
 /**
  * Specific texture reload listener.
  */
-@EventBusSubscriber(value= Dist.CLIENT, modid= Constants.MOD_ID, bus=MOD)
+@EventBusSubscriber(value= Dist.CLIENT, modid= Constants.MOD_ID)
 public class TextureReloadListener extends SimplePreparableReloadListener<TextureReloadListener.TexturePacks>
 {
     /**
@@ -70,12 +69,14 @@ public class TextureReloadListener extends SimplePreparableReloadListener<Textur
     }
 
     @SubscribeEvent
-    public static void modInitClient(final RegisterClientReloadListenersEvent event)
+    public static void modInitClient(final AddClientReloadListenersEvent event)
     {
-        event.registerReloadListener(new TextureReloadListener());
+        event.addListener(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("minecolonies", "texture_reload"), new TextureReloadListener());
 
         // registry minecolonies gui atlas
-        AtlasManager.INSTANCE.addAtlas(event::registerReloadListener, Constants.MOD_ID);
+        AtlasManager.INSTANCE.addAtlas(
+            listener -> event.addListener(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "gui_atlas"), listener),
+            Constants.MOD_ID);
     }
 }
 

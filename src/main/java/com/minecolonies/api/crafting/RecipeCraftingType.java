@@ -44,7 +44,7 @@ public class RecipeCraftingType<C extends RecipeInput, T extends Recipe<C>> exte
                                             @NotNull final Level world)
     {
         final List<IGenericRecipe> recipes = new ArrayList<>();
-        for (final RecipeHolder<T> recipe : recipeManager.getAllRecipesFor(recipeType))
+        for (final RecipeHolder<T> recipe : com.minecolonies.api.util.RecipeCompat.getAllRecipesFor(recipeManager, recipeType))
         {
             if (predicate != null && !predicate.test(recipe)) continue;
 
@@ -58,7 +58,7 @@ public class RecipeCraftingType<C extends RecipeInput, T extends Recipe<C>> exte
                                                @NotNull final Level world)
     {
         final T recipe = holder.value();
-        if (recipe.isSpecial() || recipe.getResultItem(world.registryAccess()).isEmpty()) return;     // invalid or special recipes
+        if (recipe.isSpecial() || com.minecolonies.api.util.RecipeCompat.getResultItem(recipe, world).isEmpty()) return;     // invalid or special recipes
         try
         {
             final IGenericRecipe genericRecipe = GenericRecipe.of(holder, world);

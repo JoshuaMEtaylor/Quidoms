@@ -10,7 +10,7 @@ import com.minecolonies.api.util.constant.ColonyConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import com.minecolonies.core.datalistener.GsonEventReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
@@ -21,12 +21,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.minecolonies.core.generation.DataGeneratorConstants.COLONY_RECRUITMENT_ITEMS_DIR;
 
 /**
  * Loads and listens to recruitment costs data.
  */
-public class RecruitmentItemsListener extends SimpleJsonResourceReloadListener
+public class RecruitmentItemsListener extends GsonEventReloadListener
 {
     /**
      * Base recruitment level.
@@ -79,7 +78,7 @@ public class RecruitmentItemsListener extends SimpleJsonResourceReloadListener
      */
     public RecruitmentItemsListener()
     {
-        super(GSON, COLONY_RECRUITMENT_ITEMS_DIR);
+        super(GSON, "colony/recruitment_items");
     }
 
     /**
@@ -127,7 +126,7 @@ public class RecruitmentItemsListener extends SimpleJsonResourceReloadListener
             }
 
             final JsonObject object = entry.getValue().getAsJsonObject();
-            final Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(GsonHelper.getAsString(object, KEY_ITEM)));
+            final Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(GsonHelper.getAsString(object, KEY_ITEM)));
             final int rarity = GsonHelper.getAsInt(object, KEY_RARITY);
 
             if (item == Items.AIR)

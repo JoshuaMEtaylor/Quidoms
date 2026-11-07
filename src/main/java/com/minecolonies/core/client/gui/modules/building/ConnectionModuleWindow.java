@@ -15,7 +15,6 @@ import com.minecolonies.api.util.MessageUtils;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.client.gui.AbstractBuildingWindow;
 import com.minecolonies.core.client.gui.WindowConfirm;
-import com.minecolonies.core.commands.ClickEventWithExecutable;
 import com.minecolonies.core.network.messages.server.colony.TeleportToColonyMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

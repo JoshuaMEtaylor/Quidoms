@@ -1,4 +1,3 @@
 {
-  "parent": "minecolonies:block/rack/blockrackfulldouble",
-  "loader": "domum_ornamentum:materially_textured"
+  "parent": "minecolonies:block/rack/blockrackfulldouble"
 }

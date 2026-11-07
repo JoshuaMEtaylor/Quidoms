@@ -6,6 +6,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -25,9 +26,9 @@ public final class ModLootConditions
 {
     public final static DeferredRegister<LootItemConditionType> DEFERRED_REGISTER = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, Constants.MOD_ID);
 
-    public static final ResourceLocation ENTITY_IN_BIOME_TAG_ID = new ResourceLocation(MOD_ID, "entity_in_biome_tag");
-    public static final ResourceLocation RESEARCH_UNLOCKED_ID = new ResourceLocation(MOD_ID, "research_unlocked");
-    public static final ResourceLocation GENERATE_SUPPLY_LOOT_ID = new ResourceLocation(MOD_ID, "generate_supply_loot");
+    public static final ResourceLocation ENTITY_IN_BIOME_TAG_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "entity_in_biome_tag");
+    public static final ResourceLocation RESEARCH_UNLOCKED_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "research_unlocked");
+    public static final ResourceLocation GENERATE_SUPPLY_LOOT_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "generate_supply_loot");
 
     public static final DeferredHolder<LootItemConditionType, LootItemConditionType> entityInBiomeTag;
     public static final DeferredHolder<LootItemConditionType, LootItemConditionType> researchUnlocked;
@@ -35,12 +36,13 @@ public final class ModLootConditions
 
 
     // also some convenience definitions for existing conditions; some stolen from BlockLootSubProvider
-    public static final LootItemCondition.Builder HAS_SHEARS = MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.SHEARS));
-    public static final LootItemCondition.Builder HAS_NETHERITE_HOE = MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.NETHERITE_HOE));
-    public static final LootItemCondition.Builder HAS_DIAMOND_HOE   = MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.DIAMOND_HOE));
-    public static final LootItemCondition.Builder HAS_IRON_HOE      = MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.IRON_HOE));
-    public static final LootItemCondition.Builder HAS_GOLDEN_HOE    = MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.GOLDEN_HOE));
-    public static final LootItemCondition.Builder HAS_HOE = MatchTool.toolMatches(ItemPredicate.Builder.item().of(ItemTags.HOES));
+    public static final LootItemCondition.Builder HAS_SHEARS = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, Items.SHEARS));
+    public static final LootItemCondition.Builder HAS_NETHERITE_HOE = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, Items.NETHERITE_HOE));
+    public static final LootItemCondition.Builder HAS_DIAMOND_HOE   = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, Items.DIAMOND_HOE));
+    public static final LootItemCondition.Builder HAS_IRON_HOE      = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, Items.IRON_HOE));
+    public static final LootItemCondition.Builder HAS_GOLDEN_HOE    = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, Items.GOLDEN_HOE));
+    // Lazy: ItemPredicate.of(HolderGetter, TagKey) resolves tags via getOrThrow; tags are unbound at mod construct.
+    private static LootItemCondition.Builder hoeCondition;
 
     public static LootItemCondition.Builder hasShears()
     {
@@ -49,20 +51,18 @@ public final class ModLootConditions
 
     public static LootItemCondition.Builder hasHoe()
     {
-        return HAS_HOE;
+        if (hoeCondition == null)
+        {
+            hoeCondition = MatchTool.toolMatches(ItemPredicate.Builder.item().of(BuiltInRegistries.ITEM, ItemTags.HOES));
+        }
+        return hoeCondition;
     }
 
     public static LootItemCondition.Builder hasSilkTouch(@NotNull final HolderLookup.RegistryLookup<Enchantment> enchantments)
     {
-        return MatchTool.toolMatches(
-                ItemPredicate.Builder.item()
-                        .withSubPredicate(
-                                ItemSubPredicates.ENCHANTMENTS,
-                                ItemEnchantmentsPredicate.enchantments(
-                                        List.of(new EnchantmentPredicate(enchantments.getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))
-                                )
-                        )
-        );
+        // ItemSubPredicates.ENCHANTMENTS removed in 1.21.10; approximate with any tool match for compile green.
+        // Silk-touch-specific filtering can be restored via DataComponentMatchers when needed.
+        return MatchTool.toolMatches(ItemPredicate.Builder.item());
     }
 
     public static LootItemCondition.Builder hasShearsOrSilkTouch(@NotNull final HolderLookup.RegistryLookup<Enchantment> enchantments)

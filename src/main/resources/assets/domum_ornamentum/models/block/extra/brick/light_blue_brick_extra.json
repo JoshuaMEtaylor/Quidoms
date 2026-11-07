@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "domum_ornamentum:block/extra/light_blue_brick_extra",
+    "particle": "domum_ornamentum:block/extra/light_blue_brick_extra"
+  }
+}

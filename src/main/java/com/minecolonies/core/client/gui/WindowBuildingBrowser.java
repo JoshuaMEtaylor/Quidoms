@@ -50,10 +50,10 @@ public class WindowBuildingBrowser extends AbstractWindowSkeleton
      * Number of worker threads to spawn to scan blueprints (each pack on a separate thread); higher reduces total search time.
      */
     private static final int WORKER_THREADS = 4;
-    @SuppressWarnings("ConstantConditions") private static final int COLOR_NORMAL          = ChatFormatting.BLACK.getColor();
-    @SuppressWarnings("ConstantConditions") private static final int COLOR_CHILD           = ChatFormatting.DARK_GREEN.getColor();
-    @SuppressWarnings("ConstantConditions") private static final int COLOR_INVISIBLE       = ChatFormatting.DARK_BLUE.getColor();
-    @SuppressWarnings("ConstantConditions") private static final int COLOR_INVISIBLE_CHILD = ChatFormatting.BLUE.getColor();
+    @SuppressWarnings("ConstantConditions") private static final int COLOR_NORMAL          = ChatFormatting.BLACK.getColor() | 0xFF000000;
+    @SuppressWarnings("ConstantConditions") private static final int COLOR_CHILD           = ChatFormatting.DARK_GREEN.getColor() | 0xFF000000;
+    @SuppressWarnings("ConstantConditions") private static final int COLOR_INVISIBLE       = ChatFormatting.DARK_BLUE.getColor() | 0xFF000000;
+    @SuppressWarnings("ConstantConditions") private static final int COLOR_INVISIBLE_CHILD = ChatFormatting.BLUE.getColor() | 0xFF000000;
 
     private static final Map<Block, List<BuildingInfo>> buildingCache = new HashMap<>();
 
@@ -417,7 +417,7 @@ public class WindowBuildingBrowser extends AbstractWindowSkeleton
             assert !anchor.hasTileEntityData() || anchor.getTileEntityData() != null;   // quiet warnings
             if (anchor.hasTileEntityData() && anchor.getTileEntityData().contains(TAG_BLUEPRINTDATA))
             {
-                final Map<BlockPos, List<String>> tagMap = IBlueprintDataProviderBE.readTagPosMapFrom(anchor.getTileEntityData().getCompound(TAG_BLUEPRINTDATA));
+                final Map<BlockPos, List<String>> tagMap = IBlueprintDataProviderBE.readTagPosMapFrom(anchor.getTileEntityData().getCompoundOrEmpty(TAG_BLUEPRINTDATA));
                 final List<String> anchorTags = tagMap.computeIfAbsent(BlockPos.ZERO, k -> new ArrayList<>());
                 if (anchorTags.contains(INVISIBLE_TAG))
                 {

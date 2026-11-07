@@ -116,7 +116,7 @@ public class EmptyColonyStructure extends Structure
                     result,
                     false,
                     this.projectStartToHeightmap,
-                    this.maxDistanceFromCenter,
+                    new net.minecraft.world.level.levelgen.structure.structures.JigsawStructure.MaxDistance(this.maxDistanceFromCenter),
                     PoolAliasLookup.create(this.poolAliases, result, context.seed()),
                     DimensionPadding.ZERO,
                     LiquidSettings.IGNORE_WATERLOGGING
@@ -151,7 +151,7 @@ public class EmptyColonyStructure extends Structure
             blockpos,
             false,
             this.projectStartToHeightmap,
-            this.maxDistanceFromCenter,
+            new net.minecraft.world.level.levelgen.structure.structures.JigsawStructure.MaxDistance(this.maxDistanceFromCenter),
             PoolAliasLookup.create(this.poolAliases, blockpos, context.seed()),
             DimensionPadding.ZERO,
             LiquidSettings.IGNORE_WATERLOGGING

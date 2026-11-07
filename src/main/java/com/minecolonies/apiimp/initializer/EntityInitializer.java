@@ -60,9 +60,12 @@ import static com.minecolonies.api.util.constant.CitizenConstants.CITIZEN_HEIGHT
 import static com.minecolonies.api.util.constant.CitizenConstants.CITIZEN_WIDTH;
 import static com.minecolonies.api.util.constant.Constants.*;
 
-@EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public class EntityInitializer
 {
+    /** Quidoms: raid/camp raider entity types are not registered into the pack. */
+    private static final boolean QUIDOMS_REGISTER_RAID_ENTITIES = false;
+
     public static void setupEntities(RegisterEvent event)
     {
         if (event.getRegistryKey().equals(Registries.ENTITY_TYPE))
@@ -97,41 +100,53 @@ public class EntityInitializer
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.BARBARIAN = build(registry, "barbarian",
               EntityType.Builder.of(EntityBarbarianRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.ARCHERBARBARIAN = build(registry, "archerbarbarian",
               EntityType.Builder.of(EntityArcherBarbarianRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CHIEFBARBARIAN = build(registry, "chiefbarbarian",
               EntityType.Builder.of(EntityChiefBarbarianRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.PIRATE = build(registry, "pirate",
               EntityType.Builder.of(EntityPirateRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.ARCHERPIRATE = build(registry, "archerpirate",
               EntityType.Builder.of(EntityArcherPirateRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CHIEFPIRATE = build(registry, "chiefpirate",
               EntityType.Builder.of(EntityCaptainPirateRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
             ModEntities.SITTINGENTITY = build(registry, "sittingentity",
               EntityType.Builder.<SittingEntity>of(SittingEntity::new, MobCategory.MISC)
@@ -151,48 +166,62 @@ public class EntityInitializer
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized(CavalryHorseEntity.SLIM_W, CavalryHorseEntity.BASE_H));           
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.MUMMY = build(registry, "mummy",
               EntityType.Builder.of(EntityMummyRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.ARCHERMUMMY = build(registry, "archermummy",
               EntityType.Builder.of(EntityArcherMummyRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.PHARAO = build(registry, "pharao",
               EntityType.Builder.of(EntityPharaoRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.AMAZON = build(registry, "amazon",
               EntityType.Builder.of(EntityArcherAmazonRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.AMAZONSPEARMAN = build(registry, "amazonspearman",
               EntityType.Builder.of(EntityAmazonSpearmanRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.AMAZONCHIEF = build(registry, "amazonchief",
               EntityType.Builder.of(EntityAmazonChiefRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.FIREARROW = build(registry, "firearrow",
               EntityType.Builder.of(FireArrowEntity::new, MobCategory.MISC)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY_FISHHOOK)
                 .sized(0.5F, 0.5F)
                 .setShouldReceiveVelocityUpdates(true));
+            }
 
             ModEntities.MC_NORMAL_ARROW = build(registry, "mcnormalarrow",
               EntityType.Builder.of(CustomArrowEntity::new, MobCategory.MISC)
@@ -208,23 +237,29 @@ public class EntityInitializer
                 .sized(0.25F, 0.25F)
                 .setShouldReceiveVelocityUpdates(true));
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.SHIELDMAIDEN = build(registry, "shieldmaiden",
               EntityType.Builder.of(EntityShieldmaidenRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.NORSEMEN_ARCHER = build(registry, "norsemenarcher",
               EntityType.Builder.of(EntityNorsemenArcherRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.NORSEMEN_CHIEF = build(registry, "norsemenchief",
               EntityType.Builder.of(EntityNorsemenChiefRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
             ModEntities.SPEAR = build(registry, "spear",
               EntityType.Builder.<SpearEntity>of(SpearEntity::new, MobCategory.MISC)
@@ -233,139 +268,181 @@ public class EntityInitializer
                 .sized(0.5F, 0.5F)
                 .setShouldReceiveVelocityUpdates(true));
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.DROWNED_PIRATE = build(registry, "drownedpirate",
               EntityType.Builder.of(EntityDrownedPirateRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.DROWNED_ARCHERPIRATE = build(registry, "drownedarcherpirate",
               EntityType.Builder.of(EntityDrownedArcherPirateRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.DROWNED_CHIEFPIRATE = build(registry, "drownedchiefpirate",
               EntityType.Builder.of(EntityDrownedCaptainPirateRaider::new, MobCategory.MONSTER)
                 .setTrackingRange(ENTITY_TRACKING_RANGE)
                 .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                 .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
             // Camp Raiders
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_BARBARIAN = build(registry, "campbarbarian",
                     EntityType.Builder.of(EntityBarbarian::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_ARCHERBARBARIAN = build(registry, "camparcherbarbarian",
                     EntityType.Builder.of(EntityArcherBarbarian::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_CHIEFBARBARIAN = build(registry, "campchiefbarbarian",
                     EntityType.Builder.of(EntityChiefBarbarian::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_PIRATE = build(registry, "camppirate",
                     EntityType.Builder.of(EntityPirate::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_ARCHERPIRATE = build(registry, "camparcherpirate",
                     EntityType.Builder.of(EntityArcherPirate::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_CHIEFPIRATE = build(registry, "campchiefpirate",
                     EntityType.Builder.of(EntityCaptainPirate::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_AMAZON = build(registry, "campamazon",
                     EntityType.Builder.of(EntityArcherAmazon::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_AMAZONSPEARMAN = build(registry, "campamazonspearman",
                     EntityType.Builder.of(EntityAmazonSpearman::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_AMAZONCHIEF = build(registry, "campamazonchief",
                     EntityType.Builder.of(EntityAmazonChief::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_MUMMY = build(registry, "campmummy",
                     EntityType.Builder.of(EntityMummy::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_ARCHERMUMMY = build(registry, "camparchermummy",
                     EntityType.Builder.of(EntityArcherMummy::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_PHARAO = build(registry, "camppharao",
                     EntityType.Builder.of(EntityPharao::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_SHIELDMAIDEN = build(registry, "campshieldmaiden",
                     EntityType.Builder.of(EntityShieldmaiden::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_NORSEMEN_ARCHER = build(registry, "campnorsemenarcher",
                     EntityType.Builder.of(EntityNorsemenArcher::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_NORSEMEN_CHIEF = build(registry, "campnorsemenchief",
                     EntityType.Builder.of(EntityNorsemenChief::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_DROWNED_PIRATE = build(registry, "campdrownedpirate",
                     EntityType.Builder.of(EntityDrownedPirate::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_DROWNED_ARCHERPIRATE = build(registry, "campdrownedarcherpirate",
                     EntityType.Builder.of(EntityDrownedArcherPirate::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
 
+            if (QUIDOMS_REGISTER_RAID_ENTITIES) {
             ModEntities.CAMP_DROWNED_CHIEFPIRATE = build(registry, "campdrownedchiefpirate",
                     EntityType.Builder.of(EntityDrownedCaptainPirate::new, MobCategory.MONSTER)
                             .setTrackingRange(ENTITY_TRACKING_RANGE)
                             .setUpdateInterval(ENTITY_UPDATE_FREQUENCY)
                             .sized((float) CITIZEN_WIDTH, (float) CITIZEN_HEIGHT));
+            }
         }
     }
 
     private static <T extends Entity> EntityType<T> build(Registry<EntityType<?>> registry, final String key, final EntityType.Builder<T> builder)
     {
-        EntityType<T> entity = builder.build(Constants.MOD_ID + ":" + key);
+        EntityType<T> entity = builder.build(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, key)));
         Registry.register(registry, ResourceLocation.parse(Constants.MOD_ID + ":" + key), entity);
         return entity;
     }

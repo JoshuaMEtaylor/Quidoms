@@ -34,7 +34,7 @@ public class ItemFireArrow extends ArrowItem
     @Override
     public AbstractArrow createArrow(final Level worldIn, final ItemStack stack, final LivingEntity shooter, @Nullable final ItemStack bow)
     {
-        AbstractArrow entity = ModEntities.FIREARROW.create(worldIn);
+        AbstractArrow entity = ModEntities.FIREARROW.create(worldIn, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
         entity.setOwner(shooter);
         return entity;
     }
@@ -43,6 +43,6 @@ public class ItemFireArrow extends ArrowItem
     @Override
     public Entity createEntity(final Level world, final Entity location, final ItemStack itemstack)
     {
-        return ModEntities.FIREARROW.create(world);
+        return ModEntities.FIREARROW.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
     }
 }

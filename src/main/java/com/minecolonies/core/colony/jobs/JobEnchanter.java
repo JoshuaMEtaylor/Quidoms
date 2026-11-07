@@ -68,7 +68,7 @@ public class JobEnchanter extends AbstractJobCrafter<EntityAIWorkEnchanter, JobE
         {
             this.posToDrainFrom = BlockPosUtil.read(compound, TAG_BUILDING_TO_DRAIN);
         }
-        this.waitingTicks = compound.getInt(TAG_WAITING_TICKS);
+        this.waitingTicks = compound.getIntOr(TAG_WAITING_TICKS, 0);
     }
 
     @Override

@@ -4,10 +4,8 @@ import com.minecolonies.api.equipment.registry.EquipmentTypeEntry;
 import com.minecolonies.api.util.ItemStackUtils;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
-import net.minecraft.world.item.SwordItem;
 
 import java.util.function.Predicate;
 
@@ -150,9 +148,9 @@ public class GuardGear implements Predicate<ItemStack>
     public boolean test(final ItemStack stack)
     {
         return
-          (ItemStackUtils.hasEquipmentLevel(stack, itemNeeded, minArmorLevel, maxArmorLevel) && stack.getItem() instanceof ArmorItem
-             && ((ArmorItem) stack.getItem()).getEquipmentSlot() == getType())
-            || (stack.getItem() instanceof SwordItem && getType() == EquipmentSlot.MAINHAND)
+          (ItemStackUtils.hasEquipmentLevel(stack, itemNeeded, minArmorLevel, maxArmorLevel)
+             && getType().equals(ItemStackUtils.getHumanoidArmorSlot(stack)))
+            || (ItemStackUtils.isSword(stack) && getType() == EquipmentSlot.MAINHAND)
             || (stack.getItem() instanceof ShieldItem && getType() == EquipmentSlot.OFFHAND);
     }
 }

@@ -14,7 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -56,7 +56,7 @@ public class ItemScanAnalyzer extends AbstractItemWithPosSelector
       final Item.Properties properties)
     {
         super(properties.durability(0)
-            .setNoRepair()
+            .setNoCombineRepair()
             .rarity(Rarity.UNCOMMON)
             .component(ModDataComponents.POS_SELECTION, PosSelection.EMPTY));
     }
@@ -76,10 +76,14 @@ public class ItemScanAnalyzer extends AbstractItemWithPosSelector
      * {@inheritDoc}
      */
     @Override
-    public boolean canAttackBlock(final BlockState state, final Level worldIn, final BlockPos pos, final Player player)
+    public boolean canDestroyBlock(final ItemStack stack, final BlockState state, final Level worldIn, final BlockPos pos, final LivingEntity entity)
     {
+        if (!(entity instanceof final Player player))
+        {
+            return false;
+        }
         checkTimeout(player.getMainHandItem(), worldIn);
-        boolean result = super.canAttackBlock(state, worldIn, pos, player);
+        boolean result = super.canDestroyBlock(stack, state, worldIn, pos, entity);
         openAreaBox(player.getMainHandItem());
         return result;
     }
@@ -94,7 +98,7 @@ public class ItemScanAnalyzer extends AbstractItemWithPosSelector
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level worldIn, final Player playerIn, final InteractionHand handIn)
+    public InteractionResult use(final Level worldIn, final Player playerIn, final InteractionHand handIn)
     {
         checkTimeout(playerIn.getItemInHand(handIn), worldIn);
         return super.use(worldIn, playerIn, handIn);
@@ -103,7 +107,7 @@ public class ItemScanAnalyzer extends AbstractItemWithPosSelector
     @Override
     public InteractionResult onAirRightClick(final BlockPos start, final BlockPos end, final Level worldIn, final Player playerIn, final ItemStack itemStack)
     {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             if (start != null && end != null && (!lastPos.equals(start) || !lastPos2.equals(end)))
             {

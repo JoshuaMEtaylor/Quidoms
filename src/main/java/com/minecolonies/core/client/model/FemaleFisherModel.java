@@ -4,7 +4,7 @@
 package com.minecolonies.core.client.model;
 
 import com.minecolonies.api.client.render.modeltype.CitizenModel;
-import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
+import com.minecolonies.api.client.render.modeltype.CitizenRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.minecolonies.core.entity.ai.workers.production.agriculture.EntityAIWorkFisherman.RENDER_META_FISH;
 import static com.minecolonies.core.entity.ai.workers.production.agriculture.EntityAIWorkFisherman.RENDER_META_ROD;
 
-public class FemaleFisherModel extends CitizenModel<AbstractEntityCitizen>
+public class FemaleFisherModel extends CitizenModel<CitizenRenderState>
 {
 
     public FemaleFisherModel(final ModelPart part)
@@ -98,10 +98,10 @@ public class FemaleFisherModel extends CitizenModel<AbstractEntityCitizen>
     }
 
     @Override
-    public void setupAnim(@NotNull final AbstractEntityCitizen entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(@NotNull final CitizenRenderState entity)
     {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        body.getChild("fishingPole").visible = entity.getRenderMetadata().contains(RENDER_META_ROD);
-        body.getChild("fish").visible = entity.getRenderMetadata().contains(RENDER_META_FISH);
+        super.setupAnim(entity);
+        body.getChild("fishingPole").visible = entity.renderMetadata.contains(RENDER_META_ROD);
+        body.getChild("fish").visible = entity.renderMetadata.contains(RENDER_META_FISH);
     }
 }

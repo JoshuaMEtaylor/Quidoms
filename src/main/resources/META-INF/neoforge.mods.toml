@@ -19,7 +19,7 @@ Quidoms product changes on top of upstream:
 - Colonist tools are unbreakable and ignore hut/citizen tool-level gates (player-equivalent stats/enchants kept).
 - Building material lists expand to recursive crafting ingredients where recipes allow.
 
-Requires Structurize, BlockUI, Domum Ornamentum, and MultiPiston matching the 1.21.1 NeoForge line.
+Requires separate NeoForge mods: BlockUI, Structurize, Domum Ornamentum, MultiPiston (1.21.10 builds).
 '''
 
 [[accessTransformers]]
@@ -50,16 +50,22 @@ file="META-INF/accesstransformer.cfg"
     ordering="AFTER"
     side="BOTH"
 [[dependencies.minecolonies]]
-    modId="jei"
-    type="optional"
-    versionRange="[${jei_version},)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.minecolonies]]
     modId="domum_ornamentum"
     type="required"
     versionRange="[${domumOrnamentumVersion}, )"
     ordering="AFTER"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="multipiston"
+    type="required"
+    versionRange="[${multiPistonVersion}, )"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="jei"
+    type="optional"
+    versionRange="[${jei_version},)"
+    ordering="NONE"
     side="BOTH"
 [[dependencies.minecolonies]]
     modId="journeymap"

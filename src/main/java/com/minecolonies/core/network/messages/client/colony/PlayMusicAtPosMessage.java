@@ -77,7 +77,7 @@ public class PlayMusicAtPosMessage extends AbstractClientPlayMessage
     protected PlayMusicAtPosMessage(final RegistryFriendlyByteBuf buf, final PlayMessageType<?> type)
     {
         super(buf, type);
-        this.soundEvent = BuiltInRegistries.SOUND_EVENT.get(buf.readResourceLocation());
+        this.soundEvent = BuiltInRegistries.SOUND_EVENT.getValue(buf.readResourceLocation());
         this.pos = buf.readBlockPos();
         this.dimensionID = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(buf.readUtf(32767)));
         this.volume = buf.readFloat();

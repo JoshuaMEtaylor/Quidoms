@@ -1,0 +1,25 @@
+{
+  "branch": "minecolonies:combat",
+  "costs": [
+    {
+      "ingredient": "minecraft:iron_ingot",
+      "count": 16
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/armordurabilitymultiplier",
+      "level": 3
+    }
+  ],
+  "icon": "minecraft:chainmail_helmet",
+  "parentResearch": "minecolonies:combat/boiledleather",
+  "requirements": [
+    {
+      "type": "minecolonies:single-building",
+      "building": "minecolonies:townhall",
+      "level": 3
+    }
+  ],
+  "researchLevel": 3
+}

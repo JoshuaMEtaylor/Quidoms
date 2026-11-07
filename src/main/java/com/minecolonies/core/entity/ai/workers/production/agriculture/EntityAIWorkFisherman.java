@@ -547,7 +547,7 @@ public class EntityAIWorkFisherman extends AbstractEntityAISkill<JobFisherman, B
      */
     private void throwRod()
     {
-        if (!world.isClientSide)
+        if (!world.isClientSide())
         {
             WorkerUtil.faceBlock(job.getWater().getA(), worker);
             world.playSound(null,

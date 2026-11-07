@@ -31,7 +31,7 @@
 /runServer
 /runs/*
 .cache
-/libs
+/libs/*
 # Quidoms: keep gradle.properties tracked for reproducible NeoForge 1.21.1 builds.
 # gradle.properties
 
@@ -59,3 +59,10 @@ gradle/local.configuration.gradle
 
 /src/main/resources/assets/minecolonies/lang/**
 !src/main/assets/minecolonies/lang/manual_en_us.json
+.idea/
+/vendor/
+/libs/*
+!/libs/blockui-*.jar
+!/libs/structurize-*.jar
+!/libs/domum_ornamentum-*.jar
+!/libs/multipiston-*.jar

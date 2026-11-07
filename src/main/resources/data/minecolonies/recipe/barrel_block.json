@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": "minecraft:dirt",
+    "S": "minecraft:iron_ingot",
+    "T": "structurize:sceptergold",
+    "W": "#minecraft:planks"
+  },
+  "pattern": [
+    "WTW",
+    "WGW",
+    "WSW"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:barrel_block"
+  }
+}

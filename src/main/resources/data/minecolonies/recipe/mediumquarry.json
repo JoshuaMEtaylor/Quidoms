@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "minecraft:barrel",
+    "D": "minecraft:diamond_pickaxe",
+    "T": "structurize:sceptergold",
+    "X": "#minecraft:planks"
+  },
+  "pattern": [
+    "XTX",
+    "XDX",
+    "XBX"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:mediumquarry"
+  }
+}

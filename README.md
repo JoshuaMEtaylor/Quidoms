@@ -1,6 +1,6 @@
 # Quidoms
 
-Colony simulator for **NeoForge / Minecraft 1.21.1**, based on the **full [MineColonies](https://github.com/ldtteam/minecolonies)** codebase (LDT Team).
+Colony simulator for **NeoForge**, based on the **full [MineColonies](https://github.com/ldtteam/minecolonies)** codebase (LDT Team).
 
 Repository: https://github.com/JoshuaMEtaylor/Quidoms
 
@@ -19,25 +19,39 @@ This is **not** a from-scratch stub. Quidoms keeps essentially the whole MineCol
 3. **Ingredient BOM builds** — builder resource lists expand schematic items through recursive crafting recipes into base ingredients (`IngredientBomExpand` → `BuildingResourcesModule`).
 4. **Branding** — display name **Quidoms** (mod id remains `minecolonies` for blueprint/save compatibility).
 
-UI modernization beyond branding is **deferred** this pass (BlockUI still powers the majority of screens).
+## Minecraft / NeoForge versions
 
-## Minecraft version note
+| Line | Minecraft | NeoForge | Notes |
+|---|---|---|---|
+| Current separate-jars (`dist/*-1.21.10.jar`) | **1.21.10** | **21.10.x** | Quidoms + standalone LDT jars (normal MineColonies-style install). |
+| Older 1.21.1 line on `main` | 1.21.1 | 21.1.x | Upstream LDT publish line. |
 
-Upstream LDT NeoForge line for this tree is **1.21.1** (`neo 21.1.x`), not 1.21.10. Structurize / BlockUI / Domum do not yet publish a 1.21.10 line usable as hard deps. Quidoms therefore ships the **real full mod on 1.21.1**. A later pass can port the LDT stack to 1.21.10 when those libs exist.
+## Install (1.21.10 separate jars)
 
-## Install
+1. Install **Minecraft 1.21.10** + **NeoForge 21.10.x**.
+2. Drop **all** of these into `mods/` (do not omit deps):
+   - `dist/blockui-1.0.212-1.21.10.jar`
+   - `dist/structurize-1.0.832-1.21.10.jar`
+   - `dist/domum_ornamentum-1.21.10-1.0.193.jar`
+   - `dist/multipiston-1.2.58-1.21.10.jar`
+   - `dist/quidoms-*-1.21.10.jar`
+3. **Do not** use the old fat/JiJ Quidoms jar that baked LDT mods inside it.
+4. Optional: JEI / JourneyMap / Dynamic Trees as usual.
 
-1. Install **Minecraft 1.21.1** + **NeoForge 21.1.x**.
-2. Install matching **Structurize**, **BlockUI**, **Domum Ornamentum**, and **MultiPiston** (versions from `gradle.properties`).
-3. Drop `dist/quidoms-*.jar` (or the built `minecolonies-*-1.21.1.jar`) into `mods/`.
+### JPMS / NeoForge util package
+
+Quidoms must **not** ship classes under `net.neoforged.*`. The old `INBTSerializable` shim lives only at `com.minecolonies.api.compat.INBTSerializable`.
 
 ## Build
 
 ```bash
+# Package standalone LDT jars (from a known-good 1.21.10 class dump / prior fat jar):
+./scripts/package-ldt-standalone.sh /path/to/source.jar
+# Build Quidoms against libs/*.jar:
 ./gradlew build
 ```
 
-Playable jar: `build/libs/minecolonies-*-1.21.1.jar` (also mirrored under `dist/`).
+Outputs land in `dist/`. Gradle `runServer` / `runClient` copy the LDT jars into `run/mods/` automatically.
 
 ## Play
 

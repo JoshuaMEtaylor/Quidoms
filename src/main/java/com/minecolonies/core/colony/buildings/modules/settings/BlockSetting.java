@@ -218,7 +218,7 @@ public class BlockSetting implements ISetting<BlockItem>
         }
 
         @Override
-        public int getMinBuildHeight()
+        public int getMinY()
         {
             return Integer.MIN_VALUE;
         }

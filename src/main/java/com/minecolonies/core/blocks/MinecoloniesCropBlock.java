@@ -1,5 +1,9 @@
 package com.minecolonies.core.blocks;
 
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
+
 import com.minecolonies.api.blocks.AbstractBlockMinecolonies;
 import com.minecolonies.api.colony.IColonyManager;
 import com.minecolonies.api.util.InventoryUtils;
@@ -15,7 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -87,7 +91,7 @@ public class MinecoloniesCropBlock extends AbstractBlockMinecolonies<Minecolonie
      */
     public MinecoloniesCropBlock(final String blockName, final Block preferredFarmland, final List<Block> droppedFrom, @Nullable final TagKey<Biome> preferredBiome)
     {
-        super(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).noCollission().instabreak().sound(SoundType.CROP).pushReaction(PushReaction.DESTROY));
+        super(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).noCollision().instabreak().sound(SoundType.CROP).pushReaction(PushReaction.DESTROY));
         this.registerDefaultState(this.stateDefinition.any().setValue(AGE, 0));
         this.blockId = new ResourceLocation(Constants.MOD_ID, blockName);
         this.preferredFarmland = preferredFarmland;
@@ -155,7 +159,7 @@ public class MinecoloniesCropBlock extends AbstractBlockMinecolonies<Minecolonie
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(
+    protected InteractionResult useItemOn(
         final ItemStack stack,
         final BlockState state,
         final Level level,
@@ -197,13 +201,13 @@ public class MinecoloniesCropBlock extends AbstractBlockMinecolonies<Minecolonie
 
     @NotNull
     @Override
-    public BlockState updateShape(BlockState state, @NotNull Direction dir, @NotNull BlockState newState, @NotNull LevelAccessor level, @NotNull BlockPos pos, @NotNull BlockPos neighborPos)
+    public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState newState, RandomSource random)
     {
-        return !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, dir, newState, level, pos, neighborPos);
+        return !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, level, scheduledTickAccess, pos, dir, neighborPos, newState, random);
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos)
+    public boolean propagatesSkylightDown(BlockState state)
     {
         return state.getFluidState().isEmpty();
     }

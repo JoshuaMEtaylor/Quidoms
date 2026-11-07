@@ -12,7 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import com.minecolonies.api.compat.INBTSerializable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -146,7 +146,7 @@ public interface IBuildingExtension extends IModuleContainer<IBuildingExtensionM
 
         public static ExtensionId deserializeNBT(final HolderLookup.Provider provider, final CompoundTag nbt)
         {
-            return new ExtensionId(BlockPosUtil.read(nbt, TAG_POS), BuildingExtensionRegistries.getBuildingExtensionRegistry().get(ResourceLocation.parse(nbt.getString(TAG_ID))));
+            return new ExtensionId(BlockPosUtil.read(nbt, TAG_POS), BuildingExtensionRegistries.getBuildingExtensionRegistry().getValue(ResourceLocation.parse(nbt.getStringOr(TAG_ID, ""))));
         }
     }
 }

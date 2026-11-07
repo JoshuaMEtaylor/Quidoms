@@ -1,5 +1,7 @@
 package com.minecolonies.core.colony.jobs;
 
+import com.minecolonies.api.util.ItemStackUtils;
+
 import com.minecolonies.api.client.render.modeltype.ModModelTypes;
 import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.core.entity.ai.workers.production.EntityAIWorkNether;
@@ -63,13 +65,13 @@ public class JobNetherWorker extends AbstractJobCrafter<EntityAIWorkNether, JobN
 
         @NotNull final ListTag craftedList = new ListTag();
         craftedResults.forEach(item -> {
-            craftedList.add(item.saveOptional(provider));
+            craftedList.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(item, provider));
         });
         compound.put(TAG_CRAFTED, craftedList);
 
         @NotNull final ListTag processedList = new ListTag();
         processedResults.forEach(item -> {
-            processedList.add(item.saveOptional(provider));
+            processedList.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(item, provider));
         });
         compound.put(TAG_PROCESSED, processedList);
 
@@ -82,24 +84,24 @@ public class JobNetherWorker extends AbstractJobCrafter<EntityAIWorkNether, JobN
     {
         super.deserializeNBT(provider, compound);
 
-        final ListTag craftedList = compound.getList(TAG_CRAFTED, CompoundTag.TAG_COMPOUND);
+        final ListTag craftedList = compound.getListOrEmpty(TAG_CRAFTED);
         for (int i = 0; i < craftedList.size(); ++i)
         {
-            final CompoundTag itemCompound = craftedList.getCompound(i);
-            craftedResults.add(ItemStack.parseOptional(provider, itemCompound));
+            final CompoundTag itemCompound = craftedList.getCompoundOrEmpty(i);
+            craftedResults.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, itemCompound));
         }
 
-        final ListTag processedList = compound.getList(TAG_PROCESSED, CompoundTag.TAG_COMPOUND);
+        final ListTag processedList = compound.getListOrEmpty(TAG_PROCESSED);
         for (int i = 0; i < processedList.size(); ++i)
         {
-            final CompoundTag itemCompound = processedList.getCompound(i);
-            processedResults.add(ItemStack.parseOptional(provider, itemCompound));
+            final CompoundTag itemCompound = processedList.getCompoundOrEmpty(i);
+            processedResults.add(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, itemCompound));
         }
 
 
         if (compound.contains(TAG_IN_NETHER))
         {
-            citizenInNether = compound.getBoolean(TAG_IN_NETHER);
+            citizenInNether = compound.getBooleanOr(TAG_IN_NETHER, false);
         }
     }
 

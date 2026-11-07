@@ -1,5 +1,239 @@
 plugins {
-  id "org.sonarqube" version "3.0"
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.148'
+    id 'idea'
 }
 
-apply from: 'https://raw.githubusercontent.com/ldtteam/OperaPublicaCreator/ng7/gradle/mod.gradle'
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = 'quidoms'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+// Quidoms is a normal MineColonies-derived mod: LDT libraries are EXTERNAL jars
+// under libs/ (also mirrored to dist/). Do NOT vendor / class-merge / multi-mods bake them.
+sourceSets.main.java {
+    exclude 'com/ldtteam/**'
+    // Datagen needs ExistingFileHelper / older APIs — skip for game jar
+    exclude '**/datagen/**'
+    exclude '**/generation/**'
+    exclude '**/GatherDataHandler.java'
+}
+
+sourceSets.main.resources {
+    exclude '**/datagen/**'
+    exclude '**/.cache/**'
+    // LDT-owned namespaces ship in the standalone dependency jars
+    exclude 'assets/blockui/**'
+    exclude 'assets/structurize/**'
+    exclude 'assets/domum_ornamentum/**'
+    exclude 'assets/multipiston/**'
+    exclude 'assets/placementpreview/**'
+    exclude 'data/blockui/**'
+    exclude 'data/structurize/**'
+    exclude 'data/domum_ornamentum/**'
+    exclude 'data/multipiston/**'
+    exclude 'structurize.png'
+}
+
+repositories {
+    maven { url = 'https://ldtteam.jfrog.io/ldtteam/modding/' }
+    maven { url = 'https://maven.blamejared.com/' }
+    maven { url = 'https://jm.gserv.me/repository/maven-public/' }
+    flatDir { dirs 'libs' }
+}
+
+def ldtJars = [
+    file("libs/blockui-${blockUI_version}.jar"),
+    file("libs/structurize-${structurize_version}.jar"),
+    file("libs/domum_ornamentum-${domumOrnamentumVersion}.jar"),
+    file("libs/multipiston-${multiPistonVersion}.jar"),
+]
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    mods {
+        minecolonies {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    // Required LDT stack — separate NeoForge mods, not merged into Quidoms.
+    // compileOnly for APIs; runtime comes from run/mods via prepareRunMods (avoids
+    // double-loading the same mod from classpath + mods folder).
+    ldtJars.each { jar ->
+        if (!jar.exists()) {
+            throw new GradleException(
+                "Missing LDT dependency jar: ${jar}. Run ./scripts/package-ldt-standalone.sh first.")
+        }
+        compileOnly files(jar)
+    }
+
+    compileOnly "mezz.jei:jei-${project.jei_mcversion}-neoforge-api:${project.jei_version}"
+    compileOnly "info.journeymap:journeymap-api-neoforge:${project.jmapApiVersion}"
+    if (project.hasProperty('dynamicTreesVersion')) {
+        compileOnly("com.dtteam.dynamictrees:dynamictrees-neoforge-${project.dynamicTreesMcVersion}:${project.dynamicTreesVersion}") {
+            transitive = false
+        }
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    var replaceProperties = [
+        minecraft_version      : minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        minecraft_range        : minecraft_range,
+        neo_version            : neo_version,
+        forgeMinVersion        : forgeMinVersion,
+        forgeVersion           : forgeVersion,
+        fml_range              : fml_range,
+        mod_id                 : mod_id,
+        mod_name               : mod_name,
+        mod_license            : mod_license,
+        mod_version            : mod_version,
+        version                : mod_version,
+        structurize_version    : structurize_version,
+        blockUI_version        : blockUI_version,
+        domumOrnamentumVersion : domumOrnamentumVersion,
+        multiPistonVersion     : multiPistonVersion,
+        jei_version            : jei_version,
+        jmapVersion            : jmapVersion,
+        dynamicTreesVersion    : dynamicTreesVersion,
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xmaxerrs', '5000']
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    exclude 'net/neoforged/**'
+    exclude '**/module-info.class'
+    // Belt-and-suspenders: never ship LDT packages inside Quidoms
+    exclude 'com/ldtteam/blockui/**'
+    exclude 'com/ldtteam/structurize/**'
+    exclude 'com/ldtteam/domumornamentum/**'
+    exclude 'com/ldtteam/multipiston/**'
+    exclude 'com/ldtteam/common/**'
+    exclude 'assets/blockui/**'
+    exclude 'assets/structurize/**'
+    exclude 'assets/domum_ornamentum/**'
+    exclude 'assets/multipiston/**'
+    exclude 'data/blockui/**'
+    exclude 'data/structurize/**'
+    exclude 'data/domum_ornamentum/**'
+    exclude 'data/multipiston/**'
+    manifest {
+        attributes([
+            'Implementation-Title'   : 'Quidoms',
+            'Implementation-Version' : project.mod_version,
+            'Implementation-Vendor'  : 'JoshuaMEtaylor',
+            'Automatic-Module-Name'  : 'minecolonies',
+        ])
+    }
+}
+
+tasks.register('prepareRunMods', Copy) {
+    from ldtJars
+    into layout.projectDirectory.dir('run/mods')
+    doFirst {
+        def modsDir = layout.projectDirectory.dir('run/mods').asFile
+        modsDir.mkdirs()
+        // Drop any previous Quidoms fat jar so only the separate stack loads
+        modsDir.listFiles()?.each { f ->
+            if (f.name.startsWith('quidoms-') || f.name.startsWith('minecolonies-')) {
+                f.delete()
+            }
+        }
+    }
+}
+
+tasks.named('runServer').configure { dependsOn prepareRunMods }
+tasks.named('runClient').configure { dependsOn prepareRunMods }
+
+tasks.register('copyDist', Copy) {
+    dependsOn jar
+    from jar.archiveFile
+    into layout.projectDirectory.dir('dist')
+    rename { "quidoms-${mod_version}.jar" }
+    doLast {
+        def out = layout.projectDirectory.file("dist/quidoms-${mod_version}.jar").asFile
+        def bad = new java.util.zip.ZipFile(out).withCloseable { z ->
+            z.entries().iterator().findAll { e ->
+                def n = e.name
+                (n.startsWith('net/neoforged/') && n.endsWith('.class')) ||
+                    n.endsWith('module-info.class') ||
+                    n.startsWith('com/ldtteam/blockui/') ||
+                    n.startsWith('com/ldtteam/structurize/') ||
+                    n.startsWith('com/ldtteam/domumornamentum/') ||
+                    n.startsWith('com/ldtteam/multipiston/') ||
+                    n.startsWith('com/ldtteam/common/')
+            }.collect { it.name }
+        }
+        if (!bad.isEmpty()) {
+            throw new GradleException("Quidoms jar still contains baked LDT/NeoForge entries: ${bad.take(20)}")
+        }
+        def toml = new java.util.zip.ZipFile(out).withCloseable { z ->
+            new String(z.getInputStream(z.getEntry('META-INF/neoforge.mods.toml')).bytes)
+        }
+        // Only a single [[mods]] entry (minecolonies) is allowed — LDT must be dependencies only.
+        def modBlocks = (toml =~ /(?ms)\[\[mods\]\].*?(?=\[\[|\z)/).collect { it.toString() }
+        if (modBlocks.size() != 1 || !modBlocks[0].contains('modId="minecolonies"')) {
+            throw new GradleException("Quidoms mods.toml must declare exactly one [[mods]] (minecolonies); found ${modBlocks.size()}")
+        }
+        for (id in ['blockui', 'structurize', 'domum_ornamentum', 'multipiston']) {
+            if (modBlocks[0].contains("modId=\"${id}\"")) {
+                throw new GradleException("Quidoms mods.toml still bakes [[mods]] modId=${id}")
+            }
+        }
+    }
+}
+
+tasks.named('build').configure {
+    finalizedBy copyDist
+}

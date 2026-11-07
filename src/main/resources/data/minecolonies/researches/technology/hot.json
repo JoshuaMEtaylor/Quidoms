@@ -1,0 +1,25 @@
+{
+  "branch": "minecolonies:technology",
+  "costs": [
+    {
+      "ingredient": "minecraft:lava_bucket",
+      "count": 4
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/blockhutsmeltery",
+      "level": 1
+    }
+  ],
+  "icon": "minecolonies:blockhutsmeltery",
+  "requirements": [
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:miner",
+      "level": 2
+    }
+  ],
+  "researchLevel": 1,
+  "sortOrder": 6
+}

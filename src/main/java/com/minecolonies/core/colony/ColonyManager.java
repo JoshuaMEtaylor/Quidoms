@@ -26,14 +26,12 @@ import com.minecolonies.api.util.ColonyUtils;
 import com.minecolonies.api.util.DamageSourceKeys;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.core.MineColonies;
-import com.minecolonies.core.client.gui.WindowReactivateBuilding;
 import com.minecolonies.core.colony.requestsystem.management.manager.StandardRecipeManager;
 import com.minecolonies.core.network.messages.client.colony.ColonyViewRemoveMessage;
 import com.minecolonies.core.util.BackUpHelper;
 import com.minecolonies.core.util.ChunkDataHelper;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -45,7 +43,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -430,13 +428,26 @@ public final class ColonyManager implements IColonyManager
     @Nullable
     public IColony getIColony(@NotNull final Level w, @NotNull final BlockPos pos)
     {
-        return w.isClientSide ? getColonyView(w, pos) : getColonyByPosFromWorld(w, pos);
+        return w.isClientSide() ? getColonyView(w, pos) : getColonyByPosFromWorld(w, pos);
     }
 
     @Override
     public void openReactivationWindow(final BlockPos pos)
     {
-        new WindowReactivateBuilding(pos).open();
+        // Client-only UI — resolved by name so ColonyManager's constant pool stays server-safe.
+        if (FMLEnvironment.getDist().isClient())
+        {
+            try
+            {
+                Class.forName("com.minecolonies.core.colony.ClientColonyUi")
+                    .getMethod("openReactivationWindow", BlockPos.class)
+                    .invoke(null, pos);
+            }
+            catch (ReflectiveOperationException e)
+            {
+                Log.getLogger().error("Failed to open reactivation window", e);
+            }
+        }
     }
 
     @Override
@@ -472,7 +483,7 @@ public final class ColonyManager implements IColonyManager
     @Nullable
     public IColony getClosestIColony(@NotNull final Level w, @NotNull final BlockPos pos)
     {
-        return w.isClientSide ? getClosestColonyView(w, pos) : getClosestColony(w, pos);
+        return w.isClientSide() ? getClosestColonyView(w, pos) : getClosestColony(w, pos);
     }
 
     @Override
@@ -546,14 +557,14 @@ public final class ColonyManager implements IColonyManager
     @Nullable
     public IColony getIColonyByOwner(@NotNull final Level w, @NotNull final Player owner)
     {
-        return getIColonyByOwner(w, w.isClientSide ? owner.getUUID() : owner.getGameProfile().getId());
+        return getIColonyByOwner(w, w.isClientSide() ? owner.getUUID() : owner.getGameProfile().id());
     }
 
     @Override
     @Nullable
     public IColony getIColonyByOwner(@NotNull final Level w, final UUID owner)
     {
-        return w.isClientSide ? getColonyViewByOwner(owner, w.dimension()) : getColonyByOwner(owner);
+        return w.isClientSide() ? getColonyViewByOwner(owner, w.dimension()) : getColonyByOwner(owner);
     }
 
     /**
@@ -636,21 +647,20 @@ public final class ColonyManager implements IColonyManager
     {
         if (compound.contains(TAG_COMPATABILITY_MANAGER))
         {
-            compatibilityManager.read(provider, compound.getCompound(TAG_COMPATABILITY_MANAGER));
+            compatibilityManager.read(provider, compound.getCompoundOrEmpty(TAG_COMPATABILITY_MANAGER));
         }
 
-        recipeManager.read(provider, compound.getCompound(RECIPE_MANAGER_TAG));
+        recipeManager.read(provider, compound.getCompoundOrEmpty(RECIPE_MANAGER_TAG));
     }
 
     @Override
-    public void onClientTick(@NotNull final ClientTickEvent.Pre event)
+    public void onClientTick(final boolean clientLevelPresent)
     {
-        if (Minecraft.getInstance().level == null && !colonyViews.isEmpty())
+        if (!clientLevelPresent && !colonyViews.isEmpty())
         {
             //  Player has left the game, clear the Colony View cache
             colonyViews.clear();
         }
-
 
         if (clientSoundManager == null)
         {
@@ -662,7 +672,7 @@ public final class ColonyManager implements IColonyManager
     @Override
     public void onWorldTick(final @NotNull LevelTickEvent.Pre event)
     {
-        if (!event.getLevel().isClientSide)
+        if (!event.getLevel().isClientSide())
         {
             for (final IColony colony : getColonies(event.getLevel()))
             {
@@ -695,7 +705,7 @@ public final class ColonyManager implements IColonyManager
     @Override
     public void onWorldUnload(@NotNull final Level world)
     {
-        if (!world.isClientSide)
+        if (!world.isClientSide())
         {
             boolean hasColonies = false;
             for (@NotNull final IColony c : getColonies(world))

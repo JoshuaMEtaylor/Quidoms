@@ -10,6 +10,7 @@ import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.crafting.*;
 import com.minecolonies.api.util.CraftingUtils;
 import com.minecolonies.api.util.InventoryUtils;
+import com.minecolonies.api.util.ItemStackUtils;
 import com.minecolonies.api.util.OptionalPredicate;
 import com.minecolonies.core.colony.buildings.AbstractBuilding;
 import com.minecolonies.core.colony.buildings.modules.AbstractCraftingBuildingModule;
@@ -116,14 +117,14 @@ public class BuildingDyer extends AbstractBuilding
                     Tags.Items.DYES_BROWN, Tags.Items.DYES_GREEN, Tags.Items.DYES_RED, Tags.Items.DYES_BLACK);
             for (final ItemStack item : IColonyManager.getInstance().getCompatibilityManager().getListOfAllItems())
             {
-                if (!(item.getItem() instanceof ArmorItem armorItem) || !item.has(DataComponents.DYED_COLOR))
+                if (!ItemStackUtils.isHumanoidArmor(item) || !item.has(DataComponents.DYED_COLOR))
                 {
                     continue;
                 }
 
                 for (final TagKey<Item> dyeTag : dyes)
                 {
-                    final List<ItemStack> dyeItems = BuiltInRegistries.ITEM.getTag(dyeTag).get()
+                    final List<ItemStack> dyeItems = BuiltInRegistries.ITEM.get(dyeTag).get()
                             .stream().map(ItemStack::new).toList();
                     if (dyeItems.isEmpty()) { continue; }
 
@@ -230,9 +231,9 @@ public class BuildingDyer extends AbstractBuilding
         {
             if (woolItems == null)
             {
-                woolItems = BuiltInRegistries.ITEM.getOrCreateTag(ItemTags.WOOL).stream()
+                woolItems = BuiltInRegistries.ITEM.get(ItemTags.WOOL).orElseThrow().stream()
                   .filter(item -> !item.value().equals(Items.WHITE_WOOL))
-                  .map(i -> new ItemStorage(new ItemStack(i))).collect(Collectors.toList());
+                  .map(i -> new ItemStorage(new ItemStack(i.value()))).collect(Collectors.toList());
             }
             return woolItems;
         }

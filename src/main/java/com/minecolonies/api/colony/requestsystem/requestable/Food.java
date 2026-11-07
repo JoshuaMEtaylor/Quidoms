@@ -86,14 +86,14 @@ public class Food implements IDeliverable
 
         if (!ItemStackUtils.isEmpty(food.result))
         {
-            compound.put(NBT_RESULT, food.result.saveOptional(provider));
+            compound.put(NBT_RESULT, com.minecolonies.api.util.ItemStackUtils.saveOptional(food.result, provider));
         }
         if (!food.exclusionList.isEmpty())
         {
             @NotNull final ListTag items = new ListTag();
             for (@NotNull final ItemStorage item : food.exclusionList)
             {
-                items.add(item.getItemStack().saveOptional(provider));
+                items.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(item.getItemStack(), provider));
             }
             compound.put(NBT_EXCLUSION, items);
         }
@@ -110,19 +110,19 @@ public class Food implements IDeliverable
      */
     public static Food deserialize(@NotNull final HolderLookup.Provider provider, final IFactoryController controller, final CompoundTag compound)
     {
-        final int count = compound.getInt(NBT_COUNT);
-        final ItemStack result = compound.contains(NBT_RESULT) ? ItemStackUtils.deserializeFromNBT(compound.getCompound(NBT_RESULT), provider) : ItemStackUtils.EMPTY;
+        final int count = compound.getIntOr(NBT_COUNT, 0);
+        final ItemStack result = compound.contains(NBT_RESULT) ? ItemStackUtils.deserializeFromNBT(compound.getCompoundOrEmpty(NBT_RESULT), provider) : ItemStackUtils.EMPTY;
         final List<ItemStorage> items = new ArrayList<>();
 
         if (compound.contains(NBT_EXCLUSION))
         {
-            final ListTag filterableItems = compound.getList(NBT_EXCLUSION, Tag.TAG_COMPOUND);
+            final ListTag filterableItems = compound.getListOrEmpty(NBT_EXCLUSION);
             for (int i = 0; i < filterableItems.size(); ++i)
             {
-                items.add(new ItemStorage(ItemStack.parseOptional(provider, filterableItems.getCompound(i))));
+                items.add(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, filterableItems.getCompoundOrEmpty(i))));
             }
         }
-        final int minNutrition = compound.getInt(NBT_MIN_NUTRITION);
+        final int minNutrition = compound.getIntOr(NBT_MIN_NUTRITION, 0);
         return new Food(count, result, items, minNutrition);
     }
 
@@ -183,7 +183,7 @@ public class Food implements IDeliverable
         return ItemStackUtils.ISFOOD.test(stack)
                  && !exclusionList.contains(new ItemStorage(stack))
                  && !(ItemStackUtils.ISCOOKABLE.test(stack) && exclusionList.contains(new ItemStorage(MinecoloniesAPIProxy.getInstance().getFurnaceRecipes().getSmeltingResult(stack))))
-                 && (ItemStackUtils.ISCOOKABLE.test(stack) || stack.getItem().getFoodProperties(stack, null).nutrition() >= minNutrition);
+                 && (ItemStackUtils.ISCOOKABLE.test(stack) || com.minecolonies.api.util.FoodCompat.getFoodProperties(stack).nutrition() >= minNutrition);
     }
 
     @Override

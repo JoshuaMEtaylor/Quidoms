@@ -573,7 +573,7 @@ public class Colony implements IColony
                         if (world instanceof ServerLevel)
                         {
                             final ChunkPos pos = new ChunkPos(chunkX, chunkZ);
-                            ((ServerChunkCache) world.getChunkSource()).removeRegionTicket(KEEP_LOADED_TYPE, pos, 2, pos);
+                            ((ServerChunkCache) world.getChunkSource()).removeTicketWithRadius(KEEP_LOADED_TYPE, pos, 2);
                             pendingToUnloadChunks.add(chunkPos);
                         }
                     }
@@ -597,7 +597,7 @@ public class Colony implements IColony
             {
                 ticketedChunks.add(chunkPos);
                 ticketedChunksDirty = true;
-                world.getChunkSource().addRegionTicket(KEEP_LOADED_TYPE, chunk.getPos(), 2, chunk.getPos(), true);
+                world.getChunkSource().addTicketWithRadius(KEEP_LOADED_TYPE, chunk.getPos(), 2);
             }
         }
     }
@@ -730,11 +730,11 @@ public class Colony implements IColony
     {
         try
         {
-            final int id = compound.getInt(TAG_ID);
-            final String name = compound.getString(TAG_NAME);
+            final int id = compound.getIntOr(TAG_ID, 0);
+            final String name = compound.getStringOr(TAG_NAME, "");
             final BlockPos center = BlockPosUtil.read(compound, TAG_CENTER);
             @NotNull final Colony c = new Colony(id, name, world, center);
-            c.dimensionId = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(compound.getString(TAG_DIMENSION)));
+            c.dimensionId = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(compound.getStringOr(TAG_DIMENSION, "")));
 
             c.read(compound, provider);
 
@@ -754,88 +754,88 @@ public class Colony implements IColony
      */
     public void read(@NotNull final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
     {
-        dimensionId = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(compound.getString(TAG_DIMENSION)));
+        dimensionId = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(compound.getStringOr(TAG_DIMENSION, "")));
 
-        mercenaryLastUse = compound.getLong(TAG_MERCENARY_TIME);
-        additionalChildTime = compound.getInt(TAG_CHILD_TIME);
+        mercenaryLastUse = compound.getLongOr(TAG_MERCENARY_TIME, 0L);
+        additionalChildTime = compound.getIntOr(TAG_CHILD_TIME, 0);
 
         // Permissions
         permissions.loadPermissions(compound);
 
-        citizenManager.read(provider, compound.getCompound(TAG_CITIZEN_MANAGER));
+        citizenManager.read(provider, compound.getCompoundOrEmpty(TAG_CITIZEN_MANAGER));
         visitorManager.read(provider, compound);
         animalManager.read(provider, compound);
-        buildingManager.read(provider, compound.getCompound(TAG_BUILDING_MANAGER));
+        buildingManager.read(provider, compound.getCompoundOrEmpty(TAG_BUILDING_MANAGER));
 
         // Recalculate max after citizens and buildings are loaded.
         citizenManager.afterBuildingLoad();
 
-        graveManager.read(compound.getCompound(TAG_GRAVE_MANAGER));
+        graveManager.read(compound.getCompoundOrEmpty(TAG_GRAVE_MANAGER));
 
         eventManager.readFromNBT(provider, compound);
         statisticManager.readFromNBT(compound);
 
-        questManager.deserializeNBT(provider, compound.getCompound(TAG_QUEST_MANAGER));
-        eventDescManager.deserializeNBT(provider, compound.getCompound(NbtTagConstants.TAG_EVENT_DESC_MANAGER));
+        questManager.deserializeNBT(provider, compound.getCompoundOrEmpty(TAG_QUEST_MANAGER));
+        eventDescManager.deserializeNBT(provider, compound.getCompoundOrEmpty(NbtTagConstants.TAG_EVENT_DESC_MANAGER));
 
         if (compound.contains(TAG_RESEARCH))
         {
-            researchManager.readFromNBT(provider, compound.getCompound(TAG_RESEARCH));
+            researchManager.readFromNBT(provider, compound.getCompoundOrEmpty(TAG_RESEARCH));
             // now that buildings, colonists, and research are loaded, check for new autoStartResearch.
             // this is mostly for backwards compatibility with older saves, so players do not have to manually start newly added autostart researches that they've unlocked before the update.
             researchManager.checkAutoStartResearch();
         }
 
         //  Workload
-        workManager.read(compound.getCompound(TAG_WORK));
+        workManager.read(compound.getCompoundOrEmpty(TAG_WORK));
 
         wayPoints.clear();
         // Waypoints
-        final ListTag wayPointTagList = compound.getList(TAG_WAYPOINT, Tag.TAG_COMPOUND);
+        final ListTag wayPointTagList = compound.getListOrEmpty(TAG_WAYPOINT);
         for (int i = 0; i < wayPointTagList.size(); ++i)
         {
-            final CompoundTag blockAtPos = wayPointTagList.getCompound(i);
+            final CompoundTag blockAtPos = wayPointTagList.getCompoundOrEmpty(i);
             final BlockPos pos = BlockPosUtil.read(blockAtPos, TAG_WAYPOINT);
-            final BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), blockAtPos);
+            final BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK, blockAtPos);
             wayPoints.put(pos, state);
         }
 
         // Free blocks
         final Set<Block> tempFreeBlocks = new HashSet<>();
-        final ListTag freeBlockTagList = compound.getList(TAG_FREE_BLOCKS, Tag.TAG_STRING);
+        final ListTag freeBlockTagList = compound.getListOrEmpty(TAG_FREE_BLOCKS);
         for (int i = 0; i < freeBlockTagList.size(); ++i)
         {
-            tempFreeBlocks.add(BuiltInRegistries.BLOCK.get(ResourceLocation.parse(freeBlockTagList.getString(i))));
+            tempFreeBlocks.add(BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(freeBlockTagList.getStringOr(i, ""))));
         }
         freeBlocks = ImmutableSet.copyOf(tempFreeBlocks);
 
         final Set<BlockPos> tempFreePositions = new HashSet<>();
         // Free positions
-        final ListTag freePositionTagList = compound.getList(TAG_FREE_POSITIONS, Tag.TAG_COMPOUND);
+        final ListTag freePositionTagList = compound.getListOrEmpty(TAG_FREE_POSITIONS);
         for (int i = 0; i < freePositionTagList.size(); ++i)
         {
-            final CompoundTag blockTag = freePositionTagList.getCompound(i);
+            final CompoundTag blockTag = freePositionTagList.getCompoundOrEmpty(i);
             final BlockPos block = BlockPosUtil.read(blockTag, TAG_FREE_POSITIONS);
             tempFreePositions.add(block);
         }
         freePositions = ImmutableSet.copyOf(tempFreePositions);
 
-        packageManager.setLastContactInHours(compound.getInt(TAG_ABANDONED));
+        packageManager.setLastContactInHours(compound.getIntOr(TAG_ABANDONED, 0));
 
         if (compound.contains(TAG_STYLE))
         {
-            this.pack = BlueprintMapping.getStyleMapping(compound.getString(TAG_STYLE));
+            this.pack = BlueprintMapping.getStyleMapping(compound.getStringOr(TAG_STYLE, ""));
         }
         else
         {
-            this.pack = compound.getString(TAG_PACK);
+            this.pack = compound.getStringOr(TAG_PACK, "");
         }
 
         raidManager.read(compound);
 
         if (compound.contains(TAG_AUTO_DELETE))
         {
-            this.canColonyBeAutoDeleted = compound.getBoolean(TAG_AUTO_DELETE);
+            this.canColonyBeAutoDeleted = compound.getBooleanOr(TAG_AUTO_DELETE, false);
         }
         else
         {
@@ -846,7 +846,7 @@ public class Colony implements IColony
         {
             // This read can occur before the world is non-null, due to Minecraft's order of operations for capabilities.
             // As a result, setColonyColor proper must wait until onWorldLoad fires.
-            this.colonyTeamColor = ChatFormatting.values()[compound.getInt(TAG_TEAM_COLOR)];
+            this.colonyTeamColor = ChatFormatting.values()[compound.getIntOr(TAG_TEAM_COLOR, 0)];
         }
 
         if (compound.contains(TAG_FLAG_PATTERNS))
@@ -857,44 +857,44 @@ public class Colony implements IColony
         getRequestManager().reset();
         if (compound.contains(TAG_REQUESTMANAGER))
         {
-            getRequestManager().deserializeNBT(provider, compound.getCompound(TAG_REQUESTMANAGER));
+            getRequestManager().deserializeNBT(provider, compound.getCompoundOrEmpty(TAG_REQUESTMANAGER));
         }
-        this.lastOnlineTime = compound.getLong(TAG_LAST_ONLINE);
+        this.lastOnlineTime = compound.getLongOr(TAG_LAST_ONLINE, 0L);
         if (compound.contains(TAG_COL_TEXT))
         {
-            this.textureStyle = compound.getString(TAG_COL_TEXT);
+            this.textureStyle = compound.getStringOr(TAG_COL_TEXT, "");
         }
         if (compound.contains(TAG_COL_NAME_STYLE))
         {
-            this.nameStyle = compound.getString(TAG_COL_NAME_STYLE);
+            this.nameStyle = compound.getStringOr(TAG_COL_NAME_STYLE, "");
         }
 
         if (compound.contains(BuildingModules.TOWNHALL_SETTINGS.key) && settingsModule != null)
         {
-            settingsModule.deserializeNBT(provider, compound.getCompound(BuildingModules.TOWNHALL_SETTINGS.key));
+            settingsModule.deserializeNBT(provider, compound.getCompoundOrEmpty(BuildingModules.TOWNHALL_SETTINGS.key));
         }
 
-        @NotNull final ListTag claimTagList = compound.getList(TAG_CLAIM_DATA, Tag.TAG_COMPOUND);
+        @NotNull final ListTag claimTagList = compound.getListOrEmpty(TAG_CLAIM_DATA);
         for (int i = 0; i < claimTagList.size(); i++)
         {
-            @NotNull final CompoundTag chunkCompound = claimTagList.getCompound(i);
+            @NotNull final CompoundTag chunkCompound = claimTagList.getCompoundOrEmpty(i);
             final ChunkClaimData chunkClaimData = new ChunkClaimData();
-            chunkClaimData.deserializeNBT(provider, chunkCompound.getCompound(TAG_CHUNK_CLAIM));
-            claimData.put(chunkCompound.getLong(TAG_CHUNK_POS), chunkClaimData);
+            chunkClaimData.deserializeNBT(provider, chunkCompound.getCompoundOrEmpty(TAG_CHUNK_CLAIM));
+            claimData.put(chunkCompound.getLongOr(TAG_CHUNK_POS, 0L), chunkClaimData);
         }
         IColonyManager.getInstance().addClaimData(this, claimData);
 
-        this.day = compound.getInt(COLONY_DAY);
+        this.day = compound.getIntOr(COLONY_DAY, 0);
         this.colonyTag = compound;
 
         if (compound.contains(NbtTagConstants.TAG_TRAVELLING_DATA))
         {
-            this.travellingManager.deserializeNBT(provider, compound.getCompound(NbtTagConstants.TAG_TRAVELLING_DATA));
+            this.travellingManager.deserializeNBT(provider, compound.getCompoundOrEmpty(NbtTagConstants.TAG_TRAVELLING_DATA));
         }
 
         if (compound.contains(NbtTagConstants.TAG_CONNECTION_MANAGER))
         {
-            this.connectionManager.deserializeNBT(provider, compound.getCompound(NbtTagConstants.TAG_CONNECTION_MANAGER));
+            this.connectionManager.deserializeNBT(provider, compound.getCompoundOrEmpty(NbtTagConstants.TAG_CONNECTION_MANAGER));
         }
     }
 
@@ -1224,7 +1224,7 @@ public class Colony implements IColony
             return;
         }
 
-        if (!event.getLevel().isClientSide && (event.getLevel().getGameTime() + id) % 20 == 0)
+        if (!event.getLevel().isClientSide() && (event.getLevel().getGameTime() + id) % 20 == 0)
         {
             connectionManager.tick();
         }

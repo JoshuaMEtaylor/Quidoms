@@ -147,7 +147,7 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
         nonAddedPlayerList = new ArrayList<>();
         for (final PlayerInfo info : Minecraft.getInstance().player.connection.getOnlinePlayers())
         {
-            if (!buildingView.getColony().getPlayers().containsKey(info.getProfile().getId()))
+            if (!buildingView.getColony().getPlayers().containsKey(info.getProfile().id()))
             {
                 nonAddedPlayerList.add(info);
             }
@@ -179,7 +179,7 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
             @Override
             public void updateElement(final int index, final Pane pane)
             {
-                String playerName = nonAddedPlayerList.get(index).getProfile().getName();
+                String playerName = nonAddedPlayerList.get(index).getProfile().name();
                 final Button button = pane.findPaneOfTypeByID(BUTTON_SELECT_PLAYER_LIST, Button.class);
                 button.setText(Component.literal(playerName));
                 button.setEnabled(true);
@@ -536,7 +536,7 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
 
         try
         {
-            final Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(inputText));
+            final Block block = BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(inputText));
 
             if (block != null && !block.defaultBlockState().isAir())
             {

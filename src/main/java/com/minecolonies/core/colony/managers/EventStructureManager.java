@@ -171,14 +171,14 @@ public class EventStructureManager implements IEventStructureManager
         if (compound.contains(TAG_EVENT_STRUCTURE_MANAGER))
         {
             backupSchematics.clear();
-            final CompoundTag structureManagerCompound = compound.getCompound(TAG_EVENT_STRUCTURE_MANAGER);
-            final ListTag schematicTags = structureManagerCompound.getList(TAG_SCHEMATIC_LIST, Tag.TAG_COMPOUND);
+            final CompoundTag structureManagerCompound = compound.getCompoundOrEmpty(TAG_EVENT_STRUCTURE_MANAGER);
+            final ListTag schematicTags = structureManagerCompound.getListOrEmpty(TAG_SCHEMATIC_LIST);
 
             for (final Tag base : schematicTags)
             {
                 final CompoundTag tagCompound = (CompoundTag) base;
-                final BlockPos pos = BlockPosUtil.read(tagCompound, TAG_POS);
-                final int eventID = tagCompound.getInt(TAG_EVENT_ID);
+                final BlockPos pos = BlockPosUtil.read(tagCompound);
+                final int eventID = tagCompound.getIntOr(TAG_EVENT_ID, 0);
                 if (eventManager.getEventByID(eventID) != null)
                 {
                     backupSchematics.put(pos, eventID);

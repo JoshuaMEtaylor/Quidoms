@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "domum_ornamentum:block/brick/cream_bricks",
+    "particle": "domum_ornamentum:block/brick/cream_bricks"
+  }
+}

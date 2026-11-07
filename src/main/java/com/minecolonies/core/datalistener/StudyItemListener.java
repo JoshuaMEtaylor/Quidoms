@@ -33,7 +33,7 @@ public class StudyItemListener extends BaseDataListener<StudyItem>
     @NotNull
     protected MappingResult<StudyItem> mapEntry(final ResourceLocation key, final JsonObject object)
     {
-        final Item item = BuiltInRegistries.ITEM.get(GsonHelper.getAsResourceLocation(object, "item"));
+        final Item item = BuiltInRegistries.ITEM.getValue(GsonHelper.getAsResourceLocation(object, "item"));
         final int skillIncreaseChance = Mth.clamp(GsonHelper.getAsInt(object, "skill_increase_chance", 1), 1, 100);
         final int breakChance = Mth.clamp(GsonHelper.getAsInt(object, "break_chance", 1), 1, 100);
         return MappingResult.ok(new StudyItem(item, skillIncreaseChance, breakChance));

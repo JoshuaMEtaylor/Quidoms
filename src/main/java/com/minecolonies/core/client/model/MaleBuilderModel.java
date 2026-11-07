@@ -4,14 +4,14 @@
 package com.minecolonies.core.client.model;
 
 import com.minecolonies.api.client.render.modeltype.CitizenModel;
-import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
+import com.minecolonies.api.client.render.modeltype.CitizenRenderState;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import org.jetbrains.annotations.NotNull;
 
-public class MaleBuilderModel extends CitizenModel<AbstractEntityCitizen>
+public class MaleBuilderModel extends CitizenModel<CitizenRenderState>
 {
 
     public MaleBuilderModel(final ModelPart part)
@@ -91,9 +91,9 @@ public class MaleBuilderModel extends CitizenModel<AbstractEntityCitizen>
     }
 
     @Override
-    public void setupAnim(@NotNull final AbstractEntityCitizen entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(@NotNull final CitizenRenderState entity)
     {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        super.setupAnim(entity);
         body.getChild("toolbag").visible = isWorking(entity);
         head.getChild("SailorHat1").visible = isWorking(entity) && displayHat(entity);
     }

@@ -107,7 +107,7 @@ public class BuildingBeekeeper extends AbstractBuilding
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        final ListTag hiveTag = compound.getList(NbtTagConstants.TAG_HIVES, Tag.TAG_INT_ARRAY);
+        final ListTag hiveTag = compound.getListOrEmpty(NbtTagConstants.TAG_HIVES);
         for (Tag tag : hiveTag)
         {
             hives.add(NBTUtils.readBlockPos(tag));

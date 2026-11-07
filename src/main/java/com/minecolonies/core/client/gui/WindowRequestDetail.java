@@ -167,7 +167,7 @@ public class WindowRequestDetail extends AbstractWindowSkeleton implements Butto
     public void onUpdate()
     {
         super.onUpdate();
-        if (!Screen.hasShiftDown())
+        if (!net.minecraft.client.Minecraft.getInstance().hasShiftDown())
         {
             lifeCount++;
         }

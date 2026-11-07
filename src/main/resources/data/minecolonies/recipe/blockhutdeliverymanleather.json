@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XTX",
+    "XBX",
+    "XXX"
+  ],
+  "key": {
+    "X": "#minecraft:planks",
+    "B": "minecraft:leather_boots",
+    "T": "structurize:sceptergold"
+  },
+  "result": {
+    "id": "minecolonies:blockhutdeliveryman"
+  }
+}

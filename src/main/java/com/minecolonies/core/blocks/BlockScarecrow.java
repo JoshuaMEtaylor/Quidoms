@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -89,7 +89,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
     }
 
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
         final ItemStack stack,
         final BlockState state,
         final Level worldIn,
@@ -103,11 +103,11 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
             worldIn.setBlock(pos, state.setValue(LANTERN, true), 3);
             worldIn.playSound(player, pos, SoundEvents.LANTERN_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             InventoryUtils.reduceStackInItemHandler(new InvWrapper(player.getInventory()), player.getItemInHand(hand));
-            return ItemInteractionResult.CONSUME_PARTIAL;
+            return InteractionResult.CONSUME;
         }
 
         // If the world is client, open the inventory of the field.
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             // Get the entity of the bottom half
             DoubleBlockHalf half = state.getValue(HALF);
@@ -116,11 +116,11 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
             if (entity instanceof TileEntityScarecrow scarecrow)
             {
                 new WindowField(scarecrow).open();
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             else
             {
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
         }
 
@@ -130,7 +130,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
             iColony.getServerBuildingManager().addBuildingExtensionIfMissing(BuildingExtensionRegistries.farmField.get(), getFieldBasePos(state, pos), player);
         }
         // This must succeed in Remote to stop more right click interactions like placing blocks
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @NotNull
@@ -172,15 +172,12 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos, final Block block, final BlockPos fromPos, final boolean isMoving)
+    public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos, final Block block, net.minecraft.world.level.redstone.Orientation orientation, final boolean isMoving)
     {
-        super.neighborChanged(state, worldIn, pos, block, fromPos, isMoving);
+        super.neighborChanged(state, worldIn, pos, block, orientation, isMoving);
         final DoubleBlockHalf half = state.getValue(HALF);
         final BlockPos otherPos = half == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
-        if (!fromPos.equals(otherPos))
-        {
-            return;
-        }
+        // 1.21.10: neighborChanged uses Orientation instead of fromPos; always sync lantern from the other half.
         final BlockState otherState = worldIn.getBlockState(otherPos);
         if (otherState.getBlock() == this && otherState.getValue(HALF) != half && otherState.getValue(LANTERN) != state.getValue(LANTERN))
         {
@@ -200,7 +197,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
     }
 
     @Override
-    public void wasExploded(final Level worldIn, final BlockPos pos, final Explosion explosionIn)
+    public void wasExploded(final net.minecraft.server.level.ServerLevel worldIn, final BlockPos pos, final Explosion explosionIn)
     {
         notifyColonyAboutDestruction(worldIn, pos);
         super.wasExploded(worldIn, pos, explosionIn);
@@ -212,7 +209,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
     {
         @NotNull final Direction dir = (context.getPlayer() == null) ? Direction.NORTH : Direction.fromYRot(context.getPlayer().getYRot() + 180);
 
-        if (context.getClickedPos().getY() < context.getLevel().getMaxBuildHeight() && context.getLevel().getBlockState(context.getClickedPos().above()).canBeReplaced(context))
+        if (context.getClickedPos().getY() < context.getLevel().getMaxY() && context.getLevel().getBlockState(context.getClickedPos().above()).canBeReplaced(context))
         {
             return this.defaultBlockState().setValue(FACING, dir).setValue(HALF, DoubleBlockHalf.LOWER);
         }
@@ -228,7 +225,7 @@ public class BlockScarecrow extends AbstractBlockMinecoloniesDefault<BlockScarec
         super.setPlacedBy(worldIn, pos, state, placer, stack);
         worldIn.setBlock(pos.above(), state.setValue(HALF, DoubleBlockHalf.UPPER), 3);
 
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             return;
         }

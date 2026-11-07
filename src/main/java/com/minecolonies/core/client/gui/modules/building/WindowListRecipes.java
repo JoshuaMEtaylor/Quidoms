@@ -109,7 +109,7 @@ public class WindowListRecipes extends AbstractModuleWindow<CraftingModuleView>
      */
     private void backwardClicked(final Button button)
     {
-        final boolean shift = InputConstants.isKeyDown(mc.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT);
+        final boolean shift = InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT);
         final int row = recipeList.getListElementIndexByPane(button);
         moduleView.switchOrder(row, row + 1, shift);
         new ChangeRecipePriorityMessage(buildingView, row, false, moduleView.getProducer().getRuntimeID(), shift).sendToServer();
@@ -122,7 +122,7 @@ public class WindowListRecipes extends AbstractModuleWindow<CraftingModuleView>
      */
     private void forwardClicked(final Button button)
     {
-        final boolean shift = InputConstants.isKeyDown(mc.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT);
+        final boolean shift = InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT);
         final int row = recipeList.getListElementIndexByPane(button);
         moduleView.switchOrder(row, row - 1, shift);
         new ChangeRecipePriorityMessage(buildingView, row, true, moduleView.getProducer().getRuntimeID(), shift).sendToServer();
@@ -184,7 +184,7 @@ public class WindowListRecipes extends AbstractModuleWindow<CraftingModuleView>
                     if (moduleView.isRecipeAlterationAllowed())
                     {
                         removeButton.on();
-                        if (recipe.getRecipeSource() != null && !Screen.hasControlDown())
+                        if (recipe.getRecipeSource() != null && !net.minecraft.client.Minecraft.getInstance().hasControlDown())
                         {
                             removeButton.disable();
                             PaneBuilders.tooltipBuilder()
@@ -282,7 +282,7 @@ public class WindowListRecipes extends AbstractModuleWindow<CraftingModuleView>
     public void onUpdate()
     {
         super.onUpdate();
-        if (!Screen.hasShiftDown())
+        if (!net.minecraft.client.Minecraft.getInstance().hasShiftDown())
         {
             lifeCount++;
         }

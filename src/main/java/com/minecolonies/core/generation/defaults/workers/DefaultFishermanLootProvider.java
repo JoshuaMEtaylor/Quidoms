@@ -132,7 +132,7 @@ public class DefaultFishermanLootProvider implements LootTableSubProvider
         }
         try
         {
-            return weightField.getInt(entry);
+            return weightField.getIntOr(entry, 0);
         }
         catch (final IllegalArgumentException | IllegalAccessException e)
         {

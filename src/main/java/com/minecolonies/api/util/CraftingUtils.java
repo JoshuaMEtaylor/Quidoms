@@ -196,7 +196,8 @@ public final class CraftingUtils
                     }
                     catch (final Throwable ex)
                     {
-                        Log.getLogger().warn("Error populating items for " + tab.getDisplayName().getString(), ex);
+                        // Pass throwable as last arg so SLF4J prints the stack (was previously swallowed).
+                        Log.getLogger().warn("Error populating items for {}", tab.getDisplayName().getString(), ex);
                     }
                 }
                 else

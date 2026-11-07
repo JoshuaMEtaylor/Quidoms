@@ -210,9 +210,9 @@ public abstract class JobBasedRecipeCategory<T> extends AbstractRecipeCategory<T
             final float headYaw = (float) Math.atan((citizen_cx - mouseX) / 40.0F) * 40.0F;
             final float yaw = (float) Math.atan((citizen_cx - mouseX) / 40.0F) * 20.0F;
             final float pitch = (float) Math.atan((citizen_cy - offsetY - mouseY) / 40.0F) * 20.0F;
-            Lighting.setupForFlatItems();
+            net.minecraft.client.Minecraft.getInstance().gameRenderer.getLighting().setupFor(com.mojang.blaze3d.platform.Lighting.Entry.ITEMS_FLAT);
             UiRenderMacros.drawEntity(stack.pose(), citizen_cx, citizen_by - offsetY, scale, headYaw, yaw, pitch, citizen);
-            Lighting.setupFor3DItems();
+            net.minecraft.client.Minecraft.getInstance().gameRenderer.getLighting().setupFor(com.mojang.blaze3d.platform.Lighting.Entry.ITEMS_3D);
         }
     }
 
@@ -329,7 +329,7 @@ public abstract class JobBasedRecipeCategory<T> extends AbstractRecipeCategory<T
             if (modIdHelper.isDisplayingModNameEnabled())
             {
                 final String recipeModId = id.getNamespace();
-                final String ingredientModId = ingredient.getItem().getCreatorModId(ingredient);
+                final String ingredientModId = ingredient.getItem().getCreatorModId(net.minecraft.client.Minecraft.getInstance().level.registryAccess(), ingredient);
                 if (!recipeModId.equals(ingredientModId))
                 {
                     final String modName = modIdHelper.getFormattedModNameForModId(recipeModId);
@@ -338,7 +338,7 @@ public abstract class JobBasedRecipeCategory<T> extends AbstractRecipeCategory<T
                 }
             }
 
-            final boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || Screen.hasShiftDown();
+            final boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || net.minecraft.client.Minecraft.getInstance().hasShiftDown();
             if (showAdvanced)
             {
                 final MutableComponent recipeId = Component.translatableEscape("jei.tooltip.recipe.id", id.toString());
@@ -382,7 +382,7 @@ public abstract class JobBasedRecipeCategory<T> extends AbstractRecipeCategory<T
                 tooltip.add(Component.translatableEscape(TranslationConstants.PARTIAL_JEI_INFO + "conditions.tip"));
             }
 
-            final boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || Screen.hasShiftDown();
+            final boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || net.minecraft.client.Minecraft.getInstance().hasShiftDown();
             if (showAdvanced)
             {
                 final MutableComponent recipeId = Component.translatableEscape("com.minecolonies.coremod.jei.loottableid", id.location().toString());

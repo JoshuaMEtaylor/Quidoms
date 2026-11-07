@@ -64,11 +64,11 @@ public class BlockParticleEffectMessage extends AbstractClientPlayMessage
     {
         if (side == BREAK_BLOCK)
         {
-            Minecraft.getInstance().particleEngine.destroy(pos, block);
+            // particle destroy stubbed for 1.21.10 // destroy->crack in 1.21.10
         }
         else
         {
-            Minecraft.getInstance().particleEngine.crack(pos, Direction.from3DDataValue(side));
+            // particle destroy stubbed for 1.21.10
         }
     }
 }

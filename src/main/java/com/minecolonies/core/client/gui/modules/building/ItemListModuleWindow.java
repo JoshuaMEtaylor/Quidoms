@@ -138,7 +138,7 @@ public class ItemListModuleWindow extends AbstractModuleWindow<IItemListModuleVi
     private void updateResources()
     {
         final Predicate<ItemStack> filterPredicate = stack -> filter.isEmpty()
-                                                                || stack.getDescriptionId().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US))
+                                                                || stack.getItem().getDescriptionId().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US))
                                                                 || stack.getHoverName().getString().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US));
         currentDisplayedList.clear();
         for (final ItemStorage storage : groupedItemList)

@@ -148,7 +148,7 @@ public class ContainerRack extends AbstractContainerMenu
     @Override
     public void clicked(int slotId, int dragType, @NotNull ClickType clickTypeIn, Player player)
     {
-        if (player.level().isClientSide || slotId >= inventory.getSlots() || slotId < 0)
+        if (player.level().isClientSide() || slotId >= inventory.getSlots() || slotId < 0)
         {
             super.clicked(slotId, dragType, clickTypeIn, player);
             return;

@@ -26,7 +26,7 @@ public class ModParticleTypesInitializer
     /**
      * Register the particle
      */
-    @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = Constants.MOD_ID)
     public static class CommonRegistration
     {
         @SubscribeEvent
@@ -39,7 +39,7 @@ public class ModParticleTypesInitializer
     /**
      * Register the client side factory
      */
-    @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
     public static class ClientRegistration
     {
         @SubscribeEvent

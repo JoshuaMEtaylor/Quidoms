@@ -185,12 +185,14 @@ public abstract class AbstractEntityCitizen extends AbstractCivilianEntity imple
     }
 
     /**
-     * Disable vanilla steering logic for villagers
+     * Disable vanilla steering logic for villagers.
+     * 1.21.10: isControlledByLocalInstance became final isLocalInstanceAuthoritative();
+     * isEffectiveAi() remains the authoritative AI check for non-player control.
      */
     @Override
-    public boolean isControlledByLocalInstance()
+    public boolean isEffectiveAi()
     {
-        return this.isEffectiveAi();
+        return super.isEffectiveAi();
     }
 
     /**
@@ -244,7 +246,7 @@ public abstract class AbstractEntityCitizen extends AbstractCivilianEntity imple
      */
     public void setTexture()
     {
-        if (!CompatibilityUtils.getWorldFromCitizen(this).isClientSide)
+        if (!CompatibilityUtils.getWorldFromCitizen(this).isClientSide())
         {
             return;
         }
@@ -524,7 +526,7 @@ public abstract class AbstractEntityCitizen extends AbstractCivilianEntity imple
      */
     public int getRecentlyHit()
     {
-        return lastHurtByPlayerTime;
+        return getLastHurtByPlayerMemoryTime();
     }
 
     /**
@@ -657,14 +659,14 @@ public abstract class AbstractEntityCitizen extends AbstractCivilianEntity imple
             list.add(new Pair<>(EquipmentSlot.LEGS, getItemBySlot(EquipmentSlot.LEGS)));
             list.add(new Pair<>(EquipmentSlot.OFFHAND, getItemBySlot(EquipmentSlot.OFFHAND)));
             list.add(new Pair<>(EquipmentSlot.MAINHAND, getItemBySlot(EquipmentSlot.MAINHAND)));
-            ((ServerLevel) this.level()).getChunkSource().broadcast(this, new ClientboundSetEquipmentPacket(this.getId(), list));
+            ((ServerLevel) this.level()).getChunkSource().sendToTrackingPlayersAndSelf(this, new ClientboundSetEquipmentPacket(this.getId(), list));
         }
     }
 
     @Override
     public void setItemSlot(final EquipmentSlot slot, @NotNull final ItemStack newItem)
     {
-        if (!level().isClientSide)
+        if (!level().isClientSide())
         {
             final ItemStack previous = getItemBySlot(slot);
             if (!ItemStackUtils.compareItemStacksIgnoreStackSize(previous, newItem, false, true))

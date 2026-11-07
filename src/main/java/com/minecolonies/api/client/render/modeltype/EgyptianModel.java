@@ -7,7 +7,7 @@ import net.minecraft.client.model.geom.ModelPart;
 /**
  * Egyptian model.
  */
-public class EgyptianModel<T extends AbstractEntityMinecoloniesMonster> extends HumanoidModel<AbstractEntityMinecoloniesMonster>
+public class EgyptianModel<T extends net.minecraft.client.renderer.entity.state.HumanoidRenderState> extends HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     /**
      * Create a model of a specific size.

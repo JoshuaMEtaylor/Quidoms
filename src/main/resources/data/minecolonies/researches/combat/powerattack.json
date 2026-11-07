@@ -1,0 +1,25 @@
+{
+  "branch": "minecolonies:combat",
+  "costs": [
+    {
+      "ingredient": "minecraft:iron_block",
+      "count": 4
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/meleedamageaddition",
+      "level": 2
+    }
+  ],
+  "icon": "minecraft:stone_sword",
+  "parentResearch": "minecolonies:combat/quickdraw",
+  "requirements": [
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:combatacademy",
+      "level": 3
+    }
+  ],
+  "researchLevel": 3
+}

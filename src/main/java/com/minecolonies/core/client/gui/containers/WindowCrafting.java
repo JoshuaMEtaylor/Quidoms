@@ -264,7 +264,7 @@ public class WindowCrafting extends AbstractContainerScreen<ContainerCrafting>
         {
             texture = CRAFTING_TABLE_GUI_TEXTURES;
         }
-        stack.blit(texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, texture, this.leftPos, this.topPos, 0f, 0f, this.imageWidth, this.imageHeight, 256, 256);
     }
 
     @Override

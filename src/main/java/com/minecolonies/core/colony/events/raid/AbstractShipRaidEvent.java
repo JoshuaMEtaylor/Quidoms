@@ -525,23 +525,23 @@ public abstract class AbstractShipRaidEvent implements IColonyRaidEvent, IColony
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        id = compound.getInt(TAG_EVENT_ID);
-        status = EventStatus.values()[compound.getInt(TAG_EVENT_STATUS)];
-        daysToGo = compound.getInt(TAG_DAYS_LEFT);
+        id = compound.getIntOr(TAG_EVENT_ID, 0);
+        status = EventStatus.values()[compound.getIntOr(TAG_EVENT_STATUS, 0)];
+        daysToGo = compound.getIntOr(TAG_DAYS_LEFT, 0);
 
-        @NotNull final ListTag spawnerListCompound = compound.getList(TAG_SPAWNERS, Tag.TAG_INT_ARRAY);
+        @NotNull final ListTag spawnerListCompound = compound.getListOrEmpty(TAG_SPAWNERS);
         for (int i = 0; i < spawnerListCompound.size(); i++)
         {
             spawners.add(NBTUtils.readBlockPos(spawnerListCompound.get(i)));
         }
 
-        maxSpawners = compound.getInt(TAG_SPAWNER_COUNT);
+        maxSpawners = compound.getIntOr(TAG_SPAWNER_COUNT, 0);
         spawnPoint = BlockPosUtil.read(compound, TAG_SPAWN_POS);
-        shipSize = ShipSize.values()[compound.getInt(TAG_SHIPSIZE)];
-        shipRotationMirror = RotationMirror.values()[compound.getByte(TAG_SHIP_ROTMIR)];
+        shipSize = ShipSize.values()[compound.getIntOr(TAG_SHIPSIZE, 0)];
+        shipRotationMirror = RotationMirror.values()[compound.getByteOr(TAG_SHIP_ROTMIR, (byte)0)];
         wayPoints = BlockPosUtil.readPosListFromNBT(compound, TAG_WAYPOINT);
-        maxRaiderCount = compound.getInt(TAG_MAX_RAIDER_COUNT);
-        spawnerThresholdKillTracker = compound.getInt(TAG_RAIDER_THRESHOLD_TRACKER);
+        maxRaiderCount = compound.getIntOr(TAG_MAX_RAIDER_COUNT, 0);
+        spawnerThresholdKillTracker = compound.getIntOr(TAG_RAIDER_THRESHOLD_TRACKER, 0);
     }
 
     @Override

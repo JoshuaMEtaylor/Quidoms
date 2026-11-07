@@ -4,7 +4,7 @@
 package com.minecolonies.core.client.model;
 
 import com.minecolonies.api.client.render.modeltype.CitizenModel;
-import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
+import com.minecolonies.api.client.render.modeltype.CitizenRenderState;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.minecolonies.core.entity.ai.workers.guard.EntityAIDruid.RENDER_META_POTION;
 
-public class MaleDruidModel extends CitizenModel<AbstractEntityCitizen>
+public class MaleDruidModel extends CitizenModel<CitizenRenderState>
 {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("modid", "modelentitydruidmale"), "main");
 
@@ -86,9 +86,9 @@ public class MaleDruidModel extends CitizenModel<AbstractEntityCitizen>
     }
 
     @Override
-    public void setupAnim(@NotNull final AbstractEntityCitizen entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(@NotNull final CitizenRenderState entity)
     {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        body.getChild("potionBag").visible = entity.getRenderMetadata().contains(RENDER_META_POTION) && isWorking(entity);
+        super.setupAnim(entity);
+        body.getChild("potionBag").visible = entity.renderMetadata.contains(RENDER_META_POTION) && isWorking(entity);
     }
 }

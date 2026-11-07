@@ -96,6 +96,10 @@ public class DeliveryObjectiveTemplateTemplate extends DialogueObjectiveTemplate
         JsonObject details = jsonObject.getAsJsonObject(DETAILS_KEY);
         final int target = details.get(TARGET_KEY).getAsInt();
         final ItemStack item = Utils.deserializeCodecMessFromJson(ItemStack.CODEC, provider, details.get(ITEM_KEY));
+        if (item == null || item.isEmpty())
+        {
+            throw new IllegalArgumentException("Quest delivery objective has invalid item JSON");
+        }
         final int nextObj = details.has(NEXT_OBJ_KEY) ? details.get(NEXT_OBJ_KEY).getAsInt() : -1;
         final String nbtMode = details.has(NBT_MODE_KEY) ? details.get(NBT_MODE_KEY).getAsString() : "";
         return new DeliveryObjectiveTemplateTemplate(target, item, item.getCount(), nextObj, parseRewards(jsonObject), nbtMode);

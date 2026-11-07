@@ -1,0 +1,35 @@
+{
+  "branch": "minecolonies:combat",
+  "costs": [
+    {
+      "ingredient": "minecraft:leather_horse_armor",
+      "count": 8
+    },
+    {
+      "ingredient": "minecraft:iron_ingot",
+      "count": 5
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/mountarmor",
+      "level": 1
+    }
+  ],
+  "icon": "minecraft:leather_horse_armor",
+  "parentResearch": "minecolonies:combat/mountedcombat",
+  "requirements": [
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:stable",
+      "level": 3
+    },
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:blacksmith",
+      "level": 3
+    }
+  ],
+  "researchLevel": 3,
+  "subtitle": "com.minecolonies.research.combat.barding.subtitle"
+}

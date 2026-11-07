@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:large_soy_milk_bottle"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:yogurt"
+  }
+}

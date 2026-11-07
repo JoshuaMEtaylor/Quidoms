@@ -113,13 +113,13 @@ public class BuildingConcreteMixer extends AbstractBuilding
         super.deserializeNBT(provider, compound);
 
         waterPos.clear();
-        final ListTag waterMapList = compound.getList(TAG_WATER, Tag.TAG_COMPOUND);
+        final ListTag waterMapList = compound.getListOrEmpty(TAG_WATER);
         for (int i = 0; i < waterMapList.size(); ++i)
         {
-            final CompoundTag waterCompound = waterMapList.getCompound(i);
-            final int level = waterCompound.getInt(TAG_LEVEL);
+            final CompoundTag waterCompound = waterMapList.getCompoundOrEmpty(i);
+            final int level = waterCompound.getIntOr(TAG_LEVEL, 0);
 
-            final ListTag waterTagList = waterCompound.getList(TAG_WATER, Tag.TAG_INT_ARRAY);
+            final ListTag waterTagList = waterCompound.getListOrEmpty(TAG_WATER);
             final List<BlockPos> water = new ArrayList<>();
             for (int j = 0; j < waterTagList.size(); ++j)
             {
@@ -129,7 +129,7 @@ public class BuildingConcreteMixer extends AbstractBuilding
                     water.add(waterPos);
                 }
             }
-            waterPos.put(level, water);
+            this.waterPos.put(level, water);
         }
     }
 

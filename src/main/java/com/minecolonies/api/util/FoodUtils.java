@@ -13,7 +13,6 @@ import com.minecolonies.core.tileentities.TileEntityRack;
 import com.minecolonies.api.items.ModTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.HoneyBottleItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -69,9 +68,9 @@ public class FoodUtils
 
         if (buildingLevel < 3)
         {
-            return stack.getItem().getFoodProperties(stack, null) != null;
+            return com.minecolonies.api.util.FoodCompat.getFoodProperties(stack) != null;
         }
-        final FoodProperties foodProperties = stack.getItem().getFoodProperties(stack, null);
+        final FoodProperties foodProperties = com.minecolonies.api.util.FoodCompat.getFoodProperties(stack);
         return foodProperties != null && foodProperties.nutrition() >= buildingLevel + 1;
     }
 
@@ -82,7 +81,12 @@ public class FoodUtils
      */
     public static int getBuildingLevelForFood(final ItemStack resource)
     {
-        return Math.max(2, Math.min(resource.getFoodProperties(null).nutrition() - 1, MAX_BUILDING_LEVEL));
+        final FoodProperties props = com.minecolonies.api.util.FoodCompat.getFoodProperties(resource);
+        if (props == null)
+        {
+            return 2;
+        }
+        return Math.max(2, Math.min(props.nutrition() - 1, MAX_BUILDING_LEVEL));
     }
 
     /**
@@ -111,7 +115,7 @@ public class FoodUtils
      */
     public static double getFoodValue(final ItemStack foodStack, final AbstractEntityCitizen citizen)
     {
-        final FoodProperties itemFood = foodStack.getItem().getFoodProperties(foodStack, citizen);
+        final FoodProperties itemFood = com.minecolonies.api.util.FoodCompat.getFoodProperties(foodStack, citizen);
         final double researchBonus = citizen.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(SATURATION);
         return getFoodValue(foodStack, itemFood, researchBonus);
     }
@@ -129,7 +133,7 @@ public class FoodUtils
             return foodItem.getTier();
         }
 
-        final FoodProperties foodValue = food.getFoodProperties(null);
+        final FoodProperties foodValue = com.minecolonies.api.util.FoodCompat.getFoodProperties(food, null);
         if (foodValue == null || foodValue.nutrition() < 12 || foodValue.saturation() < 0.8)
         {
             return 0;
@@ -395,16 +399,16 @@ public class FoodUtils
     public static ItemStack consumeFoodStack(final ItemStack foodStack,
                                              final AbstractEntityCitizen citizen)
     {
-        final FoodProperties food = foodStack.getFoodProperties(citizen);
+        final FoodProperties food = com.minecolonies.api.util.FoodCompat.getFoodProperties(foodStack, citizen);
         if (food != null)
         {
             final ItemStack consumedStack = foodStack.finishUsingItem(citizen.level(), citizen);
-            final Optional<ItemStack> returned = food.usingConvertsTo();
+            final Optional<ItemStack> returned = com.minecolonies.api.util.FoodCompat.usingConvertsTo(foodStack);
             if (returned.isPresent())
             {
                 return returned.get().copy();
             }
-            else if (foodStack.getItem() instanceof HoneyBottleItem)
+            else if (foodStack.is(net.minecraft.world.item.Items.HONEY_BOTTLE))
             {
                 // Special handling because vanilla doesn't use usingConvertsTo since it's stackable
                 return new ItemStack(Items.GLASS_BOTTLE);

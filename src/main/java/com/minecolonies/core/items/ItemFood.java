@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * A custom item class for food items.
@@ -43,11 +45,11 @@ public class ItemFood extends Item implements IMinecoloniesFoodItem
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         if (WindowCitizenInventory.activeCitizenInventory == null)
         {
-            tooltip.add(Component.translatable(TranslationConstants.TIER_TOOLTIP + this.tier));
+            tooltip.accept(Component.translatable(TranslationConstants.TIER_TOOLTIP + this.tier));
         }
     }
 

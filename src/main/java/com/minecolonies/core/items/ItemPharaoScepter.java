@@ -6,7 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -38,22 +38,22 @@ public class ItemPharaoScepter extends BowItem
 
     @NotNull
     @Override
-    public InteractionResultHolder<ItemStack> use(@NotNull final Level worldIn, Player playerIn, @NotNull final InteractionHand handIn)
+    public InteractionResult use(@NotNull final Level worldIn, Player playerIn, @NotNull final InteractionHand handIn)
     {
         ItemStack itemstack = playerIn.getItemInHand(handIn);
 
-        InteractionResultHolder<ItemStack> ret = net.neoforged.neoforge.event.EventHooks.onArrowNock(itemstack, worldIn, playerIn, handIn, true);
+        InteractionResult ret = net.neoforged.neoforge.event.EventHooks.onArrowNock(itemstack, worldIn, playerIn, handIn, true);
         if (ret != null)
         {
             return ret;
         }
 
         playerIn.startUsingItem(handIn);
-        return InteractionResultHolder.consume(itemstack);
+        return InteractionResult.CONSUME;
     }
 
     @Override
-    public void releaseUsing(@NotNull final ItemStack stack, @NotNull final Level worldIn, LivingEntity entityLiving, int timeLeft)
+    public boolean releaseUsing(@NotNull final ItemStack stack, @NotNull final Level worldIn, LivingEntity entityLiving, int timeLeft)
     {
         if (entityLiving instanceof Player)
         {
@@ -62,7 +62,7 @@ public class ItemPharaoScepter extends BowItem
             useDuration = net.neoforged.neoforge.event.EventHooks.onArrowLoose(stack, worldIn, playerentity, useDuration, true);
             if (useDuration < 0)
             {
-                return;
+                return false;
             }
 
             ItemStack itemstack = playerentity.getProjectile(stack);
@@ -86,9 +86,11 @@ public class ItemPharaoScepter extends BowItem
                       1.0F,
                       1.0F / (entityLiving.getRandom().nextFloat() * 0.4F + 1.2F) + speed * 0.5F);
                     playerentity.awardStat(Stats.ITEM_USED.get(this));
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @NotNull

@@ -232,9 +232,9 @@ public class BuildingCowboy extends AbstractBuilding
         @Override
         public void deserializeNBT(@NotNull final HolderLookup.Provider provider, CompoundTag compound)
         {
-            this.currentMilk = compound.getInt("milkValue");
-            this.currentStew = compound.getInt("stewValue");
-            this.currentMilkDays = compound.getInt("milkDays");
+            this.currentMilk = compound.getIntOr("milkValue", 0);
+            this.currentStew = compound.getIntOr("stewValue", 0);
+            this.currentMilkDays = compound.getIntOr("milkDays", 0);
         }
 
         @Override
