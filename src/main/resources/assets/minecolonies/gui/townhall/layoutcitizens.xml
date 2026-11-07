@@ -25,7 +25,8 @@
     <button label="$(com.minecolonies.coremod.gui.townhall.recallone)" id="recallone" pos="306 70" size="86 17"
                  source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="black"/>
 
-    <input id="search" size="129 17" pos="285 90" maxlength="32" tooltip="$(com.minecolonies.core.townhall.citizen.filter)"/>
+    <input id="search" size="129 17" pos="285 90" maxlength="32" color="white"
+           tooltip="$(com.minecolonies.core.townhall.citizen.filter)"/>
     <list id="citizenList" size="148 106" pos="276 110">
         <view size="100% 17">
             <button id="name" pos="9 0" size="129 17" color="black"
