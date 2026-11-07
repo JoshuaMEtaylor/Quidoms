@@ -18,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Chorus Bread, made by the baker. Teleports user to surface.
@@ -41,7 +43,7 @@ public class ItemChorusBread extends ItemFood
      */
     public ItemChorusBread(final Properties properties)
     {
-        super((new Item.Properties()).food(chorusBread), 2);
+        super(properties.food(chorusBread), 2);
     }
 
    /**
@@ -50,7 +52,7 @@ public class ItemChorusBread extends ItemFood
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving)
     {
-        if (!worldIn.isClientSide && entityLiving instanceof ServerPlayer && WorldUtil.isOverworldType(worldIn))
+        if (!worldIn.isClientSide() && entityLiving instanceof ServerPlayer && WorldUtil.isOverworldType(worldIn))
         {
             TeleportHelper.surfaceTeleport((ServerPlayer)entityLiving);
         }
@@ -59,12 +61,12 @@ public class ItemChorusBread extends ItemFood
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         final MutableComponent guiHint = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_COREMOD_CHORUS_BREAD_TOOLTIP_GUI);
         guiHint.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-        tooltip.add(guiHint);
+        tooltip.accept(guiHint);
 
-        super.appendHoverText(stack, ctx, tooltip, flagIn);
+        super.appendHoverText(stack, ctx, display, tooltip, flagIn);
     }
 }

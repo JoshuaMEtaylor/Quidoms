@@ -5,6 +5,8 @@ import com.minecolonies.api.loot.ModLootTables;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -68,7 +70,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     private NewBobberEntity(EntityType<? extends Projectile> type, Level level, int luck, int lure)
     {
         super(type, level);
-        this.noCulling = true;
+        // noCulling removed in 1.21.10
         this.luck = Math.max(0, luck);
         this.lureSpeed = Math.max(0, lure);
     }
@@ -91,7 +93,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
         double d0 = citizen.getX() - (double)f3 * 0.3;
         double d1 = citizen.getEyeY();
         double d2 = citizen.getZ() - (double)f2 * 0.3;
-        this.moveTo(d0, d1, d2, f1, f);
+        this.snapTo(d0, d1, d2, f1, f);
         Vec3 vec3 = new Vec3((double)(-f3), (double)Mth.clamp(-(f5 / f4), -5.0F, 5.0F), (double)(-f2));
         double d3 = vec3.length();
         vec3 = vec3.multiply(
@@ -139,14 +141,16 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     }
 
     @OnlyIn(Dist.CLIENT)
-    @Override
     public void lerpTo(
       final double x,
       final double y,
       final double z,
       final float yaw,
       final float pitch,
-      final int posRotationIncrements) { }
+      final int posRotationIncrements)
+    {
+        this.absSnapTo(x, y, z, yaw, pitch);
+    }
 
     @Override
     public void tick() {
@@ -155,7 +159,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
         AbstractEntityCitizen citizen = (AbstractEntityCitizen) this.getOwner();
         if (citizen == null) {
             this.discard();
-        } else if (this.level().isClientSide || !this.shouldStopFishing(citizen)) {
+        } else if (this.level().isClientSide() || !this.shouldStopFishing(citizen)) {
             if (this.onGround()) {
                 this.life++;
                 if (this.life >= 1200) {
@@ -225,7 +229,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
                             );
                         }
 
-                        if (!this.level().isClientSide) {
+                        if (!this.level().isClientSide()) {
                             this.catchingFish(blockpos);
                         }
                     } else {
@@ -283,7 +287,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     protected void onHitEntity(EntityHitResult hitEntity)
     {
         super.onHitEntity(hitEntity);
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             this.setHookedEntity(hitEntity.getEntity());
         }
     }
@@ -482,13 +486,13 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag)
+    public void addAdditionalSaveData(ValueOutput tag)
     {
 
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag)
+    public void readAdditionalSaveData(ValueInput tag)
     {
 
     }
@@ -496,7 +500,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     public int retrieve(ItemStack p_37157_)
     {
         AbstractEntityCitizen citizen = (AbstractEntityCitizen) this.getOwner();
-        if (!this.level().isClientSide && citizen != null && !this.shouldStopFishing(citizen))
+        if (!this.level().isClientSide() && citizen != null && !this.shouldStopFishing(citizen))
         {
             int i = 0;
             if (this.hookedEntity != null)
@@ -548,7 +552,7 @@ public class NewBobberEntity extends Projectile implements IEntityWithComplexSpa
     @Override
     public void handleEntityEvent(byte b)
     {
-        if (b == 31 && this.level().isClientSide && this.hookedEntity instanceof Player && ((Player)this.hookedEntity).isLocalPlayer())
+        if (b == 31 && this.level().isClientSide() && this.hookedEntity instanceof Player && ((Player)this.hookedEntity).isLocalPlayer())
         {
             this.pullEntity(this.hookedEntity);
         }

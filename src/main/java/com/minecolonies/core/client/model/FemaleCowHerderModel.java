@@ -4,7 +4,7 @@
 package com.minecolonies.core.client.model;
 
 import com.minecolonies.api.client.render.modeltype.CitizenModel;
-import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
+import com.minecolonies.api.client.render.modeltype.CitizenRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.minecolonies.core.entity.ai.workers.production.herders.EntityAIWorkCowboy.RENDER_META_BUCKET;
 
-public class FemaleCowHerderModel extends CitizenModel<AbstractEntityCitizen>
+public class FemaleCowHerderModel extends CitizenModel<CitizenRenderState>
 {
 
     public FemaleCowHerderModel(final ModelPart part)
@@ -79,10 +79,10 @@ public class FemaleCowHerderModel extends CitizenModel<AbstractEntityCitizen>
     }
 
     @Override
-    public void setupAnim(@NotNull final AbstractEntityCitizen entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(@NotNull final CitizenRenderState entity)
     {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        body.getChild("bucketwithHandle").visible = entity.getRenderMetadata().contains(RENDER_META_BUCKET);
+        super.setupAnim(entity);
+        body.getChild("bucketwithHandle").visible = entity.renderMetadata.contains(RENDER_META_BUCKET);
         head.getChild("LassCap").visible = displayHat(entity);
     }
 }

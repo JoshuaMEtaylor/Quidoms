@@ -203,7 +203,7 @@ public class BuildingMiner extends AbstractBuildingStructureBuilder
      */
     public int normalizeMaxDepth(final int max, final Level level)
     {
-        final int worldMaxDepth = level.getMinBuildHeight() + 5;
+        final int worldMaxDepth = level.getMinY() + 5;
         final IntSetting maxDepth = getSetting(MAX_DEPTH);
         if (maxDepth.getValue() == maxDepth.getDefault())
         {

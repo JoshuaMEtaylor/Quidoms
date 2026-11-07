@@ -6,7 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +29,7 @@ public class ItemSpear extends TridentItem
     }
 
     @Override
-    public void releaseUsing(@NotNull ItemStack stack, @NotNull Level worldIn, @NotNull LivingEntity entityLiving, int timeLeft)
+    public boolean releaseUsing(@NotNull ItemStack stack, @NotNull Level worldIn, @NotNull LivingEntity entityLiving, int timeLeft)
     {
         if (entityLiving instanceof Player)
         {
@@ -37,7 +37,7 @@ public class ItemSpear extends TridentItem
             int usedForDuration = this.getUseDuration(stack, entityLiving) - timeLeft;
             if (usedForDuration >= 10)
             {
-                if (!worldIn.isClientSide)
+                if (!worldIn.isClientSide())
                 {
                     stack.hurtAndBreak(1, playerEntity, EquipmentSlot.MAINHAND);
                     SpearEntity spearEntity = new SpearEntity(worldIn, playerEntity, stack);
@@ -58,22 +58,24 @@ public class ItemSpear extends TridentItem
                 SoundEvent soundEvent = SoundEvents.TRIDENT_THROW.value();
                 playerEntity.awardStat(Stats.ITEM_USED.get(this));
                 worldIn.playSound(null, playerEntity, soundEvent, SoundSource.PLAYERS, 1.0F, 1.0F);
+                return true;
             }
         }
+        return false;
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull final Level world, final Player playerEntity, @NotNull final InteractionHand hand)
+    public @NotNull InteractionResult use(@NotNull final Level world, final Player playerEntity, @NotNull final InteractionHand hand)
     {
         ItemStack itemstack = playerEntity.getItemInHand(hand);
         if (itemstack.getDamageValue() >= itemstack.getMaxDamage() - 1)
         {
-            return InteractionResultHolder.fail(itemstack);
+            return InteractionResult.FAIL;
         }
         else
         {
             playerEntity.startUsingItem(hand);
-            return InteractionResultHolder.consume(itemstack);
+            return InteractionResult.CONSUME;
         }
     }
 
@@ -86,7 +88,7 @@ public class ItemSpear extends TridentItem
     @Override
     public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility)
     {
-        return ItemAbilities.DEFAULT_SWORD_ACTIONS.contains(itemAbility);
+        return java.util.Set.of() /* DEFAULT_SWORD_ACTIONS removed */.contains(itemAbility);
     }
 
     /** Gets the base damage of the spear.

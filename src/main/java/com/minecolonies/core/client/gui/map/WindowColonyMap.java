@@ -35,7 +35,7 @@ import com.minecolonies.core.network.messages.client.colony.ColonyListMessage;
 import com.minecolonies.core.network.messages.server.colony.OpenInventoryMessage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -333,14 +333,7 @@ public class WindowColonyMap extends AbstractWindowSkeleton
                     Image playerImage = findPaneOfTypeByID(player.getStringUUID(), Image.class);
                     if (playerImage == null)
                     {
-                        final ResourceLocation resourceLocation = Minecraft.getInstance().getSkinManager().getInsecureSkin(player.getGameProfile()).texture();
-                        if (resourceLocation == null)
-                        {
-                            continue;
-                        }
-
-
-                        OutOfJarResourceLocation.ofMinecraftSkin(Minecraft.getInstance(), player.getGameProfile(), PlayerSkin::texture)
+                        OutOfJarResourceLocation.ofMinecraftSkin(Minecraft.getInstance(), player.getGameProfile(), skin -> skin.body().texturePath())
                             .thenAccept(resLoc ->
                             {
                                 if (resLoc != null)

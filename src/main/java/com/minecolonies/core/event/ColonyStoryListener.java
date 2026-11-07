@@ -9,7 +9,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.biome.Biome;
@@ -17,7 +17,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,14 +25,12 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import static com.minecolonies.api.util.constant.Constants.MOD_ID;
-import static com.minecolonies.core.generation.DataGeneratorConstants.COLONY_STORIES_DIR;
-import static net.neoforged.fml.common.EventBusSubscriber.Bus.MOD;
 
 /**
  * Loads and listens to colony story changes.
  */
-@EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID, bus = MOD)
-public class ColonyStoryListener extends SimpleJsonResourceReloadListener
+@EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID)
+public class ColonyStoryListener extends SimplePreparableReloadListener<java.util.Map<ResourceLocation, JsonElement>>
 {
     /**
      * Gson instance
@@ -66,17 +64,41 @@ public class ColonyStoryListener extends SimpleJsonResourceReloadListener
     public static Set<StoryText> supplyCampStories = new HashSet<>();
 
     @SubscribeEvent
-    public static void modInitClient(final RegisterClientReloadListenersEvent event)
+    public static void modInitClient(final AddClientReloadListenersEvent event)
     {
-        event.registerReloadListener(new ColonyStoryListener());
+        event.addListener(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("minecolonies", "colony_story"), new ColonyStoryListener());
     }
 
     /**
      * Create a new listener.
      */
+    private static final String COLONY_STORIES_DIR = "colony/stories";
+
     public ColonyStoryListener()
     {
-        super(GSON, COLONY_STORIES_DIR);
+        super();
+    }
+
+    @Override
+    protected java.util.Map<ResourceLocation, JsonElement> prepare(final ResourceManager resourceManager, final ProfilerFiller profiler)
+    {
+        final java.util.Map<ResourceLocation, JsonElement> map = new java.util.HashMap<>();
+        final var resources = resourceManager.listResources(COLONY_STORIES_DIR, rl -> rl.getPath().endsWith(".json"));
+        for (final var entry : resources.entrySet())
+        {
+            try (final var reader = entry.getValue().openAsReader())
+            {
+                final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                    entry.getKey().getNamespace(),
+                    entry.getKey().getPath().substring(COLONY_STORIES_DIR.length() + 1).replace(".json", ""));
+                map.put(id, GSON.fromJson(reader, JsonElement.class));
+            }
+            catch (final Exception e)
+            {
+                Log.getLogger().error("Failed loading story {}", entry.getKey(), e);
+            }
+        }
+        return map;
     }
 
     /**
@@ -228,7 +250,7 @@ public class ColonyStoryListener extends SimpleJsonResourceReloadListener
             {
                 final RegistryAccess registryAccess = ServerLifecycleHooks.getCurrentServer().registryAccess();
                 final ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, ResourceLocation.parse(value));
-                final Holder<Biome> biome = registryAccess.registryOrThrow(Registries.BIOME).getHolderOrThrow(key);
+                final Holder<Biome> biome = registryAccess.lookupOrThrow(Registries.BIOME).getOrThrow(key);
                 return new BiomeFilter(b -> b.equals(biome));
             }
         }

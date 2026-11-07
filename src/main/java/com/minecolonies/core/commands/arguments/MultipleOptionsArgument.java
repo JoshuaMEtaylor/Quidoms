@@ -109,7 +109,7 @@ public abstract class MultipleOptionsArgument<TValue> implements ArgumentType<Mu
                 allowedOption.createSuggestions(source.getLevel(), source, builder);
             }
         }
-        else if (FMLLoader.getDist().isClient())
+        else if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient())
         {
             ClientSuggester.loadClientSuggestions(context.getSource(), builder, allowedOptions);
         }

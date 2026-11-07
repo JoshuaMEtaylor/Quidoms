@@ -6,8 +6,6 @@ import com.minecolonies.api.IMinecoloniesAPI;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.constant.Constants;
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -24,14 +22,20 @@ public class UpdateClientWithCompatibilityMessage extends AbstractClientPlayMess
 
     private final RegistryFriendlyByteBuf buffer;
 
-    /**
-     * Message creation.
-     */
     public UpdateClientWithCompatibilityMessage(@NotNull RegistryAccess provider)
     {
         super(TYPE);
         this.buffer = new RegistryFriendlyByteBuf(new FriendlyByteBuf(Unpooled.buffer()), provider);
-        IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().serialize(this.buffer);
+        try
+        {
+            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().serialize(this.buffer);
+        }
+        catch (final Exception ex)
+        {
+            // Never fail player join over a compatibility sync serialization bug.
+            Log.getLogger().error("Failed to serialize compatibility manager for client sync; sending empty payload", ex);
+            this.buffer.clear();
+        }
     }
 
     protected UpdateClientWithCompatibilityMessage(final RegistryFriendlyByteBuf buf, final PlayMessageType<?> type)
@@ -51,12 +55,13 @@ public class UpdateClientWithCompatibilityMessage extends AbstractClientPlayMess
     @Override
     protected void onExecute(final IPayloadContext ctxIn, final Player player)
     {
-        final ClientLevel world = Minecraft.getInstance().level;
         try
         {
-            IMinecoloniesAPI.getInstance().getColonyManager().getCompatibilityManager().deserialize(this.buffer, world);
+            Class.forName("com.minecolonies.core.network.messages.client.ClientNetworkAccess")
+              .getMethod("updateCompatibility", RegistryFriendlyByteBuf.class)
+              .invoke(null, this.buffer);
         }
-        catch (Exception e)
+        catch (ReflectiveOperationException e)
         {
             Log.getLogger().error("Failed to load compatibility manager", e);
         }

@@ -89,10 +89,10 @@ public class GraveyardManagementModule extends AbstractBuildingModule implements
         restingCitizen.clear();
         if (compound.contains(TAG_RIP_CITIZEN_LIST))
         {
-            final ListTag ripCitizen = compound.getList(TAG_RIP_CITIZEN_LIST, TAG_STRING);
+            final ListTag ripCitizen = compound.getListOrEmpty(TAG_RIP_CITIZEN_LIST);
             for (int i = 0; i < ripCitizen.size(); i++)
             {
-                final String citizenName = ripCitizen.getString(i);
+                final String citizenName = ripCitizen.getStringOr(i, "");
                 restingCitizen.add(citizenName);
             }
         }
@@ -100,12 +100,12 @@ public class GraveyardManagementModule extends AbstractBuildingModule implements
         if (compound.contains(TAG_GRAVE_DATA))
         {
             lastGraveData = new GraveData();
-            lastGraveData.read(compound.getCompound(TAG_GRAVE_DATA));
+            lastGraveData.read(compound.getCompoundOrEmpty(TAG_GRAVE_DATA));
         }
         else lastGraveData = null;
 
         gravePositions.clear();
-        if (compound.contains(TAG_VISUAL_GRAVES, Tag.TAG_LIST))
+        if (compound.contains(TAG_VISUAL_GRAVES))
         {
             readGravePositions(compound);
         }
@@ -176,7 +176,7 @@ public class GraveyardManagementModule extends AbstractBuildingModule implements
      */
     public void migrateLegacyGravePositions(final CompoundTag compound)
     {
-        if (compound.contains(TAG_VISUAL_GRAVES, Tag.TAG_LIST))
+        if (compound.contains(TAG_VISUAL_GRAVES))
         {
             readGravePositions(compound);
             markDirty();
@@ -191,11 +191,11 @@ public class GraveyardManagementModule extends AbstractBuildingModule implements
     private void readGravePositions(final CompoundTag compound)
     {
         gravePositions.clear();
-        final ListTag visualGraveTagList = compound.getList(TAG_VISUAL_GRAVES, Tag.TAG_COMPOUND);
+        final ListTag visualGraveTagList = compound.getListOrEmpty(TAG_VISUAL_GRAVES);
         for (int i = 0; i < visualGraveTagList.size(); ++i)
         {
-            final CompoundTag graveCompound = visualGraveTagList.getCompound(i);
-            final Direction facing = Direction.byName(graveCompound.getString(TAG_VISUAL_GRAVES_FACING));
+            final CompoundTag graveCompound = visualGraveTagList.getCompoundOrEmpty(i);
+            final Direction facing = Direction.byName(graveCompound.getStringOr(TAG_VISUAL_GRAVES_FACING, ""));
             if (facing != null)
             {
                 gravePositions.add(new Tuple<>(BlockPosUtil.read(graveCompound, TAG_VISUAL_GRAVES_BLOCKPOS), facing));

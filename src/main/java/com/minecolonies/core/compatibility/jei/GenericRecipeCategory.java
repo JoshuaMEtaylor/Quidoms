@@ -296,7 +296,7 @@ public class GenericRecipeCategory extends JobBasedRecipeCategory<IGenericRecipe
         {
             try
             {
-                final Entity entity = entityCache.get(entityType, () -> entityType.create(Minecraft.getInstance().level));
+                final Entity entity = entityCache.get(entityType, () -> entityType.create(Minecraft.getInstance().level, net.minecraft.world.entity.EntitySpawnReason.LOAD));
 
                 final float scale = ANIMAL_H / 2.4f;
                 final int animal_cx = ANIMAL_X + (ANIMAL_W / 2);
@@ -306,9 +306,9 @@ public class GenericRecipeCategory extends JobBasedRecipeCategory<IGenericRecipe
                 final float yaw = animalTimer.getValue();
                 final float headYaw = (float) Math.atan((animal_cx - mouseX) / 40.0F) * 40.0F + yaw;
                 final float pitch = (float) Math.atan((animal_cy - offsetY - mouseY) / 40.0F) * 20.0F;
-                Lighting.setupForFlatItems();
+                net.minecraft.client.Minecraft.getInstance().gameRenderer.getLighting().setupFor(com.mojang.blaze3d.platform.Lighting.Entry.ITEMS_FLAT);
                 UiRenderMacros.drawEntity(stack.pose(), animal_cx, animal_by - offsetY, scale, headYaw, yaw, pitch, entity);
-                Lighting.setupFor3DItems();
+                net.minecraft.client.Minecraft.getInstance().gameRenderer.getLighting().setupFor(com.mojang.blaze3d.platform.Lighting.Entry.ITEMS_3D);
             }
             catch (final Throwable e)
             {

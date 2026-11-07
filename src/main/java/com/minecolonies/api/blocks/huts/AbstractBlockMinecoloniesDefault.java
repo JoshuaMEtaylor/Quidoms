@@ -1,19 +1,22 @@
 package com.minecolonies.api.blocks.huts;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
 import com.minecolonies.api.blocks.AbstractBlockMinecoloniesContainer;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.core.Direction;
 
 public abstract class AbstractBlockMinecoloniesDefault<B extends AbstractBlockMinecoloniesDefault<B>> extends AbstractBlockMinecoloniesContainer<B>
 {
     /**
      * The position it faces.
      */
-    public static final DirectionProperty FACING           = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING           = HorizontalDirectionalBlock.FACING;
     /**
      * Hardness of the block.
      */
@@ -45,7 +48,7 @@ public abstract class AbstractBlockMinecoloniesDefault<B extends AbstractBlockMi
 
     public AbstractBlockMinecoloniesDefault(final Properties properties)
     {
-        super(properties);
+        super(MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 
     @Override
@@ -58,6 +61,14 @@ public abstract class AbstractBlockMinecoloniesDefault<B extends AbstractBlockMi
     @Override
     public void registerBlockItem(final Registry<Item> registry, final Item.Properties properties)
     {
-        Registry.register(registry, getRegistryName(), new BlockItem(this, properties));
+        MinecoloniesBlockIds.pushItem(getRegistryName());
+        try
+        {
+            Registry.register(registry, getRegistryName(), new BlockItem(this, MinecoloniesBlockIds.withPendingItemId(properties)));
+        }
+        finally
+        {
+            MinecoloniesBlockIds.popItem();
+        }
     }
 }

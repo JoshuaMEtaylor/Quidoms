@@ -66,7 +66,7 @@ public class CircleParticleEffectMessage extends AbstractClientPlayMessage
         this.posY = buf.readDouble();
         this.posZ = buf.readDouble();
         this.stage = buf.readInt();
-        this.type = (SimpleParticleType) BuiltInRegistries.PARTICLE_TYPE.get(buf.readResourceLocation());
+        this.type = (SimpleParticleType) BuiltInRegistries.PARTICLE_TYPE.getValue(buf.readResourceLocation());
     }
 
     @Override

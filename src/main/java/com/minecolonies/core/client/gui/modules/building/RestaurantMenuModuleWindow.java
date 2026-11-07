@@ -315,7 +315,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
             {
                 ingredients.merge(ingredient, (double) ingredient.getAmount() / input.getAmount(), Double::sum);
             }
-            final FoodProperties foodProperty = dish.getItem().getFoodProperties(dish.getItemStack(), null);
+            final FoodProperties foodProperty = com.minecolonies.api.util.FoodCompat.getFoodProperties(dish.getItemStack(), null);
             saturationSum += FoodUtils.getFoodValue(dish.getItemStack(), foodProperty, researchBonus);
         }
         final double consumption = (avgCustomerConsumption * 10 * numerOfCustomers) / saturationSum;
@@ -395,7 +395,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
                     continue;
                 }
                 else if (input.getItem() instanceof ItemLargeBottle
-                    || input.getItem() instanceof HoneyBottleItem
+                    || input.getItem() == net.minecraft.world.item.Items.HONEY_BOTTLE
                     || input.getItem() == Items.DRIED_KELP
                     || !processRecipe(input, ingredients, depth + 1, level, maxDepth))
                 {
@@ -406,16 +406,16 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
             return true;
         }
 
-        final Optional<RecipeHolder<?>> recipe = level.getRecipeManager().byKey(BuiltInRegistries.ITEM.getKey(dish.getItem()));
+        final Optional<RecipeHolder<?>> recipe = Optional.empty(); // client RecipeAccess has no byKey in 1.21.10
         if (recipe.isPresent())
         {
             if (depth == 0)
             {
-                dish.setAmount(recipe.get().value().getResultItem(level.registryAccess()).getCount());
+                dish.setAmount(com.minecolonies.api.util.RecipeCompat.getResultItem(recipe.get().value(), level).getCount());
             }
-            for (final Ingredient ingredient : recipe.get().value().getIngredients())
+            for (final Ingredient ingredient : com.minecolonies.api.util.RecipeCompat.getIngredients(recipe.get().value()))
             {
-                final ItemStack[] inputs = ingredient.getItems();
+                final ItemStack[] inputs = com.minecolonies.api.util.IngredientCompat.getItems(ingredient);
                 if (inputs.length >= 1)
                 {
                     final ItemStorage input = new ItemStorage(inputs[0]);
@@ -424,7 +424,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
                         continue;
                     }
                     if (input.getItem() instanceof ItemLargeBottle
-                        || input.getItem() instanceof HoneyBottleItem
+                        || input.getItem() == net.minecraft.world.item.Items.HONEY_BOTTLE
                         || input.getItem() == Items.DRIED_KELP
                         || !processRecipe(input, ingredients, depth + 1, level, maxDepth))
                     {
@@ -443,7 +443,7 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
     private void updateResources()
     {
         final Predicate<ItemStack> filterPredicate = stack -> filter.isEmpty()
-                                                                || stack.getDescriptionId().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US))
+                                                                || stack.getItem().getDescriptionId().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US))
                                                                 || stack.getHoverName().getString().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US));
         currentDisplayedList.clear();
         for (final ItemStorage storage : groupedItemList)
@@ -466,8 +466,8 @@ public class RestaurantMenuModuleWindow extends AbstractModuleWindow<RestaurantM
     protected void applySorting(final List<ItemStorage> displayedList)
     {
         displayedList.sort((o1, o2) -> {
-            int score = FoodUtils.getFoodTier(o1.getItemStack()) * -100 - o1.getItemStack().getFoodProperties(null).nutrition();
-            int score2 = FoodUtils.getFoodTier(o2.getItemStack())* -100 - o2.getItemStack().getFoodProperties(null).nutrition();
+            int score = FoodUtils.getFoodTier(o1.getItemStack()) * -100 - com.minecolonies.api.util.FoodCompat.getFoodProperties(o1.getItemStack()).nutrition();
+            int score2 = FoodUtils.getFoodTier(o2.getItemStack())* -100 - com.minecolonies.api.util.FoodCompat.getFoodProperties(o2.getItemStack()).nutrition();
 
             final int scoreComparison = Integer.compare(score, score2);
             if (scoreComparison != 0)

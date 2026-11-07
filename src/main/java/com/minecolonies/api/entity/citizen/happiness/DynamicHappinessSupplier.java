@@ -55,14 +55,14 @@ public class DynamicHappinessSupplier implements IHappinessSupplierWrapper
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag nbt)
     {
-        this.key = ResourceLocation.parse(nbt.getString(TAG_ID));
-        this.lastValue = nbt.getDouble(TAG_VALUE);
+        this.key = ResourceLocation.parse(nbt.getStringOr(TAG_ID, ""));
+        this.lastValue = nbt.getDoubleOr(TAG_VALUE, 0.0);
     }
 
     @Override
     public double getValue(final ICitizenData citizenData)
     {
-        HappinessRegistry.HappinessFunctionEntry function = IMinecoloniesAPI.getInstance().getHappinessFunctionRegistry().get(key);
+        HappinessRegistry.HappinessFunctionEntry function = IMinecoloniesAPI.getInstance().getHappinessFunctionRegistry().getValue(key);
         if (function == null)
         {
             return lastValue;

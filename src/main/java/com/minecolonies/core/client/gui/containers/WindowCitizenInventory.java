@@ -114,20 +114,20 @@ public class WindowCitizenInventory extends AbstractContainerScreen<ContainerCit
         int j = (this.height - this.imageHeight) / 2;
 
 
-        stack.blit(TEXT, i, j, 0, 0, this.imageWidth,  10 + this.inventoryRows * SLOT_OFFSET + 12, TEXTURE_SIZE, TEXTURE_SIZE);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXT, i, j, 0f, 0f, this.imageWidth, 10 + this.inventoryRows * SLOT_OFFSET + 12, TEXTURE_SIZE, TEXTURE_SIZE);
 
 
-        stack.blit(TEXT, i, j + 10 + this.inventoryRows * SLOT_OFFSET + 12, 0, TEXTURE_OFFSET, this.imageWidth, TEXTURE_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXT, i, j + 10 + this.inventoryRows * SLOT_OFFSET + 12, 0f, (float)(TEXTURE_OFFSET), this.imageWidth, TEXTURE_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
 
 
-        //stack.blit(TEXT, i, j, 0, 0, this.imageWidth,  this.inventoryRows * SLOT_OFFSET + 12, TEXTURE_SIZE, TEXTURE_SIZE);
+        //stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXT, i, j, 0f, 0f, this.imageWidth, this.inventoryRows * SLOT_OFFSET + 12, TEXTURE_SIZE, TEXTURE_SIZE);
 
 
-        stack.blit(TEXT, i + 172, j + 22, 0, 227, 49, 72, TEXTURE_SIZE, TEXTURE_SIZE);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXT, i + 172, j + 22, 0f, 227f, 49, 72, TEXTURE_SIZE, TEXTURE_SIZE);
 
         for (int index = 0; index < 4; index++)
         {
-            stack.blit(TEXT, i + 222, j + 22 + index * 18, 0, 300, 18, 18, TEXTURE_SIZE, TEXTURE_SIZE);
+            stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXT, i + 222, j + 22 + index * 18, 0f, 300f, 18, 18, TEXTURE_SIZE, TEXTURE_SIZE);
         }
 
         renderEntityInInventoryFollowsMouse(stack, i + 197, j + 88, 30, (float)(i + 51) - mouseX, (float)(j + 75 - 50) - mouseY, this.menu.getEntity());
@@ -167,25 +167,8 @@ public class WindowCitizenInventory extends AbstractContainerScreen<ContainerCit
     }
 
     public static void renderEntityInInventory(GuiGraphics stack, int x, int y, int scale, Quaternionf quaternionf, @Nullable Quaternionf quaternionf1, LivingEntity entity) {
-        stack.pose().pushPose();
-        stack.pose().translate(x, y, 50.0D);
-        stack.pose().mulPose((new Matrix4f()).scaling((float)scale, (float)scale, (float)(-scale)));
-        stack.pose().mulPose(quaternionf);
-        Lighting.setupForEntityInInventory();
-        EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        if (quaternionf1 != null) {
-            quaternionf1.conjugate();
-            entityrenderdispatcher.overrideCameraOrientation(quaternionf1);
-        }
-
-        entityrenderdispatcher.setRenderShadow(false);
-        RenderSystem.runAsFancy(() -> {
-            entityrenderdispatcher.render(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, stack.pose(), stack.bufferSource(), 15728880);
-        });
-        stack.flush();
-        entityrenderdispatcher.setRenderShadow(true);
-        stack.pose().popPose();
-        Lighting.setupFor3DItems();
+        // 1.21.10: GuiGraphics pose is Matrix3x2fStack (2D); 3D inventory entity preview deferred.
+        // Keep slot UI functional without the live entity model.
     }
 
     @Override

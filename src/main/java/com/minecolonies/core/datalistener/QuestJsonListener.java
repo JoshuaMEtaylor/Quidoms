@@ -20,21 +20,20 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import com.minecolonies.core.datalistener.GsonEventReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
 
-import static com.minecolonies.core.generation.DataGeneratorConstants.COLONY_QUESTS_DIR;
 import static com.minecolonies.core.quests.QuestParsingConstants.*;
 import static com.minecolonies.core.quests.QuestParsingConstants.BRACE_CLOSE;
 
 /**
  * Loader for Json based quest data.
  */
-public class QuestJsonListener extends SimpleJsonResourceReloadListener
+public class QuestJsonListener extends GsonEventReloadListener
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
@@ -46,6 +45,9 @@ public class QuestJsonListener extends SimpleJsonResourceReloadListener
     /**
      * Set up the core loading, with the directory in the datapack that contains this data Directory is: <namespace>/colony/quests/<path>
      */
+    /** Directory under datapacks: {@code <namespace>/colony/quests/}. */
+    private static final String COLONY_QUESTS_DIR = "colony/quests";
+
     public QuestJsonListener()
     {
         super(GSON, COLONY_QUESTS_DIR);
@@ -131,7 +133,7 @@ public class QuestJsonListener extends SimpleJsonResourceReloadListener
 
             try
             {
-                questTriggers.add(IMinecoloniesAPI.getInstance().getQuestTriggerRegistry().get(ResourceLocation.parse(type)).produce(triggerObj));
+                questTriggers.add(IMinecoloniesAPI.getInstance().getQuestTriggerRegistry().getValue(ResourceLocation.parse(type)).produce(triggerObj));
             }
             catch (final Exception ex)
             {
@@ -146,7 +148,7 @@ public class QuestJsonListener extends SimpleJsonResourceReloadListener
             final String type = objectiveObj.get(TYPE).getAsString();
             try
             {
-                questObjectives.add(IMinecoloniesAPI.getInstance().getQuestObjectiveRegistry().get(ResourceLocation.parse(type)).produce(provider, objectiveObj));
+                questObjectives.add(IMinecoloniesAPI.getInstance().getQuestObjectiveRegistry().getValue(ResourceLocation.parse(type)).produce(provider, objectiveObj));
             }
             catch (final Exception ex)
             {
@@ -189,7 +191,7 @@ public class QuestJsonListener extends SimpleJsonResourceReloadListener
             final String type = objectiveObj.get(TYPE).getAsString();
             try
             {
-                questRewards.add(IMinecoloniesAPI.getInstance().getQuestRewardRegistry().get(ResourceLocation.parse(type)).produce(provider, objectiveObj));
+                questRewards.add(IMinecoloniesAPI.getInstance().getQuestRewardRegistry().getValue(ResourceLocation.parse(type)).produce(provider, objectiveObj));
             }
             catch (final Exception ex)
             {

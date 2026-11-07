@@ -18,7 +18,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.jetbrains.annotations.NotNull;
@@ -287,11 +286,11 @@ public interface IColonyManager
     void read(final HolderLookup.Provider provider, @NotNull CompoundTag compound);
 
     /**
-     * On Client tick, clears views when player left.
+     * On Client tick, clears views when player left and ticks client sound manager.
      *
-     * @param event {@link net.neoforged.neoforge.client.event.ClientTickEvent}.
+     * @param clientLevelPresent whether the client currently has a loaded level
      */
-    void onClientTick(@NotNull ClientTickEvent.Pre event);
+    void onClientTick(boolean clientLevelPresent);
 
     /**
      * On world tick, tick every Colony in that world. NOTE: Review this for performance.

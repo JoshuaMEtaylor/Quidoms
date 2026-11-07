@@ -124,16 +124,16 @@ public interface IQuestTriggerTemplate
         // Full equals for string.
         if (nbtTag instanceof StringTag && ((JsonPrimitive) matchTag).isString())
         {
-            return nbtTag.getAsString().equals(matchTag.getAsString());
+            return nbtTag.asString().orElse("").equals(matchTag.getAsString());
         }
         else if (nbtTag instanceof ByteTag && ((JsonPrimitive) matchTag).isBoolean())
         {
-            return (((ByteTag) nbtTag).getAsByte() == 0) != matchTag.getAsBoolean();
+            return (((ByteTag) nbtTag).byteValue() == 0) != matchTag.getAsBoolean();
         }
         // Larger equals for numbers.
         else if (nbtTag instanceof NumericTag && ((JsonPrimitive) matchTag).isNumber())
         {
-            return ((NumericTag) nbtTag).getAsDouble() >= matchTag.getAsDouble();
+            return ((NumericTag) nbtTag).doubleValue() >= matchTag.getAsDouble();
         }
         return false;
     }

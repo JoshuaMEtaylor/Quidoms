@@ -32,7 +32,6 @@ import com.minecolonies.core.client.render.mobs.pirates.RendererPirate;
 import com.minecolonies.core.client.render.projectile.FireArrowRenderer;
 import com.minecolonies.core.client.render.projectile.RendererSpear;
 import com.minecolonies.core.client.render.worldevent.ColonyBlueprintRenderer;
-import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -41,7 +40,6 @@ import net.minecraft.client.renderer.entity.HorseRenderer;
 import net.minecraft.client.renderer.entity.MinecartRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.TippableArrowRenderer;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -49,7 +47,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterRecipeBookCategoriesEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -278,7 +275,7 @@ public class ClientRegistryHandler
         event.registerEntityRenderer(ModEntities.CITIZEN, RenderBipedCitizen::new);
         event.registerEntityRenderer(ModEntities.VISITOR, RenderBipedCitizen::new);
         event.registerEntityRenderer(ModEntities.FISHHOOK, RenderFishHook::new);
-        event.registerEntityRenderer(ModEntities.FIREARROW, FireArrowRenderer::new);
+        if (ModEntities.FIREARROW != null) event.registerEntityRenderer(ModEntities.FIREARROW, FireArrowRenderer::new);
         event.registerEntityRenderer(ModEntities.SPEAR, RendererSpear::new);
 
         event.registerEntityRenderer(ModEntities.MC_NORMAL_ARROW, TippableArrowRenderer::new);
@@ -286,67 +283,62 @@ public class ClientRegistryHandler
 
         // Raiders
 
-        event.registerEntityRenderer(ModEntities.BARBARIAN, RendererBarbarian::new);
-        event.registerEntityRenderer(ModEntities.ARCHERBARBARIAN, RendererBarbarian::new);
-        event.registerEntityRenderer(ModEntities.CHIEFBARBARIAN, RendererChiefBarbarian::new);
+        if (ModEntities.BARBARIAN != null) event.registerEntityRenderer(ModEntities.BARBARIAN, RendererBarbarian::new);
+        if (ModEntities.ARCHERBARBARIAN != null) event.registerEntityRenderer(ModEntities.ARCHERBARBARIAN, RendererBarbarian::new);
+        if (ModEntities.CHIEFBARBARIAN != null) event.registerEntityRenderer(ModEntities.CHIEFBARBARIAN, RendererChiefBarbarian::new);
 
-        event.registerEntityRenderer(ModEntities.PIRATE, RendererPirate::new);
-        event.registerEntityRenderer(ModEntities.ARCHERPIRATE, RendererArcherPirate::new);
-        event.registerEntityRenderer(ModEntities.CHIEFPIRATE, RendererChiefPirate::new);
+        if (ModEntities.PIRATE != null) event.registerEntityRenderer(ModEntities.PIRATE, RendererPirate::new);
+        if (ModEntities.ARCHERPIRATE != null) event.registerEntityRenderer(ModEntities.ARCHERPIRATE, RendererArcherPirate::new);
+        if (ModEntities.CHIEFPIRATE != null) event.registerEntityRenderer(ModEntities.CHIEFPIRATE, RendererChiefPirate::new);
 
-        event.registerEntityRenderer(ModEntities.MUMMY, RendererMummy::new);
-        event.registerEntityRenderer(ModEntities.ARCHERMUMMY, RendererArcherMummy::new);
-        event.registerEntityRenderer(ModEntities.PHARAO, RendererPharao::new);
+        if (ModEntities.MUMMY != null) event.registerEntityRenderer(ModEntities.MUMMY, RendererMummy::new);
+        if (ModEntities.ARCHERMUMMY != null) event.registerEntityRenderer(ModEntities.ARCHERMUMMY, RendererArcherMummy::new);
+        if (ModEntities.PHARAO != null) event.registerEntityRenderer(ModEntities.PHARAO, RendererPharao::new);
 
-        event.registerEntityRenderer(ModEntities.SHIELDMAIDEN, RendererShieldmaidenNorsemen::new);
-        event.registerEntityRenderer(ModEntities.NORSEMEN_ARCHER, RendererArcherNorsemen::new);
-        event.registerEntityRenderer(ModEntities.NORSEMEN_CHIEF, RendererChiefNorsemen::new);
+        if (ModEntities.SHIELDMAIDEN != null) event.registerEntityRenderer(ModEntities.SHIELDMAIDEN, RendererShieldmaidenNorsemen::new);
+        if (ModEntities.NORSEMEN_ARCHER != null) event.registerEntityRenderer(ModEntities.NORSEMEN_ARCHER, RendererArcherNorsemen::new);
+        if (ModEntities.NORSEMEN_CHIEF != null) event.registerEntityRenderer(ModEntities.NORSEMEN_CHIEF, RendererChiefNorsemen::new);
 
-        event.registerEntityRenderer(ModEntities.AMAZON, RendererAmazon::new);
-        event.registerEntityRenderer(ModEntities.AMAZONCHIEF, RendererChiefAmazon::new);
-        event.registerEntityRenderer(ModEntities.AMAZONSPEARMAN, RendererAmazonSpearman::new);
+        if (ModEntities.AMAZON != null) event.registerEntityRenderer(ModEntities.AMAZON, RendererAmazon::new);
+        if (ModEntities.AMAZONCHIEF != null) event.registerEntityRenderer(ModEntities.AMAZONCHIEF, RendererChiefAmazon::new);
+        if (ModEntities.AMAZONSPEARMAN != null) event.registerEntityRenderer(ModEntities.AMAZONSPEARMAN, RendererAmazonSpearman::new);
 
-        event.registerEntityRenderer(ModEntities.DROWNED_PIRATE, RendererDrownedPirate::new);
-        event.registerEntityRenderer(ModEntities.DROWNED_ARCHERPIRATE, RendererDrownedArcherPirate::new);
-        event.registerEntityRenderer(ModEntities.DROWNED_CHIEFPIRATE, RendererDrownedChiefPirate::new);
+        if (ModEntities.DROWNED_PIRATE != null) event.registerEntityRenderer(ModEntities.DROWNED_PIRATE, RendererDrownedPirate::new);
+        if (ModEntities.DROWNED_ARCHERPIRATE != null) event.registerEntityRenderer(ModEntities.DROWNED_ARCHERPIRATE, RendererDrownedArcherPirate::new);
+        if (ModEntities.DROWNED_CHIEFPIRATE != null) event.registerEntityRenderer(ModEntities.DROWNED_CHIEFPIRATE, RendererDrownedChiefPirate::new);
 
         // Camp Raiders
 
-        event.registerEntityRenderer(ModEntities.CAMP_BARBARIAN, RendererBarbarian::new);
-        event.registerEntityRenderer(ModEntities.CAMP_ARCHERBARBARIAN, RendererBarbarian::new);
-        event.registerEntityRenderer(ModEntities.CAMP_CHIEFBARBARIAN, RendererChiefBarbarian::new);
+        if (ModEntities.CAMP_BARBARIAN != null) event.registerEntityRenderer(ModEntities.CAMP_BARBARIAN, RendererBarbarian::new);
+        if (ModEntities.CAMP_ARCHERBARBARIAN != null) event.registerEntityRenderer(ModEntities.CAMP_ARCHERBARBARIAN, RendererBarbarian::new);
+        if (ModEntities.CAMP_CHIEFBARBARIAN != null) event.registerEntityRenderer(ModEntities.CAMP_CHIEFBARBARIAN, RendererChiefBarbarian::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_PIRATE, RendererPirate::new);
-        event.registerEntityRenderer(ModEntities.CAMP_ARCHERPIRATE, RendererArcherPirate::new);
-        event.registerEntityRenderer(ModEntities.CAMP_CHIEFPIRATE, RendererChiefPirate::new);
+        if (ModEntities.CAMP_PIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_PIRATE, RendererPirate::new);
+        if (ModEntities.CAMP_ARCHERPIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_ARCHERPIRATE, RendererArcherPirate::new);
+        if (ModEntities.CAMP_CHIEFPIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_CHIEFPIRATE, RendererChiefPirate::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_MUMMY, RendererMummy::new);
-        event.registerEntityRenderer(ModEntities.CAMP_ARCHERMUMMY, RendererArcherMummy::new);
-        event.registerEntityRenderer(ModEntities.CAMP_PHARAO, RendererPharao::new);
+        if (ModEntities.CAMP_MUMMY != null) event.registerEntityRenderer(ModEntities.CAMP_MUMMY, RendererMummy::new);
+        if (ModEntities.CAMP_ARCHERMUMMY != null) event.registerEntityRenderer(ModEntities.CAMP_ARCHERMUMMY, RendererArcherMummy::new);
+        if (ModEntities.CAMP_PHARAO != null) event.registerEntityRenderer(ModEntities.CAMP_PHARAO, RendererPharao::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_SHIELDMAIDEN, RendererShieldmaidenNorsemen::new);
-        event.registerEntityRenderer(ModEntities.CAMP_NORSEMEN_ARCHER, RendererArcherNorsemen::new);
-        event.registerEntityRenderer(ModEntities.CAMP_NORSEMEN_CHIEF, RendererChiefNorsemen::new);
+        if (ModEntities.CAMP_SHIELDMAIDEN != null) event.registerEntityRenderer(ModEntities.CAMP_SHIELDMAIDEN, RendererShieldmaidenNorsemen::new);
+        if (ModEntities.CAMP_NORSEMEN_ARCHER != null) event.registerEntityRenderer(ModEntities.CAMP_NORSEMEN_ARCHER, RendererArcherNorsemen::new);
+        if (ModEntities.CAMP_NORSEMEN_CHIEF != null) event.registerEntityRenderer(ModEntities.CAMP_NORSEMEN_CHIEF, RendererChiefNorsemen::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_AMAZON, RendererAmazon::new);
-        event.registerEntityRenderer(ModEntities.CAMP_AMAZONCHIEF, RendererChiefAmazon::new);
-        event.registerEntityRenderer(ModEntities.CAMP_AMAZONSPEARMAN, RendererAmazonSpearman::new);
+        if (ModEntities.CAMP_AMAZON != null) event.registerEntityRenderer(ModEntities.CAMP_AMAZON, RendererAmazon::new);
+        if (ModEntities.CAMP_AMAZONCHIEF != null) event.registerEntityRenderer(ModEntities.CAMP_AMAZONCHIEF, RendererChiefAmazon::new);
+        if (ModEntities.CAMP_AMAZONSPEARMAN != null) event.registerEntityRenderer(ModEntities.CAMP_AMAZONSPEARMAN, RendererAmazonSpearman::new);
 
-        event.registerEntityRenderer(ModEntities.CAMP_DROWNED_PIRATE, RendererDrownedPirate::new);
-        event.registerEntityRenderer(ModEntities.CAMP_DROWNED_ARCHERPIRATE, RendererDrownedArcherPirate::new);
-        event.registerEntityRenderer(ModEntities.CAMP_DROWNED_CHIEFPIRATE, RendererDrownedChiefPirate::new);
+        if (ModEntities.CAMP_DROWNED_PIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_DROWNED_PIRATE, RendererDrownedPirate::new);
+        if (ModEntities.CAMP_DROWNED_ARCHERPIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_DROWNED_ARCHERPIRATE, RendererDrownedArcherPirate::new);
+        if (ModEntities.CAMP_DROWNED_CHIEFPIRATE != null) event.registerEntityRenderer(ModEntities.CAMP_DROWNED_CHIEFPIRATE, RendererDrownedChiefPirate::new);
 
         // Misc
 
         event.registerEntityRenderer(ModEntities.MERCENARY, RenderMercenary::new);
         event.registerEntityRenderer(ModEntities.SITTINGENTITY, RenderSitting::new);
-        event.registerEntityRenderer(ModEntities.MINECART, (context) -> new MinecartRenderer<>(context, ModelLayers.MINECART));
-        event.registerEntityRenderer(ModEntities.CAVALRY_HORSE, ctx -> 
-        {
-            HorseRenderer renderer = new HorseRenderer(ctx); 
-            renderer.addLayer(new CavalryOverlayLayer(renderer));
-            return renderer;
-        });
+        event.registerEntityRenderer(ModEntities.MINECART, (context) -> new MinecartRenderer(context, ModelLayers.MINECART));
+        event.registerEntityRenderer(ModEntities.CAVALRY_HORSE, HorseRenderer::new);
 
         event.registerBlockEntityRenderer(MinecoloniesTileEntities.BUILDING.get(), EmptyTileEntitySpecialRenderer::new);
         event.registerBlockEntityRenderer(MinecoloniesTileEntities.SCARECROW.get(), TileEntityScarecrowRenderer::new);
@@ -357,29 +349,17 @@ public class ClientRegistryHandler
         event.registerBlockEntityRenderer(MinecoloniesTileEntities.COLONY_SIGN.get(), TileEntityColonySignRenderer::new);
 
         Arrays.stream(ModBlocks.getHuts())
-          .forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, renderType -> renderType.equals(RenderType.cutout()) || renderType.equals(RenderType.solid())));
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockScarecrow, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockRack, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockDecorationPlaceholder, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockCompostedDirt, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockBarrel, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockWayPoint, RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.floodedFarmland, RenderType.cutout());
+          .forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT));
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockScarecrow, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockRack, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockDecorationPlaceholder, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockCompostedDirt, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockBarrel, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.blockWayPoint, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.floodedFarmland, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
 
-        Arrays.stream(ModBlocks.getCrops()).forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, RenderType.cutout()));
-
-        ItemProperties.register(ModItems.spear, ResourceLocation.withDefaultNamespace("throwing"), (item, world, entity, light) ->
-                                                                           (entity != null && entity.isUsingItem() && entity.getUseItem() == item) ? 1.0F : 0.0F);
-        ItemProperties.register(ModItems.buildGoggles, ResourceLocation.withDefaultNamespace("disabled"), (item, world, entity, light) ->
-                (ColonyBlueprintRenderer.willRenderBlueprints() ? 0.0F : 1.0F));
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public static void registerRecipeBookCategories(@NotNull final RegisterRecipeBookCategoriesEvent event)
-    {
-        // not worthwhile creating a category for compost, as we never unlock them in the book; this hides some warnings
-        event.registerRecipeCategoryFinder(ModRecipeSerializer.CompostRecipeType.get(), r -> RecipeBookCategories.UNKNOWN);
+        Arrays.stream(ModBlocks.getCrops()).forEach(hut -> ItemBlockRenderTypes.setRenderLayer(hut, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT));
+        // ItemProperties API replaced by item model properties in 1.21.10 — register via assets later.
     }
 
     @OnlyIn(Dist.CLIENT)

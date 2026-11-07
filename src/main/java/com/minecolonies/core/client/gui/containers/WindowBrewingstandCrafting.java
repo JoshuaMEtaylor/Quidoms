@@ -138,10 +138,10 @@ public class WindowBrewingstandCrafting extends AbstractContainerScreen<Containe
 
     protected void renderBg(@NotNull final GuiGraphics stack, final float partialTicks, final int mouseX, final int mouseY)
     {
-        stack.blit(BREWING_STAND_LOCATION, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, BREWING_STAND_LOCATION, this.leftPos, this.topPos, 0f, 0f, this.imageWidth, this.imageHeight, 256, 256);
         int l = Mth.clamp((20 - 1) / 20, 0, 18);
         if (l > 0) {
-            stack.blit(BREWING_STAND_LOCATION, mouseX + 60, mouseY + 44, 176, 29, l, 4);
+            stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, BREWING_STAND_LOCATION, mouseX + 60, mouseY + 44, 176f, 29f, l, 4, 256, 256);
         }
     }
 }

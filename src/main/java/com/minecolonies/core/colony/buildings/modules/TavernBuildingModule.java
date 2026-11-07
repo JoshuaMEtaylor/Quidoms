@@ -259,10 +259,10 @@ public class TavernBuildingModule extends AbstractBuildingModule implements IDef
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag nbt)
     {
-        final ListTag visitorlist = nbt.getList(TAG_VISITORS, TAG_COMPOUND);
+        final ListTag visitorlist = nbt.getListOrEmpty(TAG_VISITORS);
         for (final Tag data : visitorlist)
         {
-            final int id = ((CompoundTag) data).getInt(TAG_VISITOR_ID);
+            final int id = ((CompoundTag) data).getIntOr(TAG_VISITOR_ID, 0);
             final ICitizenData citizenData = building.getColony().getVisitorManager().getCivilian(id);
             if (citizenData != null)
             {
@@ -270,7 +270,7 @@ public class TavernBuildingModule extends AbstractBuildingModule implements IDef
                 citizenData.setHomeBuilding(building);
             }
         }
-        noVisitorTime = nbt.getInt(TAG_NOVISITTIME);
+        noVisitorTime = nbt.getIntOr(TAG_NOVISITTIME, 0);
     }
 
     /**

@@ -163,9 +163,14 @@ public class ItemStorage
 
         if (jObject.has("id"))
         {
-            this.stack = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, jObject);
+            final ItemStack parsed = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, jObject);
+            this.stack = parsed != null ? parsed : ItemStack.EMPTY;
             this.shouldIgnoreNBTValue = GsonHelper.getAsString(jObject, MATCHTYPE_PROP, "exact").equals(MATCH_NBTIGNORE);
             this.shouldIgnoreDamageValue = true;
+            if (parsed == null)
+            {
+                this.amount = 0;
+            }
         }
         else
         {

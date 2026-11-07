@@ -7,7 +7,7 @@ import net.minecraft.client.model.geom.ModelPart;
 /**
  * Norsemen model.
  */
-public class NorsemenModel extends HumanoidModel<AbstractEntityMinecoloniesMonster>
+public class NorsemenModel extends HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     /**
      * Create a model of a specific size.

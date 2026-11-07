@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "P": "#minecraft:planks",
+    "S": "minecraft:stick",
+    "T": "structurize:sceptergold"
+  },
+  "pattern": [
+    " T ",
+    "SIS",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:blockhutplantationfield"
+  }
+}

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Amazon model.
  */
-public class AmazonModel<T extends AbstractEntityMinecoloniesMonster> extends HumanoidModel<AbstractEntityMinecoloniesMonster>
+public class AmazonModel<T extends net.minecraft.client.renderer.entity.state.HumanoidRenderState> extends HumanoidModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     public AmazonModel(final ModelPart part)
     {
@@ -16,9 +16,9 @@ public class AmazonModel<T extends AbstractEntityMinecoloniesMonster> extends Hu
     }
 
     @Override
-    public void setupAnim(@NotNull final AbstractEntityMinecoloniesMonster entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(@NotNull final net.minecraft.client.renderer.entity.state.HumanoidRenderState entity)
     {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        super.setupAnim(entity);
         head.y -= 3;
         rightLeg.y -= 3.5;
         leftLeg.y -= 3.5;

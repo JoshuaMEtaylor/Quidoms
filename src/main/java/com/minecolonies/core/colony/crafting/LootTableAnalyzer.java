@@ -162,7 +162,7 @@ public final class LootTableAnalyzer
         switch (type)
         {
             case "minecraft:item" -> {
-                final Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(GsonHelper.getAsString(entryJson, "name")));
+                final Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(GsonHelper.getAsString(entryJson, "name")));
                 final float quality = GsonHelper.getAsFloat(entryJson, "quality", 0);
                 float modifier = 1.0F;
                 final JsonArray conditions = GsonHelper.getAsJsonArray(entryJson, "conditions", new JsonArray());
@@ -289,7 +289,7 @@ public final class LootTableAnalyzer
         final AdventureData component = AdventureData.readFromItemStack(token);
         if (component != null)
         {
-            return toDrops(provider, component.entityType().getDefaultLootTable());
+            return toDrops(provider, component.entityType().getDefaultLootTable().orElse(null));
         }
         return Collections.emptyList();
     }
@@ -352,7 +352,7 @@ public final class LootTableAnalyzer
 
                     case "minecraft:set_potion":        // SetPotionFunction
                         final String id = GsonHelper.getAsString(function, "id");
-                        final Holder<Potion> potion = BuiltInRegistries.POTION.getHolder(ResourceLocation.tryParse(id)).orElse(null);
+                        final Holder<Potion> potion = BuiltInRegistries.POTION.get(ResourceLocation.tryParse(id)).orElse(null);
                         if (potion != null)
                         {
                             stack.update(DataComponents.POTION_CONTENTS, PotionContents.EMPTY, potion, PotionContents::withPotion);
@@ -361,7 +361,10 @@ public final class LootTableAnalyzer
 
                     case "minecraft:set_components":    // SetComponentsFunction
                         final DataComponentPatch patch = Utils.deserializeCodecMessFromJson(DataComponentPatch.CODEC, provider, function.get("components"));
-                        stack.applyComponentsAndValidate(patch);
+                        if (patch != null)
+                        {
+                            stack.applyComponentsAndValidate(patch);
+                        }
                         break;
 
                     case "minecraft:enchant_with_levels":   // EnchantWithLevelsFunction

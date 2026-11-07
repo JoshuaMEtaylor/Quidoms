@@ -1,0 +1,18 @@
+{
+  "branch": "minecolonies:combat",
+  "costs": [
+    {
+      "ingredient": "minecraft:shield",
+      "count": 27
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/blockattacksmultiplier",
+      "level": 4
+    }
+  ],
+  "icon": "minecraft:iron_block",
+  "parentResearch": "minecolonies:combat/captaintraining",
+  "researchLevel": 6
+}

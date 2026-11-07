@@ -3,7 +3,6 @@ package com.minecolonies.core.network.messages.client;
 import com.ldtteam.common.network.AbstractClientPlayMessage;
 import com.ldtteam.common.network.PlayMessageType;
 import com.minecolonies.api.util.constant.Constants;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -34,7 +33,14 @@ public class StopMusicMessage extends AbstractClientPlayMessage
     @Override
     protected void onExecute(final IPayloadContext ctxIn, final Player player)
     {
-        Minecraft.getInstance().getSoundManager().stop();
-        Minecraft.getInstance().getMusicManager().stopPlaying();
+        try
+        {
+            Class.forName("com.minecolonies.core.network.messages.client.ClientNetworkAccess")
+              .getMethod("stopMusic")
+              .invoke(null);
+        }
+        catch (ReflectiveOperationException ignored)
+        {
+        }
     }
 }

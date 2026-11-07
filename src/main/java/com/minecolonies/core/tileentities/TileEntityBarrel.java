@@ -27,6 +27,8 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,7 +70,7 @@ public class TileEntityBarrel extends AbstractTileEntityBarrel implements ITicka
     {
         final Level world = this.getLevel();
 
-        if (!world.isClientSide && (world.getGameTime() % (world.random.nextInt(AVERAGE_TICKS * 2) + 1) == 0))
+        if (!world.isClientSide() && (world.getGameTime() % (world.random.nextInt(AVERAGE_TICKS * 2) + 1) == 0))
         {
             this.updateTick(world, this.getBlockPos(), world.getBlockState(this.getBlockPos()), new Random());
         }
@@ -202,22 +204,22 @@ public class TileEntityBarrel extends AbstractTileEntityBarrel implements ITicka
     }
 
     @Override
-    public void saveAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void saveAdditional(final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
+        super.saveAdditional(output);
 
-        compound.putInt("items", this.items);
-        compound.putInt("timer", this.timer);
-        compound.putBoolean("done", this.done);
+        output.putInt("items", this.items);
+        output.putInt("timer", this.timer);
+        output.putBoolean("done", this.done);
     }
 
     @Override
-    public void loadAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void loadAdditional(final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
-        this.items = compound.getInt("items");
-        this.timer = compound.getInt("timer");
-        this.done = compound.getBoolean("done");
+        super.loadAdditional(input);
+        this.items = input.getIntOr("items", 0);
+        this.timer = input.getIntOr("timer", 0);
+        this.done = input.getBooleanOr("done", false);
     }
 
     @Override
@@ -230,14 +232,13 @@ public class TileEntityBarrel extends AbstractTileEntityBarrel implements ITicka
     @Override
     public CompoundTag getUpdateTag(@NotNull final HolderLookup.Provider provider)
     {
-        return saveWithId(provider);
+        return saveWithoutMetadata(provider);
     }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket packet, @NotNull final HolderLookup.Provider provider)
+    public void onDataPacket(final Connection net, final ValueInput input)
     {
-        final CompoundTag compound = packet.getTag();
-        this.loadAdditional(compound, provider);
+        this.loadAdditional(input);
         setChanged();
     }
 
@@ -251,11 +252,11 @@ public class TileEntityBarrel extends AbstractTileEntityBarrel implements ITicka
     }
 
     @Override
-    public final void handleUpdateTag(final CompoundTag tag, @NotNull final HolderLookup.Provider provider)
+    public final void handleUpdateTag(final ValueInput input)
     {
-        this.items = tag.getInt("items");
-        this.timer = tag.getInt("timer");
-        this.done = tag.getBoolean("done");
+        this.items = input.getIntOr("items", 0);
+        this.timer = input.getIntOr("timer", 0);
+        this.done = input.getBooleanOr("done", false);
     }
 
     /**

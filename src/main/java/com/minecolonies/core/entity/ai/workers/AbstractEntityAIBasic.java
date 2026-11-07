@@ -355,8 +355,8 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
         try
         {
             final int timeout = EXCEPTION_TIMEOUT * exceptionTimer;
-            this.setDelay(FMLEnvironment.production ? timeout : EXCEPTION_TIMEOUT);
-            setCurrentDelay(FMLEnvironment.production ? timeout : EXCEPTION_TIMEOUT);
+            this.setDelay(FMLEnvironment.isProduction() ? timeout : EXCEPTION_TIMEOUT);
+            setCurrentDelay(FMLEnvironment.isProduction() ? timeout : EXCEPTION_TIMEOUT);
             // wait for longer now
             exceptionTimer *= 2;
             if (worker != null)

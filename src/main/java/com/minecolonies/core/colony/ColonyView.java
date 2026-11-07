@@ -684,7 +684,7 @@ public final class ColonyView implements IColonyView
         final int blockListSize = buf.readInt();
         for (int i = 0; i < blockListSize; i++)
         {
-            freeBlocks.add(BuiltInRegistries.BLOCK.get(ResourceLocation.parse((buf.readUtf(32767)))));
+            freeBlocks.add(BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse((buf.readUtf(32767)))));
         }
 
         final int posListSize = buf.readInt();

@@ -1,34 +1,37 @@
 package com.minecolonies.core.client.render.mobs.drownedpirates;
 
 import com.minecolonies.api.entity.mobs.AbstractEntityMinecoloniesMonster;
-import com.minecolonies.core.client.render.RenderUtils;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Abstract for rendering Pirates.
+ * Abstract raider renderer for MC 1.21.10 EntityRenderState pipeline.
  */
-public abstract class AbstractRendererDrownedPirate<T extends AbstractEntityMinecoloniesMonster, M extends HumanoidModel<T>> extends HumanoidMobRenderer<T, M>
+public abstract class AbstractRendererDrownedPirate<T extends AbstractEntityMinecoloniesMonster, M extends HumanoidModel<HumanoidRenderState>>
+    extends HumanoidMobRenderer<T, HumanoidRenderState, M>
 {
     public AbstractRendererDrownedPirate(final EntityRendererProvider.Context context, final M modelBipedIn, final float shadowSize)
     {
         super(context, modelBipedIn, shadowSize);
-        this.addLayer(new ItemInHandLayer<>(this, context.getItemInHandRenderer()));
-        this.addLayer(new HumanoidArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)), new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), context.getModelManager()));
+        final ArmorModelSet<HumanoidModel<HumanoidRenderState>> armor = ArmorModelSet.bake(ModelLayers.PLAYER_ARMOR, context.getModelSet(), HumanoidModel::new);
+        this.addLayer(new HumanoidArmorLayer<>(this, armor, context.getEquipmentRenderer()));
+        this.addLayer(new ItemInHandLayer<>(this));
     }
 
     @Override
-    public void render(T raider, float p_115456_, float p_115457_, PoseStack p_115458_, MultiBufferSource p_115459_, int p_115460_)
+    public HumanoidRenderState createRenderState()
     {
-        model.rightArmPose = RenderUtils.getArmPose(raider, InteractionHand.MAIN_HAND);
-        model.leftArmPose = RenderUtils.getArmPose(raider, InteractionHand.OFF_HAND);
-        super.render(raider, p_115456_, p_115457_, p_115458_, p_115459_, p_115460_);
+        return new HumanoidRenderState();
     }
+
+    @Override
+    public abstract @NotNull ResourceLocation getTextureLocation(@NotNull final HumanoidRenderState state);
 }

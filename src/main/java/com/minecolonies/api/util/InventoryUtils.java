@@ -3113,7 +3113,7 @@ public class InventoryUtils
                 if (!ItemStackUtils.isEmpty(stack) && foodPredicate.test(stack))
                 {
                     // Found food
-                    final FoodProperties itemFood = stack.getItem().getFoodProperties(stack, null);
+                    final FoodProperties itemFood = com.minecolonies.api.util.FoodCompat.getFoodProperties(stack);
                     if (itemFood == null)
                     {
                         continue;
@@ -3195,7 +3195,7 @@ public class InventoryUtils
             }
 
             playerInv.setItem(hotbarSlot, itemStack);
-            playerInv.selected = hotbarSlot;
+            playerInv.setSelectedSlot(hotbarSlot);
             playerInv.setChanged();
             updateHeldItemFromServer(player);
             return true;
@@ -3240,7 +3240,7 @@ public class InventoryUtils
     {
         final Inventory playerInv = player.getInventory();
 
-        for (int slot = 0; slot < playerInv.items.size(); slot++)
+        for (int slot = 0; slot < playerInv.getNonEquipmentItems().size(); slot++)
         {
             final ItemStack itemSlot = playerInv.getItem(slot);
             if (itemSlot.getItem() == item)
@@ -3251,7 +3251,7 @@ public class InventoryUtils
                 }
                 else
                 {
-                    playerInv.selected = slot;
+                    playerInv.setSelectedSlot(slot);
                 }
                 playerInv.setChanged();
                 updateHeldItemFromServer(player);
@@ -3280,7 +3280,7 @@ public class InventoryUtils
     {
         if (player instanceof ServerPlayer)
         {
-            ((ServerPlayer) player).server.getPlayerList().sendAllPlayerInfo((ServerPlayer) player);
+            // 1.21.10: sendAllPlayerInfo removed; inventory sync happens via container/slot packets.
         }
     }
 

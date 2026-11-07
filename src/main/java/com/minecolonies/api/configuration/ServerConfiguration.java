@@ -149,7 +149,8 @@ public class ServerConfiguration extends AbstractConfiguration
         swapToCategory("research");
         researchCreativeCompletion = defineBoolean("researchcreativecompletion", true);
         researchDebugLog = defineBoolean("researchdebuglog", false);
-        researchResetCost = defineList("researchresetcost", () -> "item ID, possibly with data", stringValidator, "minecolonies:ancienttome:1");
+        // Default must already pass the element validator on a fresh file (no correcting pass).
+        researchResetCost = defineList("researchresetcost", () -> "minecolonies:ancienttome", stringValidator, "minecolonies:ancienttome");
 
         swapToCategory("commands");
 

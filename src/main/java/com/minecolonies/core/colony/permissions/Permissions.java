@@ -8,6 +8,7 @@ import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.Utils;
 import com.minecolonies.core.colony.Colony;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -328,43 +329,43 @@ public class Permissions implements IPermissions
      */
     public void loadPermissions(@NotNull final CompoundTag compound)
     {
-        final int version = compound.getInt(TAG_VERSION);
+        final int version = compound.getIntOr(TAG_VERSION, 0);
         // Ranks
         if (compound.contains(TAG_RANKS))
         {
             ranks.clear();
 
-            final ListTag rankTagList = compound.getList(TAG_RANKS, Tag.TAG_COMPOUND);
+            final ListTag rankTagList = compound.getListOrEmpty(TAG_RANKS);
             for (int i = 0; i < rankTagList.size(); ++i)
             {
-                final CompoundTag rankCompound = rankTagList.getCompound(i);
-                final int id = rankCompound.getInt(TAG_ID);
-                final String name = rankCompound.getString(TAG_NAME);
-                final boolean isInitial = rankCompound.getBoolean(TAG_INITIAL);
-                final boolean isColonyManager = rankCompound.getBoolean(TAG_COLONY_MANAGER);
-                final boolean isHostile = rankCompound.getBoolean(TAG_HOSTILE);
+                final CompoundTag rankCompound = rankTagList.getCompoundOrEmpty(i);
+                final int id = rankCompound.getIntOr(TAG_ID, 0);
+                final String name = rankCompound.getStringOr(TAG_NAME, "");
+                final boolean isInitial = rankCompound.getBooleanOr(TAG_INITIAL, false);
+                final boolean isColonyManager = rankCompound.getBooleanOr(TAG_COLONY_MANAGER, false);
+                final boolean isHostile = rankCompound.getBooleanOr(TAG_HOSTILE, false);
 
                 final Rank rank = new Rank(id, 0L, name, isInitial, isColonyManager, isHostile);
                 ranks.put(id, rank);
                 upgradePermissions(version, rank);
             }
 
-            final ListTag permissionsTagList = compound.getList(TAG_PERMISSIONS, Tag.TAG_COMPOUND);
+            final ListTag permissionsTagList = compound.getListOrEmpty(TAG_PERMISSIONS);
             for (int i = 0; i < permissionsTagList.size(); ++i)
             {
-                final CompoundTag permissionsCompound = permissionsTagList.getCompound(i);
+                final CompoundTag permissionsCompound = permissionsTagList.getCompoundOrEmpty(i);
 
-                final Rank rank = ranks.get(permissionsCompound.getInt(TAG_RANK));
+                final Rank rank = ranks.get(permissionsCompound.getIntOr(TAG_RANK, 0));
                 if (rank == null)
                 {
                     continue;
                 }
 
-                final ListTag flagsTagList = permissionsCompound.getList(TAG_FLAGS, Tag.TAG_STRING);
+                final ListTag flagsTagList = permissionsCompound.getListOrEmpty(TAG_FLAGS);
 
                 for (int j = 0; j < flagsTagList.size(); ++j)
                 {
-                    final String flag = flagsTagList.getString(j);
+                    final String flag = flagsTagList.getStringOr(j, "");
                     try
                     {
                         rank.addPermission(Action.valueOf(flag));
@@ -383,32 +384,32 @@ public class Permissions implements IPermissions
 
         players.clear();
         //  Owners
-        final ListTag ownerTagList = compound.getList(TAG_OWNERS, Tag.TAG_COMPOUND);
+        final ListTag ownerTagList = compound.getListOrEmpty(TAG_OWNERS);
         for (int i = 0; i < ownerTagList.size(); ++i)
         {
-            final CompoundTag ownerCompound = ownerTagList.getCompound(i);
-            @NotNull final UUID id = UUID.fromString(ownerCompound.getString(TAG_ID));
+            final CompoundTag ownerCompound = ownerTagList.getCompoundOrEmpty(i);
+            @NotNull final UUID id = UUID.fromString(ownerCompound.getStringOr(TAG_ID, ""));
             String name = "";
             if (ownerCompound.contains(TAG_NAME))
             {
-                name = ownerCompound.getString(TAG_NAME);
+                name = ownerCompound.getStringOr(TAG_NAME, "");
             }
             Rank rank;
             if (version >= 3)
             {
-                rank = ranks.get(ownerCompound.getInt(TAG_RANK));
+                rank = ranks.get(ownerCompound.getIntOr(TAG_RANK, 0));
             }
             else
             {
-                final OldRank oldRank = OldRank.valueOf(ownerCompound.getString(TAG_RANK));
+                final OldRank oldRank = OldRank.valueOf(ownerCompound.getStringOr(TAG_RANK, ""));
                 rank = ranks.get(oldRank.ordinal());
             }
 
-            final GameProfile player = ServerLifecycleHooks.getCurrentServer().getProfileCache().get(id).orElse(null);
+            final NameAndId player = ServerLifecycleHooks.getCurrentServer().services().nameToIdCache().get(id).orElse(null);
 
             if (player != null && rank != null)
             {
-                players.put(id, new ColonyPlayer(id, player.getName(), rank));
+                players.put(id, new ColonyPlayer(id, player.name(), rank));
             }
             else if (!name.isEmpty() && rank != null)
             {
@@ -418,13 +419,13 @@ public class Permissions implements IPermissions
 
         if (compound.contains(TAG_OWNER))
         {
-            ownerName = compound.getString(TAG_OWNER);
+            ownerName = compound.getStringOr(TAG_OWNER, "");
         }
         if (compound.contains(TAG_OWNER_ID))
         {
             try
             {
-                ownerUUID = UUID.fromString(compound.getString(TAG_OWNER_ID));
+                ownerUUID = UUID.fromString(compound.getStringOr(TAG_OWNER_ID, ""));
             }
             catch (final IllegalArgumentException e)
             {
@@ -436,7 +437,7 @@ public class Permissions implements IPermissions
 
         if (compound.contains(TAG_FULLY_ABANDONED))
         {
-            fullyAbandoned = compound.getBoolean(TAG_FULLY_ABANDONED);
+            fullyAbandoned = compound.getBooleanOr(TAG_FULLY_ABANDONED, false);
         }
         else
         {
@@ -454,11 +455,11 @@ public class Permissions implements IPermissions
         final Map.Entry<UUID, ColonyPlayer> owner = getOwnerEntry();
         if (owner == null && ownerUUID != null)
         {
-            final GameProfile player = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer().getProfileCache().get(ownerUUID).orElse(null);
+            final NameAndId player = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer().services().nameToIdCache().get(ownerUUID).orElse(null);
 
             if (player != null)
             {
-                players.put(ownerUUID, new ColonyPlayer(ownerUUID, player.getName(), ranks.get(OWNER_RANK_ID)));
+                players.put(ownerUUID, new ColonyPlayer(ownerUUID, player.name(), ranks.get(OWNER_RANK_ID)));
             }
         }
         else if (owner == null)
@@ -698,7 +699,7 @@ public class Permissions implements IPermissions
         }
         else if (player.hasPermissions(IMinecoloniesAPI.getInstance().getConfig().getServer().permissionEventMinBypassPermLevel.get()) && player.isCreative())
         {
-            Log.getLogger().debug("Permission check got bypassed, original event was. Player: {}, Name: {}, Action: {}", player.getUUID(), player.getName().getString(), action);
+            Log.getLogger().debug("Permission check got bypassed, original event was. Player: {}, Name: {}, Action: {}", player.getUUID(), player.getName().getString(), action, "");
             return hasPermission(OP_RANK, action);
         }
         return false;
@@ -707,7 +708,7 @@ public class Permissions implements IPermissions
     @Override
     public Rank getRank(@NotNull final Player player)
     {
-        return getRank(player.getGameProfile().getId());
+        return getRank(player.getGameProfile().id());
     }
 
     /**
@@ -744,9 +745,9 @@ public class Permissions implements IPermissions
         else
         {
 
-            final GameProfile gameprofile = world.getServer().getProfileCache().get(id).orElse(null);
+            final NameAndId gameprofile = world.getServer().services().nameToIdCache().get(id).orElse(null);
 
-            return gameprofile != null && addPlayer(gameprofile, rank);
+            return gameprofile != null && addPlayer(new GameProfile(gameprofile.id(), gameprofile.name()), rank);
         }
 
         return true;
@@ -806,13 +807,13 @@ public class Permissions implements IPermissions
         {
             return false;
         }
-        final GameProfile gameprofile = world.getServer().getProfileCache().get(player).orElse(null);
+        final NameAndId gameprofile = world.getServer().services().nameToIdCache().get(player).orElse(null);
         //Check if the player already exists so that their rank isn't overridden
 
         // Adds new subscribers
         if (!world.isClientSide() && gameprofile != null)
         {
-            final ServerPlayer playerEntity = (ServerPlayer) world.getPlayerByUUID(gameprofile.getId());
+            final ServerPlayer playerEntity = (ServerPlayer) world.getPlayerByUUID(gameprofile.id());
             if (playerEntity != null)
             {
                 if (rank.getId() == OFFICER_RANK_ID)
@@ -839,7 +840,7 @@ public class Permissions implements IPermissions
             }
         }
 
-        return gameprofile != null && !ownerUUID.equals(gameprofile.getId()) && addPlayer(gameprofile, rank);
+        return gameprofile != null && !ownerUUID.equals(gameprofile.id()) && addPlayer(new GameProfile(gameprofile.id(), gameprofile.name()), rank);
     }
 
     /**
@@ -852,7 +853,7 @@ public class Permissions implements IPermissions
     @Override
     public boolean addPlayer(@NotNull final GameProfile gameprofile, final Rank rank)
     {
-        @NotNull final ColonyPlayer p = new ColonyPlayer(gameprofile.getId(), gameprofile.getName(), rank);
+        @NotNull final ColonyPlayer p = new ColonyPlayer(gameprofile.id(), gameprofile.name(), rank);
 
         players.remove(p.getID());
         players.put(p.getID(), p);
@@ -957,7 +958,7 @@ public class Permissions implements IPermissions
     @Override
     public boolean isColonyMember(@NotNull final Player player)
     {
-        return players.containsKey(player.getGameProfile().getId());
+        return players.containsKey(player.getGameProfile().id());
     }
 
     /**

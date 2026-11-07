@@ -68,7 +68,7 @@ public record FoodIngredient(@NotNull Optional<Integer> minHealing,
 
     private boolean matchesFood(@NotNull final ItemStack stack)
     {
-        @NotNull final FoodProperties food = Objects.requireNonNull(stack.getItem().getFoodProperties(stack, null));
+        @NotNull final FoodProperties food = Objects.requireNonNull(com.minecolonies.api.util.FoodCompat.getFoodProperties(stack));
         return minHealing.map(healing -> food.nutrition() >= healing).orElse(true) &&
                maxHealing.map(healing -> food.nutrition() < healing).orElse(true) &&
                minSaturation.map(saturation -> food.saturation() >= saturation).orElse(true) &&
@@ -88,11 +88,11 @@ public record FoodIngredient(@NotNull Optional<Integer> minHealing,
 
     @NotNull
     @Override
-    public Stream<ItemStack> getItems()
+    public Stream<net.minecraft.core.Holder<net.minecraft.world.item.Item>> items()
     {
-        return BuiltInRegistries.ITEM.stream()
-                .map(ItemStack::new)
-                .filter(this::test);
+        return BuiltInRegistries.ITEM.listElements()
+                .map(h -> (net.minecraft.core.Holder<net.minecraft.world.item.Item>) h)
+                .filter(h -> test(new ItemStack(h)));
     }
 
     @Override

@@ -4,6 +4,6 @@ public abstract class AbstractBlockMinecoloniesContainer<B extends AbstractBlock
 {
     public AbstractBlockMinecoloniesContainer(final Properties properties)
     {
-        super(properties);
+        super(MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 }

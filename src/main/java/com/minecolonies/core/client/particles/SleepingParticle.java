@@ -1,39 +1,31 @@
 package com.minecolonies.core.client.particles;
 
 import com.minecolonies.api.util.constant.Constants;
-import net.minecraft.client.particle.*;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 
 /**
- * Custom particle for sleeping.
+ * Custom particle for sleeping (MC 1.21.10 SingleQuadParticle).
  */
-public class SleepingParticle extends TextureSheetParticle
+public class SleepingParticle extends SingleQuadParticle
 {
-
-    /**
-     * Spawn coords
-     */
     private final double coordX;
     private final double coordY;
     private final double coordZ;
 
-    /**
-     * The light level of the particle
-     */
     private static final int LIGHT_LEVEL = 15 << 20 | 15 << 4;
 
-    /**
-     * The resourcelocation for the sleeping image.
-     */
-    public static final ResourceLocation SLEEPING_TEXTURE = new ResourceLocation(Constants.MOD_ID, "particle/sleeping");
+    public static final ResourceLocation SLEEPING_TEXTURE = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "particle/sleeping");
 
     public SleepingParticle(SpriteSet spriteSet, ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn)
     {
-        super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
-
-        //this.setSprite(Minecraft.getInstance().getTextureMap().getSprite(SLEEPING_TEXTURE));
+        super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, spriteSet.get(0, 1));
         setSpriteFromAge(spriteSet);
         this.xd = xSpeedIn * 0.5;
         this.yd = ySpeedIn;
@@ -47,21 +39,15 @@ public class SleepingParticle extends TextureSheetParticle
         this.x = this.xo;
         this.y = this.yo;
         this.z = this.zo;
-        // Slight color variance
         float f = this.random.nextFloat() * 0.6F + 0.4F;
         this.rCol = 0.9F * f;
         this.gCol = 0.9F * f;
         this.bCol = f;
-        // particles max age in ticks, random causes them to appear a bit more dynamic, as they get faster/slower with shorter/longer lifetime
         this.lifetime = (int) (Math.random() * 30.0D) + 40;
-        // starting scale to fit
-        this.quadSize = (float) ((0.8 * Math.sin(0) + 1.3) * 0.1);
+        this.scale((float) ((0.8 * Math.sin(0) + 1.3) * 0.1));
     }
 
-    /**
-     * Updates the particles, setting new position/scale
-     */
-
+    @Override
     public void tick()
     {
         this.xo = this.x;
@@ -69,11 +55,8 @@ public class SleepingParticle extends TextureSheetParticle
         this.zo = this.z;
 
         float f = (float) this.age / (float) this.lifetime;
+        this.scale((float) ((0.8 * Math.sin(f * 4) + 1.3) * 0.1));
 
-        // Scale smaller/bigger in a similar rate to snoring
-        quadSize = (float) ((0.8 * Math.sin(f * 4) + 1.3) * 0.1);
-
-        // Moves the particle in relation to movespeed and age
         this.x = this.coordX + this.xd * f;
         this.y = this.coordY + this.yd * f;
         this.z = this.coordZ + this.zd * f;
@@ -91,14 +74,14 @@ public class SleepingParticle extends TextureSheetParticle
     }
 
     @Override
-    public ParticleRenderType getRenderType()
+    public SingleQuadParticle.Layer getLayer()
     {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
     public static class Factory implements ParticleProvider<SimpleParticleType>
     {
-        private SpriteSet spriteSet;
+        private final SpriteSet spriteSet;
 
         public Factory(SpriteSet spriteSet)
         {
@@ -106,7 +89,16 @@ public class SleepingParticle extends TextureSheetParticle
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType particleType, ClientLevel world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed)
+        public Particle createParticle(
+          SimpleParticleType particleType,
+          ClientLevel world,
+          double x,
+          double y,
+          double z,
+          double xSpeed,
+          double ySpeed,
+          double zSpeed,
+          RandomSource random)
         {
             return new SleepingParticle(spriteSet, world, x, y, z, xSpeed, ySpeed, zSpeed);
         }

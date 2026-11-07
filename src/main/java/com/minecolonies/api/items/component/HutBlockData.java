@@ -47,7 +47,7 @@ public record HutBlockData(int level, boolean pastable) implements TooltipProvid
     }
 
     @Override
-    public void addToTooltip(@NotNull final Item.TooltipContext context, @NotNull final Consumer<Component> tooltip, @NotNull final TooltipFlag flags)
+    public void addToTooltip(@NotNull final Item.TooltipContext context, @NotNull final Consumer<Component> tooltip, @NotNull final TooltipFlag flags, @NotNull final net.minecraft.core.component.DataComponentGetter componentGetter)
     {
         final Component level = Component.literal(String.valueOf(this.level)).withStyle(ChatFormatting.GOLD);
         tooltip.accept(Component.translatable("item.minecolonies.hut.level", level).withStyle(ChatFormatting.GREEN));

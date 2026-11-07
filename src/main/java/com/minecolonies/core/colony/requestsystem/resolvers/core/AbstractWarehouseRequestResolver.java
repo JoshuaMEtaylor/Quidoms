@@ -77,7 +77,7 @@ public abstract class AbstractWarehouseRequestResolver extends AbstractRequestRe
             return false;
         }
 
-        if (!manager.getColony().getWorld().isClientSide)
+        if (!manager.getColony().getWorld().isClientSide())
         {
             final Colony colony = (Colony) manager.getColony();
             final IBuilding wareHouse = colony.getServerBuildingManager().getBuilding(getLocation().getInDimensionLocation());
@@ -157,7 +157,7 @@ public abstract class AbstractWarehouseRequestResolver extends AbstractRequestRe
     @Override
     public List<IToken<?>> attemptResolveRequest(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> request)
     {
-        if (manager.getColony().getWorld().isClientSide)
+        if (manager.getColony().getWorld().isClientSide())
         {
             return Lists.newArrayList();
         }
@@ -237,7 +237,7 @@ public abstract class AbstractWarehouseRequestResolver extends AbstractRequestRe
     @Override
     public List<IRequest<?>> getFollowupRequestForCompletion(@NotNull final IRequestManager manager, @NotNull final IRequest<? extends IDeliverable> completedRequest)
     {
-        if (manager.getColony().getWorld().isClientSide)
+        if (manager.getColony().getWorld().isClientSide())
         {
             return null;
         }

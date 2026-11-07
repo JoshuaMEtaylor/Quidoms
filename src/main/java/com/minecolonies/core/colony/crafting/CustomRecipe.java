@@ -282,7 +282,8 @@ public class CustomRecipe
 
         if (recipeJson.has(RECIPE_RESULT_PROP))
         {
-            recipe.result = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, recipeJson.get(RECIPE_RESULT_PROP));
+            final ItemStack parsed = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, recipeJson.get(RECIPE_RESULT_PROP));
+            recipe.result = parsed != null ? parsed : ItemStack.EMPTY;
         }
         else
         {
@@ -297,7 +298,7 @@ public class CustomRecipe
         if (recipeJson.has(RECIPE_TOOL_PROP))
         {
             String resLoc = recipeJson.get(RECIPE_TOOL_PROP).getAsString();
-            recipe.requiredTool = ModEquipmentTypes.getRegistry().get(EquipmentTypeEntry.parseResourceLocation(resLoc));
+            recipe.requiredTool = ModEquipmentTypes.getRegistry().getValue(EquipmentTypeEntry.parseResourceLocation(resLoc));
         }
 
         if (recipeJson.has(RECIPE_SECONDARY_PROP))
@@ -307,7 +308,7 @@ public class CustomRecipe
                 if (e.isJsonObject())
                 {
                     ItemStack stack = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, e);
-                    if (!stack.isEmpty())
+                    if (stack != null && !stack.isEmpty())
                     {
                         recipe.secondary.add(stack);
                     }
@@ -322,7 +323,7 @@ public class CustomRecipe
                 if (e.isJsonObject())
                 {
                     ItemStack stack = Utils.deserializeCodecMessFromJson(ItemStack.OPTIONAL_CODEC, provider, e);
-                    if (!stack.isEmpty())
+                    if (stack != null && !stack.isEmpty())
                     {
                         recipe.altOutputs.add(stack);
                     }
@@ -336,7 +337,7 @@ public class CustomRecipe
         }
         if (recipeJson.has(RECIPE_INTERMEDIATE_PROP))
         {
-            recipe.intermediate = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(recipeJson.get(RECIPE_INTERMEDIATE_PROP).getAsString()));
+            recipe.intermediate = BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(recipeJson.get(RECIPE_INTERMEDIATE_PROP).getAsString()));
         }
         else
         {
@@ -931,7 +932,7 @@ public class CustomRecipe
         {
             lootTable = null;
         }
-        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().get(buffer.readResourceLocation());
+        final EquipmentTypeEntry requiredTool = ModEquipmentTypes.getRegistry().getValue(buffer.readResourceLocation());
         final int minBldgLevel = buffer.readVarInt();
         final int maxBldgLevel = buffer.readVarInt();
         final boolean mustExist = buffer.readBoolean();
@@ -953,7 +954,7 @@ public class CustomRecipe
             altOutputs.add(Utils.deserializeCodecMess(buffer));
         }
 
-        final Block intermediate = BuiltInRegistries.BLOCK.get(buffer.readResourceLocation());
+        final Block intermediate = BuiltInRegistries.BLOCK.getValue(buffer.readResourceLocation());
 
         return new CustomRecipe(crafter, minBldgLevel, maxBldgLevel, mustExist, showTooltip, recipeId,
                 researchReq, researchExclude, lootTable, requiredTool,

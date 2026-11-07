@@ -10,7 +10,7 @@ import net.minecraft.client.model.geom.builders.*;
 /**
  * General amazon model.
  */
-public class ModelAmazon extends AmazonModel<AbstractEntityMinecoloniesMonster>
+public class ModelAmazon extends AmazonModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     /**
      * Create an instance of it.

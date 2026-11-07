@@ -182,7 +182,7 @@ public class EntityMercenaryAI extends Goal
             else
             {
                 movingToBuilding = false;
-                currentPatrolPos = BlockPosUtil.getRandomPosition(entity.getCommandSenderWorld(), entity.blockPosition(), entity.blockPosition(), 10, 27);
+                currentPatrolPos = BlockPosUtil.getRandomPosition(entity.level(), entity.blockPosition(), entity.blockPosition(), 10, 27);
             }
         }
 

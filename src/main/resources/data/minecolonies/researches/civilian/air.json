@@ -1,0 +1,19 @@
+{
+  "branch": "minecolonies:civilian",
+  "costs": [
+    {
+      "ingredient": "minecraft:heart_of_the_sea",
+      "count": 1
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/air",
+      "level": 1
+    }
+  ],
+  "icon": "minecraft:potion",
+  "parentResearch": "minecolonies:civilian/ambition",
+  "researchLevel": 2,
+  "sortOrder": 1
+}

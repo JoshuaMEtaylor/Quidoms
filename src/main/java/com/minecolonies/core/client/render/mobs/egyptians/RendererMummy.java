@@ -5,29 +5,20 @@ import com.minecolonies.core.client.model.raiders.ModelMummy;
 import com.minecolonies.core.event.ClientRegistryHandler;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * Renderer used for mummies.
- */
 public class RendererMummy extends AbstractRendererEgyptian<AbstractEntityMinecoloniesMonster, ModelMummy>
 {
-    /**
-     * Texture of the entity.
-     */
-    private static final ResourceLocation TEXTURE = new ResourceLocation("minecolonies", "textures/entity/raiders/mummy.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("minecolonies", "textures/entity/raiders/mummy.png");
 
-    /**
-     * Constructor method for renderer
-     *
-     * @param context the renderManager
-     */
     public RendererMummy(final EntityRendererProvider.Context context)
     {
         super(context, new ModelMummy(context.bakeLayer(ClientRegistryHandler.MUMMY)), 0.5F);
     }
 
+    @NotNull
     @Override
-    public ResourceLocation getTextureLocation(final AbstractEntityMinecoloniesMonster entity)
+    public ResourceLocation getTextureLocation(final net.minecraft.client.renderer.entity.state.HumanoidRenderState state)
     {
         return TEXTURE;
     }

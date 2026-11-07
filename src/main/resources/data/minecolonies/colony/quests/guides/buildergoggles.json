@@ -1,18 +1,84 @@
 {
-  "name": "The Builder's Glasses",
   "max-occurrences": 1,
+  "name": "minecolonies.quests.guides.buildergoggles",
+  "objectives": [
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.guides.buildergoggles.obj0.answer0",
+          "result": {
+            "type": "minecolonies:advanceobjective",
+            "go-to": 1
+          }
+        },
+        {
+          "answer": "minecolonies.quests.guides.buildergoggles.obj0.answer1",
+          "result": {
+            "type": "minecolonies:return"
+          }
+        },
+        {
+          "answer": "minecolonies.quests.guides.buildergoggles.obj0.answer2",
+          "result": {
+            "type": "minecolonies:advanceobjective",
+            "go-to": -1
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.guides.buildergoggles.obj0"
+    },
+    {
+      "type": "minecolonies:delivery",
+      "details": {
+        "item": {
+          "id": "minecolonies:build_goggles"
+        },
+        "next-objective": 2,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.guides.buildergoggles.obj2.answer0",
+          "result": {
+            "type": "minecolonies:advanceobjective",
+            "go-to": 3
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.guides.buildergoggles.obj2",
+      "unlocks-rewards": [
+        0
+      ]
+    }
+  ],
   "parents": [
     "minecolonies:tutorial/builder"
+  ],
+  "rewards": [
+    {
+      "type": "minecolonies:item",
+      "details": {
+        "item": {
+          "id": "minecolonies:build_goggles"
+        }
+      }
+    }
   ],
   "triggers": [
     {
       "type": "minecolonies:state",
       "state": {
-        "path": "buildingManager/buildings",
         "match": {
           "type": "minecolonies:builder",
           "level": 2
-        }
+        },
+        "path": "buildingManager/buildings"
       }
     },
     {
@@ -22,70 +88,6 @@
           "job": {
             "type": "minecolonies:builder"
           }
-        }
-      }
-    }
-  ],
-  "objectives": [
-    {
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Hey there! Can I ask you for a favor? I lost my glasses the other day and I can't see very well without them. Do you think you could get me a new pair of builders goggles?",
-      "options": [
-        {
-          "answer": "Of course, I'll see what I can do!",
-          "result": {
-            "type": "minecolonies:advanceobjective",
-            "go-to": 1
-          }
-        },
-        {
-          "answer": "Sorry, I don't have time to help you right now.",
-          "result": {
-            "type": "minecolonies:return"
-          }
-        },
-        {
-          "answer": "I already know all about the builder goggles. You'll be fine without them!",
-          "result": {
-            "type": "minecolonies:advanceobjective",
-            "go-to": -1
-          }
-        }
-      ]
-    },
-    {
-      "type": "minecolonies:delivery",
-      "details": {
-        "target": 0,
-        "item": {
-          "id": "minecolonies:build_goggles"
-        },
-        "next-objective": 2
-      }
-    },
-    {
-      "type": "minecolonies:dialogue",
-      "unlocks-rewards": [0],
-      "target": 0,
-      "text": "Ah, you found my glasses! Thank you so much. I can finally see clearly what I'm building again. You should try them out sometime, they're pretty neat.",
-      "options": [
-        {
-          "answer": "You're welcome!",
-          "result": {
-            "type": "minecolonies:advanceobjective",
-            "go-to": 3
-          }
-        }
-      ]
-    }
-  ],
-  "rewards": [
-    {
-      "type": "minecolonies:item",
-      "details": {
-        "item": {
-          "id": "minecolonies:build_goggles"
         }
       }
     }

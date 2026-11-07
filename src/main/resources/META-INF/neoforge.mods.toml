@@ -9,7 +9,7 @@ version="${version}"
 displayName="Quidoms"
 displayURL="https://github.com/JoshuaMEtaylor/Quidoms"
 logoFile="minecolonies_logo.png"
-credits="Based on MineColonies by LDT Team (GPL-3.0). Quidoms fork changes: no raids, unbreakable any-tier colonist tools, ingredient BOM builds."
+credits="Based on MineColonies by LDT Team (GPL-3.0). Quidoms fork changes: no raids, unbreakable any-tier colonist tools, ingredient BOM builds. Vendors Structurize/BlockUI/Domum/MultiPiston."
 authors="JoshuaMEtaylor; LDT Team (upstream MineColonies)"
 description='''
 Quidoms is a colony simulator for NeoForge based on the full MineColonies codebase (LDT Team, GPL-3.0).
@@ -19,8 +19,36 @@ Quidoms product changes on top of upstream:
 - Colonist tools are unbreakable and ignore hut/citizen tool-level gates (player-equivalent stats/enchants kept).
 - Building material lists expand to recursive crafting ingredients where recipes allow.
 
-Requires Structurize, BlockUI, Domum Ornamentum, and MultiPiston matching the 1.21.1 NeoForge line.
+LDT libraries (Structurize, BlockUI, Domum Ornamentum, MultiPiston) are baked into this jar (compiled for NeoForge 1.21.10).
 '''
+
+[[mods]]
+modId="blockui"
+version="${blockUI_version}"
+displayName="BlockUI"
+authors="LDT Team"
+description="BlockUI library (vendored into Quidoms for 1.21.10)."
+
+[[mods]]
+modId="structurize"
+version="${structurize_version}"
+displayName="Structurize"
+authors="LDT Team"
+description="Structurize library (vendored into Quidoms for 1.21.10)."
+
+[[mods]]
+modId="domum_ornamentum"
+version="${domumOrnamentumVersion}"
+displayName="Domum Ornamentum"
+authors="LDT Team"
+description="Domum Ornamentum library (vendored into Quidoms for 1.21.10)."
+
+[[mods]]
+modId="multipiston"
+version="${multiPistonVersion}"
+displayName="Multi-Piston"
+authors="LDT Team"
+description="Multi-Piston library (vendored into Quidoms for 1.21.10)."
 
 [[accessTransformers]]
 file="META-INF/accesstransformer.cfg"
@@ -50,16 +78,22 @@ file="META-INF/accesstransformer.cfg"
     ordering="AFTER"
     side="BOTH"
 [[dependencies.minecolonies]]
-    modId="jei"
-    type="optional"
-    versionRange="[${jei_version},)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.minecolonies]]
     modId="domum_ornamentum"
     type="required"
     versionRange="[${domumOrnamentumVersion}, )"
     ordering="AFTER"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="multipiston"
+    type="required"
+    versionRange="[${multiPistonVersion}, )"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="jei"
+    type="optional"
+    versionRange="[${jei_version},)"
+    ordering="NONE"
     side="BOTH"
 [[dependencies.minecolonies]]
     modId="journeymap"
@@ -72,4 +106,74 @@ file="META-INF/accesstransformer.cfg"
     type="optional"
     versionRange="[${dynamicTreesVersion},)"
     ordering="NONE"
+    side="BOTH"
+
+[[dependencies.structurize]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${forgeMinVersion}, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.structurize]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_range}"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.structurize]]
+    modId="blockui"
+    type="required"
+    versionRange="[${blockUI_version}, )"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.structurize]]
+    modId="domum_ornamentum"
+    type="required"
+    versionRange="[${domumOrnamentumVersion}, )"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.blockui]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${forgeMinVersion}, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.blockui]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.domum_ornamentum]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${forgeMinVersion}, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.domum_ornamentum]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.multipiston]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${forgeMinVersion}, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.multipiston]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_range}"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.multipiston]]
+    modId="blockui"
+    type="required"
+    versionRange="[${blockUI_version}, )"
+    ordering="AFTER"
     side="BOTH"

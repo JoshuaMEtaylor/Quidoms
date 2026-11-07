@@ -8,7 +8,8 @@
     "2": "block/oak_log_top",
     "3": "block/oak_log",
     "5": "minecolonies:block/books/barrackstextures",
-    "particle": "block/oak_planks"
+    "particle": "block/oak_planks",
+    "all": "minecraft:block/oak_planks"
   },
   "elements": [
     {

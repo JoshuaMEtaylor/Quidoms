@@ -6,17 +6,14 @@
 
 package com.minecolonies.core.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.model.HumanoidModel;
-import org.jetbrains.annotations.NotNull;
 
-public class ScarecrowModel extends Model
+public class ScarecrowModel extends Model<Object>
 {
     //fields
     ModelPart head;
@@ -33,7 +30,7 @@ public class ScarecrowModel extends Model
 
     public ScarecrowModel(final ModelPart part)
     {
-        super(RenderType::entitySolid);
+        super(part, rl -> RenderType.entitySolid(rl));
         head = part.getChild("head");
         post = part.getChild("post");
         leftArmPeg = part.getChild("leftArmPeg");
@@ -98,25 +95,5 @@ public class ScarecrowModel extends Model
 
         return LayerDefinition.create(meshdefinition,  128,  64 );
     }
-
-    @Override
-    public void renderToBuffer(
-      final @NotNull PoseStack stack,
-      final @NotNull VertexConsumer iVertexBuilder,
-      final int p_225598_3_,
-      final int p_225598_4_,
-      final int p_350308_)
-    {
-        head.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        post.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        leftArmPeg.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        rightArmPeg.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        torso.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        rightLegPeg.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        leftLegPeg.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        leftArm.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        rightArm.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        rightLeg.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-        leftLeg.render(stack, iVertexBuilder, p_225598_3_, p_225598_4_);
-    }
+    // renderToBuffer is final on Model in 1.21.10; root ModelPart renders children
 }

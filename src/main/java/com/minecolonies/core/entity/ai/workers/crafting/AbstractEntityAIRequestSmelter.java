@@ -133,7 +133,7 @@ public abstract class AbstractEntityAIRequestSmelter<J extends AbstractJobCrafte
                     {
                         if (furnace.isLit())
                         {
-                            FurnaceBlockEntity.serverTick(furnace.getLevel(), entity.getBlockPos(), entity.getBlockState(), furnace);
+                            FurnaceBlockEntity.serverTick((net.minecraft.server.level.ServerLevel) furnace.getLevel(), entity.getBlockPos(), entity.getBlockState(), furnace);
                         }
                     }
                 }

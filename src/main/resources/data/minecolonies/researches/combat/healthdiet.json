@@ -1,0 +1,30 @@
+{
+  "branch": "minecolonies:combat",
+  "costs": [
+    {
+      "ingredient": "minecraft:hay_block",
+      "count": 2
+    },
+    {
+      "ingredient": "minecraft:apple",
+      "count": 8
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/mounthealth",
+      "level": 2
+    }
+  ],
+  "icon": "minecraft:hay_block",
+  "parentResearch": "minecolonies:combat/ivermectin",
+  "requirements": [
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:stable",
+      "level": 3
+    }
+  ],
+  "researchLevel": 4,
+  "subtitle": "com.minecolonies.research.combat.healthdiet.subtitle"
+}

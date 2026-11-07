@@ -24,7 +24,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -251,10 +250,10 @@ public class WindowPostBoxMain extends AbstractWindowSkeleton
     private void updateResources()
     {
         final Predicate<ItemStack> filterPredicate =
-            stack -> filter.isEmpty() || stack.getDescriptionId().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US)) || stack.getHoverName()
+            stack -> filter.isEmpty() || stack.getItem().getDescriptionId().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US)) || stack.getHoverName()
                 .getString()
                 .toLowerCase(Locale.US)
-                .contains(filter.toLowerCase(Locale.US)) || (stack.getItem() instanceof EnchantedBookItem && stack.getTagEnchantments()
+                .contains(filter.toLowerCase(Locale.US)) || (stack.get(net.minecraft.core.component.DataComponents.STORED_ENCHANTMENTS) != null && stack.get(net.minecraft.core.component.DataComponents.STORED_ENCHANTMENTS)
                 .entrySet()
                 .stream()
                 .anyMatch(f -> f.getKey().getRegisteredName().contains(filter.toLowerCase(Locale.US))));

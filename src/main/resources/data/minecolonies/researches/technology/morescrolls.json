@@ -1,0 +1,33 @@
+{
+  "branch": "minecolonies:technology",
+  "costs": [
+    {
+      "ingredient": "minecraft:paper",
+      "count": 64
+    },
+    {
+      "ingredient": "minecolonies:ancienttome",
+      "count": 1
+    },
+    {
+      "ingredient": "minecraft:lapis_lazuli",
+      "count": 64
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/morescrollsunlock",
+      "level": 1
+    }
+  ],
+  "icon": "minecolonies:scroll_highlight",
+  "requirements": [
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:enchanter",
+      "level": 3
+    }
+  ],
+  "researchLevel": 1,
+  "sortOrder": 3
+}

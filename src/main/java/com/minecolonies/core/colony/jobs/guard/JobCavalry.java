@@ -92,7 +92,7 @@ public class JobCavalry extends AbstractJobGuard<JobCavalry>
 
         if (myMount != null)
         {
-            compound.putUUID(TAG_MOUNT, myMount);
+            compound.store(TAG_MOUNT, net.minecraft.core.UUIDUtil.CODEC, myMount);
         }
 
         return compound;
@@ -102,7 +102,7 @@ public class JobCavalry extends AbstractJobGuard<JobCavalry>
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        myMount = compound.contains(TAG_MOUNT) ? compound.getUUID(TAG_MOUNT) : null;
+        myMount = compound.read(TAG_MOUNT, net.minecraft.core.UUIDUtil.CODEC).orElse(null);
     }
 
     /**

@@ -277,7 +277,7 @@ public class ContainerCraftingFurnace extends AbstractContainerMenu
      */
     private void updateFurnaceOutput()
     {
-        if (!playerInventory.player.level().isClientSide)
+        if (!playerInventory.player.level().isClientSide())
         {
             final ServerPlayer player = (ServerPlayer) playerInventory.player;
             final ItemStack result = IMinecoloniesAPI.getInstance().getFurnaceRecipes().getSmeltingResult(furnaceInventory.getStackInSlot(0));

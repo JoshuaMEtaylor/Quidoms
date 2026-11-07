@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:raw_noodle",
+    "minecolonies:butter",
+    "minecraft:bowl",
+    "minecolonies:garlic"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:pasta_plain"
+  }
+}
