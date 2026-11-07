@@ -4,7 +4,7 @@ import com.ldtteam.common.network.AbstractClientPlayMessage;
 import com.ldtteam.common.network.PlayMessageType;
 import com.minecolonies.api.util.Utils;
 import com.minecolonies.api.util.constant.Constants;
-import com.minecolonies.core.client.gui.WindowSuggestBuildTool;
+import com.minecolonies.core.network.messages.server.DirectPlaceMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -70,6 +70,7 @@ public class OpenSuggestionWindowMessage extends AbstractClientPlayMessage
     @Override
     protected void onExecute(final IPayloadContext ctxIn, final Player player)
     {
-        new WindowSuggestBuildTool(pos, state, stack).open();
+        // Quidoms: place hut/town-hall directly — no Structurize build-tool suggest workflow.
+        new DirectPlaceMessage(state, pos, stack).sendToServer();
     }
 }
