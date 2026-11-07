@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
@@ -134,27 +133,20 @@ public interface IMateriallyTexturedBlock
     }
 
     default void fillDOItemCategory(final Block inputBlock, final @NotNull NonNullList<ItemStack> items, List<ItemStack> fillItemGroupCache) {
-        // Quidoms: soft-skip races with tag reload / CompatibilityManager deserialize
-        // clearing fillItemGroupCache while creative-tab fill iterates it.
+        if (!fillItemGroupCache.isEmpty()) {
+            items.addAll(fillItemGroupCache);
+            return;
+        }
+
         try {
-            if (!fillItemGroupCache.isEmpty()) {
-                items.addAll(new ArrayList<>(fillItemGroupCache));
-                return;
-            }
-
-            try {
-                final ItemStack result = new ItemStack(inputBlock);
-                fillItemGroupCache.add(result);
-            }
-            catch (IllegalStateException exception) {
-                //Ignored. Thrown during start up.
-            }
-
-            items.addAll(new ArrayList<>(fillItemGroupCache));
+            final ItemStack result = new ItemStack(inputBlock);
+            fillItemGroupCache.add(result);
         }
-        catch (final ConcurrentModificationException ignored) {
-            // Soft: concurrent cache clear during compat discovery.
+        catch (IllegalStateException exception) {
+            //Ignored. Thrown during start up.
         }
+
+        items.addAll(fillItemGroupCache);
     }
 
     /**
