@@ -126,11 +126,9 @@ public final class RecipeAnalyzer
                     animals.add(animal);
                 }
             }
-            catch (final Throwable t)
+            catch (final LinkageError | Exception ex) 
             {
-                // Quidoms/1.21.10: visitor/mercenary/cavalry_horse etc. NPE when pathFinder is null
-                // outside a real spawn. Soft-skip — do not ERROR-spam the log.
-                Log.getLogger().debug("Skipping animal probe for {}: {}", id, t.toString());
+                Log.getLogger().error("Couldnt analyze animal: {}. Please report this to the author of {}." , id, id.getNamespace(), ex);
             }
         }
 

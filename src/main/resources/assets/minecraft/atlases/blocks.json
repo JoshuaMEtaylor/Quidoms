@@ -2,31 +2,31 @@
   "sources": [
     {
       "type": "minecraft:single",
-      "resource": "minecolonies:block/compat/chest_normal"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "minecolonies:block/compat/horse_gray"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "minecolonies:block/compat/chicken"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "minecolonies:block/compat/armorstand_wood"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "minecolonies:block/compat/zombified_piglin"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "minecolonies:block/compat/leather_armor"
-    },
-    {
-      "type": "minecraft:single",
       "resource": "minecolonies:map/map_icons"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:entity/chest/normal"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:entity/horse/horse_gray"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:entity/chicken/temperate_chicken"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:entity/armorstand/wood"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:entity/piglin/zombified_piglin"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:entity/equipment/humanoid/leather"
     },
     {
       "type": "minecraft:single",
