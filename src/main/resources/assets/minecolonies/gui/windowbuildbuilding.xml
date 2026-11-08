@@ -1,10 +1,9 @@
 <!--
-  BlockUI default window is 420×240. Upstream layout uses that canvas (cancel @ x=400,
-  footer @ y=220). Stretch parchment to fill; keep content inset so the 8px list
-  scrollbar stays on the paper.
+  Upstream MineColonies build window is BlockUI default 420×240.
+  Parchment fills the canvas; list uses 80%×80% with icon+name+qty-from-right
+  so rows stay fully inside the paper (no left-clip orphan quantities).
 -->
-<window size="420 240"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         lightbox="true">
 
@@ -45,12 +44,11 @@
     <button id="cancel" size="14 15" pos="390 8"
                  source="minecolonies:textures/gui/button_x.png" color="black"/>
 
-    <!-- 380 wide @ x=20 → right edge 400; scrollbar (8px) ends at 408 inside 420 -->
-    <list id="resources" size="380 170" pos="20 30">
+    <list id="resources" size="80% 75%" pos="30 32">
         <box size="100% 30" linewidth="1">
             <itemicon id="resourceIcon" size="24 24" pos="3 3"/>
-            <text id="resourceName" size="280 12" pos="33 9" color="black" textalign="MIDDLE_LEFT"/>
-            <text id="resourceQuantity" size="40 12" pos="320 9" color="black" textalign="MIDDLE_RIGHT"/>
+            <text id="resourceName" size="70% 12" pos="33 9" color="black" textalign="MIDDLE_LEFT"/>
+            <text id="resourceQuantity" align="MIDDLE_RIGHT" size="36 12" pos="12 9" color="black" textalign="MIDDLE_RIGHT"/>
         </box>
     </list>
 

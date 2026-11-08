@@ -593,16 +593,19 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
                 final ItemStorage resource = tempRes.get(index);
                 final Text resourceLabel = rowPane.findPaneOfTypeByID(RESOURCE_NAME, Text.class);
                 final Text quantityLabel = rowPane.findPaneOfTypeByID(RESOURCE_QUANTITY_MISSING, Text.class);
-                // Resolve hover name to a plain string so BlockUI shows the translated label
-                // (nested Domum format components otherwise leak raw lang keys when clipped).
+                final ItemIcon icon = rowPane.findPaneOfTypeByID(RESOURCE_ICON, ItemIcon.class);
                 final ItemStack displayStack = resource.getItemStack();
+                // Plain translated string (Domum nested components) + force panes visible/opaque.
                 resourceLabel.setText(Component.literal(displayStack.getHoverName().getString()));
                 quantityLabel.setText(Component.literal(Integer.toString(resource.getAmount())));
                 resourceLabel.setColors(INK);
                 quantityLabel.setColors(INK);
+                resourceLabel.show();
+                quantityLabel.show();
                 final ItemStack itemIcon = displayStack.copy();
                 itemIcon.setCount(1);
-                rowPane.findPaneOfTypeByID(RESOURCE_ICON, ItemIcon.class).setItem(itemIcon);
+                icon.setItem(itemIcon);
+                icon.show();
             }
         });
     }

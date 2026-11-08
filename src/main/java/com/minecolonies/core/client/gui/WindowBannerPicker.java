@@ -169,8 +169,11 @@ public class WindowBannerPicker extends Screen
             final int posY = center(this.height + 30, PATTERN_ROWS, PATTERN_HEIGHT, Math.floorDiv(i, PATTERN_COLUMNS), PATTERN_MARGIN);
 
             final PatternButton button = new PatternButton(posX, posY, PATTERN_HEIGHT, patterns.get(i));
-            // Start hidden so stale hitboxes cannot steal Done/Cancel before first render.
-            button.visible = false;
+            // Rows beyond the first page start parked off-screen (still visible for later render).
+            if (i >= PATTERN_COLUMNS * PATTERN_ROWS)
+            {
+                button.setY(-10000);
+            }
             button.active = false;
             this.addRenderableWidget(button);
 
@@ -463,8 +466,7 @@ public class WindowBannerPicker extends Screen
         @Override
         public void onPress(final InputWithModifiers input)
         {
-            // Guard again — off-page buttons must never change the layer.
-            if (!this.blocked && activeLayer > 0 && inVisiblePage())
+            if (!this.blocked && activeLayer > 0 && inVisiblePage() && this.active)
             {
                 setLayer(this.pattern, colors.getSelected());
             }
@@ -473,7 +475,9 @@ public class WindowBannerPicker extends Screen
         @Override
         public boolean isMouseOver(final double mx, final double my)
         {
-            if (activeLayer == 0 || !inVisiblePage() || this.blocked)
+            // Click filter only — never toggle visible (Screen skips renderWidget when false,
+            // which permanently erased the pattern grid after opening on Base).
+            if (activeLayer == 0 || this.blocked || !inVisiblePage())
             {
                 return false;
             }
@@ -483,21 +487,21 @@ public class WindowBannerPicker extends Screen
         @Override
         public void renderWidget(final GuiGraphics stack, int mx, int my, float partial)
         {
-            final boolean onPage = inVisiblePage();
-            // CRITICAL: off-page / Base-layer buttons must be inactive+invisible or their
-            // stale hitboxes (near the bottom) steal Done/Cancel and "cycle" patterns.
-            final boolean show = activeLayer > 0 && onPage;
-            this.visible = show;
-            this.active = show && !this.blocked;
+            this.visible = true;
 
-            if (!show)
+            if (!inVisiblePage())
             {
+                // Park off-screen so init Y cannot cover Done/Cancel; keep visible so we re-render.
+                this.setY(-10000);
+                this.active = false;
                 return;
             }
 
             final int position = Math.floorDiv(this.index - scrollRow * PATTERN_COLUMNS, PATTERN_COLUMNS);
             this.setY(center(WindowBannerPicker.this.height, PATTERN_ROWS, PATTERN_HEIGHT, position, PATTERN_MARGIN));
-            this.isHovered = mx >= this.getX() && my >= this.getY()
+            // Always draw the grid (including on Base); clicks only on layers 1–6.
+            this.active = activeLayer > 0 && !this.blocked;
+            this.isHovered = this.active && mx >= this.getX() && my >= this.getY()
               && mx < this.getX() + this.width && my < this.getY() + this.height;
 
             try
@@ -519,7 +523,7 @@ public class WindowBannerPicker extends Screen
                 stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x66FFFFFF);
             }
 
-            if (activeLayer < layers.size() && layers.get(activeLayer).pattern() == this.pattern)
+            if (activeLayer > 0 && activeLayer < layers.size() && layers.get(activeLayer).pattern() == this.pattern)
             {
                 stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x66DD88FF);
             }
