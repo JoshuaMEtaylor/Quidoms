@@ -33,7 +33,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -48,6 +47,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Assistant Hammer item used to allow the player to assist the builder in building
@@ -184,7 +185,7 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
     @Override
     public InteractionResult useOn(UseOnContext context)
     {
-        if (context.getLevel().isClientSide)
+        if (context.getLevel().isClientSide())
         {
             final BlockPos interactPos = context.getClickedPos().relative(context.getClickedFace());
             useOnBlock(context.getPlayer(), interactPos);
@@ -195,15 +196,15 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
 
     @NotNull
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
+    public InteractionResult use(Level level, Player player, InteractionHand hand)
     {
-        if (level.isClientSide)
+        if (level.isClientSide())
         {
             final BlockPos interactPos = BlockPos.containing(player.getEyePosition().add(player.getLookAngle().multiply(3, 3, 3)));
             useOnBlock(player, interactPos);
         }
 
-        return InteractionResultHolder.success(player.getMainHandItem());
+        return InteractionResult.SUCCESS;
     }
 
     /**
@@ -223,7 +224,7 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
     {
         final BlockPos.MutableBlockPos workPos = new BlockPos.MutableBlockPos();
         boolean areBlocksToBuildNearby = false;
-        player.getCooldowns().addCooldown(this, 5);
+        player.getCooldowns().addCooldown(new ItemStack(this), 5);
 
         for (int currentDistance = 0; currentDistance <= reach; currentDistance++)
         {
@@ -286,7 +287,7 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
                             for (final ItemStack required : requiredItem)
                             {
                                 boolean found = false;
-                                for (final ItemStack stack : player.getInventory().items)
+                                for (final ItemStack stack : player.getInventory().getNonEquipmentItems())
                                 {
                                     if (ItemStackUtils.compareItemStacksIgnoreStackSize(required, stack))
                                     {
@@ -333,7 +334,7 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
                         }
 
                         // Server message
-                        if (colony.getWorld().isClientSide)
+                        if (colony.getWorld().isClientSide())
                         {
                             new PlayerAssistantBuildRequestMessage(colony, workOrder.getID(), interactPos).sendToServer();
                         }
@@ -410,9 +411,9 @@ public class ItemAssistantHammer extends AbstractItemMinecolonies
         boolean didTryBuilding) {}
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltipList, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltipList, @NotNull final TooltipFlag flagIn)
     {
-        tooltipList.add(Component.translatable("item.minecolonies.assistanthammer.reach", reach).withStyle(ChatFormatting.BLUE));
-        tooltipList.add(Component.translatable("item.minecolonies.assistanthammer.desc").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
+        tooltipList.accept(Component.translatable("item.minecolonies.assistanthammer.reach", reach).withStyle(ChatFormatting.BLUE));
+        tooltipList.accept(Component.translatable("item.minecolonies.assistanthammer.desc").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
     }
 }

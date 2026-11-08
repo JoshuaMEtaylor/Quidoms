@@ -391,12 +391,12 @@ public abstract class AbstractEntityAIGuard<J extends AbstractJobGuard<J>, B ext
      */
     private IAIState flee()
     {
-        if (!worker.hasEffect(MobEffects.MOVEMENT_SPEED))
+        if (!worker.hasEffect(MobEffects.SPEED))
         {
             final double effect = worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(FLEEING_SPEED);
             if (effect > 0)
             {
-                worker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, (int) (0 + effect)));
+                worker.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, (int) (0 + effect)));
             }
         }
 
@@ -439,7 +439,7 @@ public abstract class AbstractEntityAIGuard<J extends AbstractJobGuard<J>, B ext
     {
         if (BlockPosUtil.getDistance2D(worker.blockPosition(), buildingGuards.getPositionToFollow()) > MAX_FOLLOW_DERIVATION)
         {
-            TeleportHelper.teleportCitizen(worker, worker.getCommandSenderWorld(), buildingGuards.getPositionToFollow());
+            TeleportHelper.teleportCitizen(worker, worker.level(), buildingGuards.getPositionToFollow());
             return null;
         }
 
@@ -467,12 +467,12 @@ public abstract class AbstractEntityAIGuard<J extends AbstractJobGuard<J>, B ext
                                                randomGenerator.nextInt(GUARD_FOLLOW_TIGHT_RANGE) - GUARD_FOLLOW_TIGHT_RANGE / 2),
           GUARD_FOLLOW_TIGHT_RANGE) && citizenData != null)
         {
-            if (!worker.hasEffect(MobEffects.MOVEMENT_SPEED))
+            if (!worker.hasEffect(MobEffects.SPEED))
             {
                 // Guards will rally faster with higher skill.
                 // Considering 99 is the maximum for any skill, the maximum theoretical getJobModifier() = 99 + 99/4 = 124. We want them to have Speed 5
                 // when they're at half-max, so at about skill60. Therefore, divide the skill by 20.
-                worker.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED,
+                worker.addEffect(new MobEffectInstance(MobEffects.SPEED,
                   5 * TICKS_SECOND,
                     Mth.clamp((citizenData.getCitizenSkillHandler().getLevel(Skill.Adaptability) / 30), 0, 3),
                   false,

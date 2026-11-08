@@ -21,7 +21,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -100,17 +99,13 @@ public class BuildingNetherWorker extends AbstractBuilding
         keepX.put(itemStack -> itemStack.getItem() instanceof FlintAndSteelItem, new Tuple<>(1, true));
 
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-            && itemStack.getItem() instanceof ArmorItem
-            && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.HEAD, new Tuple<>(1, true));
+            && EquipmentSlot.HEAD.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-            && itemStack.getItem() instanceof ArmorItem
-            && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.CHEST, new Tuple<>(1, true));
+            && EquipmentSlot.CHEST.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-            && itemStack.getItem() instanceof ArmorItem
-            && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.LEGS, new Tuple<>(1, true));
+            && EquipmentSlot.LEGS.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
         keepX.put(itemStack -> !ItemStackUtils.isEmpty(itemStack)
-            && itemStack.getItem() instanceof ArmorItem
-            && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == EquipmentSlot.FEET, new Tuple<>(1, true));
+            && EquipmentSlot.FEET.equals(ItemStackUtils.getHumanoidArmorSlot(itemStack)), new Tuple<>(1, true));
     }
 
     @NotNull
@@ -156,12 +151,12 @@ public class BuildingNetherWorker extends AbstractBuilding
         super.deserializeNBT(provider, compound);
         if (compound.contains(TAG_CURRENT_TRIPS))
         {
-            this.currentTrips = compound.getInt(TAG_CURRENT_TRIPS);
+            this.currentTrips = compound.getIntOr(TAG_CURRENT_TRIPS, 0);
         }
 
         if (compound.contains(TAG_CURRENT_DAY))
         {
-            this.currentPeriodDay = compound.getInt(TAG_CURRENT_DAY);
+            this.currentPeriodDay = compound.getIntOr(TAG_CURRENT_DAY, 0);
         }
     }
 

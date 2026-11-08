@@ -97,7 +97,7 @@ public class CommandRaid implements IMCOPCommand
     {
         final ResourceLocation raidType =
             ResourceKeyArgument.resolveKey(context, RAID_TYPE_ARG, CommonMinecoloniesAPIImpl.COLONY_EVENT_TYPES, ERROR_INVALID_COLONY_EVENT_TYPE).getKey().location();
-        final ColonyEventTypeRegistryEntry colonyEventTypeRegistryEntry = IMinecoloniesAPI.getInstance().getColonyEventRegistry().get(raidType);
+        final ColonyEventTypeRegistryEntry colonyEventTypeRegistryEntry = IMinecoloniesAPI.getInstance().getColonyEventRegistry().getValue(raidType);
         if (colonyEventTypeRegistryEntry != null && colonyEventTypeRegistryEntry.isRaidEvent())
         {
             return raidType.getPath();
@@ -155,14 +155,9 @@ public class CommandRaid implements IMCOPCommand
      */
     private int raidExecute(final CommandContext<CommandSourceStack> context, final IRaiderManager.RaidSettings raidSettings)
     {
-        final String raidTime = StringArgumentType.getString(context, RAID_TIME_ARG);
-
-        return switch (raidTime)
-        {
-            case RAID_NOW -> startRaidNow(context, raidSettings);
-            case RAID_TONIGHT -> startRaidTonight(context, raidSettings);
-            default -> 0;
-        };
+        // Quidoms: raids removed — command retained for API shape but never starts an event.
+        context.getSource().sendFailure(Component.literal("Quidoms: raids are disabled; raid commands do nothing."));
+        return 0;
     }
 
     /**

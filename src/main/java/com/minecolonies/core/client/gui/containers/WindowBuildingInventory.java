@@ -73,8 +73,7 @@ public class WindowBuildingInventory extends AbstractContainerScreen<ContainerBu
     {
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        stack.blit(TEXT, i, j, 0, 0, this.imageWidth, this.inventoryRows * SLOT_OFFSET + SLOT_OFFSET - 1, TEXTURE_SIZE, TEXTURE_SIZE);
-        stack.blit(TEXT, i, j + this.inventoryRows * SLOT_OFFSET + SLOT_OFFSET - 1, 0,
-          TEXTURE_OFFSET, this.imageWidth, TEXTURE_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXT, i, j, 0f, 0f, this.imageWidth, this.inventoryRows * SLOT_OFFSET + SLOT_OFFSET - 1, TEXTURE_SIZE, TEXTURE_SIZE);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXT, i, j + this.inventoryRows * SLOT_OFFSET + SLOT_OFFSET - 1, 0f, (float)(TEXTURE_OFFSET), this.imageWidth, TEXTURE_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 }

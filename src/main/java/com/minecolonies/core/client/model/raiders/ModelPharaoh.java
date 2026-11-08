@@ -12,7 +12,7 @@ import net.minecraft.util.Mth;
 /**
  * ModelPharaohMummy. Created using Tabula 7.0.0
  */
-public class ModelPharaoh extends EgyptianModel<AbstractEntityEgyptianRaider>
+public class ModelPharaoh extends EgyptianModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     private ModelPart bodyGoldenStrip;
     private ModelPart jaw;
@@ -157,11 +157,8 @@ public class ModelPharaoh extends EgyptianModel<AbstractEntityEgyptianRaider>
     }
 
     @Override
-    public void setupAnim(AbstractEntityMinecoloniesMonster entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(final net.minecraft.client.renderer.entity.state.HumanoidRenderState state)
     {
-        super.setupAnim(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        this.bodyGoldenStrip.xRot = -Math.max(this.rightLeg.xRot, this.leftLeg.xRot);
-        this.jaw.xRot = 0.3F - 0.1F * sinPi(ageInTicks / 20.0F) % 2.0F;
-        this.jaw.yRot = 0.05F * sinPi((ageInTicks + 10.0F) / 20.0F) % 2.0F;
+        super.setupAnim(state);
     }
 }

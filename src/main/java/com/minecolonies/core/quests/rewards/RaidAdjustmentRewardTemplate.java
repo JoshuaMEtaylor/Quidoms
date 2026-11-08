@@ -42,6 +42,6 @@ public class RaidAdjustmentRewardTemplate implements IQuestRewardTemplate
     @Override
     public void applyReward(final IColony colony, final Player player, final IQuestInstance colonyQuest)
     {
-        colony.getRaiderManager().setNightsSinceLastRaid(colony.getRaiderManager().getNightsSinceLastRaid() + qty);
+        // Quidoms: raids removed — raid-adjustment quest rewards are no-ops.
     }
 }

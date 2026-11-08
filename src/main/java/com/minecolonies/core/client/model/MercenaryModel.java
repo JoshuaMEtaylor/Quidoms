@@ -7,9 +7,9 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
-public class MercenaryModel extends HumanoidModel<PathfinderMob>
+public class MercenaryModel extends HumanoidModel<HumanoidRenderState>
 {
     public MercenaryModel(final ModelPart part)
     {

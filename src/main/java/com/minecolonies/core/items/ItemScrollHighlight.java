@@ -27,6 +27,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Magic scroll which highlights and speedbuffs workers of the building it is applied to
@@ -48,7 +50,7 @@ public class ItemScrollHighlight extends AbstractItemScroll
     public InteractionResult useOn(UseOnContext ctx)
     {
         // Right click on block
-        if (ctx.getLevel().isClientSide || ctx.getPlayer() == null || !ctx.getPlayer().isShiftKeyDown())
+        if (ctx.getLevel().isClientSide() || ctx.getPlayer() == null || !ctx.getPlayer().isShiftKeyDown())
         {
             return InteractionResult.PASS;
         }
@@ -77,7 +79,7 @@ public class ItemScrollHighlight extends AbstractItemScroll
                 if (citizenData.getEntity().isPresent())
                 {
                     citizenData.getEntity().get().addEffect(new MobEffectInstance(MobEffects.GLOWING, TICKS_SECOND * 120));
-                    citizenData.getEntity().get().addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, TICKS_SECOND * 120));
+                    citizenData.getEntity().get().addEffect(new MobEffectInstance(MobEffects.SPEED, TICKS_SECOND * 120));
                 }
             }
 
@@ -100,10 +102,10 @@ public class ItemScrollHighlight extends AbstractItemScroll
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         final MutableComponent guiHint = Component.translatableEscape(TOOL_GENERIC_SCROLL_HIGHLIGHT_DESCRIPTION);
         guiHint.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GREEN));
-        tooltip.add(guiHint);
+        tooltip.accept(guiHint);
     }
 }

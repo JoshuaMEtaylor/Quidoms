@@ -31,7 +31,7 @@ public class BlockWaypoint extends AbstractBlockMinecolonies<BlockWaypoint>
      */
     public BlockWaypoint()
     {
-        super(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(BLOCK_HARDNESS, RESISTANCE).noCollission());
+        super(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(BLOCK_HARDNESS, RESISTANCE).noCollision());
     }
 
     @Override

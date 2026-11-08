@@ -1,6 +1,7 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-        lightbox="true">
+        lightbox="true"
+        type="OVERSIZED_VANILLA">
 
     <image source="minecolonies:textures/gui/citizen/colonist_paper.png" pos="150 0" size="152 145"/>
     <image size="82 16" source="minecolonies:textures/gui/citizen/colonist_text_decor_down.png" pos="190 9"/>
@@ -9,8 +10,12 @@
     <image source="minecolonies:textures/item/moneygold.png" pos="170 90" size="20 20"/>
     <image source="minecraft:textures/item/diamond_sword.png" pos="200 60" size="40 40"/>
 
-    <button id="done" size="200 20" pos="110 170" label="$(com.minecolonies.coremod.gui.townhall.mercenaryhire)"/>
-    <button id="cancel" size="200 20" pos="110 194" label="$(gui.cancel)"/>
+    <button id="done" size="200 20" pos="110 170" color="black"
+            source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+            label="$(com.minecolonies.coremod.gui.townhall.mercenaryhire)"/>
+    <button id="cancel" size="200 20" pos="110 194" color="black"
+            source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+            label="$(gui.cancel)"/>
 
     <text id="text" size="145 90" pos="10 55" color="white" text="$(com.minecolonies.coremod.gui.townhall.mercenarystory)"/>
 

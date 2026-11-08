@@ -9,7 +9,7 @@ import com.minecolonies.core.tileentities.TileEntityGrave;
 import com.minecolonies.api.util.InventoryUtils;
 import com.minecolonies.api.util.constant.Constants;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -75,7 +75,7 @@ public class BlockMinecoloniesGrave extends AbstractBlockMinecoloniesGrave<Block
     }
 
     @Override
-    public boolean propagatesSkylightDown(final BlockState state, @NotNull final BlockGetter reader, @NotNull final BlockPos pos)
+    public boolean propagatesSkylightDown(BlockState state)
     {
         return false;
     }
@@ -141,7 +141,7 @@ public class BlockMinecoloniesGrave extends AbstractBlockMinecoloniesGrave<Block
     }
 
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
       final ItemStack stack,
       final BlockState state,
       final Level worldIn,
@@ -157,13 +157,13 @@ public class BlockMinecoloniesGrave extends AbstractBlockMinecoloniesGrave<Block
               && tileEntity instanceof TileEntityGrave)
         {
             final TileEntityGrave grave = (TileEntityGrave) tileEntity;
-            if (!worldIn.isClientSide)
+            if (!worldIn.isClientSide())
             {
                 ((ServerPlayer) player).openMenu(grave, buf -> buf.writeBlockPos(grave.getBlockPos()));
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ItemInteractionResult.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
@@ -199,22 +199,19 @@ public class BlockMinecoloniesGrave extends AbstractBlockMinecoloniesGrave<Block
     }
 
     @Override
-    public void onRemove(BlockState state, @NotNull Level worldIn, @NotNull BlockPos pos, BlockState newState, boolean isMoving)
+    protected void affectNeighborsAfterRemoval(BlockState state, @NotNull net.minecraft.server.level.ServerLevel worldIn, @NotNull BlockPos pos, boolean movedByPiston)
     {
-        if (state.getBlock() != newState.getBlock())
+        BlockEntity tileEntity = worldIn.getBlockEntity(pos);
+        if (tileEntity instanceof TileEntityGrave tileEntityGrave)
         {
-            BlockEntity tileEntity = worldIn.getBlockEntity(pos);
-            if (tileEntity instanceof TileEntityGrave tileEntityGrave)
-            {
-                InventoryUtils.dropItemHandler(tileEntityGrave.getInventory(),
-                    worldIn,
-                    tileEntityGrave.getBlockPos().getX(),
-                    tileEntityGrave.getBlockPos().getY(),
-                    tileEntityGrave.getBlockPos().getZ());
-                worldIn.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            super.onRemove(state, worldIn, pos, newState, isMoving);
+            InventoryUtils.dropItemHandler(tileEntityGrave.getInventory(),
+                worldIn,
+                tileEntityGrave.getBlockPos().getX(),
+                tileEntityGrave.getBlockPos().getY(),
+                tileEntityGrave.getBlockPos().getZ());
+            worldIn.updateNeighbourForOutputSignal(pos, this);
         }
+
+        super.affectNeighborsAfterRemoval(state, worldIn, pos, movedByPiston);
     }
 }

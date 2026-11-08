@@ -57,7 +57,7 @@ public class DefaultLootModifiersProvider extends GlobalLootModifierProvider
         {
             for (final Block source : crop.getDroppedFrom())
             {
-                cropSources.add(source.getLootTable());
+                cropSources.add(source.getLootTable().orElse(null));
             }
         }
 

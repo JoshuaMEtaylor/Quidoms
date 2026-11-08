@@ -6,9 +6,10 @@ import com.ldtteam.structurize.api.RotationMirror;
 import com.minecolonies.api.colony.workorders.WorkOrderType;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.network.messages.server.PlantationFieldBuildRequestMessage;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 /**
  * Message to open the plantation field build window on the client.
@@ -41,6 +42,21 @@ public class OpenPlantationFieldBuildWindowMessage extends OpenBuildWindowMessag
     @Override
     protected AbstractServerPlayMessage createWorkOrderMessage(final BlockPos builder)
     {
-        return new PlantationFieldBuildRequestMessage(WorkOrderType.BUILD, pos, packName, path, Minecraft.getInstance().level.dimension(), rotationMirror, builder);
+        return new PlantationFieldBuildRequestMessage(WorkOrderType.BUILD, pos, packName, path, clientDimension(), rotationMirror, builder);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ResourceKey<Level> clientDimension()
+    {
+        try
+        {
+            return (ResourceKey<Level>) Class.forName("com.minecolonies.core.network.messages.client.ClientNetworkAccess")
+              .getMethod("clientDimension")
+              .invoke(null);
+        }
+        catch (ReflectiveOperationException e)
+        {
+            throw new IllegalStateException("clientDimension only available on physical client", e);
+        }
     }
 }

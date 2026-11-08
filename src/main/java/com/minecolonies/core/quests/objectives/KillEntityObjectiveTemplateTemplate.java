@@ -60,7 +60,7 @@ public class KillEntityObjectiveTemplateTemplate extends DialogueObjectiveTempla
     @NotNull
     private static DialogueElement buildDialogueTree(final EntityType<?> entityToKill)
     {
-        final Component text = Component.translatableEscape("com.minecolonies.coremod.questobjectives.kill", entityToKill.getDescription());
+        final Component text = Component.translatableEscape("com.minecolonies.coremod.questobjectives.kill", Component.translatable(entityToKill.getDescriptionId()));
         final AnswerElement answer1 = new AnswerElement(Component.translatableEscape("com.minecolonies.coremod.questobjectives.answer.later"),
                 new IQuestDialogueAnswer.CloseUIDialogueAnswer());
         final AnswerElement answer2 = new AnswerElement(Component.translatableEscape("com.minecolonies.coremod.questobjectives.answer.cancel"),
@@ -78,7 +78,7 @@ public class KillEntityObjectiveTemplateTemplate extends DialogueObjectiveTempla
         JsonObject details = jsonObject.getAsJsonObject(DETAILS_KEY);
         final int target = details.get(TARGET_KEY).getAsInt();
         final int quantity = details.get(QUANTITY_KEY).getAsInt();
-        final EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(details.get(ENTITY_TYPE_KEY).getAsString()));
+        final EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getValue(ResourceLocation.parse(details.get(ENTITY_TYPE_KEY).getAsString()));
         final int nextObj = details.has(NEXT_OBJ_KEY) ? details.get(NEXT_OBJ_KEY).getAsInt() : -1;
 
         return new KillEntityObjectiveTemplateTemplate(target, quantity, entityType, nextObj, parseRewards(jsonObject));
@@ -104,7 +104,7 @@ public class KillEntityObjectiveTemplateTemplate extends DialogueObjectiveTempla
             return Component.translatableEscape("com.minecolonies.coremod.questobjectives.kill.progress",
               progress.currentProgress,
               entitiesToKill,
-              entityToKill.getDescription().plainCopy().setStyle(style));
+              entityToKill.getDescription().copy().setStyle(style));
         }
         return Component.empty();
     }
@@ -201,7 +201,7 @@ public class KillEntityObjectiveTemplateTemplate extends DialogueObjectiveTempla
         @Override
         public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag nbt)
         {
-            this.currentProgress = nbt.getInt(TAG_QUANTITY);
+            this.currentProgress = nbt.getIntOr(TAG_QUANTITY, 0);
         }
     }
 }

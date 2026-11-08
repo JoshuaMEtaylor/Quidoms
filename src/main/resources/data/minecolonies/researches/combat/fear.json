@@ -1,0 +1,25 @@
+{
+  "branch": "minecolonies:combat",
+  "costs": [
+    {
+      "ingredient": "minecraft:emerald",
+      "count": 16
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/fleeingdamagemultiplier",
+      "level": 2
+    }
+  ],
+  "icon": "minecraft:iron_boots",
+  "parentResearch": "minecolonies:combat/feint",
+  "requirements": [
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:guardtower",
+      "level": 8
+    }
+  ],
+  "researchLevel": 4
+}

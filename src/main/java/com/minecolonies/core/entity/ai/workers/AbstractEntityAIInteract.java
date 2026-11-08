@@ -224,10 +224,7 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
             blockBreakAction.run();
         }
 
-        if (tool != ItemStack.EMPTY && damageTool)
-        {
-            tool.getItem().inventoryTick(tool, world, worker, worker.getCitizenInventoryHandler().findFirstSlotInInventoryWith(tool.getItem()), true);
-        }
+        // Quidoms: tools are unbreakable; skip inventoryTick durability path (1.21.10 EquipmentSlot API).
         worker.getCitizenExperienceHandler().addExperience(XP_PER_BLOCK);
         this.incrementActionsDone();
         return true;
@@ -369,7 +366,7 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
         items = world.getEntitiesOfClass(ItemEntity.class, boundingBox)
                   .stream()
                   .filter(item -> item != null && item.isAlive() &&
-                                    (!item.getPersistentData().contains("PreventRemoteMovement") || !item.getPersistentData().getBoolean("PreventRemoteMovement")) &&
+                                    (!item.getPersistentData().contains("PreventRemoteMovement") || !item.getPersistentData().getBooleanOr("PreventRemoteMovement", false)) &&
                                     isItemWorthPickingUp(item.getItem()))
                   .map(BlockPosUtil::fromEntity)
                   .collect(Collectors.toList());

@@ -67,7 +67,7 @@ public class WindowSelectRequest extends AbstractModuleWindow<CraftingModuleView
     {
         super.onUpdate();
 
-        if (!Screen.hasShiftDown())
+        if (!net.minecraft.client.Minecraft.getInstance().hasShiftDown())
         {
             lifeCount++;
         }

@@ -13,13 +13,15 @@ import com.minecolonies.api.tileentities.AbstractTileEntityColonyBuilding;
 import com.minecolonies.api.tileentities.MinecoloniesTileEntities;
 import com.minecolonies.api.util.*;
 import com.minecolonies.api.util.constant.Constants;
+
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import net.minecraft.core.BlockPos;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +35,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
@@ -62,7 +64,7 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
     /**
      * The direction the block is facing.
      */
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     /**
      * The default hardness.
@@ -96,7 +98,7 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
      */
     public AbstractColonyBlock()
     {
-        super(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(HARDNESS, RESISTANCE).noOcclusion());
+        super(MinecoloniesBlockIds.withPendingBlockId(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(HARDNESS, RESISTANCE).noOcclusion()));
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
         this.name = getHutName();
     }
@@ -123,7 +125,7 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
      */
     public AbstractColonyBlock(final Properties properties)
     {
-        super(properties.noOcclusion());
+        super(MinecoloniesBlockIds.withPendingBlockId(properties.noOcclusion()));
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
         this.name = getHutName();
     }
@@ -145,14 +147,14 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
     }
 
     @Override
-    public void onRemove(final @NotNull BlockState blockState, final @NotNull Level level, final @NotNull BlockPos pos, final @NotNull BlockState newBlockState, final boolean p_60519_)
+    protected void affectNeighborsAfterRemoval(final @NotNull BlockState blockState, final @NotNull net.minecraft.server.level.ServerLevel level, final @NotNull BlockPos pos, final boolean movedByPiston)
     {
         final BlockEntity tileentity = level.getBlockEntity(pos);
         if (tileentity instanceof AbstractTileEntityColonyBuilding tileEntityColonyBuilding)
         {
             InventoryUtils.dropItemHandler(tileEntityColonyBuilding.getInventory(), level, pos.getX(), pos.getY(), pos.getZ());
         }
-        super.onRemove(blockState, level, pos, newBlockState, p_60519_);
+        super.affectNeighborsAfterRemoval(blockState, level, pos, movedByPiston);
     }
 
     /**
@@ -171,7 +173,7 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
 
     @NotNull
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
         final ItemStack stack,
         final BlockState state,
         final Level worldIn,
@@ -183,11 +185,11 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
        /*
         If the world is client, open the gui of the building
          */
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             if (hand == InteractionHand.OFF_HAND)
             {
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
             @Nullable final IBuildingView building = IColonyManager.getInstance().getBuildingView(worldIn.dimension(), pos);
@@ -198,37 +200,37 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
                 if (building == null && ColonyUtils.getOwningColony(chunk) == 0)
                 {
                     MessageUtils.format(MISSING_COLONY).sendTo(player);
-                    return ItemInteractionResult.FAIL;
+                    return InteractionResult.FAIL;
                 }
 
                 if (building == null && ColonyUtils.getAllClaimingBuildings(chunk).values().stream().flatMap(Collection::stream).noneMatch(p -> p.equals(pos)))
                 {
                     IColonyManager.getInstance().openReactivationWindow(pos);
-                    return ItemInteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
             }
 
             if (building == null)
             {
                 MessageUtils.format(HUT_BLOCK_MISSING_BUILDING).sendTo(player);
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
             if (building.getColony() == null)
             {
                 MessageUtils.format(HUT_BLOCK_MISSING_COLONY).sendTo(player);
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
             if (!building.getColony().getPermissions().hasPermission(player, Action.ACCESS_HUTS))
             {
                 MessageUtils.format(PERMISSION_DENIED).sendTo(player);
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
             building.openGui(player.isShiftKeyDown());
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Nullable
@@ -254,7 +256,7 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
         /*
         Only work on server side
         */
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             return;
         }

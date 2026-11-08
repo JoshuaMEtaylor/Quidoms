@@ -520,17 +520,17 @@ public abstract class HordeRaidEvent implements IColonyRaidEvent, IColonyCampFir
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        id = compound.getInt(TAG_EVENT_ID);
+        id = compound.getIntOr(TAG_EVENT_ID, 0);
         setHorde(Horde.loadFromNbt(compound));
         spawnPoint = BlockPosUtil.read(compound, TAG_SPAWN_POS);
 
-        for (final Tag posCompound : compound.getList(TAG_CAMPFIRE_LIST, TAG_COMPOUND))
+        for (final Tag posCompound : compound.getListOrEmpty(TAG_CAMPFIRE_LIST))
         {
-            campFires.add(BlockPosUtil.read((CompoundTag) posCompound, NbtTagConstants.TAG_POS));
+            campFires.add(BlockPosUtil.read((CompoundTag) posCompound));
         }
 
-        status = EventStatus.values()[compound.getInt(TAG_EVENT_STATUS)];
-        daysToGo = compound.getInt(TAG_DAYS_LEFT);
+        status = EventStatus.values()[compound.getIntOr(TAG_EVENT_STATUS, 0)];
+        daysToGo = compound.getIntOr(TAG_DAYS_LEFT, 0);
         wayPoints = BlockPosUtil.readPosListFromNBT(compound, TAG_WAYPOINT);
     }
 

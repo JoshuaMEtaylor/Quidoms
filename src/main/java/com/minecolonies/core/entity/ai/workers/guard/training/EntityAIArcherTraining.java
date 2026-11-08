@@ -170,7 +170,7 @@ public class EntityAIArcherTraining extends AbstractEntityAITraining<JobArcherTr
             WorkerUtil.faceBlock(currentShootingTarget, worker);
             worker.swing(InteractionHand.MAIN_HAND);
 
-            final Arrow arrow = ModEntities.MC_NORMAL_ARROW.create(world);
+            final Arrow arrow = ModEntities.MC_NORMAL_ARROW.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
             arrow.setBaseDamage(0);
             arrow.setOwner(worker);
             arrow.setPos(worker.getX(), worker.getY() + 1, worker.getZ());

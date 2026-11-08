@@ -153,11 +153,11 @@ public abstract class AbstractCivilianEntity extends AbstractFastMinecoloniesEnt
      * @return true if successful.
      */
     @Override
-    public boolean startRiding(final @NotNull Entity entity, final boolean force)
+    public boolean startRiding(final @NotNull Entity entity, final boolean force, final boolean sendEvent)
     {
         if (entity instanceof SittingEntity || entity instanceof MinecoloniesMinecart || entity instanceof ICitizenJobMount)
         {
-            return super.startRiding(entity, force);
+            return super.startRiding(entity, force, sendEvent);
         }
         return false;
     }

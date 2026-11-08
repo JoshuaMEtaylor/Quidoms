@@ -176,7 +176,7 @@ public class BuildingLumberjack extends AbstractBuilding
             endRestriction = null;
         }
 
-        final ListTag netherTreeBinTagList = compound.getList(TAG_NETHER_TREE_LIST, Tag.TAG_COMPOUND);
+        final ListTag netherTreeBinTagList = compound.getListOrEmpty(TAG_NETHER_TREE_LIST);
         for (int i = 0; i < netherTreeBinTagList.size(); i++)
         {
             netherTrees.add(BlockPosUtil.readFromListNBT(netherTreeBinTagList, i));
@@ -298,7 +298,7 @@ public class BuildingLumberjack extends AbstractBuilding
                         final BonemealableBlock growable = (BonemealableBlock) block;
                         if (growable.isValidBonemealTarget(world, pos, blockState))
                         {
-                            if (!world.isClientSide)
+                            if (!world.isClientSide())
                             {
                                 if (growable.isBonemealSuccess(world, world.random, pos, blockState))
                                 {

@@ -163,7 +163,7 @@ public class CraftingTagAuditor
             writer.write(entry.getKey().location().toString());
             writer.write(',');
             writer.write('"');
-            writer.write(Component.translatableEscape(entry.getValue().getDescriptionId()).getString().replace("\"", "\"\""));
+            writer.write(Component.translatableEscape(entry.getValue().getName().getString()).getString().replace("\"", "\"\""));
             writer.write('"');
             entry.getValue().builtInRegistryHolder().tags().map(t -> t.location().toString()).sorted().forEach(t -> {
                 try
@@ -186,13 +186,13 @@ public class CraftingTagAuditor
         writer.write("block,name,path,climbable,dangerous");
         writer.newLine();
 
-        for (final Map.Entry<ResourceKey<Block>, Block> entry : server.registryAccess().registryOrThrow(Registries.BLOCK).entrySet()
+        for (final Map.Entry<ResourceKey<Block>, Block> entry : server.registryAccess().lookupOrThrow(Registries.BLOCK).entrySet()
                 .stream().sorted(Comparator.comparing(e -> e.getKey().location().toString())).toList())
         {
             writer.write(entry.getKey().location().toString());
             writer.write(',');
             writer.write('"');
-            writer.write(Component.translatable(entry.getValue().getDescriptionId()).getString().replace("\"", "\"\""));
+            writer.write(Component.translatable(entry.getValue().getName().getString()).getString().replace("\"", "\"\""));
             writer.write('"');
             writer.write(',');
             if (entry.getValue().defaultBlockState().is(ModTags.pathingBlocks))
@@ -219,13 +219,13 @@ public class CraftingTagAuditor
         writer.write("block,name,score,tier0,tier1,tier2,tier3,tier4,tier5,tier6");
         writer.newLine();
 
-        for (final Map.Entry<ResourceKey<Block>, Block> entry : server.registryAccess().registryOrThrow(Registries.BLOCK).entrySet()
+        for (final Map.Entry<ResourceKey<Block>, Block> entry : server.registryAccess().lookupOrThrow(Registries.BLOCK).entrySet()
             .stream().sorted(Comparator.comparing(e -> e.getKey().location().toString())).toList())
         {
             writer.write(entry.getKey().location().toString());
             writer.write(',');
             writer.write('"');
-            writer.write(Component.translatable(entry.getValue().getDescriptionId()).getString().replace("\"", "\"\""));
+            writer.write(Component.translatable(entry.getValue().getName().getString()).getString().replace("\"", "\"\""));
             writer.write('"');
             writer.write(',');
             writer.write(String.valueOf(SchemAnalyzerUtil.getScoreFor(entry.getValue())));
@@ -243,7 +243,7 @@ public class CraftingTagAuditor
         writer.write("biome,name,tags...");
         writer.newLine();
 
-        final Registry<Biome> biomes = server.registryAccess().registry(Registries.BIOME).orElse(null);
+        final Registry<Biome> biomes = server.registryAccess().lookup(Registries.BIOME).orElse(null);
         if (biomes == null) { return; }
 
         for (final ResourceLocation id : biomes.keySet().stream().sorted().toList())
@@ -253,7 +253,7 @@ public class CraftingTagAuditor
             writer.write('"');
             writer.write(Component.translatable(id.toLanguageKey("biome")).getString().replace("\"", "\"\""));
             writer.write('"');
-            biomes.getHolder(ResourceKey.create(biomes.key(), id)).ifPresent(holder ->
+            biomes.get(ResourceKey.create(biomes.key(), id)).ifPresent(holder ->
                     holder.tags()
                         .map(t -> t.location().toString())
                         .sorted()
@@ -452,7 +452,7 @@ public class CraftingTagAuditor
         {
             if (!ItemStackUtils.ISFOOD.test(item)) continue;
 
-            final FoodProperties properties = item.getItem().getFoodProperties(item, null);
+            final FoodProperties properties = com.minecolonies.api.util.FoodCompat.getFoodProperties(item, null);
             if (properties == null) continue;
 
             writeItemData(writer, item);

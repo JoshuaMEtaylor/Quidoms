@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:rice",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:cooked_rice"
+  }
+}

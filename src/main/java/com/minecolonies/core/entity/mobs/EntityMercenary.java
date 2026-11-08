@@ -19,10 +19,13 @@ import com.minecolonies.core.entity.pathfinding.navigation.MinecoloniesAdvancedP
 import com.minecolonies.core.entity.pathfinding.proxy.GeneralEntityWalkToProxy;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -146,7 +149,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new EntityMercenaryAI(this));
         this.goalSelector.addGoal(4, new EntityAIInteractToggleAble(this, FENCE_TOGGLE, TRAP_TOGGLE, DOOR_TOGGLE));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false, e -> e instanceof Enemy && !(e instanceof Llama)));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false, (e, level) -> e instanceof Enemy && !(e instanceof Llama)));
 
         setCustomNameVisible(true);
         this.setPersistenceRequired();
@@ -324,7 +327,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundTag compound)
+    public void addAdditionalSaveData(final ValueOutput compound)
     {
         compound.putLong(TAG_TIME, worldTimeAtSpawn);
         compound.putInt(TAG_COLONY_ID, this.colony == null ? 0 : colony.getID());
@@ -332,12 +335,12 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundTag compound)
+    public void readAdditionalSaveData(final ValueInput compound)
     {
-        worldTimeAtSpawn = compound.getLong(TAG_TIME);
-        if (compound.contains(TAG_COLONY_ID))
+        worldTimeAtSpawn = compound.getLongOr(TAG_TIME, 0L);
+        if (compound.keySet().contains(TAG_COLONY_ID))
         {
-            colonyId = compound.getInt(TAG_COLONY_ID);
+            colonyId = compound.getIntOr(TAG_COLONY_ID, 0);
             if (colonyId != 0)
             {
                 setColony(IColonyManager.getInstance().getColonyByWorld(colonyId, level()));
@@ -390,13 +393,13 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
     }
 
     @Override
-    public boolean hurt(final DamageSource source, final float damage)
+    public boolean hurtServer(final ServerLevel level, final DamageSource source, final float damage)
     {
         if (source.getEntity() instanceof LivingEntity)
         {
             this.setTarget((LivingEntity) source.getEntity());
         }
-        return super.hurt(source, damage);
+        return super.hurtServer(level, source, damage);
     }
 
     @Override
@@ -453,7 +456,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
     @Override
     public void aiStep()
     {
-        if (level() != null && !level().isClientSide)
+        if (level() != null && !level().isClientSide())
         {
             stateMachine.tick();
         }
@@ -496,7 +499,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
         final List<EntityMercenary> soldiers = new ArrayList<>();
         for (int i = 0; i < amountOfMercenaries; i++)
         {
-            final EntityMercenary merc = (EntityMercenary) ModEntities.MERCENARY.create(world);
+            final EntityMercenary merc = (EntityMercenary) ModEntities.MERCENARY.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
             merc.setColony(colony);
             merc.setPos(spawn.getX() + i, spawn.getY(), spawn.getZ());
             merc.setDoSpawnEvent();
@@ -505,7 +508,7 @@ public class EntityMercenary extends AbstractFastMinecoloniesEntity implements N
         }
 
         // spawn leader for the event.
-        final EntityMercenary merc = (EntityMercenary) ModEntities.MERCENARY.create(world);
+        final EntityMercenary merc = (EntityMercenary) ModEntities.MERCENARY.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
         merc.setColony(colony);
         merc.setPos(spawn.getX(), spawn.getY(), spawn.getZ() + 1);
         merc.setLeader(soldiers);

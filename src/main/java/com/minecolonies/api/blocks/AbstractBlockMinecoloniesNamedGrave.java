@@ -2,7 +2,8 @@ package com.minecolonies.api.blocks;
 
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.core.Direction;
 
 /**
  * Abstract class for minecolonies named graves.
@@ -12,10 +13,10 @@ public abstract class AbstractBlockMinecoloniesNamedGrave<B extends AbstractBloc
     /**
      * The direction the block is facing.
      */
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     public AbstractBlockMinecoloniesNamedGrave(final Properties properties)
     {
-        super(properties.noOcclusion());
+        super(MinecoloniesBlockIds.withPendingBlockId(properties.noOcclusion()));
     }
 }

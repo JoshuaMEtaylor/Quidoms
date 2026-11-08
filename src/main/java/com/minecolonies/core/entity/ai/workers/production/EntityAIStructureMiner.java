@@ -39,7 +39,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootParams.Builder;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.common.ItemAbilities;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +69,7 @@ public class EntityAIStructureMiner extends AbstractEntityAIStructureWithWorkOrd
     /**
      * The loot parameter set definition
      */
-    public static final LootContextParamSet LUCKY_ORE_PARAM_SET = (new LootContextParamSet.Builder())
+    public static final ContextKeySet LUCKY_ORE_PARAM_SET = (new ContextKeySet.Builder())
                                                                     .required(LootContextParams.ORIGIN)
                                                                     .required(LootContextParams.THIS_ENTITY)
                                                                     .required(LootContextParams.TOOL)
@@ -244,11 +244,11 @@ public class EntityAIStructureMiner extends AbstractEntityAIStructureWithWorkOrd
             {
                 renderData.append(RENDER_META_STONE);
             }
-            else if (stack.canPerformAction(ItemAbilities.PICKAXE_DIG) && renderData.indexOf(RENDER_META_PICKAXE) == -1)
+            else if (stack.is(net.minecraft.tags.ItemTags.PICKAXES) && renderData.indexOf(RENDER_META_PICKAXE) == -1)
             {
                 renderData.append(RENDER_META_PICKAXE);
             }
-            else if (stack.canPerformAction(ItemAbilities.SHOVEL_DIG) && renderData.indexOf(RENDER_META_SHOVEL) == -1)
+            else if (stack.is(net.minecraft.tags.ItemTags.SHOVELS) && renderData.indexOf(RENDER_META_SHOVEL) == -1)
             {
                 renderData.append(RENDER_META_SHOVEL);
             }
@@ -415,7 +415,7 @@ public class EntityAIStructureMiner extends AbstractEntityAIStructureWithWorkOrd
     {
         final BuildingMiner buildingMiner = building;
         // Check if we reached the bottom of the shaft
-        if (getLastLadder(buildingMiner.getLadderLocation(), world) < world.getMinBuildHeight() + SHAFT_BASE_DEPTH)
+        if (getLastLadder(buildingMiner.getLadderLocation(), world) < world.getMinY() + SHAFT_BASE_DEPTH)
         {
             AdvancementUtils.TriggerAdvancementPlayersForColony(job.getColony(), AdvancementTriggers.DEEP_MINE.get()::trigger);
         }

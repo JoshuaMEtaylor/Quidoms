@@ -25,7 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -43,7 +43,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
@@ -303,7 +305,7 @@ public class TileEntityRack extends AbstractTileEntityRack implements IMateriall
     @Override
     public void updateItemStorage()
     {
-        if (level != null && !level.isClientSide)
+        if (level != null && !level.isClientSide())
         {
             final boolean beforeEmpty = content.isEmpty();
             updateContent();
@@ -399,64 +401,63 @@ public class TileEntityRack extends AbstractTileEntityRack implements IMateriall
     }
 
     @Override
-    public void loadAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void loadAdditional(final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
-        if (compound.contains(TAG_SIZE))
+        super.loadAdditional(input);
+        if (input.keySet().contains(TAG_SIZE))
         {
-            size = compound.getInt(TAG_SIZE);
+            size = input.getIntOr(TAG_SIZE, 0);
             inventory = createInventory(DEFAULT_SIZE + size * SLOT_PER_LINE);
         }
 
-        final ListTag inventoryTagList = compound.getList(TAG_INVENTORY, TAG_COMPOUND);
-        for (int i = 0; i < inventoryTagList.size(); i++)
+        int i = 0;
+        for (final CompoundTag compoundTag : input.listOrEmpty(TAG_INVENTORY, CompoundTag.CODEC))
         {
-            final CompoundTag compoundTag = inventoryTagList.getCompound(i);
             if (!compoundTag.contains(TAG_EMPTY))
             {
+                CompoundTag stackTag = compoundTag;
                 if (compoundTag.contains("Count"))
                 {
-                    CompoundTag fixedTag = DataFixerUtils.runDataFixer(compoundTag, References.ITEM_STACK, DataVersion.v1_20_1);
-                    inventory.setStackInSlot(i, ItemStack.parseOptional(provider, fixedTag));
+                    stackTag = DataFixerUtils.runDataFixer(compoundTag, References.ITEM_STACK, DataVersion.v1_20_1);
                 }
-                else
-                {
-                    inventory.setStackInSlot(i, ItemStack.parseOptional(provider, compoundTag));
-                }
+                inventory.setStackInSlot(i, ItemStack.OPTIONAL_CODEC
+                    .parse(input.lookup().createSerializationContext(NbtOps.INSTANCE), stackTag)
+                    .result()
+                    .orElse(ItemStack.EMPTY));
             }
+            i++;
         }
 
         updateContent();
 
-        this.inWarehouse = compound.getBoolean(TAG_IN_WAREHOUSE);
-        if (compound.contains(TAG_POS))
+        this.inWarehouse = input.getBooleanOr(TAG_IN_WAREHOUSE, false);
+        if (input.child(TAG_POS).isPresent())
         {
-            this.buildingPos = BlockPosUtil.read(compound, TAG_POS);
+            this.buildingPos = BlockPosUtil.read(input, TAG_POS);
         }
-        version = compound.getByte(TAG_VERSION);
+        version = (byte) input.getByteOr(TAG_VERSION, (byte) 0);
 
         invalidateCap();
 
-        if (level != null && level.isClientSide)
+        if (level != null && level.isClientSide())
         {
             refreshTextureCache();
         }
     }
 
     @Override
-    public void saveAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void saveAdditional(final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
-        compound.putInt(TAG_SIZE, size);
-        @NotNull final ListTag inventoryTagList = new ListTag();
+        super.saveAdditional(output);
+        output.putInt(TAG_SIZE, size);
+        final ValueOutput.TypedOutputList<ItemStack> inventoryList = output.list(TAG_INVENTORY, ItemStack.OPTIONAL_CODEC);
         for (int slot = 0; slot < inventory.getSlots(); slot++)
         {
-            inventoryTagList.add(inventory.getStackInSlot(slot).saveOptional(provider));
+            inventoryList.add(inventory.getStackInSlot(slot));
         }
-        compound.put(TAG_INVENTORY, inventoryTagList);
-        compound.putBoolean(TAG_IN_WAREHOUSE, inWarehouse);
-        BlockPosUtil.write(compound, TAG_POS, buildingPos);
-        compound.putByte(TAG_VERSION, version);
+        output.putBoolean(TAG_IN_WAREHOUSE, inWarehouse);
+        BlockPosUtil.write(output, TAG_POS, buildingPos);
+        output.putByte(TAG_VERSION, version);
     }
 
     @Override
@@ -469,19 +470,19 @@ public class TileEntityRack extends AbstractTileEntityRack implements IMateriall
     @Override
     public CompoundTag getUpdateTag(@NotNull final HolderLookup.Provider provider)
     {
-        return this.saveWithId(provider);
+        return this.saveWithoutMetadata(provider);
     }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket packet, @NotNull final HolderLookup.Provider provider)
+    public void onDataPacket(final Connection net, final ValueInput input)
     {
-        this.loadAdditional(packet.getTag(), provider);
+        this.loadAdditional(input);
     }
 
     @Override
-    public void handleUpdateTag(final CompoundTag tag, @NotNull final HolderLookup.Provider provider)
+    public void handleUpdateTag(final ValueInput input)
     {
-        this.loadAdditional(tag, provider);
+        this.loadAdditional(input);
     }
 
     @Override
@@ -664,7 +665,7 @@ public class TileEntityRack extends AbstractTileEntityRack implements IMateriall
                 }
 
                 final ResourceLocation secondaryResLoc = secondarytextureMapping.get(index);
-                if (!block.defaultBlockState().isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO))
+                if (!block.defaultBlockState().isSolidRender())
                 {
                     resMap.put(secondaryResLoc, block);
                     block = Blocks.BARREL;
@@ -702,7 +703,7 @@ public class TileEntityRack extends AbstractTileEntityRack implements IMateriall
             }
 
             final ResourceLocation secondaryResLoc = secondarytextureMapping.get(i);
-            if (block != Blocks.AIR && !block.defaultBlockState().isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO))
+            if (block != Blocks.AIR && !block.defaultBlockState().isSolidRender())
             {
                 resMap.put(secondaryResLoc, block);
                 block = Blocks.BARREL;

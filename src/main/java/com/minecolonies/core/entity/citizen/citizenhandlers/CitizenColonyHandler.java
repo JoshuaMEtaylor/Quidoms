@@ -185,7 +185,7 @@ public class CitizenColonyHandler implements ICitizenColonyHandler
     @Nullable
     public IColony getColonyOrRegister()
     {
-        if (colony == null && !citizen.level().isClientSide)
+        if (colony == null && !citizen.level().isClientSide())
         {
             registerWithColony(getColonyId(), citizen.getCivilianID());
         }

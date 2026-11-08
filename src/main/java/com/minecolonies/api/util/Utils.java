@@ -253,13 +253,18 @@ public final class Utils
 
     public static <T extends Object> T deserializeCodecMessFromJson(final Codec<T> codec, HolderLookup.Provider provider, final JsonElement tag)
     {
+        // Never throw NoSuchElementException on bad datapack JSON — return null so callers can skip/log.
         return codec.parse(provider.createSerializationContext(JsonOps.INSTANCE), tag).resultOrPartial((res) -> {
             Log.getLogger().error("Failed to parse thing: '{}'", res);
-        }).get();
+        }).orElse(null);
     }
 
     public static <T extends Object> void serializeCodecMess(final StreamCodec<RegistryFriendlyByteBuf, T> codec, RegistryFriendlyByteBuf buf, final T obj)
     {
+        if (obj == null)
+        {
+            throw new IllegalArgumentException("Refusing to encode null value with stream codec (would crash player login sync)");
+        }
         codec.encode(buf, obj);
     }
 

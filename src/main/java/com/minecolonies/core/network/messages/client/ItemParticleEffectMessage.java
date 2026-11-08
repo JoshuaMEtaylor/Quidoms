@@ -9,7 +9,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
@@ -112,7 +112,7 @@ public class ItemParticleEffectMessage extends AbstractClientPlayMessage
     @Override
     protected void onExecute(final IPayloadContext ctxIn, final Player player)
     {
-        if (stack.getUseAnimation() == UseAnim.EAT)
+        if (stack.getUseAnimation() == ItemUseAnimation.EAT)
         {
             for (int i = 0; i < 5; ++i)
             {

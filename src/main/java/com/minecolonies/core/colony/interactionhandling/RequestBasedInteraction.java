@@ -127,7 +127,7 @@ public class RequestBasedInteraction extends ServerCitizenInteraction
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, @NotNull final CompoundTag compoundNBT)
     {
         super.deserializeNBT(provider, compoundNBT);
-        this.token = StandardFactoryController.getInstance().deserializeTag(provider, compoundNBT.getCompound(TOKEN_TAG));
+        this.token = StandardFactoryController.getInstance().deserializeTag(provider, compoundNBT.getCompoundOrEmpty(TOKEN_TAG));
     }
 
     @Override

@@ -31,6 +31,8 @@ import com.minecolonies.core.network.messages.server.colony.OpenInventoryMessage
 import com.minecolonies.core.util.citizenutils.CitizenItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,6 +40,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -158,9 +161,9 @@ public class VisitorCitizen extends AbstractEntityCitizen
     }
 
     @Override
-    public boolean hurt(@NotNull final DamageSource damageSource, final float damage)
+    public boolean hurtServer(final ServerLevel level, @NotNull final DamageSource damageSource, final float damage)
     {
-        if (!(damageSource.getEntity() instanceof EntityCitizen) && super.hurt(damageSource, damage))
+        if (!(damageSource.getEntity() instanceof EntityCitizen) && super.hurtServer(level, damageSource, damage))
         {
             if (damageSource.getEntity() instanceof LivingEntity && damage > 1.01f)
             {
@@ -425,7 +428,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
             return result;
         }
 
-        if (CompatibilityUtils.getWorldFromCitizen(this).isClientSide)
+        if (CompatibilityUtils.getWorldFromCitizen(this).isClientSide())
         {
             if (player.isShiftKeyDown())
             {
@@ -457,7 +460,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
         {
             if (!level().isClientSide())
             {
-                playSound(SoundEvents.GENERIC_EAT, 1.5f, (float) SoundUtils.getRandomPitch(getRandom()));
+                playSound(SoundEvents.GENERIC_EAT.value(), 1.5f, (float) SoundUtils.getRandomPitch(getRandom()));
                 new ItemParticleEffectMessage(usedStack.copy(), getX(), getY(), getZ(), getXRot(), getYRot(), getEyeHeight()).sendToTrackingEntity(this);
                 ItemStackUtils.consumeFood(usedStack, this, player);
                 MessageUtils.forCitizen(this, MESSAGE_INTERACTION_VISITOR_FOOD).sendTo(player);
@@ -504,12 +507,12 @@ public class VisitorCitizen extends AbstractEntityCitizen
     {
         super.aiStep();
 
-        if (lastHurtByPlayerTime > 0)
+        if (getLastHurtByPlayerMemoryTime() > 0)
         {
             markDirty(0);
         }
 
-        if (CompatibilityUtils.getWorldFromCitizen(this).isClientSide)
+        if (CompatibilityUtils.getWorldFromCitizen(this).isClientSide())
         {
             citizenColonyHandler.updateColonyClient();
             if (citizenColonyHandler.getColonyId() != 0 && citizenId != 0 && getOffsetTicks() % TICKS_20 == 0)
@@ -533,7 +536,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundTag compound)
+    public void addAdditionalSaveData(final ValueOutput compound)
     {
         super.addAdditionalSaveData(compound);
 
@@ -545,16 +548,16 @@ public class VisitorCitizen extends AbstractEntityCitizen
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundTag compound)
+    public void readAdditionalSaveData(final ValueInput compound)
     {
         super.readAdditionalSaveData(compound);
 
-        if (compound.contains(TAG_COLONY_ID))
+        if (compound.keySet().contains(TAG_COLONY_ID))
         {
-            citizenColonyHandler.setColonyId(compound.getInt(TAG_COLONY_ID));
-            if (compound.contains(TAG_CITIZEN))
+            citizenColonyHandler.setColonyId(compound.getIntOr(TAG_COLONY_ID, 0));
+            if (compound.keySet().contains(TAG_CITIZEN))
             {
-                citizenId = compound.getInt(TAG_CITIZEN);
+                citizenId = compound.getIntOr(TAG_CITIZEN, 0);
             }
         }
     }
@@ -586,7 +589,7 @@ public class VisitorCitizen extends AbstractEntityCitizen
     }
 
     @Override
-    protected void dropEquipment()
+    protected void dropEquipment(net.minecraft.server.level.ServerLevel level)
     {
         //Drop actual inventory
         for (int i = 0; i < getInventoryCitizen().getSlots(); i++)

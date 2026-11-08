@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
     <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
     <text id="desc" size="130 11" pos="30 14" color="black" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.allinventory)"/>
-    <input id="names" size="132 18" pos="15 30" maxlength="25"/>
+    <input id="names" size="132 18" pos="15 30" maxlength="25" color="white"/>
     <button id="sortStorageFilter" size="14 15" pos="158 31" color="black"
                  source="minecolonies:textures/gui/builderhut/builder_button_mini.png"
                  label="v^"/>

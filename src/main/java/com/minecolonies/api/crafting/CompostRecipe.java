@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public class CompostRecipe implements Recipe<SingleRecipeInput>
 {
     public static final MapCodec<CompostRecipe> CODEC = RecordCodecBuilder.mapCodec(builder -> builder
-        .group(Ingredient.CODEC_NONEMPTY.fieldOf("input").forGetter(CompostRecipe::getInput),
+        .group(Ingredient.CODEC.fieldOf("input").forGetter(CompostRecipe::getInput),
           ExtraCodecs.POSITIVE_INT.optionalFieldOf("strength", 1).forGetter(CompostRecipe::getStrength))
         .apply(builder, CompostRecipe::new));
 
@@ -52,7 +52,7 @@ public class CompostRecipe implements Recipe<SingleRecipeInput>
 
     @NotNull
     @Override
-    public RecipeType<?> getType() { return ModRecipeSerializer.CompostRecipeType.get(); }
+    public RecipeType<? extends Recipe<SingleRecipeInput>> getType() { return ModRecipeSerializer.CompostRecipeType.get(); }
 
     /**
      * Get the input ingredient for this recipe (this is multiple alternative item types).
@@ -91,14 +91,7 @@ public class CompostRecipe implements Recipe<SingleRecipeInput>
         return this.output.copy();
     }
 
-    @Override
-    public boolean canCraftInDimensions(final int width, final int height)
-    {
-        return true;
-    }
-
     @NotNull
-    @Override
     public ItemStack getResultItem(@Nullable final HolderLookup.Provider provider)
     {
         return this.output;
@@ -106,9 +99,23 @@ public class CompostRecipe implements Recipe<SingleRecipeInput>
 
     @NotNull
     @Override
-    public RecipeSerializer<?> getSerializer()
+    public RecipeSerializer<? extends Recipe<SingleRecipeInput>> getSerializer()
     {
         return ModRecipeSerializer.CompostRecipeSerializer.get();
+    }
+
+    @NotNull
+    @Override
+    public PlacementInfo placementInfo()
+    {
+        return PlacementInfo.create(this.input);
+    }
+
+    @NotNull
+    @Override
+    public RecipeBookCategory recipeBookCategory()
+    {
+        return RecipeBookCategories.CRAFTING_MISC;
     }
 
     /**
@@ -118,7 +125,6 @@ public class CompostRecipe implements Recipe<SingleRecipeInput>
      * @return The list of input ingredients.
      */
     @NotNull
-    @Override
     public NonNullList<Ingredient> getIngredients()
     {
         final NonNullList<Ingredient> ingredients = NonNullList.create();

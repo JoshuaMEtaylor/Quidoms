@@ -181,11 +181,11 @@ public abstract class AbstractSchematicProvider implements ISchematicProvider, I
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        buildingLevel = compound.getInt(TAG_SCHEMATIC_LEVEL);
+        buildingLevel = compound.getIntOr(TAG_SCHEMATIC_LEVEL, 0);
 
         deserializerStructureInformationFrom(compound);
 
-        this.rotationMirror = RotationMirror.values()[compound.getByte(TAG_ROTATION_MIRROR)];
+        this.rotationMirror = RotationMirror.values()[compound.getByteOr(TAG_ROTATION_MIRROR, (byte)0)];
 
         if (compound.contains(TAG_CORNER1) && compound.contains(TAG_CORNER2))
         {
@@ -194,12 +194,12 @@ public abstract class AbstractSchematicProvider implements ISchematicProvider, I
 
         if (compound.contains(TAG_HEIGHT))
         {
-            this.height = compound.getInt(TAG_HEIGHT);
+            this.height = compound.getIntOr(TAG_HEIGHT, 0);
         }
 
         if (compound.contains(TAG_DECONSTRUCTED))
         {
-            this.isDeconstructed = compound.getBoolean(TAG_DECONSTRUCTED);
+            this.isDeconstructed = compound.getBooleanOr(TAG_DECONSTRUCTED, false);
         }
         else
         {
@@ -213,15 +213,15 @@ public abstract class AbstractSchematicProvider implements ISchematicProvider, I
     {
         String packName;
         String path;
-        if (compound.contains(TAG_STYLE) && !compound.getString(TAG_STYLE).isEmpty())
+        if (compound.contains(TAG_STYLE) && !compound.getStringOr(TAG_STYLE, "").isEmpty())
         {
-            packName = BlueprintMapping.getStyleMapping(compound.getString(TAG_STYLE));
-            path = BlueprintMapping.getPathMapping(compound.getString(TAG_STYLE), this.getSchematicName()) + buildingLevel + ".blueprint";
+            packName = BlueprintMapping.getStyleMapping(compound.getStringOr(TAG_STYLE, ""));
+            path = BlueprintMapping.getPathMapping(compound.getStringOr(TAG_STYLE, ""), this.getSchematicName()) + buildingLevel + ".blueprint";
         }
         else
         {
-            packName = compound.getString(TAG_PACK);
-            path = compound.getString(TAG_PATH);
+            packName = compound.getStringOr(TAG_PACK, "");
+            path = compound.getStringOr(TAG_PATH, "");
         }
 
         if ((path == null || path.isEmpty()) && getBuildingType().getBuildingBlock() instanceof AbstractBlockHut<?> abstractBlockHut)

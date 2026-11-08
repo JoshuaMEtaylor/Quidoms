@@ -169,11 +169,11 @@ public class MinimumStockModule extends AbstractBuildingModule implements IMinim
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         minimumStock.clear();
-        final ListTag minimumStockTagList = compound.getList(TAG_MINIMUM_STOCK, Tag.TAG_COMPOUND);
+        final ListTag minimumStockTagList = compound.getListOrEmpty(TAG_MINIMUM_STOCK);
         for (int i = 0; i < minimumStockTagList.size(); i++)
         {
-            final CompoundTag compoundNBT = minimumStockTagList.getCompound(i);
-            minimumStock.put(new ItemStorage(ItemStack.parseOptional(provider, compoundNBT.getCompound(NbtTagConstants.STACK))), compoundNBT.getInt(TAG_QUANTITY));
+            final CompoundTag compoundNBT = minimumStockTagList.getCompoundOrEmpty(i);
+            minimumStock.put(new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compoundNBT.getCompoundOrEmpty(NbtTagConstants.STACK))), compoundNBT.getIntOr(TAG_QUANTITY, 0));
         }
     }
 
@@ -184,7 +184,7 @@ public class MinimumStockModule extends AbstractBuildingModule implements IMinim
         for (@NotNull final Map.Entry<ItemStorage, Integer> entry : minimumStock.entrySet())
         {
             final CompoundTag compoundNBT = new CompoundTag();
-            compoundNBT.put(NbtTagConstants.STACK, entry.getKey().getItemStack().saveOptional(provider));
+            compoundNBT.put(NbtTagConstants.STACK, com.minecolonies.api.util.ItemStackUtils.saveOptional(entry.getKey().getItemStack(), provider));
             compoundNBT.putInt(TAG_QUANTITY, entry.getValue());
             minimumStockTagList.add(compoundNBT);
         }

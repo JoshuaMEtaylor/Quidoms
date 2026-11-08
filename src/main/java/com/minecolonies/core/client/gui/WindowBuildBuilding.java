@@ -14,6 +14,7 @@ import com.ldtteam.structurize.placement.StructurePhasePlacementResult;
 import com.ldtteam.structurize.placement.StructurePlacer;
 import com.ldtteam.structurize.placement.structure.IStructureHandler;
 import com.ldtteam.structurize.storage.ClientFutureProcessor;
+import com.ldtteam.structurize.storage.StructurePackMeta;
 import com.ldtteam.structurize.storage.StructurePacks;
 import com.ldtteam.structurize.util.BlueprintPositionInfo;
 import com.minecolonies.api.blocks.AbstractBlockHut;
@@ -44,6 +45,7 @@ import net.neoforged.neoforge.common.util.TriPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -90,9 +92,9 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
     private DropDownList buildersDropDownList;
 
     /**
-     * White color.
+     * Ink on parchment (opaque black — BlockUI name colors are RGB|0xFF000000).
      */
-    private static final int WHITE = Color.getByName("white", 0);
+    private static final int INK = Color.getByName("black", 0xFF000000);
 
     /**
      * List of style for the section.
@@ -110,6 +112,11 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      * Update delay.
      */
     private int tick;
+
+    /**
+     * Monotonic id so stale async blueprint callbacks cannot overwrite a newer style selection.
+     */
+    private int resourceRequestId = 0;
 
     /**
      * Constructor for the window when the player wants to hire a worker for a certain job.
@@ -256,48 +263,119 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
 
     /**
      * Update the styles list but try to keep the same one.
+     * Quidoms: populate every installed pack that contains this building's blueprint so
+     * previous/next arrows actually cycle (upstream only ever added the current pack).
      */
     private void updateStyles()
     {
-        if (!building.getParent().equals(BlockPos.ZERO) && building.getColony().getClientBuildingManager().getBuilding(building.getParent()) != null)
+        styles = new ArrayList<>();
+
+        final IBuildingView parentBuilding = building.getParent().equals(BlockPos.ZERO)
+                                               ? null
+                                               : building.getColony().getClientBuildingManager().getBuilding(building.getParent());
+        if (parentBuilding != null)
         {
-            styles = new ArrayList<>();
-            styles.add(building.getColony().getClientBuildingManager().getBuilding(building.getParent()).getStructurePack());
-            if (!styles.isEmpty())
-            {
-                stylesDropDownList.setSelectedIndex(0);
-            }
+            // Child modules stay locked to the parent's pack.
+            styles.add(parentBuilding.getStructurePack());
         }
         else
         {
-            styles = new ArrayList<>();
-            styles.add(building.getStructurePack());
-
-            if (!styles.isEmpty())
+            final List<String> pathCandidates = blueprintPathCandidates();
+            for (final StructurePackMeta pack : StructurePacks.getPackMetas())
             {
-                int newIndex = styles.indexOf(building.getStructurePack());
-                if (newIndex == -1)
+                if (pathCandidates.stream().anyMatch(path -> packHasBlueprint(pack, path)))
                 {
-                    newIndex = 0;
+                    styles.add(pack.getName());
                 }
-                stylesDropDownList.setSelectedIndex(newIndex);
+            }
+            styles.sort(String.CASE_INSENSITIVE_ORDER);
+
+            if (styles.isEmpty() && building.getStructurePack() != null && !building.getStructurePack().isEmpty())
+            {
+                styles.add(building.getStructurePack());
             }
         }
 
-        findPaneOfTypeByID(BUTTON_PREVIOUS_STYLE_ID, Button.class).setEnabled(enabled);
-        findPaneOfTypeByID(DROPDOWN_STYLE_ID, DropDownList.class).setEnabled(enabled);
-        findPaneOfTypeByID(BUTTON_NEXT_STYLE_ID, Button.class).setEnabled(enabled);
+        if (!styles.isEmpty())
+        {
+            int newIndex = styles.indexOf(building.getStructurePack());
+            if (newIndex < 0)
+            {
+                newIndex = 0;
+            }
+            stylesDropDownList.setSelectedIndex(newIndex);
+        }
+
+        final boolean canSwitch = styles.size() > 1;
+        findPaneOfTypeByID(BUTTON_PREVIOUS_STYLE_ID, Button.class).setEnabled(canSwitch);
+        findPaneOfTypeByID(DROPDOWN_STYLE_ID, DropDownList.class).setEnabled(canSwitch || !styles.isEmpty());
+        findPaneOfTypeByID(BUTTON_NEXT_STYLE_ID, Button.class).setEnabled(canSwitch);
     }
 
     /**
-     * Clears and resets/updates all resources.
+     * Blueprint sub-paths to probe when discovering style packs (current + upgrade/level-1).
+     */
+    @NotNull
+    private List<String> blueprintPathCandidates()
+    {
+        final List<String> candidates = new ArrayList<>();
+        final String structurePath = building.getStructurePath();
+        if (structurePath == null || structurePath.isEmpty())
+        {
+            return candidates;
+        }
+        candidates.add(structurePath);
+
+        String name = structurePath.replace(".blueprint", "");
+        if (name.isEmpty())
+        {
+            return candidates;
+        }
+
+        int nextLevel = building.getBuildingLevel();
+        if (canBeUpgraded())
+        {
+            nextLevel = building.getBuildingLevel() + 1;
+        }
+        if (nextLevel < 1)
+        {
+            nextLevel = 1;
+        }
+        candidates.add(name.substring(0, name.length() - 1) + nextLevel + ".blueprint");
+        candidates.add(name.substring(0, name.length() - 1) + "1.blueprint");
+        return candidates;
+    }
+
+    /**
+     * True when the pack contains the given blueprint sub-path.
+     */
+    private static boolean packHasBlueprint(@NotNull final StructurePackMeta pack, @Nullable final String structurePath)
+    {
+        if (structurePath == null || structurePath.isEmpty())
+        {
+            return false;
+        }
+        try
+        {
+            return Files.exists(pack.getPath().resolve(pack.getNormalizedSubPath(structurePath)));
+        }
+        catch (final Exception ignored)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Clears and resets/updates all resources for the currently selected style pack.
      */
     private void updateResources()
     {
         tick = 20;
 
-        if (stylesDropDownList.getSelectedIndex() == -1)
+        if (stylesDropDownList.getSelectedIndex() == -1 || styles.isEmpty())
         {
+            resources.clear();
+            updateResourceList();
             return;
         }
 
@@ -311,18 +389,54 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
         String name = building.getStructurePath().replace(".blueprint", "");
         if (name.isEmpty())
         {
+            resources.clear();
+            updateResourceList();
             return;
         }
 
         name = name.substring(0, name.length() - 1) + nextLevel + ".blueprint";
-        ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(StructurePacks.getBlueprintFuture(styles.get(stylesDropDownList.getSelectedIndex()), name, world.registryAccess()), (blueprint -> {
+        final String stylePack = styles.get(stylesDropDownList.getSelectedIndex());
+        final int requestId = ++resourceRequestId;
+
+        // Drop stale rows immediately so a slow/failed load cannot leave the previous style's list up.
+        resources.clear();
+        updateResourceList();
+
+        ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(
+          StructurePacks.getBlueprintFuture(stylePack, name, world.registryAccess()), (blueprint -> {
+            if (requestId != resourceRequestId)
+            {
+                return;
+            }
+
             resources.clear();
             if (blueprint == null)
             {
                 findPaneOfTypeByID(BUTTON_BUILD, Button.class).hide();
                 findPaneOfTypeByID(BUTTON_REPAIR, Button.class).hide();
                 findPaneOfTypeByID(BUTTON_PICKUP_BUILDING, Button.class).show();
+                updateResourceList();
                 return;
+            }
+
+            // Restore action buttons after a previous missing-blueprint style hid them.
+            if (building.getBuildingLevel() == 0)
+            {
+                findPaneOfTypeByID(BUTTON_BUILD, Button.class).show();
+                findPaneOfTypeByID(BUTTON_REPAIR, Button.class).hide();
+                findPaneOfTypeByID(BUTTON_PICKUP_BUILDING, Button.class).show();
+            }
+            else
+            {
+                if (canBeUpgraded())
+                {
+                    findPaneOfTypeByID(BUTTON_BUILD, Button.class).show();
+                }
+                findPaneOfTypeByID(BUTTON_REPAIR, Button.class).show();
+                if (!building.isDeconstructed())
+                {
+                    findPaneOfTypeByID(BUTTON_PICKUP_BUILDING, Button.class).hide();
+                }
             }
 
             blueprint.setRotationMirror(building.getRotationMirror(), Minecraft.getInstance().level);
@@ -342,6 +456,11 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
                 }
             }
             while (result != null && result.getBlockResult().getResult() != BlockPlacementResult.Result.FINISHED);
+
+            if (requestId != resourceRequestId)
+            {
+                return;
+            }
 
             window.findPaneOfTypeByID(LIST_RESOURCES, ScrollingList.class).refreshElementPanes();
             updateResourceList();
@@ -363,7 +482,7 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
             return;
         }
         final int hashCode = res.getComponentsPatch().hashCode();
-        final String key = res.getDescriptionId() + "-" + hashCode;
+        final String key = res.getItem().getDescriptionId() + "-" + hashCode;
         ItemStorage resource = resources.get(key);
         if (resource == null)
         {
@@ -448,7 +567,18 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      */
     private void nextStyle()
     {
-        stylesDropDownList.selectNext();
+        if (styles.isEmpty())
+        {
+            return;
+        }
+        final int current = stylesDropDownList.getSelectedIndex();
+        final int next = (Math.max(current, 0) + 1) % styles.size();
+        stylesDropDownList.setSelectedIndex(next);
+        // Handler fires on index change; force refresh if setSelectedIndex no-ops (same index edge cases).
+        if (stylesDropDownList.getSelectedIndex() == current)
+        {
+            updateResources();
+        }
     }
 
     /**
@@ -456,7 +586,17 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      */
     private void previousStyle()
     {
-        stylesDropDownList.selectPrevious();
+        if (styles.isEmpty())
+        {
+            return;
+        }
+        final int current = stylesDropDownList.getSelectedIndex();
+        final int prev = current <= 0 ? styles.size() - 1 : current - 1;
+        stylesDropDownList.setSelectedIndex(prev);
+        if (stylesDropDownList.getSelectedIndex() == current)
+        {
+            updateResources();
+        }
     }
 
     /**
@@ -511,13 +651,19 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
                 final ItemStorage resource = tempRes.get(index);
                 final Text resourceLabel = rowPane.findPaneOfTypeByID(RESOURCE_NAME, Text.class);
                 final Text quantityLabel = rowPane.findPaneOfTypeByID(RESOURCE_QUANTITY_MISSING, Text.class);
-                resourceLabel.setText(resource.getItemStack().getHoverName());
+                final ItemIcon icon = rowPane.findPaneOfTypeByID(RESOURCE_ICON, ItemIcon.class);
+                final ItemStack displayStack = resource.getItemStack();
+                // Plain translated string (Domum nested components) + force panes visible/opaque.
+                resourceLabel.setText(Component.literal(displayStack.getHoverName().getString()));
                 quantityLabel.setText(Component.literal(Integer.toString(resource.getAmount())));
-                resourceLabel.setColors(WHITE);
-                quantityLabel.setColors(WHITE);
-                final ItemStack itemIcon = resource.getItemStack().copy();
+                resourceLabel.setColors(INK);
+                quantityLabel.setColors(INK);
+                resourceLabel.show();
+                quantityLabel.show();
+                final ItemStack itemIcon = displayStack.copy();
                 itemIcon.setCount(1);
-                rowPane.findPaneOfTypeByID(RESOURCE_ICON, ItemIcon.class).setItem(itemIcon);
+                icon.setItem(itemIcon);
+                icon.show();
             }
         });
     }

@@ -110,7 +110,7 @@ public class BuildingSifter extends AbstractBuilding
     {
         super.deserializeNBT(provider, compound);
 
-        this.currentDailyQuantity = compound.getInt(TAG_CURRENT_DAILY);
+        this.currentDailyQuantity = compound.getIntOr(TAG_CURRENT_DAILY, 0);
     }
 
     @Override

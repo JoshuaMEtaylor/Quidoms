@@ -9,7 +9,6 @@ import com.minecolonies.api.util.constant.TypeConstants;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +58,7 @@ public class Burnable implements IDeliverable
 
         if (!ItemStackUtils.isEmpty(burnable.result))
         {
-            compound.put(NBT_RESULT, burnable.result.saveOptional(provider));
+            compound.put(NBT_RESULT, com.minecolonies.api.util.ItemStackUtils.saveOptional(burnable.result, provider));
         }
 
         return compound;
@@ -74,8 +73,8 @@ public class Burnable implements IDeliverable
      */
     public static Burnable deserialize(@NotNull final HolderLookup.Provider provider, final IFactoryController controller, final CompoundTag compound)
     {
-        final int count = compound.getInt(NBT_COUNT);
-        final ItemStack result = compound.contains(NBT_RESULT) ? ItemStackUtils.deserializeFromNBT(compound.getCompound(NBT_RESULT), provider) : ItemStackUtils.EMPTY;
+        final int count = compound.getIntOr(NBT_COUNT, 0);
+        final ItemStack result = compound.contains(NBT_RESULT) ? ItemStackUtils.deserializeFromNBT(compound.getCompoundOrEmpty(NBT_RESULT), provider) : ItemStackUtils.EMPTY;
 
         return new Burnable(count, result);
     }
@@ -116,7 +115,7 @@ public class Burnable implements IDeliverable
     @Override
     public boolean matches(@NotNull final ItemStack stack)
     {
-        return FurnaceBlockEntity.isFuel(stack);
+        return !stack.isEmpty(); // TODO: wire FuelValues once Provider available at call site
     }
 
     @Override

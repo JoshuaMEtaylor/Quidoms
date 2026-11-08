@@ -9,9 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.Ticket;
 import net.minecraft.server.level.TicketType;
-import net.minecraft.util.SortedArraySet;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,21 +30,10 @@ public class CommandColonyChunks implements IMCColonyOfficerCommand
     {
         final IColony colony = ColonyIdArgument.getColony(context, COLONYID_ARG);
 
-        Set<TicketType> types = new HashSet<>();
+        // Ticket map API changed in 1.21.10; chunk ticket dump deferred
+        final Set<TicketType> types = new HashSet<>();
 
-        for (final Long chunkLong : colony.getLoadedChunks())
-        {
-            final SortedArraySet<Ticket<?>> tickets = context.getSource().getLevel().getChunkSource().chunkMap.getDistanceManager().tickets.get((long) chunkLong);
-            if (tickets != null)
-            {
-                for (final Ticket<?> ticket : tickets)
-                {
-                    types.add(ticket.getType());
-                }
-            }
-        }
-
-        StringBuilder ticketString = new StringBuilder();
+        final StringBuilder ticketString = new StringBuilder();
         for (final TicketType type : types)
         {
             ticketString.append("[").append(type).append("]");

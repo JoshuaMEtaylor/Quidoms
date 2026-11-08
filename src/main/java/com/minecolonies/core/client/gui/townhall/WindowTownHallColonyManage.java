@@ -69,7 +69,7 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
     {
         final String colonyName = this.findPaneOfTypeByID("colonyname", TextField.class).getText();
 
-        new VanillaParticleMessage(pos.getX(), pos.getY(), pos.getZ(), ParticleTypes.DRAGON_BREATH).onExecute(null, mc.player);
+        new VanillaParticleMessage(pos.getX(), pos.getY(), pos.getZ(), ParticleTypes.FLAME).onExecute(null, mc.player);
         Minecraft.getInstance().level.playSound(Minecraft.getInstance().player, Minecraft.getInstance().player.blockPosition(),
           SoundEvents.CAMPFIRE_CRACKLE, SoundSource.AMBIENT, 2.5f, 0.8f);
         final BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(pos);

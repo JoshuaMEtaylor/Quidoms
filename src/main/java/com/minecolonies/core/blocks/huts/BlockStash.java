@@ -11,7 +11,7 @@ import com.minecolonies.api.colony.permissions.Action;
 import com.minecolonies.api.tileentities.MinecoloniesTileEntities;
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import com.minecolonies.core.network.messages.server.colony.OpenInventoryMessage;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -83,7 +83,7 @@ public class BlockStash extends AbstractColonyBlock<BlockStash> implements IRSCo
 
     @NotNull
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
       final ItemStack stack,
       final BlockState state,
       final Level worldIn,
@@ -92,7 +92,7 @@ public class BlockStash extends AbstractColonyBlock<BlockStash> implements IRSCo
       final InteractionHand hand,
       final BlockHitResult ray)
     {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             @Nullable final IBuildingView building = IColonyManager.getInstance().getBuildingView(worldIn.dimension(), pos);
 
@@ -103,6 +103,6 @@ public class BlockStash extends AbstractColonyBlock<BlockStash> implements IRSCo
                 new OpenInventoryMessage(building).sendToServer();
             }
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 }

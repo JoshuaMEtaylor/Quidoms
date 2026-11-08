@@ -19,8 +19,8 @@ import java.util.Objects;
 public class CitizenCombatTracker extends CombatTracker
 {
     private static final Style         INTENTIONAL_GAME_DESIGN_STYLE =
-      Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://bugs.mojang.com/browse/MCPE-28723"))
-        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("MCPE-28723")));
+      Style.EMPTY.withClickEvent(new ClickEvent.OpenUrl(java.net.URI.create("https://bugs.mojang.com/browse/MCPE-28723")))
+        .withHoverEvent(new HoverEvent.ShowText(Component.literal("MCPE-28723")));
     private final        EntityCitizen citizen;
 
     public CitizenCombatTracker(EntityCitizen citizen)

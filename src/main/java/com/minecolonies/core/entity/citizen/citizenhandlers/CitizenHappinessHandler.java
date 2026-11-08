@@ -164,11 +164,11 @@ public class CitizenHappinessHandler implements ICitizenHappinessHandler
         // Only deserialize for new version. Old can keep the above defaults just fine.
         if (compound.contains(TAG_NEW_HAPPINESS))
         {
-            final ListTag tag = compound.getList(TAG_NEW_HAPPINESS, Tag.TAG_COMPOUND);
+            final ListTag tag = compound.getListOrEmpty(TAG_NEW_HAPPINESS);
             for (int i = 0; i < tag.size(); i++)
             {
-                final CompoundTag compoundTag = tag.getCompound(i);
-                final String id = compoundTag.getString(TAG_ID);
+                final CompoundTag compoundTag = tag.getCompoundOrEmpty(i);
+                final String id = compoundTag.getStringOr(TAG_ID, "");
                 if (happinessFactors.containsKey(id))
                 {
                     happinessFactors.get(id).read(provider, compoundTag, persist);

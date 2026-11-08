@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:large_empty_bottle",
+    "#c:buckets/water"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:large_water_bottle"
+  }
+}

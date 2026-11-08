@@ -207,13 +207,14 @@ public class ContainerCrafting extends AbstractContainerMenu
     @Override
     public void slotsChanged(final Container inventoryIn)
     {
-        if (!world.isClientSide)
+        if (!world.isClientSide())
         {
             final ServerPlayer player = (ServerPlayer) inv.player;
-            final List<RecipeHolder<CraftingRecipe>> recipes = player.server.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), world)
-                    .stream().filter(recipe -> recipe.value().isSpecial()
-                            || !world.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING)
-                            || player.getRecipeBook().contains(recipe)
+            final List<RecipeHolder<CraftingRecipe>> recipes = player.level().getServer().getRecipeManager().recipeMap()
+                    .getRecipesFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), world)
+                    .filter(recipe -> recipe.value().isSpecial()
+                            || !(world.getServer() != null && world.getServer().getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING))
+                            || player.getRecipeBook().contains(recipe.id())
                             || player.isCreative())
                     .toList();
             if (recipes.isEmpty())
@@ -423,7 +424,7 @@ public class ContainerCrafting extends AbstractContainerMenu
      */
     public List<ItemStack> getRemainingItems()
     {
-        final Optional<RecipeHolder<CraftingRecipe>> iRecipe = this.world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), world);
+        final Optional<RecipeHolder<CraftingRecipe>> iRecipe = this.world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix.asCraftInput(), world);
         if (iRecipe.isPresent())
         {
             List<ItemStack> ri = iRecipe.get().value().getRemainingItems(this.craftMatrix.asCraftInput());

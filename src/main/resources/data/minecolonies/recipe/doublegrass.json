@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:short_grass",
+    "minecraft:short_grass"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:tall_grass"
+  }
+}

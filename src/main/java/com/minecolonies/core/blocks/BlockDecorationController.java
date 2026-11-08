@@ -16,7 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +24,9 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -94,7 +97,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
      */
     public BlockDecorationController()
     {
-        this(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(BLOCK_HARDNESS, RESISTANCE).noCollission());
+        this(Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(BLOCK_HARDNESS, RESISTANCE).noCollision());
     }
 
     public BlockDecorationController(final Properties properties)
@@ -148,25 +151,19 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
 
     @NotNull
     @Override
-    public BlockState updateShape(
-      @NotNull final BlockState stateIn,
-      final Direction dir,
-      final BlockState state,
-      final LevelAccessor worldIn,
-      @NotNull final BlockPos currentPos,
-      final BlockPos pos)
+    public BlockState updateShape(BlockState stateIn, LevelReader worldIn, ScheduledTickAccess scheduledTickAccess, BlockPos currentPos, Direction dir, BlockPos pos, BlockState state, RandomSource random)
     {
         if (stateIn.getValue(WATERLOGGED))
         {
-            worldIn.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+            scheduledTickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
         }
 
 
-        return super.updateShape(stateIn, dir, state, worldIn, currentPos, pos);
+        return super.updateShape(stateIn, worldIn, scheduledTickAccess, currentPos, dir, pos, state, random);
     }
 
     @Override
-    public ItemInteractionResult useItemOn(
+    public InteractionResult useItemOn(
       final ItemStack Stack,
       final BlockState state,
       final Level worldIn,
@@ -175,7 +172,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
       final InteractionHand hand,
       final BlockHitResult ray)
     {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             final BlockEntity tileEntity = worldIn.getBlockEntity(pos);
             if (tileEntity instanceof TileEntityDecorationController)
@@ -183,7 +180,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
                 new WindowDecorationController(pos).open();
             }
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -200,7 +197,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
         /*
         Only work on server side
         */
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             return;
         }
@@ -267,7 +264,7 @@ public class BlockDecorationController extends AbstractBlockMinecoloniesDirectio
 
         try
         {
-            return Integer.parseInt(beData.getCompound(TAG_BLUEPRINTDATA).getString(TAG_SCHEMATIC_NAME).replaceAll("[^0-9]", ""));
+            return Integer.parseInt(beData.getCompoundOrEmpty(TAG_BLUEPRINTDATA).getStringOr(TAG_SCHEMATIC_NAME, "").replaceAll("[^0-9]", ""));
         }
         catch (final NumberFormatException exception)
         {

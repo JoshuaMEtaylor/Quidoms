@@ -6,8 +6,11 @@ import com.minecolonies.api.util.EntityUtils;
 import com.minecolonies.api.util.LookHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -63,7 +66,8 @@ public class SittingEntity extends Entity
     /**
      * Do not let the entity be destroyed
      */
-    public boolean hurt(DamageSource source, float amount)
+    @Override
+    public boolean hurtServer(final ServerLevel level, DamageSource source, float amount)
     {
         return false;
     }
@@ -77,13 +81,13 @@ public class SittingEntity extends Entity
     }
 
     @Override
-    protected void readAdditionalSaveData(final CompoundTag compound)
+    protected void readAdditionalSaveData(final ValueInput compound)
     {
 
     }
 
     @Override
-    protected void addAdditionalSaveData(final CompoundTag compound)
+    protected void addAdditionalSaveData(final ValueOutput compound)
     {
 
     }
@@ -104,7 +108,7 @@ public class SittingEntity extends Entity
     @Override
     public void tick()
     {
-        if (this.level().isClientSide)
+        if (this.level().isClientSide())
         {
             return;
         }
@@ -126,7 +130,7 @@ public class SittingEntity extends Entity
     protected void addPassenger(Entity passenger)
     {
         super.addPassenger(passenger);
-        if (this.level().isClientSide)
+        if (this.level().isClientSide())
         {
             return;
         }
@@ -138,7 +142,7 @@ public class SittingEntity extends Entity
     protected void removePassenger(Entity passenger)
     {
         super.removePassenger(passenger);
-        if (this.level().isClientSide)
+        if (this.level().isClientSide())
         {
             return;
         }
@@ -214,7 +218,7 @@ public class SittingEntity extends Entity
         }
         existingSittingEntities.computeIfAbsent(entity.level().dimension(), k -> new HashSet<>()).add(pos);
 
-        final SittingEntity sittingEntity = (SittingEntity) ModEntities.SITTINGENTITY.create(entity.level());
+        final SittingEntity sittingEntity = (SittingEntity) ModEntities.SITTINGENTITY.create(entity.level(), net.minecraft.world.entity.EntitySpawnReason.LOAD);
 
         // Find the lowest box and sit on that
         final BlockState state = entity.level().getBlockState(pos);

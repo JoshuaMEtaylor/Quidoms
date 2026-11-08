@@ -101,7 +101,7 @@ public class JobResearch extends AbstractJob<EntityAIWorkResearcher, JobResearch
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        this.currentMana = compound.getInt(TAG_CURR_MANA);
+        this.currentMana = compound.getIntOr(TAG_CURR_MANA, 0);
     }
 
     /**
