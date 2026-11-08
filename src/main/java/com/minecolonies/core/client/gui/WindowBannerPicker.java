@@ -169,6 +169,9 @@ public class WindowBannerPicker extends Screen
             final int posY = center(this.height + 30, PATTERN_ROWS, PATTERN_HEIGHT, Math.floorDiv(i, PATTERN_COLUMNS), PATTERN_MARGIN);
 
             final PatternButton button = new PatternButton(posX, posY, PATTERN_HEIGHT, patterns.get(i));
+            // Start hidden so stale hitboxes cannot steal Done/Cancel before first render.
+            button.visible = false;
+            button.active = false;
             this.addRenderableWidget(button);
 
             if (!isFeatureUnlocked.get() && patterns.get(i).unwrapKey().get().location().getNamespace().equals(Constants.MOD_ID))
@@ -181,6 +184,7 @@ public class WindowBannerPicker extends Screen
 
     protected void createCloseButtons()
     {
+        // Added last so they sit above pattern widgets in the click stack.
         this.addRenderableWidget(new Button(
           center(this.width, 2, 80, 1, 10),
           this.height - 40,
@@ -193,6 +197,7 @@ public class WindowBannerPicker extends Screen
                   builder.add(layer);
               }
               colony.setColonyFlag(builder.build());
+              this.onClose();
               window.open();
           }, DEFAULT_NARRATION
         ));
@@ -201,8 +206,30 @@ public class WindowBannerPicker extends Screen
           this.height - 40,
           80, SIDE,
           Component.translatableEscape("gui.cancel"),
-          pressed -> window.open(), DEFAULT_NARRATION
+          pressed -> {
+              this.onClose();
+              window.open();
+          }, DEFAULT_NARRATION
         ));
+    }
+
+    @Override
+    public boolean mouseClicked(final MouseButtonEvent event, final boolean isDoubleClick)
+    {
+        this.scrolling = false;
+        final double mouseX = event.x();
+        final double mouseY = event.y();
+
+        final int trackX = center(this.width, PATTERN_COLUMNS, PATTERN_WIDTH, PATTERN_COLUMNS, PATTERN_MARGIN);
+        final int trackY = center(this.height, PATTERN_ROWS, PATTERN_HEIGHT, 0, PATTERN_MARGIN);
+        final int trackEnd = trackY + PATTERN_ROWS * (PATTERN_HEIGHT + PATTERN_MARGIN);
+        if (mouseX > trackX + 2 && mouseX < trackX + 8 && mouseY > trackY && mouseY < trackEnd)
+        {
+            this.scrolling = true;
+        }
+        // Screen walks children top-most first; PatternButtons that are not in the
+        // visible page must not remain active/visible or they steal Done/Cancel.
+        return super.mouseClicked(event, isDoubleClick);
     }
 
     public static int center(int length, int count, int side, int n, int margin)
@@ -348,23 +375,6 @@ public class WindowBannerPicker extends Screen
     }
 
     @Override
-    public boolean mouseClicked(final MouseButtonEvent event, final boolean isDoubleClick)
-    {
-        this.scrolling = false;
-        final double mouseX = event.x();
-        final double mouseY = event.y();
-
-        final int trackX = center(this.width, PATTERN_COLUMNS, PATTERN_WIDTH, PATTERN_COLUMNS, PATTERN_MARGIN);
-        final int trackY = center(this.height, PATTERN_ROWS, PATTERN_HEIGHT, 0, PATTERN_MARGIN);
-        final int trackEnd = trackY + PATTERN_ROWS * (PATTERN_HEIGHT + PATTERN_MARGIN);
-        if (mouseX > trackX + 2 && mouseX < trackX + 8 && mouseY > trackY && mouseY < trackEnd)
-        {
-            this.scrolling = true;
-        }
-        return super.mouseClicked(event, isDoubleClick);
-    }
-
-    @Override
     public boolean mouseDragged(final MouseButtonEvent event, final double deltaX, final double deltaY)
     {
         if (this.scrolling && this.activeLayer > 0)
@@ -444,24 +454,43 @@ public class WindowBannerPicker extends Screen
             }
         }
 
+        private boolean inVisiblePage()
+        {
+            return scrollRow * PATTERN_COLUMNS <= this.index
+              && this.index < PATTERN_COLUMNS * (scrollRow + PATTERN_ROWS);
+        }
+
         @Override
         public void onPress(final InputWithModifiers input)
         {
-            if (!this.blocked && activeLayer > 0)
+            // Guard again — off-page buttons must never change the layer.
+            if (!this.blocked && activeLayer > 0 && inVisiblePage())
             {
                 setLayer(this.pattern, colors.getSelected());
             }
         }
 
         @Override
+        public boolean isMouseOver(final double mx, final double my)
+        {
+            if (activeLayer == 0 || !inVisiblePage() || this.blocked)
+            {
+                return false;
+            }
+            return super.isMouseOver(mx, my);
+        }
+
+        @Override
         public void renderWidget(final GuiGraphics stack, int mx, int my, float partial)
         {
-            final boolean isVisible = scrollRow * PATTERN_COLUMNS <= this.index
-              && this.index < PATTERN_COLUMNS * (scrollRow + PATTERN_ROWS);
-            // Upstream behavior: pattern grid is inactive/hidden on Base.
-            this.active = activeLayer != 0 && !this.blocked;
+            final boolean onPage = inVisiblePage();
+            // CRITICAL: off-page / Base-layer buttons must be inactive+invisible or their
+            // stale hitboxes (near the bottom) steal Done/Cancel and "cycle" patterns.
+            final boolean show = activeLayer > 0 && onPage;
+            this.visible = show;
+            this.active = show && !this.blocked;
 
-            if (!this.active || !this.visible || !isVisible)
+            if (!show)
             {
                 return;
             }
