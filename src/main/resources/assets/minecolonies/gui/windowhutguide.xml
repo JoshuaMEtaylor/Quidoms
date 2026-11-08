@@ -3,7 +3,12 @@
         >
 
     <image source="minecolonies:textures/gui/guide/background.png" size="960 540" id="guide1"/>
-    <button id="confirm" pos="360 455" label="$(com.minecolonies.coremod.gui.workerhuts.guide.confirm)"/>
+    <!-- Vanilla AbstractButton sprites resolve as magenta via BlockUI Image.resolveBlit;
+         use the packaged guide button tile instead (stretched to vanilla 200×20). -->
+    <button id="confirm" size="200 20" pos="380 455"
+                 source="minecolonies:textures/gui/guide/button.png"
+                 label="$(com.minecolonies.coremod.gui.workerhuts.guide.confirm)"
+                 color="white"/>
     <text id="questionmark" size="210 75" color="black" pos="80 363" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.questionmark)"/>
     <text id="arrow" size="210 75" color="black" pos="637 22" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.arrow)"/>
     <text id="chest" size="210 75" color="black" pos="646 363" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.chest)"/>

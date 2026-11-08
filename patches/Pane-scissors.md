@@ -1,22 +1,20 @@
-# BlockUI `Pane.scissorsStart` fix (Quidoms 0.0.31)
+# BlockUI scissors fix (Quidoms 0.0.31)
 
 ## Bug
 `GuiGraphics.enableScissor(x0,y0,x1,y1)` transforms the rectangle through the **current pose**.
-The fat-jar `Pane.scissorsStart` also ran `pose.transformPosition` first, then called
+Older BlockUI `Pane.scissorsStart` also ran `pose.transformPosition` then called
 `enableScissor` with those absolute coords — **double-applying** `BOScreen` centering/scale.
 
-Symptom on Build (`windowbuildbuilding.xml`): blank parchment with only right-edge scraps
-(e.g. `": Bricks Pillar"` + qty). The parchment image was behind the list; the list was
-clipped away by a wrong scissor region.
+Symptom: Build resource `ScrollingList` left-clipped to blank parchment with only
+right-edge scraps (`: Bricks Pillar` + qty) and the scrollbar (sibling, unclipped).
+
+A prior attempt that passed **local** coords alone was not enough in practice on the
+fat jar; the reliable fix is absolute corners + identity pose around `enableScissor`.
 
 ## Fix
-Pass **local** pane coords only:
+1. `Pane.scissorsStart`: `transformPosition` → absolute rect → `pose.identity()` →
+   `enableScissor` → `pose.pop`. `scissorsEnd` only restores screen size + `disableScissor`.
+2. `ScrollingContainer.drawSelf`: same pattern (does not call `scissorsStart`), so the
+   Build list clip cannot regress if `Pane` is overwritten.
 
-```java
-target.enableScissor(this.x, this.y, this.x + this.width, this.y + this.height);
-```
-
-`scissorsEnd` only restores `BOScreen` width/height and calls `disableScissor()` —
-do **not** re-`enableScissor` parent absolute coords after pop (vanilla stack restores parent).
-
-Matches BlockUI-26 approach. Keep the 3-arg signature for `ScrollingContainer` callers.
+Sources: `patches/ScrollingContainer.java`, patched `Pane` class in the fat jar.

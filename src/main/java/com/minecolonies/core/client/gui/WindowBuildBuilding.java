@@ -114,6 +114,11 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
     private int tick;
 
     /**
+     * Monotonic id so stale async blueprint callbacks cannot overwrite a newer style selection.
+     */
+    private int resourceRequestId = 0;
+
+    /**
      * Constructor for the window when the player wants to hire a worker for a certain job.
      *
      * @param c        the colony view.
@@ -361,14 +366,16 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
     }
 
     /**
-     * Clears and resets/updates all resources.
+     * Clears and resets/updates all resources for the currently selected style pack.
      */
     private void updateResources()
     {
         tick = 20;
 
-        if (stylesDropDownList.getSelectedIndex() == -1)
+        if (stylesDropDownList.getSelectedIndex() == -1 || styles.isEmpty())
         {
+            resources.clear();
+            updateResourceList();
             return;
         }
 
@@ -382,18 +389,54 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
         String name = building.getStructurePath().replace(".blueprint", "");
         if (name.isEmpty())
         {
+            resources.clear();
+            updateResourceList();
             return;
         }
 
         name = name.substring(0, name.length() - 1) + nextLevel + ".blueprint";
-        ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(StructurePacks.getBlueprintFuture(styles.get(stylesDropDownList.getSelectedIndex()), name, world.registryAccess()), (blueprint -> {
+        final String stylePack = styles.get(stylesDropDownList.getSelectedIndex());
+        final int requestId = ++resourceRequestId;
+
+        // Drop stale rows immediately so a slow/failed load cannot leave the previous style's list up.
+        resources.clear();
+        updateResourceList();
+
+        ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(
+          StructurePacks.getBlueprintFuture(stylePack, name, world.registryAccess()), (blueprint -> {
+            if (requestId != resourceRequestId)
+            {
+                return;
+            }
+
             resources.clear();
             if (blueprint == null)
             {
                 findPaneOfTypeByID(BUTTON_BUILD, Button.class).hide();
                 findPaneOfTypeByID(BUTTON_REPAIR, Button.class).hide();
                 findPaneOfTypeByID(BUTTON_PICKUP_BUILDING, Button.class).show();
+                updateResourceList();
                 return;
+            }
+
+            // Restore action buttons after a previous missing-blueprint style hid them.
+            if (building.getBuildingLevel() == 0)
+            {
+                findPaneOfTypeByID(BUTTON_BUILD, Button.class).show();
+                findPaneOfTypeByID(BUTTON_REPAIR, Button.class).hide();
+                findPaneOfTypeByID(BUTTON_PICKUP_BUILDING, Button.class).show();
+            }
+            else
+            {
+                if (canBeUpgraded())
+                {
+                    findPaneOfTypeByID(BUTTON_BUILD, Button.class).show();
+                }
+                findPaneOfTypeByID(BUTTON_REPAIR, Button.class).show();
+                if (!building.isDeconstructed())
+                {
+                    findPaneOfTypeByID(BUTTON_PICKUP_BUILDING, Button.class).hide();
+                }
             }
 
             blueprint.setRotationMirror(building.getRotationMirror(), Minecraft.getInstance().level);
@@ -413,6 +456,11 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
                 }
             }
             while (result != null && result.getBlockResult().getResult() != BlockPlacementResult.Result.FINISHED);
+
+            if (requestId != resourceRequestId)
+            {
+                return;
+            }
 
             window.findPaneOfTypeByID(LIST_RESOURCES, ScrollingList.class).refreshElementPanes();
             updateResourceList();
@@ -523,8 +571,14 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
         {
             return;
         }
-        final int next = (Math.max(stylesDropDownList.getSelectedIndex(), 0) + 1) % styles.size();
+        final int current = stylesDropDownList.getSelectedIndex();
+        final int next = (Math.max(current, 0) + 1) % styles.size();
         stylesDropDownList.setSelectedIndex(next);
+        // Handler fires on index change; force refresh if setSelectedIndex no-ops (same index edge cases).
+        if (stylesDropDownList.getSelectedIndex() == current)
+        {
+            updateResources();
+        }
     }
 
     /**
@@ -539,6 +593,10 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
         final int current = stylesDropDownList.getSelectedIndex();
         final int prev = current <= 0 ? styles.size() - 1 : current - 1;
         stylesDropDownList.setSelectedIndex(prev);
+        if (stylesDropDownList.getSelectedIndex() == current)
+        {
+            updateResources();
+        }
     }
 
     /**
