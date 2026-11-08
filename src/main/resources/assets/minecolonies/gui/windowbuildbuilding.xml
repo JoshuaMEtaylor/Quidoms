@@ -1,14 +1,16 @@
 <!--
-  Revert to last known centered layout (5c595cb2 absolute 420×240).
-  Parchment is a plain full-bleed image only — no flex %, negative sizes,
-  BOTTOM_* align, or type= overrides. BlockUI default centering applies.
+  Centered absolute 420×240 parchment.
+  Background image is first (behind). Resource rows use <view> (no box/gradient overlay).
+  List visibility also depends on BlockUI Pane.scissorsStart using local coords
+  (GuiGraphics.enableScissor applies pose once — do not pre-transform).
 -->
 <window size="420 240"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         lightbox="true">
 
-    <image source="minecolonies:textures/gui/builderhut/builder_paper_wide.png" size="420 240" pos="0 0"/>
+    <!-- Bottom-most layer only — must stay before all controls/list -->
+    <image id="parchmentBg" source="minecolonies:textures/gui/builderhut/builder_paper_wide.png" size="420 240" pos="0 0"/>
 
     <button id="previousStyle" size="14 15" pos="46 8" label="&lt;"
                  source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="black"/>
@@ -46,11 +48,11 @@
                  source="minecolonies:textures/gui/button_x.png" color="black"/>
 
     <list id="resources" size="360 168" pos="30 30">
-        <box size="100% 30" linewidth="1">
+        <view size="100% 30">
             <itemicon id="resourceIcon" size="24 24" pos="3 3"/>
             <text id="resourceName" size="280 12" pos="33 9" color="black"/>
             <text id="resourceQuantity" size="36 12" pos="318 9" color="black" textalign="MIDDLE_RIGHT"/>
-        </box>
+        </view>
     </list>
 
     <button id="repair" size="129 17" pos="16 214"
