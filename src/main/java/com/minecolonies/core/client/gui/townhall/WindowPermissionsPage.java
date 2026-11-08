@@ -718,7 +718,19 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
     private void addPlayerCLicked()
     {
         final TextField input = findPaneOfTypeByID(INPUT_ADDPLAYER_NAME, TextField.class);
-        new PermissionsMessage.AddPlayer(buildingView.getColony(), input.getText()).sendToServer();
+        final String name = input.getText() == null ? "" : input.getText().trim();
+        if (name.isEmpty())
+        {
+            return;
+        }
+        final boolean already = users.stream().anyMatch(u -> u.getName() != null && u.getName().equalsIgnoreCase(name));
+        if (already)
+        {
+            Minecraft.getInstance().player.displayClientMessage(
+              Component.translatableEscape("com.minecolonies.core.permissions.addplayer.already", name), false);
+            return;
+        }
+        new PermissionsMessage.AddPlayer(buildingView.getColony(), name).sendToServer();
         input.setText("");
     }
 

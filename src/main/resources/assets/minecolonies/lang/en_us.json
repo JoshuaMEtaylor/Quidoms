@@ -4104,5 +4104,10 @@
   "item.minecolonies.colonysign": "Colony Sign",
   "itemGroup.minecolonies.general": "Quidoms",
   "com.minecolonies.coremod.gui.workerHuts.retrieveOn": "On",
-  "com.minecolonies.coremod.gui.workerhuts.retrieveOn": "On"
+  "com.minecolonies.coremod.gui.workerhuts.retrieveOn": "On",
+  "com.minecolonies.core.permissions.addplayer.empty": "Enter a player name to add.",
+  "com.minecolonies.core.permissions.addplayer.already": "%s is already on the colony permissions list.",
+  "com.minecolonies.core.permissions.addplayer.success": "Added %s to the colony.",
+  "com.minecolonies.core.permissions.addplayer.notfound": "Could not find player %s (must be online or have joined this server before).",
+  "com.minecolonies.core.gui.flag.pick_layer": "Select a layer (1–6) above to choose a pattern."
 }

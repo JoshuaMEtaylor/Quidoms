@@ -92,9 +92,9 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
     private DropDownList buildersDropDownList;
 
     /**
-     * White color.
+     * Ink on parchment (matches builder hut resource list).
      */
-    private static final int WHITE = Color.getByName("white", 0);
+    private static final int INK = Color.getByName("black", 0);
 
     /**
      * List of style for the section.
@@ -595,8 +595,8 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
                 final Text quantityLabel = rowPane.findPaneOfTypeByID(RESOURCE_QUANTITY_MISSING, Text.class);
                 resourceLabel.setText(resource.getItemStack().getHoverName());
                 quantityLabel.setText(Component.literal(Integer.toString(resource.getAmount())));
-                resourceLabel.setColors(WHITE);
-                quantityLabel.setColors(WHITE);
+                resourceLabel.setColors(INK);
+                quantityLabel.setColors(INK);
                 final ItemStack itemIcon = resource.getItemStack().copy();
                 itemIcon.setCount(1);
                 rowPane.findPaneOfTypeByID(RESOURCE_ICON, ItemIcon.class).setItem(itemIcon);

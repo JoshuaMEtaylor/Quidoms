@@ -17,6 +17,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -179,7 +180,45 @@ public class PermissionsMessage
         @Override
         protected void onExecute(final IPayloadContext ctxIn, final ServerPlayer player, final IColony colony)
         {
-            colony.getPermissions().addPlayer(playerName, colony.getPermissions().getRank(IPermissions.NEUTRAL_RANK_ID), colony.getWorld());
+            final String name = playerName == null ? "" : playerName.trim();
+            if (name.isEmpty())
+            {
+                player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.empty"));
+                return;
+            }
+
+            final boolean already =
+              colony.getPermissions().getPlayers().values().stream().anyMatch(p -> p.getName() != null && p.getName().equalsIgnoreCase(name));
+            if (already)
+            {
+                player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.already", name));
+                return;
+            }
+
+            // Prefer currently online players, then the server's name→UUID cache (offline who have joined).
+            boolean added = false;
+            final var server = colony.getWorld().getServer();
+            if (server != null)
+            {
+                final ServerPlayer online = server.getPlayerList().getPlayer(name);
+                if (online != null)
+                {
+                    added = colony.getPermissions().addPlayer(online.getGameProfile(), colony.getPermissions().getRank(IPermissions.NEUTRAL_RANK_ID));
+                }
+            }
+            if (!added)
+            {
+                added = colony.getPermissions().addPlayer(name, colony.getPermissions().getRank(IPermissions.NEUTRAL_RANK_ID), colony.getWorld());
+            }
+
+            if (added)
+            {
+                player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.success", name));
+            }
+            else
+            {
+                player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.notfound", name));
+            }
         }
 
         @Override

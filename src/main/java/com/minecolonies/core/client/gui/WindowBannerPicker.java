@@ -5,28 +5,27 @@ import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.Utils;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.client.gui.townhall.AbstractWindowTownHall;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.InputWithModifiers;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.model.BannerFlagModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import com.mojang.blaze3d.platform.Lighting;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.blockentity.BannerRenderer;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.util.Mth;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.world.level.block.entity.BannerPatterns;
 import net.neoforged.api.distmarker.Dist;
@@ -107,8 +106,8 @@ public class WindowBannerPicker extends Screen
     /** The town hall window that called this picker. Will be used to return to it. */
     private final AbstractWindowTownHall window;
 
-    /** The assigned renderer for the banner models */
-    private final ModelPart modelRender; // may be null if banner layer missing
+    /** Flag model for the large preview (1.21.10 STANDING_BANNER_FLAG). */
+    private final BannerFlagModel flagModel;
 
     /**
      * Local reference of feature unlocked flag.
@@ -138,8 +137,7 @@ public class WindowBannerPicker extends Screen
 
         this.colony = colony;
         this.window = hallWindow;
-        // Banner ModelLayers.BANNER removed/renamed on 1.21.10; 3D preview stubbed.
-        this.modelRender = null;
+        this.flagModel = new BannerFlagModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.STANDING_BANNER_FLAG));
 
         /* Get all patterns, then remove excluded and item-required patterns */
         List<Holder<BannerPattern>> exclusion = new ArrayList<>();
@@ -306,6 +304,12 @@ public class WindowBannerPicker extends Screen
 
         // Render the instructions
         stack.drawCenteredString(this.font, Component.translatableEscape("com.minecolonies.coremod.gui.flag.choose").getString(), this.width / 2, 16, 0xFFFFFF);
+        if (activeLayer == 0)
+        {
+            stack.drawCenteredString(this.font,
+              Component.translatableEscape("com.minecolonies.core.gui.flag.pick_layer").getString(),
+              this.width / 2, this.height / 2 - 10, 0xFFCCCCCC);
+        }
     }
 
     /**
@@ -313,41 +317,39 @@ public class WindowBannerPicker extends Screen
      */
     private void drawFlag(final GuiGraphics stack)
     {
-        // 1.21.10: GuiGraphics is 2D (Matrix3x2fStack); 3D banner preview deferred.
         final int posX = (int) ((this.width + PATTERN_HEIGHT / 2.0 * PATTERN_COLUMNS) / 2 + SIDE * 2);
-        final int posY = this.height / 2;
-        stack.fill(posX - 20, posY - 40, posX + 20, posY + 40, 0xFF888888);
-        for (int i = 0; i < layers.size(); i++)
+        final int posY = this.height / 2 - 40;
+        final DyeColor base = layers.isEmpty() ? DyeColor.WHITE : layers.get(0).color();
+        final BannerPatternLayers.Builder builder = new BannerPatternLayers.Builder();
+        for (int i = 1; i < layers.size(); i++)
         {
-            stack.fill(posX - 18, posY - 38 + i * 6, posX + 18, posY - 34 + i * 6, 0xFF000000 | layers.get(i).color().getTextColor());
+            builder.add(layers.get(i));
         }
+        stack.submitBannerPatternRenderState(flagModel, base, builder.build(), posX, posY, posX + 40, posY + 80);
     }
 
     /**
-     * Sets a specific banner pattern in place to be rendered
-     * @param pattern the banner pattern to render
-     * @param x the left x position of the banner
-     * @param y the top y position of the banner
-     * @param stack 
+     * Draw a single banner pattern sprite into a pattern button cell (loom-style).
      */
     private void drawBannerPattern(Holder<BannerPattern> pattern, int x, int y, GuiGraphics stack)
     {
-        // 2D stand-in for pattern preview
-        final DyeColor dye = (!isFeatureUnlocked.get() && pattern.unwrapKey().isPresent()
-            && pattern.unwrapKey().get().location().getNamespace().equals(Constants.MOD_ID))
-            ? DyeColor.BLACK : DyeColor.WHITE;
-        stack.fill(x, y, x + PATTERN_WIDTH, y + PATTERN_HEIGHT, 0xFF777777);
-        stack.fill(x + 2, y + 2, x + PATTERN_WIDTH - 2, y + PATTERN_HEIGHT - 2, 0xFF000000 | dye.getTextColor());
-    }
-
-    /**
-     * Renders the provided banner using the given transformations
-     * @param transform the transformation matrix stack to render with
-     * @param layers the pattern-color pairs that form the banner
-     */
-    public void renderBanner(PoseStack transform, List<BannerPatternLayers.Layer> layers, GuiGraphics stack)
-    {
-        // no-op: 3D banner rendering deferred on 1.21.10 GuiGraphics
+        final boolean locked = !isFeatureUnlocked.get() && pattern.unwrapKey().isPresent()
+          && pattern.unwrapKey().get().location().getNamespace().equals(Constants.MOD_ID);
+        stack.fill(x, y, x + PATTERN_WIDTH, y + PATTERN_HEIGHT, locked ? 0xFF222222 : 0xFF555555);
+        try
+        {
+            final Material material = Sheets.getBannerMaterial(pattern);
+            final TextureAtlasSprite sprite = stack.getSprite(material);
+            // Tint: locked patterns stay dark; others use current palette / white.
+            final int tint = locked ? 0xFF000000 : (0xFF000000 | colors.getSelected().getTextureDiffuseColor());
+            stack.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x + 1, y + 1, PATTERN_WIDTH - 2, PATTERN_HEIGHT - 2, tint);
+        }
+        catch (final Exception ex)
+        {
+            // Fallback solid if atlas lookup fails
+            stack.fill(x + 2, y + 2, x + PATTERN_WIDTH - 2, y + PATTERN_HEIGHT - 2, 0xFFFFFFFF);
+            Log.getLogger().debug("Banner pattern sprite missing: {}", pattern.value().assetId(), ex);
+        }
     }
 
     @Override
@@ -494,35 +496,19 @@ public class WindowBannerPicker extends Screen
         public void renderWidget(final GuiGraphics stack, int mx, int my, float p_renderButton_3_)
         {
             boolean isVisible = scrollRow * PATTERN_COLUMNS <= this.index && this.index < PATTERN_COLUMNS * (scrollRow + PATTERN_ROWS);
-            this.active = activeLayer != 0;
+            // Clickable only when editing a pattern layer (not Base).
+            this.active = activeLayer != 0 && !this.blocked;
 
-            if (!this.active || !this.visible || !isVisible) return;
+            if (!this.visible || !isVisible)
+            {
+                return;
+            }
 
-            int position = Math.floorDiv(this.index - scrollRow*PATTERN_COLUMNS, PATTERN_COLUMNS);
+            int position = Math.floorDiv(this.index - scrollRow * PATTERN_COLUMNS, PATTERN_COLUMNS);
             this.setY(center(WindowBannerPicker.this.height, PATTERN_ROWS, PATTERN_HEIGHT, position, PATTERN_MARGIN));
             this.isHovered = mx >= this.getX() && my >= this.getY() && mx < this.getX() + this.width && my < this.getY() + this.height;
 
-            super.renderWidget(stack, mx, my, p_renderButton_3_);
-
-            if (isVisible)
-            {
-                if (this.blocked)
-                {
-                    stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0xFF000000);
-                }
-                else if (this.visible)
-                {
-                    if (this.isHovered && this.active)
-                        stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0xDDFFFFFF);
-
-                    if (activeLayer < layers.size() && layers.get(activeLayer).pattern() == this.pattern)
-                        stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0xFFDD88FF);
-
-                    else
-                        stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x33888888);
-                }
-            }
-
+            // Always draw pattern sprites (even on Base layer) so the list is never an empty gray field.
             try
             {
                 drawBannerPattern(this.pattern, this.getX(), this.getY(), stack);
@@ -531,6 +517,20 @@ public class WindowBannerPicker extends Screen
             {
                 Log.getLogger().warn(pattern.value().translationKey());
                 Log.getLogger().error(ex);
+            }
+
+            if (this.blocked)
+            {
+                stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x99000000);
+            }
+            else if (this.isHovered && this.active)
+            {
+                stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x66FFFFFF);
+            }
+
+            if (activeLayer > 0 && activeLayer < layers.size() && layers.get(activeLayer).pattern() == this.pattern)
+            {
+                stack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x66DD88FF);
             }
         }
     }
