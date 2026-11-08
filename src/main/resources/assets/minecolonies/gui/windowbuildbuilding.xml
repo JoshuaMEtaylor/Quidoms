@@ -1,80 +1,68 @@
 <!--
-  Reconstruct: canvas matches parchment (400×244). BlockUI OVERSIZED_VANILLA
-  scales the whole window via renderScale — no manual squash.
-
-  Layout bands (all coords relative to window; footer bottom-anchored):
-    header  y≈10–28
-    list    y≈34, height = windowH - 72  (flexes with canvas)
-    footer  BOTTOM_MIDDLE inset 12px from bottom
+  Revert to last known centered layout (5c595cb2 absolute 420×240).
+  Parchment is a plain full-bleed image only — no flex %, negative sizes,
+  BOTTOM_* align, or type= overrides. BlockUI default centering applies.
 -->
-<window size="400 244" type="OVERSIZED_VANILLA"
+<window size="420 240"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         lightbox="true">
 
-    <image source="minecolonies:textures/gui/builderhut/builder_paper_wide.png" size="100% 100%" pos="0 0"/>
+    <image source="minecolonies:textures/gui/builderhut/builder_paper_wide.png" size="420 240" pos="0 0"/>
 
-    <!-- Header: style pack switcher -->
-    <button id="previousStyle" size="14 15" pos="16 12" label="&lt;"
+    <button id="previousStyle" size="14 15" pos="46 8" label="&lt;"
                  source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="black"/>
     <dropdown id="style"
-              size="120 17"
-              pos="32 11"
+              size="129 17"
+              pos="62 7"
               maxContentHeight="75"
               dropDownSize="140 75"
               source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
               color="black">
         <view size="100% 15">
             <text id="id" size="100% 100%" label="" pos="0 0"/>
-            <button id="button" size="120 17" pos="0 0"
+            <button id="button" size="129 17" pos="0 0"
                          source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" color="black"/>
         </view>
     </dropdown>
-    <button id="nextStyle" size="14 15" pos="154 12" label="&gt;"
+    <button id="nextStyle" size="14 15" pos="193 8" label="&gt;"
                  source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="black"/>
 
-    <!-- Header: builder picker -->
     <dropdown id="worker"
-              size="120 17"
-              pos="200 11"
+              size="129 17"
+              pos="220 7"
               maxContentHeight="75"
               dropDownSize="140 75"
               source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
               color="black">
         <view size="100% 15">
             <text id="id" size="100% 100%" label="" pos="0 0"/>
-            <button id="button" size="120 17" pos="0 0"
+            <button id="button" size="129 17" pos="0 0"
                          source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" color="black"/>
         </view>
     </dropdown>
 
-    <button id="cancel" size="14 15" align="TOP_RIGHT" pos="16 12"
+    <button id="cancel" size="14 15" pos="390 8"
                  source="minecolonies:textures/gui/button_x.png" color="black"/>
 
-    <!--
-      Resource list: 92% width, height = parentH - 72 (negative-height flex).
-      Leaves a clear band above the bottom-anchored footer; 8px scrollbar stays on paper.
-    -->
-    <!-- pos must be px (BlockUI pos-% scales against parent x/y, not width); size-% is fine -->
-    <list id="resources" size="92% -72" pos="16 34">
+    <list id="resources" size="360 168" pos="30 30">
         <box size="100% 30" linewidth="1">
-            <itemicon id="resourceIcon" size="24 24" pos="2 3"/>
-            <text id="resourceName" size="-72 12" pos="28 9" color="black" textalign="MIDDLE_LEFT"/>
-            <text id="resourceQuantity" align="MIDDLE_RIGHT" size="40 12" pos="4 9" color="black" textalign="MIDDLE_RIGHT"/>
+            <itemicon id="resourceIcon" size="24 24" pos="3 3"/>
+            <text id="resourceName" size="280 12" pos="33 9" color="black"/>
+            <text id="resourceQuantity" size="36 12" pos="318 9" color="black" textalign="MIDDLE_RIGHT"/>
         </box>
     </list>
 
-    <!-- Footer: anchored to bottom so they stay on parchment at every renderScale -->
-    <button id="repair" align="BOTTOM_MIDDLE" size="86 17" pos="-100 12"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
+    <button id="repair" size="129 17" pos="16 214"
+                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
                  label="$(com.minecolonies.coremod.gui.workerhuts.repair)" color="black"/>
-    <button id="build" align="BOTTOM_MIDDLE" size="86 17" pos="0 12"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
+    <button id="build" size="129 17" pos="145 214"
+                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
                  label="$(com.minecolonies.coremod.gui.workerhuts.upgrade)" color="black"/>
-    <button id="deconstruct" align="BOTTOM_MIDDLE" size="86 17" pos="100 12"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
+    <button id="deconstruct" size="129 17" pos="274 214"
+                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
                  label="$(com.minecolonies.coremod.gui.workerhuts.deconstruct)" color="black"/>
-    <button id="pickup" align="BOTTOM_MIDDLE" size="86 17" pos="100 12"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
+    <button id="pickup" size="129 17" pos="274 214"
+                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
                  label="$(com.minecolonies.coremod.gui.workerhuts.pickup)" color="black" visible="false"/>
 </window>
