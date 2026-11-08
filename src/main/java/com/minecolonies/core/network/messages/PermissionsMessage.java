@@ -20,12 +20,17 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.server.players.UserNameToIdResolver;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.mojang.authlib.GameProfile;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -195,20 +200,29 @@ public class PermissionsMessage
                 return;
             }
 
-            // Prefer currently online players, then the server's name→UUID cache (offline who have joined).
+            // Resolve online first, then an *existing* name→UUID cache entry.
+            // Do NOT call Permissions.addPlayer(String) / cache.get with offline invent enabled:
+            // CachedUserNameToIdResolver fabricates offline UUIDs for any unknown name and would
+            // falsely report success for made-up singleplayer names.
             boolean added = false;
-            final var server = colony.getWorld().getServer();
+            final MinecraftServer server = colony.getWorld().getServer();
             if (server != null)
             {
-                final ServerPlayer online = server.getPlayerList().getPlayer(name);
+                final Rank neutral = colony.getPermissions().getRank(IPermissions.NEUTRAL_RANK_ID);
+                final ServerPlayer online = server.getPlayerList().getPlayerByName(name);
                 if (online != null)
                 {
-                    added = colony.getPermissions().addPlayer(online.getGameProfile(), colony.getPermissions().getRank(IPermissions.NEUTRAL_RANK_ID));
+                    added = colony.getPermissions().addPlayer(online.getGameProfile(), neutral);
                 }
-            }
-            if (!added)
-            {
-                added = colony.getPermissions().addPlayer(name, colony.getPermissions().getRank(IPermissions.NEUTRAL_RANK_ID), colony.getWorld());
+                else
+                {
+                    final Optional<NameAndId> known = resolveKnownPlayer(server, name);
+                    if (known.isPresent())
+                    {
+                        final NameAndId id = known.get();
+                        added = colony.getPermissions().addPlayer(new GameProfile(id.id(), id.name()), neutral);
+                    }
+                }
             }
 
             if (added)
@@ -218,6 +232,26 @@ public class PermissionsMessage
             else
             {
                 player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.notfound", name));
+            }
+        }
+
+        /**
+         * Looks up a player name in the server's name cache without inventing offline UUIDs.
+         * Temporarily disables {@link UserNameToIdResolver#resolveOfflineUsers(boolean)} so
+         * unknown names return empty instead of {@link NameAndId#createOffline(String)}.
+         */
+        private static Optional<NameAndId> resolveKnownPlayer(final MinecraftServer server, final String name)
+        {
+            final UserNameToIdResolver cache = server.services().nameToIdCache();
+            cache.resolveOfflineUsers(false);
+            try
+            {
+                return cache.get(name);
+            }
+            finally
+            {
+                // Integrated/offline servers need offline invent for normal joins; restore it.
+                cache.resolveOfflineUsers(true);
             }
         }
 

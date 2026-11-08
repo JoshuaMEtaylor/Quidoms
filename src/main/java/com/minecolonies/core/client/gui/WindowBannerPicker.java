@@ -5,6 +5,7 @@ import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.Utils;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.client.gui.townhall.AbstractWindowTownHall;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -14,16 +15,14 @@ import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.model.BannerFlagModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
@@ -69,6 +68,13 @@ public class WindowBannerPicker extends Screen
     /** The number of rows the patterns are arranged in */
     private static final int PATTERN_ROWS = 4;
 
+    /**
+     * Banner pattern atlas is 64×64; loom samples the flag face at 21×40 within that.
+     * @see net.minecraft.client.gui.screens.inventory.LoomScreen#renderBannerOnButton
+     */
+    private static final float BANNER_PATTERN_TEXTURE_SIZE = 64.0F;
+    private static final float BANNER_PATTERN_FACE_WIDTH = 21.0F;
+    private static final float BANNER_PATTERN_FACE_HEIGHT = 40.0F;
 
     /**
      * The list of patterns that usually require charges, or are to be made more valuable
@@ -155,7 +161,11 @@ public class WindowBannerPicker extends Screen
 
         // Fetch the patterns as a List and not ListNBT
         this.layers = new ArrayList<>(colony.getColonyFlag().layers());
-        // Remove the extra base layer created by the above function
+        if (this.layers.isEmpty())
+        {
+            this.layers.add(new BannerPatternLayers.Layer(
+              Utils.getRegistryValue(BannerPatterns.BASE, colony.getWorld()), DyeColor.WHITE));
+        }
     }
 
     @Override
@@ -186,12 +196,21 @@ public class WindowBannerPicker extends Screen
                 center(this.width, 6, SIDE, 7, 0), GUI_Y,
                 SIDE, SIDE,
                 Component.literal(ChatFormatting.RED + "X"),
-                pressed -> layers.remove(activeLayer), DEFAULT_NARRATION)
+                pressed -> {
+                    if (activeLayer > 0 && activeLayer < layers.size())
+                    {
+                        layers.remove(activeLayer);
+                        if (activeLayer >= layers.size())
+                        {
+                            activeLayer = Math.max(0, layers.size() - 1);
+                        }
+                    }
+                }, DEFAULT_NARRATION)
         {
             @Override
             public void renderWidget(final GuiGraphics stack, int mouseX, int mouseY, float partialTicks)
             {
-                this.active = activeLayer < layers.size() && activeLayer != 0; // TODO: port this last vital condition
+                this.active = activeLayer < layers.size() && activeLayer != 0;
                 super.renderWidget(stack, mouseX, mouseY, partialTicks);
             }
         });
@@ -270,16 +289,35 @@ public class WindowBannerPicker extends Screen
     {
         if (pattern == null)
         {
-            // Drop out if only the color was selected.
-            if (activeLayer == layers.size()) return;
-            else if (activeLayer == 0) pattern = Utils.getRegistryValue(BannerPatterns.BASE, colony.getWorld());
-            else pattern = layers.get(activeLayer).pattern();
+            // Drop out if only the color was selected on a not-yet-created layer.
+            if (activeLayer == layers.size())
+            {
+                return;
+            }
+            else if (activeLayer == 0)
+            {
+                pattern = Utils.getRegistryValue(BannerPatterns.BASE, colony.getWorld());
+            }
+            else
+            {
+                pattern = layers.get(activeLayer).pattern();
+            }
+        }
+
+        // Base layer is color-only; ignore pattern picks while Base is selected.
+        if (activeLayer == 0)
+        {
+            pattern = Utils.getRegistryValue(BannerPatterns.BASE, colony.getWorld());
         }
 
         if (activeLayer == layers.size())
+        {
             layers.add(new BannerPatternLayers.Layer(pattern, color));
+        }
         else
+        {
             layers.set(activeLayer, new BannerPatternLayers.Layer(pattern, color));
+        }
     }
 
     @Override
@@ -301,14 +339,15 @@ public class WindowBannerPicker extends Screen
             stack.fill(trackX+2, trackY, trackX+6, trackY+ (int) barHeight, 0xBBFFFFFF);
         }
 
-
-        // Render the instructions
-        stack.drawCenteredString(this.font, Component.translatableEscape("com.minecolonies.coremod.gui.flag.choose").getString(), this.width / 2, 16, 0xFFFFFF);
+        // Title + layer hint sit above the pattern grid (near the layer buttons), never over it.
+        stack.drawCenteredString(this.font,
+          Component.translatableEscape("com.minecolonies.coremod.gui.flag.choose").getString(),
+          this.width / 2, 16, 0xFFFFFF);
         if (activeLayer == 0)
         {
             stack.drawCenteredString(this.font,
               Component.translatableEscape("com.minecolonies.core.gui.flag.pick_layer").getString(),
-              this.width / 2, this.height / 2 - 10, 0xFFCCCCCC);
+              this.width / 2, GUI_Y + SIDE + 4, 0xFFCCCCCC);
         }
     }
 
@@ -325,29 +364,51 @@ public class WindowBannerPicker extends Screen
         {
             builder.add(layers.get(i));
         }
+        this.flagModel.setupAnim(0.0F);
         stack.submitBannerPatternRenderState(flagModel, base, builder.build(), posX, posY, posX + 40, posY + 80);
     }
 
     /**
-     * Draw a single banner pattern sprite into a pattern button cell (loom-style).
+     * Draw a single banner pattern into a pattern button cell using loom-style UV crop
+     * of the flag face (21×40 within the 64×64 pattern atlas sprite).
      */
     private void drawBannerPattern(Holder<BannerPattern> pattern, int x, int y, GuiGraphics stack)
     {
         final boolean locked = !isFeatureUnlocked.get() && pattern.unwrapKey().isPresent()
           && pattern.unwrapKey().get().location().getNamespace().equals(Constants.MOD_ID);
         stack.fill(x, y, x + PATTERN_WIDTH, y + PATTERN_HEIGHT, locked ? 0xFF222222 : 0xFF555555);
+
+        // Loom-sized face inset inside our taller cell.
+        final int faceW = PATTERN_WIDTH - 4;
+        final int faceH = (int) (faceW * (BANNER_PATTERN_FACE_HEIGHT / BANNER_PATTERN_FACE_WIDTH));
+        final int faceX = x + 2;
+        final int faceY = y + Math.max(2, (PATTERN_HEIGHT - faceH) / 2);
+
+        stack.fill(faceX, faceY, faceX + faceW, faceY + faceH,
+          locked ? 0xFF111111 : (0xFF000000 | DyeColor.GRAY.getTextureDiffuseColor()));
+
         try
         {
             final Material material = Sheets.getBannerMaterial(pattern);
             final TextureAtlasSprite sprite = stack.getSprite(material);
-            // Tint: locked patterns stay dark; others use current palette / white.
-            final int tint = locked ? 0xFF000000 : (0xFF000000 | colors.getSelected().getTextureDiffuseColor());
-            stack.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x + 1, y + 1, PATTERN_WIDTH - 2, PATTERN_HEIGHT - 2, tint);
+            final float u0 = sprite.getU0();
+            final float u1 = u0 + (sprite.getU1() - u0) * (BANNER_PATTERN_FACE_WIDTH / BANNER_PATTERN_TEXTURE_SIZE);
+            final float vSpan = sprite.getV1() - sprite.getV0();
+            final float v0 = sprite.getV0() + vSpan / BANNER_PATTERN_TEXTURE_SIZE;
+            final float v1 = v0 + vSpan * (BANNER_PATTERN_FACE_HEIGHT / BANNER_PATTERN_TEXTURE_SIZE);
+
+            stack.blit(sprite.atlasLocation(), faceX, faceY, faceW, faceH, u0, u1, v0, v1);
+
+            // Soft color wash so the cell reflects the selected dye (preview uses true dye).
+            if (!locked)
+            {
+                final int tint = (0x55000000 | (colors.getSelected().getTextureDiffuseColor() & 0x00FFFFFF));
+                stack.fill(faceX, faceY, faceX + faceW, faceY + faceH, tint);
+            }
         }
         catch (final Exception ex)
         {
-            // Fallback solid if atlas lookup fails
-            stack.fill(x + 2, y + 2, x + PATTERN_WIDTH - 2, y + PATTERN_HEIGHT - 2, 0xFFFFFFFF);
+            stack.fill(faceX + 1, faceY + 1, faceX + faceW - 1, faceY + faceH - 1, 0xFFFFFFFF);
             Log.getLogger().debug("Banner pattern sprite missing: {}", pattern.value().assetId(), ex);
         }
     }
@@ -486,7 +547,7 @@ public class WindowBannerPicker extends Screen
         @Override
         public void onPress(final InputWithModifiers input)
         {
-            if (!this.blocked)
+            if (!this.blocked && activeLayer > 0)
             {
                 setLayer(this.pattern, colors.getSelected());
             }
@@ -508,7 +569,6 @@ public class WindowBannerPicker extends Screen
             this.setY(center(WindowBannerPicker.this.height, PATTERN_ROWS, PATTERN_HEIGHT, position, PATTERN_MARGIN));
             this.isHovered = mx >= this.getX() && my >= this.getY() && mx < this.getX() + this.width && my < this.getY() + this.height;
 
-            // Always draw pattern sprites (even on Base layer) so the list is never an empty gray field.
             try
             {
                 drawBannerPattern(this.pattern, this.getX(), this.getY(), stack);

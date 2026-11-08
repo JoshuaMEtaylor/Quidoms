@@ -12,9 +12,9 @@
 
             <list id="users" size="148 121" pos="26 100">
                 <box size="100% 35" linewidth="1">
-                    <text id="name" size="100 11" pos="5 2" color="black"/>
+                    <text id="name" size="100 11" pos="5 2" color="white"/>
                     <button id="removePlayer" size="14 15" pos="2 1" align="TOP_RIGHT" source="minecolonies:textures/gui/button_x.png"/>
-                    <text id="rank" size="129 11" pos="5 17" color="black" />
+                    <text id="rank" size="129 11" pos="5 17" color="white" />
                     <dropdown id="rankPicker"
                               size="129 17"
                               pos="2 17"

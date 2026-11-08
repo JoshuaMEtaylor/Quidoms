@@ -653,12 +653,17 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
             {
                 final ColonyPlayer player = users.get(index);
                 Rank rank = player.getRank();
-                rowPane.findPaneOfTypeByID(NAME_LABEL, Text.class).setText(Component.literal(player.getName()));
+                final Text nameLabel = rowPane.findPaneOfTypeByID(NAME_LABEL, Text.class);
+                nameLabel.setText(Component.literal(player.getName()));
+                // Opaque white so names stay visible on the permissions list rows.
+                nameLabel.setColors(0xFFFFFFFF);
                 DropDownList dropdown = rowPane.findPaneOfTypeByID(TOWNHALL_RANK_PICKER, DropDownList.class);
                 if (rank.getId() == buildingView.getColony().getPermissions().OWNER_RANK_ID)
                 {
                     rowPane.findPaneOfTypeByID(BUTTON_REMOVE_PLAYER, Button.class).setEnabled(false);
-                    rowPane.findPaneOfTypeByID("rank", Text.class).setText(Component.literal(rank.getName()));
+                    final Text rankLabel = rowPane.findPaneOfTypeByID("rank", Text.class);
+                    rankLabel.setText(Component.literal(rank.getName()));
+                    rankLabel.setColors(0xFFFFFFFF);
                     dropdown.setEnabled(false);
                 }
                 else

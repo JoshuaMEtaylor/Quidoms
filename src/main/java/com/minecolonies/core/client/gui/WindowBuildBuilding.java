@@ -92,9 +92,9 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
     private DropDownList buildersDropDownList;
 
     /**
-     * Ink on parchment (matches builder hut resource list).
+     * Ink on parchment (opaque black — BlockUI name colors are RGB|0xFF000000).
      */
-    private static final int INK = Color.getByName("black", 0);
+    private static final int INK = Color.getByName("black", 0xFF000000);
 
     /**
      * List of style for the section.
@@ -593,11 +593,14 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
                 final ItemStorage resource = tempRes.get(index);
                 final Text resourceLabel = rowPane.findPaneOfTypeByID(RESOURCE_NAME, Text.class);
                 final Text quantityLabel = rowPane.findPaneOfTypeByID(RESOURCE_QUANTITY_MISSING, Text.class);
-                resourceLabel.setText(resource.getItemStack().getHoverName());
+                // Resolve hover name to a plain string so BlockUI shows the translated label
+                // (nested Domum format components otherwise leak raw lang keys when clipped).
+                final ItemStack displayStack = resource.getItemStack();
+                resourceLabel.setText(Component.literal(displayStack.getHoverName().getString()));
                 quantityLabel.setText(Component.literal(Integer.toString(resource.getAmount())));
                 resourceLabel.setColors(INK);
                 quantityLabel.setColors(INK);
-                final ItemStack itemIcon = resource.getItemStack().copy();
+                final ItemStack itemIcon = displayStack.copy();
                 itemIcon.setCount(1);
                 rowPane.findPaneOfTypeByID(RESOURCE_ICON, ItemIcon.class).setItem(itemIcon);
             }
