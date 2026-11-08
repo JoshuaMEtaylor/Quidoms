@@ -14,6 +14,7 @@ import com.ldtteam.structurize.placement.StructurePhasePlacementResult;
 import com.ldtteam.structurize.placement.StructurePlacer;
 import com.ldtteam.structurize.placement.structure.IStructureHandler;
 import com.ldtteam.structurize.storage.ClientFutureProcessor;
+import com.ldtteam.structurize.storage.StructurePackMeta;
 import com.ldtteam.structurize.storage.StructurePacks;
 import com.ldtteam.structurize.util.BlueprintPositionInfo;
 import com.minecolonies.api.blocks.AbstractBlockHut;
@@ -44,6 +45,7 @@ import net.neoforged.neoforge.common.util.TriPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -256,37 +258,106 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
 
     /**
      * Update the styles list but try to keep the same one.
+     * Quidoms: populate every installed pack that contains this building's blueprint so
+     * previous/next arrows actually cycle (upstream only ever added the current pack).
      */
     private void updateStyles()
     {
-        if (!building.getParent().equals(BlockPos.ZERO) && building.getColony().getClientBuildingManager().getBuilding(building.getParent()) != null)
+        styles = new ArrayList<>();
+
+        final IBuildingView parentBuilding = building.getParent().equals(BlockPos.ZERO)
+                                               ? null
+                                               : building.getColony().getClientBuildingManager().getBuilding(building.getParent());
+        if (parentBuilding != null)
         {
-            styles = new ArrayList<>();
-            styles.add(building.getColony().getClientBuildingManager().getBuilding(building.getParent()).getStructurePack());
-            if (!styles.isEmpty())
-            {
-                stylesDropDownList.setSelectedIndex(0);
-            }
+            // Child modules stay locked to the parent's pack.
+            styles.add(parentBuilding.getStructurePack());
         }
         else
         {
-            styles = new ArrayList<>();
-            styles.add(building.getStructurePack());
-
-            if (!styles.isEmpty())
+            final List<String> pathCandidates = blueprintPathCandidates();
+            for (final StructurePackMeta pack : StructurePacks.getPackMetas())
             {
-                int newIndex = styles.indexOf(building.getStructurePack());
-                if (newIndex == -1)
+                if (pathCandidates.stream().anyMatch(path -> packHasBlueprint(pack, path)))
                 {
-                    newIndex = 0;
+                    styles.add(pack.getName());
                 }
-                stylesDropDownList.setSelectedIndex(newIndex);
+            }
+            styles.sort(String.CASE_INSENSITIVE_ORDER);
+
+            if (styles.isEmpty() && building.getStructurePack() != null && !building.getStructurePack().isEmpty())
+            {
+                styles.add(building.getStructurePack());
             }
         }
 
-        findPaneOfTypeByID(BUTTON_PREVIOUS_STYLE_ID, Button.class).setEnabled(enabled);
-        findPaneOfTypeByID(DROPDOWN_STYLE_ID, DropDownList.class).setEnabled(enabled);
-        findPaneOfTypeByID(BUTTON_NEXT_STYLE_ID, Button.class).setEnabled(enabled);
+        if (!styles.isEmpty())
+        {
+            int newIndex = styles.indexOf(building.getStructurePack());
+            if (newIndex < 0)
+            {
+                newIndex = 0;
+            }
+            stylesDropDownList.setSelectedIndex(newIndex);
+        }
+
+        final boolean canSwitch = styles.size() > 1;
+        findPaneOfTypeByID(BUTTON_PREVIOUS_STYLE_ID, Button.class).setEnabled(canSwitch);
+        findPaneOfTypeByID(DROPDOWN_STYLE_ID, DropDownList.class).setEnabled(canSwitch || !styles.isEmpty());
+        findPaneOfTypeByID(BUTTON_NEXT_STYLE_ID, Button.class).setEnabled(canSwitch);
+    }
+
+    /**
+     * Blueprint sub-paths to probe when discovering style packs (current + upgrade/level-1).
+     */
+    @NotNull
+    private List<String> blueprintPathCandidates()
+    {
+        final List<String> candidates = new ArrayList<>();
+        final String structurePath = building.getStructurePath();
+        if (structurePath == null || structurePath.isEmpty())
+        {
+            return candidates;
+        }
+        candidates.add(structurePath);
+
+        String name = structurePath.replace(".blueprint", "");
+        if (name.isEmpty())
+        {
+            return candidates;
+        }
+
+        int nextLevel = building.getBuildingLevel();
+        if (canBeUpgraded())
+        {
+            nextLevel = building.getBuildingLevel() + 1;
+        }
+        if (nextLevel < 1)
+        {
+            nextLevel = 1;
+        }
+        candidates.add(name.substring(0, name.length() - 1) + nextLevel + ".blueprint");
+        candidates.add(name.substring(0, name.length() - 1) + "1.blueprint");
+        return candidates;
+    }
+
+    /**
+     * True when the pack contains the given blueprint sub-path.
+     */
+    private static boolean packHasBlueprint(@NotNull final StructurePackMeta pack, @Nullable final String structurePath)
+    {
+        if (structurePath == null || structurePath.isEmpty())
+        {
+            return false;
+        }
+        try
+        {
+            return Files.exists(pack.getPath().resolve(pack.getNormalizedSubPath(structurePath)));
+        }
+        catch (final Exception ignored)
+        {
+            return false;
+        }
     }
 
     /**
@@ -448,7 +519,12 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      */
     private void nextStyle()
     {
-        stylesDropDownList.selectNext();
+        if (styles.isEmpty())
+        {
+            return;
+        }
+        final int next = (Math.max(stylesDropDownList.getSelectedIndex(), 0) + 1) % styles.size();
+        stylesDropDownList.setSelectedIndex(next);
     }
 
     /**
@@ -456,7 +532,13 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      */
     private void previousStyle()
     {
-        stylesDropDownList.selectPrevious();
+        if (styles.isEmpty())
+        {
+            return;
+        }
+        final int current = stylesDropDownList.getSelectedIndex();
+        final int prev = current <= 0 ? styles.size() - 1 : current - 1;
+        stylesDropDownList.setSelectedIndex(prev);
     }
 
     /**
