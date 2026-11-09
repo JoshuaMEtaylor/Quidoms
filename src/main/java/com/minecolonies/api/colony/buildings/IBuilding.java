@@ -448,15 +448,8 @@ public interface IBuilding extends IBuildingContainer, IBuildingModuleContainer,
      */
     default int getMaxEquipmentLevel()
     {
-        if (getBuildingLevel() >= getMaxBuildingLevel())
-        {
-            return TOOL_LEVEL_MAXIMUM;
-        }
-        else if (getBuildingLevel() <= WOOD_HUT_LEVEL)
-        {
-            return BASIC_TOOL_LEVEL;
-        }
-        return getBuildingLevel() - WOOD_HUT_LEVEL;
+        // Quidoms: any tool tier usable at any hut level.
+        return TOOL_LEVEL_MAXIMUM;
     }
 
     /**

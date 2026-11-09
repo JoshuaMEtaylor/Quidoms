@@ -40,9 +40,14 @@ import static com.minecolonies.api.util.constant.TranslationConstants.COM_MINECO
 public class EntityAIStructureBuilder extends AbstractEntityAIStructureWithWorkOrder<JobBuilder, BuildingBuilder>
 {
     /**
-     * Speed buff at 0 depth level.
+     * Path accept / work reach around the target block (was ~4–5).
      */
-    private static final double SPEED_BUFF_0 = 0.5;
+    private static final int BUILDER_WORK_REACH = 10;
+
+    /**
+     * Approach speed factor for site pathing (1.0 = citizen base).
+     */
+    private static final double BUILDER_APPROACH_SPEED = 1.75D;
 
     /**
      * After how many actions should the builder dump his inventory.
@@ -220,10 +225,11 @@ public class EntityAIStructureBuilder extends AbstractEntityAIStructureWithWorkO
                 final PathJobMoveCloseToXNearY pathJob = new PathJobMoveCloseToXNearY(world,
                     currentBlock,
                     building.getWorkOrder().getLocation(),
-                    4,
+                    BUILDER_WORK_REACH,
                     worker);
-                gotoPath = ((MinecoloniesAdvancedPathNavigate) worker.getNavigation()).setPathJob(pathJob, currentBlock, 1.0, false);
-                pathJob.getPathingOptions().canDrop = false;
+                gotoPath = ((MinecoloniesAdvancedPathNavigate) worker.getNavigation()).setPathJob(pathJob, currentBlock, BUILDER_APPROACH_SPEED, false);
+                // Quidoms: allow drops for tall builds; faster approach so movement matches place/break cadence.
+                pathJob.getPathingOptions().canDrop = true;
                 pathJob.extraNodes = 0;
             }
             else if (gotoPath.isDone())
@@ -238,7 +244,7 @@ public class EntityAIStructureBuilder extends AbstractEntityAIStructureWithWorkO
             if (prevBlockPosition != null)
             {
                 // This is good for building, and bad for mining, this is why mining should validate workFrom.
-                return BlockPosUtil.dist(prevBlockPosition, currentBlock) <= 10;
+                return BlockPosUtil.dist(prevBlockPosition, currentBlock) <= BUILDER_WORK_REACH + 6;
             }
             return false;
         }
@@ -253,7 +259,7 @@ public class EntityAIStructureBuilder extends AbstractEntityAIStructureWithWorkO
             return false;
         }
 
-        if (BlockPosUtil.getDistance2D(worker.blockPosition(), currentBlock) > 5)
+        if (BlockPosUtil.getDistance2D(worker.blockPosition(), currentBlock) > BUILDER_WORK_REACH)
         {
             if (BlockPosUtil.dist(workFrom, building.getWorkOrder().getLocation()) < 100)
             {
@@ -273,12 +279,6 @@ public class EntityAIStructureBuilder extends AbstractEntityAIStructureWithWorkO
     public boolean shallReplaceSolidSubstitutionBlock(final Block worldBlock, final BlockState worldMetadata)
     {
         return false;
-    }
-
-    @Override
-    public int getBlockMiningTime(@NotNull final BlockState state, @NotNull final BlockPos pos)
-    {
-        return (int) (super.getBlockMiningTime(state, pos) * SPEED_BUFF_0);
     }
 
     /**
