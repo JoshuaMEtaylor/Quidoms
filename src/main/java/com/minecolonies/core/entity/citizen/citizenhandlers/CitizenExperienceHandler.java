@@ -96,6 +96,9 @@ public class CitizenExperienceHandler implements ICitizenExperienceHandler
 
         localXp *= (1 + citizen.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(LEVELING));
 
+        // Quidoms: substantially faster skill leveling from job XP (~4×).
+        localXp *= 4.0;
+
         final WorkerBuildingModule module = workBuilding.getModuleMatching(WorkerBuildingModule.class, m -> m.getAssignedCitizen().contains(data));
         final Skill primary = module.getPrimarySkill();
         final Skill secondary = module.getSecondarySkill();

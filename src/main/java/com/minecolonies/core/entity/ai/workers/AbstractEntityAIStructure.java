@@ -75,9 +75,9 @@ import static com.minecolonies.core.entity.ai.workers.util.BuildingProgressStage
 public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?, J>, B extends AbstractBuildingStructureBuilder> extends AbstractEntityAIInteract<J, B>
 {
     /**
-     * Building block delay
+     * Building block delay (Quidoms: near-instant place cadence; research can still shave ticks).
      */
-    protected static final int BUILD_BLOCK_DELAY = 15;
+    protected static final int BUILD_BLOCK_DELAY = 1;
 
     /**
      * The current structure task to be build.
@@ -498,8 +498,9 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             blockToMine = null;
         }
 
+        // Quidoms: place delay skill-decoupled (no Adaptability); fixed high place speed.
         final double decrease = 1 - worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(BLOCK_PLACE_SPEED);
-        setDelay((int) ((BUILD_BLOCK_DELAY * PROGRESS_MULTIPLIER / (getPlaceSpeedLevel() / 2 + PROGRESS_MULTIPLIER)) * decrease));
+        setDelay(Math.max(1, (int) (BUILD_BLOCK_DELAY * decrease)));
 
         return getState();
     }

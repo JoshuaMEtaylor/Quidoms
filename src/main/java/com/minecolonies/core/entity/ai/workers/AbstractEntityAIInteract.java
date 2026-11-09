@@ -46,11 +46,6 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
     public static final double XP_PER_BLOCK = 0.05D;
 
     /**
-     * The percentage of time needed if we are one level higher.
-     */
-    private static final double LEVEL_MODIFIER = 0.85D;
-
-    /**
      * The minimum range the builder has to reach in order to construct or clear.
      */
     private static final int MIN_WORKING_RANGE = 12;
@@ -92,9 +87,9 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
     private List<BlockPos> items;
 
     /**
-     * Block mining delay base
+     * Block mining delay scale (Quidoms: tool/hardness driven; was 500 skill-floored ticks).
      */
-    public static final int BLOCK_MINING_DELAY = 500;
+    public static final int BLOCK_MINING_DELAY = 20;
 
     /**
      * Creates the abstract part of the AI. Always use this constructor!
@@ -328,12 +323,11 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
     private int calculateWorkerMiningDelay(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
         final double reduction = 1 - worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(BLOCK_BREAK_SPEED);
+        final double hardness = Math.max(0.05D, world.getBlockState(pos).getDestroySpeed(world, pos));
+        final double toolSpeed = Math.max(0.1D, worker.getMainHandItem().getItem().getDestroySpeed(worker.getMainHandItem(), state));
 
-        return (int) (((BLOCK_MINING_DELAY * Math.pow(LEVEL_MODIFIER, getBreakSpeedLevel() / 2.0))
-                         * (double) world.getBlockState(pos).getDestroySpeed(world, pos) / (double) (worker.getMainHandItem()
-                                                                                                       .getItem()
-                                                                                                       .getDestroySpeed(worker.getMainHandItem(), state)))
-                        * reduction);
+        // Quidoms: break as fast as tools allow — hardness/toolSpeed only (Athletics skill flattened).
+        return Math.max(1, (int) ((BLOCK_MINING_DELAY * hardness / toolSpeed) * reduction));
     }
 
     /**
