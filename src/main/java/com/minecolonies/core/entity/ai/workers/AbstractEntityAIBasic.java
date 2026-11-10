@@ -1698,7 +1698,8 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
         }
 
         // Quidoms + QuidCraft (optional): try materials-market buy before colony request/deliveryman.
-        if (com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(building, stack, updatedCount, matchNBT))
+        final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
+        if (com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(building, stack, updatedCount, matchNBT, citizenName))
         {
             if (InventoryUtils.hasBuildingEnoughElseCount(building, new ItemStorage(stack, true, matchNBT), updatedMinCount) >= updatedMinCount &&
                   updatedCount - InventoryUtils.transferXOfFirstSlotInProviderWithIntoNextFreeSlotInItemHandlerWithResult(

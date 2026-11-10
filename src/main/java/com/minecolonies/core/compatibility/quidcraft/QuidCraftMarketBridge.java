@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Soft QuidCraft marketplace bridge. Uses reflection so Quidoms compiles and runs without QuidCraft.
  * When QuidCraft is loaded and ready, missing worker materials can be bought from the materials market
  * against the colony owner's Quid account before/alongside the normal request system.
+ * Purchase attempts are recorded for QuidCraft's Colonies screen tab when the API is available.
  */
 public final class QuidCraftMarketBridge
 {
@@ -52,11 +53,21 @@ public final class QuidCraftMarketBridge
         return presentCached && !reflectFailed;
     }
 
+    public static boolean tryBuyForBuilding(@NotNull final IBuilding building, @NotNull final ItemStack stack, final int count, final boolean matchNBT)
+    {
+        return tryBuyForBuilding(building, stack, count, matchNBT, "");
+    }
+
     /**
      * Attempt to buy {@code count} of {@code stack}'s item from QuidCraft into the colony owner's inventory,
      * then move matching stacks into the building. Returns true if the building now holds enough.
      */
-    public static boolean tryBuyForBuilding(@NotNull final IBuilding building, @NotNull final ItemStack stack, final int count, final boolean matchNBT)
+    public static boolean tryBuyForBuilding(
+      @NotNull final IBuilding building,
+      @NotNull final ItemStack stack,
+      final int count,
+      final boolean matchNBT,
+      @NotNull final String citizenName)
     {
         if (!isPresent() || stack.isEmpty() || count <= 0 || building.getColony() == null || building.getColony().getWorld() == null)
         {
@@ -78,28 +89,32 @@ public final class QuidCraftMarketBridge
         }
         COOLDOWNS.put(coolKey, nowMs + COOLDOWN_MS);
 
+        final UUID orderId = UUID.randomUUID();
+        final UUID ownerId = colony.getPermissions().getOwner();
+        final String ownerName = colony.getPermissions().getOwnerName() == null ? "colony-owner" : colony.getPermissions().getOwnerName();
+        final String colonyName = colony.getName() == null ? ("colony-" + colony.getID()) : colony.getName();
+
         try
         {
             if (!quidReady())
             {
                 return false;
             }
-
-            final UUID ownerId = colony.getPermissions().getOwner();
             if (ownerId == null)
             {
+                recordOrder(orderId, colony.getID(), colonyName, new UUID(0L, 0L), ownerName, citizenName, itemId, count, false, 0L, "no-owner", nowMs);
                 return false;
             }
 
             final Level world = colony.getWorld();
             final ServerPlayer owner = world.getServer() == null ? null : world.getServer().getPlayerList().getPlayer(ownerId);
-            final String ownerName = colony.getPermissions().getOwnerName() == null ? "colony-owner" : colony.getPermissions().getOwnerName();
 
             final BlockPos pos = building.getPosition();
             final String dimension = world.dimension().location().toString();
             final Object economy = economyHostGet();
             if (economy == null)
             {
+                recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, false, 0L, "economy-null", nowMs);
                 return false;
             }
 
@@ -110,8 +125,13 @@ public final class QuidCraftMarketBridge
             final int before = owner == null ? 0 : countMatching(owner, stack, matchNBT);
 
             final Object outcome = invokeTrade(economy, actor, requestId, itemId, buySide, count, dimension, pos.getX(), pos.getZ(), System.currentTimeMillis());
-            if (outcome == null || !outcomeOk(outcome))
+            final boolean ok = outcome != null && outcomeOk(outcome);
+            final long cost = outcomeCost(outcome);
+            final String detail = outcomeDetail(outcome);
+
+            if (!ok)
             {
+                recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, false, cost, detail.isEmpty() ? "trade-failed" : detail, nowMs);
                 return false;
             }
 
@@ -123,7 +143,8 @@ public final class QuidCraftMarketBridge
 
             if (owner == null)
             {
-                // Purchase may sit in Claims until the owner is online; request system still runs.
+                recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, true, cost,
+                  detail.isEmpty() ? "ok-claims-offline" : detail, nowMs);
                 Log.getLogger().info("QuidCraft bought {} x{} for colony {} (owner offline — Claims).", itemId, count, colony.getName());
                 return false;
             }
@@ -132,17 +153,20 @@ public final class QuidCraftMarketBridge
             final int gained = Math.max(0, after - before);
             if (gained <= 0)
             {
-                // Bought into Claims or already reserved; leave request path active.
+                recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, true, cost,
+                  detail.isEmpty() ? "ok-pending-delivery" : detail, nowMs);
                 return false;
             }
 
             final int toMove = Math.min(gained, count);
             moveFromPlayerToBuilding(owner, building, stack, toMove, matchNBT);
 
-            // Same ItemStorage flag pattern as AbstractEntityAIBasic request checks.
             final int inBuilding = InventoryUtils.hasBuildingEnoughElseCount(building,
               new com.minecolonies.api.crafting.ItemStorage(stack, true, matchNBT), Math.min(toMove, count));
-            return inBuilding >= Math.min(toMove, count);
+            final boolean delivered = inBuilding >= Math.min(toMove, count);
+            recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, delivered, cost,
+              delivered ? (detail.isEmpty() ? "ok-delivered" : detail) : "ok-partial-hut", nowMs);
+            return delivered;
         }
         catch (final ClassNotFoundException | NoSuchMethodException | NoClassDefFoundError e)
         {
@@ -152,8 +176,47 @@ public final class QuidCraftMarketBridge
         }
         catch (final Throwable t)
         {
+            recordOrder(orderId, colony.getID(), colonyName, ownerId == null ? new UUID(0L, 0L) : ownerId, ownerName, citizenName, itemId, count, false, 0L, t.toString(), nowMs);
             Log.getLogger().debug("QuidCraft market buy failed for {}: {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), t.toString());
             return false;
+        }
+    }
+
+    private static void recordOrder(
+      final UUID orderId,
+      final int colonyId,
+      final String colonyName,
+      final UUID ownerId,
+      final String ownerName,
+      final String citizenName,
+      final String itemId,
+      final int quantity,
+      final boolean success,
+      final long costMinor,
+      final String detail,
+      final long now)
+    {
+        try
+        {
+            final Class<?> api = Class.forName("com.quidcraft.api.QuidApi");
+            if (!Boolean.TRUE.equals(api.getMethod("ready").invoke(null)))
+            {
+                return;
+            }
+            final Object access = api.getMethod("get").invoke(null);
+            access.getClass().getMethod(
+              "recordColonyMarketOrder",
+              UUID.class, int.class, String.class, UUID.class, String.class, String.class, String.class,
+              int.class, boolean.class, long.class, String.class, long.class
+            ).invoke(access, orderId, colonyId, colonyName, ownerId, ownerName, citizenName == null ? "" : citizenName, itemId, quantity, success, costMinor, detail == null ? "" : detail, now);
+        }
+        catch (final NoSuchMethodException e)
+        {
+            // Older QuidCraft without Colonies tab API — ignore.
+        }
+        catch (final Throwable t)
+        {
+            Log.getLogger().debug("Could not record QuidCraft colony order: {}", t.toString());
         }
     }
 
@@ -213,6 +276,36 @@ public final class QuidCraftMarketBridge
     {
         final Method ok = outcome.getClass().getMethod("ok");
         return Boolean.TRUE.equals(ok.invoke(outcome));
+    }
+
+    private static String outcomeDetail(final Object outcome)
+    {
+        if (outcome == null)
+        {
+            return "";
+        }
+        try
+        {
+            final Object key = outcome.getClass().getMethod("messageKey").invoke(outcome);
+            final Object detail = outcome.getClass().getMethod("detail").invoke(outcome);
+            final String k = key == null ? "" : key.toString();
+            final String d = detail == null ? "" : detail.toString();
+            if (k.isEmpty())
+            {
+                return d;
+            }
+            return d.isEmpty() ? k : (k + ":" + d);
+        }
+        catch (final Throwable t)
+        {
+            return "";
+        }
+    }
+
+    private static long outcomeCost(final Object outcome)
+    {
+        // Outcome does not expose goods total; leave 0 unless a future API adds it.
+        return 0L;
     }
 
     private static void tryClaimAll(final Object economy, final Object actor)
@@ -280,7 +373,6 @@ public final class QuidCraftMarketBridge
             }
             if (!leftover.isEmpty())
             {
-                // Return what did not fit.
                 playerInv.insertItem(slot, leftover, false);
                 remaining -= (take - leftover.getCount());
             }
