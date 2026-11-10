@@ -107,6 +107,12 @@ file="META-INF/accesstransformer.cfg"
     versionRange="[${dynamicTreesVersion},)"
     ordering="NONE"
     side="BOTH"
+[[dependencies.minecolonies]]
+    modId="quidcraft"
+    type="optional"
+    versionRange="[1.0.9,1.1.0)"
+    ordering="NONE"
+    side="BOTH"
 
 [[dependencies.structurize]]
     modId="neoforge"
