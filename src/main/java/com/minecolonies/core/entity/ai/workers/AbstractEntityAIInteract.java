@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.minecolonies.api.research.util.ResearchConstants.BLOCK_BREAK_SPEED;
 import static com.minecolonies.core.placementhandlers.DoBlockPlacementHandler.getCorrectDOItem;
 
 /**
@@ -44,11 +43,6 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
      * The amount of xp the entity gains per block mined.
      */
     public static final double XP_PER_BLOCK = 0.05D;
-
-    /**
-     * The percentage of time needed if we are one level higher.
-     */
-    private static final double LEVEL_MODIFIER = 0.85D;
 
     /**
      * The minimum range the builder has to reach in order to construct or clear.
@@ -92,9 +86,9 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
     private List<BlockPos> items;
 
     /**
-     * Block mining delay base
+     * Legacy constant retained for callers; mining delay is vanilla destroy-progress only (tools/enchants).
      */
-    public static final int BLOCK_MINING_DELAY = 500;
+    public static final int BLOCK_MINING_DELAY = 0;
 
     /**
      * Creates the abstract part of the AI. Always use this constructor!
@@ -224,10 +218,7 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
             blockBreakAction.run();
         }
 
-        if (tool != ItemStack.EMPTY && damageTool)
-        {
-            tool.getItem().inventoryTick(tool, world, worker, worker.getCitizenInventoryHandler().findFirstSlotInInventoryWith(tool.getItem()), true);
-        }
+        // Quidoms: tools are unbreakable; skip inventoryTick durability path (1.21.10 EquipmentSlot API).
         worker.getCitizenExperienceHandler().addExperience(XP_PER_BLOCK);
         this.incrementActionsDone();
         return true;
@@ -299,7 +290,13 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
         }
         currentWorkingLocation = blockToMine;
 
-        return hasNotDelayed(getBlockMiningTime(curBlock, blockToMine));
+        // Quidoms: vanilla instamine (progress >= 1) → 0 wait ticks, break this AI tick (no min delay).
+        final int mineTime = getBlockMiningTime(curBlock, blockToMine);
+        if (mineTime <= 0)
+        {
+            return false;
+        }
+        return hasNotDelayed(mineTime);
     }
 
     /**
@@ -307,36 +304,59 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
      *
      * @param state the blockstate
      * @param pos   coordinate
-     * @return the delay in ticks
+     * @return the delay in ticks ({@code 0} = instamine / break immediately)
      */
     public int getBlockMiningTime(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
-        if (worker.getMainHandItem() == null)
-        {
-            return (int) state.getDestroySpeed(world, pos);
-        }
-
-        return MineColonies.getConfig().getServer().pvp_mode.get()
-                 ? BLOCK_MINING_DELAY / 2
-                 : calculateWorkerMiningDelay(state, pos);
+        final int ticks = calculateVanillaMiningTicks(state, pos);
+        return MineColonies.getConfig().getServer().pvp_mode.get() ? Math.max(0, ticks / 2) : ticks;
     }
 
     /**
-     * Calculate the worker mining delay for a block at a pos.
-     *
-     * @param state the blockstate.
-     * @param pos   the pos.
-     * @return the mining delay of the worker.
+     * Vanilla player break ticks for the currently held tool — tools + Efficiency only.
+     * No Adaptability/Athletics/hut level/research/min-delay floors.
+     * <p>
+     * Matches {@code Player.getDestroySpeed} + {@code BlockBehaviour.getDestroyProgress}:
+     * base {@link ItemStack#getDestroySpeed}, plus Efficiency as {@code level² + 1} when base &gt; 1
+     * (same as {@code minecraft:levels_squared} on {@code mining_efficiency}), then
+     * {@code progress = speed / hardness / (canHarvest ? 30 : 100)}. Progress ≥ 1 → {@code 0} ticks.
      */
-    private int calculateWorkerMiningDelay(@NotNull final BlockState state, @NotNull final BlockPos pos)
+    private int calculateVanillaMiningTicks(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
-        final double reduction = 1 - worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(BLOCK_BREAK_SPEED);
+        final float hardness = state.getDestroySpeed(world, pos);
+        if (hardness < 0.0F)
+        {
+            return Integer.MAX_VALUE / 2;
+        }
+        if (hardness == 0.0F)
+        {
+            return 0;
+        }
 
-        return (int) (((BLOCK_MINING_DELAY * Math.pow(LEVEL_MODIFIER, getBreakSpeedLevel() / 2.0))
-                         * (double) world.getBlockState(pos).getDestroySpeed(world, pos) / (double) (worker.getMainHandItem()
-                                                                                                       .getItem()
-                                                                                                       .getDestroySpeed(worker.getMainHandItem(), state)))
-                        * reduction);
+        final ItemStack held = worker.getMainHandItem();
+        float speed = held.isEmpty() ? 1.0F : Math.max(0.0F, held.getDestroySpeed(state));
+        if (speed <= 0.0F)
+        {
+            speed = 1.0F;
+        }
+
+        // Player adds Attributes.MINING_EFFICIENCY when base speed > 1; Efficiency enchant = level²+1.
+        if (!held.isEmpty() && speed > 1.0F)
+        {
+            final int efficiency = held.getEnchantmentLevel(Utils.getRegistryValue(Enchantments.EFFICIENCY, world));
+            if (efficiency > 0)
+            {
+                speed += (float) (efficiency * efficiency + 1);
+            }
+        }
+
+        final boolean canHarvest = !state.requiresCorrectToolForDrops() || (!held.isEmpty() && held.isCorrectToolForDrops(state));
+        final float progress = speed / hardness / (canHarvest ? 30.0F : 100.0F);
+        if (progress >= 1.0F)
+        {
+            return 0;
+        }
+        return Math.max(1, (int) Math.ceil(1.0F / progress));
     }
 
     /**
@@ -369,7 +389,7 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
         items = world.getEntitiesOfClass(ItemEntity.class, boundingBox)
                   .stream()
                   .filter(item -> item != null && item.isAlive() &&
-                                    (!item.getPersistentData().contains("PreventRemoteMovement") || !item.getPersistentData().getBoolean("PreventRemoteMovement")) &&
+                                    (!item.getPersistentData().contains("PreventRemoteMovement") || !item.getPersistentData().getBooleanOr("PreventRemoteMovement", false)) &&
                                     isItemWorthPickingUp(item.getItem()))
                   .map(BlockPosUtil::fromEntity)
                   .collect(Collectors.toList());

@@ -31,7 +31,7 @@ public class CompostRecipeCategory extends AbstractRecipeCategory<CompostRecipe>
     {
         super(
             ModRecipeTypes.COMPOSTING,
-            Component.translatableEscape(ModBlocks.blockBarrel.getDescriptionId()),
+            Component.translatableEscape(ModBlocks.blockBarrel.asItem().getDescriptionId()),
             guiHelper.createDrawableItemLike(ModBlocks.blockBarrel),
             80,
             50
@@ -54,11 +54,11 @@ public class CompostRecipeCategory extends AbstractRecipeCategory<CompostRecipe>
     {
         builder.addInputSlot(0, 0)
                 .setStandardSlotBackground()
-                .addIngredients(recipe.getIngredients().get(0));
+                .addIngredients(com.minecolonies.api.util.RecipeCompat.getIngredients(recipe).get(0));
 
         builder.addOutputSlot(62, 0)
                 .setStandardSlotBackground()
-                .addItemStack(recipe.getResultItem(null));
+                .addItemStack(com.minecolonies.api.util.RecipeCompat.getResultItem(recipe, net.minecraft.client.Minecraft.getInstance().level));
     }
 
     @Override

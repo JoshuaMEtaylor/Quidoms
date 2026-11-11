@@ -34,13 +34,13 @@ import java.util.stream.Stream;
 public record CountedIngredient(@NotNull Ingredient child, int count) implements ICustomIngredient
 {
     public static final MapCodec<CountedIngredient> CODEC = RecordCodecBuilder.mapCodec(builder -> builder
-        .group(Ingredient.CODEC_NONEMPTY.fieldOf("item").forGetter(CountedIngredient::child),
+        .group(Ingredient.CODEC.fieldOf("item").forGetter(CountedIngredient::child),
           ExtraCodecs.POSITIVE_INT.optionalFieldOf("count", 1).forGetter(CountedIngredient::count))
         .apply(builder, CountedIngredient::new));
 
     public CountedIngredient
     {
-        if (child == Ingredient.EMPTY || count <= 0) throw new IllegalArgumentException("Counted ingredient must have a child");
+        if (child == Ingredient.of() /* EMPTY removed */ || count <= 0) throw new IllegalArgumentException("Counted ingredient must have a child");
     }
 
     /**
@@ -80,10 +80,8 @@ public record CountedIngredient(@NotNull Ingredient child, int count) implements
 
     @NotNull
     @Override
-    public Stream<ItemStack> getItems()
+    public Stream<net.minecraft.core.Holder<net.minecraft.world.item.Item>> items()
     {
-        return Arrays.stream(child.getItems())
-                .map(ItemStack::copy)
-                .peek(s -> s.setCount(this.count));
+        return child.items();
     }
 }

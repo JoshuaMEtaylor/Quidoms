@@ -765,7 +765,7 @@ public abstract class AbstractPathJob implements Callable<Path>, IPathJob
             newY = getGroundHeight(node, nextX, nextY, nextZ);
         }
 
-        if (newY < world.getMinBuildHeight())
+        if (newY < world.getMinY())
         {
             return;
         }

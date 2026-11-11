@@ -26,7 +26,7 @@ public final class JobDataManager implements IJobDataManager
     @Override
     public IJob<?> createFrom(final ICitizenData citizen, @NotNull final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
     {
-        String jobTypeName = compound.getString(NbtTagConstants.TAG_JOB_TYPE);
+        String jobTypeName = compound.getStringOr(NbtTagConstants.TAG_JOB_TYPE, "");
 
         final ResourceLocation jobType =
           compound.contains(NbtTagConstants.TAG_JOB_TYPE) ? ResourceLocation.parse(jobTypeName) : ModJobs.PLACEHOLDER_ID;
@@ -73,7 +73,7 @@ public final class JobDataManager implements IJobDataManager
       final IColonyView colony, final ICitizenDataView citizenDataView, final RegistryFriendlyByteBuf networkBuffer)
     {
         final ResourceLocation jobName = ResourceLocation.parse(networkBuffer.readUtf(32767));
-        final JobEntry entry = IJobRegistry.getInstance().get(jobName);
+        final JobEntry entry = IJobRegistry.getInstance().getValue(jobName);
 
         if (entry == null)
         {

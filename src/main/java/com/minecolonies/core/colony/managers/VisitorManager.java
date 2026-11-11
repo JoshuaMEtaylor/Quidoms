@@ -138,15 +138,15 @@ public class VisitorManager implements IVisitorManager
     {
         if (compound.contains(TAG_VISIT_MANAGER))
         {
-            final CompoundTag visitorManagerNBT = compound.getCompound(TAG_VISIT_MANAGER);
-            final ListTag citizenList = visitorManagerNBT.getList(TAG_VISITORS, Tag.TAG_COMPOUND);
+            final CompoundTag visitorManagerNBT = compound.getCompoundOrEmpty(TAG_VISIT_MANAGER);
+            final ListTag citizenList = visitorManagerNBT.getListOrEmpty(TAG_VISITORS);
             for (final Tag citizen : citizenList)
             {
                 final IVisitorData data = VisitorData.loadVisitorFromNBT(colony, (CompoundTag) citizen, provider);
                 visitorMap.put(data.getId(), data);
             }
 
-            nextVisitorID = visitorManagerNBT.getInt(TAG_NEXTID);
+            nextVisitorID = visitorManagerNBT.getIntOr(TAG_NEXTID, 0);
         }
         markDirty();
     }
@@ -254,7 +254,7 @@ public class VisitorManager implements IVisitorManager
                 BlockPos calculatedSpawn = EntityUtils.getSpawnPoint(world, spawnLocation);
                 if (calculatedSpawn != null)
                 {
-                    VisitorCitizen citizenEntity = (VisitorCitizen) ModEntities.VISITOR.create(colony.getWorld());
+                    VisitorCitizen citizenEntity = (VisitorCitizen) ModEntities.VISITOR.create(colony.getWorld(), net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
 
                     if (citizenEntity == null)
                     {

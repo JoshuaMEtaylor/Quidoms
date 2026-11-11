@@ -280,13 +280,15 @@ public class BuildingStructureHandler<J extends AbstractJobStructure<?, J>, B ex
     @Override
     public int getStepsPerCall()
     {
-        return 1;
+        // Quidoms: place/skip more cells per AI tick after the break queue drains.
+        return 32;
     }
 
     @Override
     public int getMaxBlocksCheckedPerCall()
     {
-        return 10000;
+        // Quidoms: larger scan window so LIMIT_REACHED is rarer between queued commits.
+        return 25000;
     }
 
     @Override

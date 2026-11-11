@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "floating_carpets",
+  "ingredients": [
+    "minecraft:pink_carpet",
+    "#c:strings"
+  ],
+  "result": {
+    "count": 1,
+    "id": "domum_ornamentum:pink_floating_carpet"
+  }
+}

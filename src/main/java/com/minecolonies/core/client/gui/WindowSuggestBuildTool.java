@@ -3,7 +3,6 @@ package com.minecolonies.core.client.gui;
 import com.ldtteam.structurize.client.gui.WindowExtendedBuildTool;
 import com.ldtteam.structurize.items.ModItems;
 import com.minecolonies.api.util.InventoryUtils;
-import com.minecolonies.api.util.MessageUtils;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.network.messages.server.DirectPlaceMessage;
 import com.minecolonies.core.network.messages.server.SwitchBuildingWithToolMessage;
@@ -16,7 +15,6 @@ import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 
 import static com.ldtteam.structurize.api.constants.Constants.GROUNDSTYLE_RELATIVE;
-import static com.minecolonies.api.util.constant.TranslationConstants.WARNING_MISSING_BUILD_TOOL;
 import static com.minecolonies.api.util.constant.WindowConstants.*;
 
 /**
@@ -80,8 +78,8 @@ public class WindowSuggestBuildTool extends AbstractWindowSkeleton
             new WindowExtendedBuildTool(this.pos, GROUNDSTYLE_RELATIVE, mc.level.registryAccess()).open();
             return;
         }
-        MessageUtils.format(WARNING_MISSING_BUILD_TOOL).sendTo(Minecraft.getInstance().player);
-        close();
+        // Quidoms: players are not required to carry the Structurize build tool.
+        directClicked();
     }
 
     /**

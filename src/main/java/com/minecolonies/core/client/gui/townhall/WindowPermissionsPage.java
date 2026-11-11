@@ -147,7 +147,7 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
         nonAddedPlayerList = new ArrayList<>();
         for (final PlayerInfo info : Minecraft.getInstance().player.connection.getOnlinePlayers())
         {
-            if (!buildingView.getColony().getPlayers().containsKey(info.getProfile().getId()))
+            if (!buildingView.getColony().getPlayers().containsKey(info.getProfile().id()))
             {
                 nonAddedPlayerList.add(info);
             }
@@ -179,7 +179,7 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
             @Override
             public void updateElement(final int index, final Pane pane)
             {
-                String playerName = nonAddedPlayerList.get(index).getProfile().getName();
+                String playerName = nonAddedPlayerList.get(index).getProfile().name();
                 final Button button = pane.findPaneOfTypeByID(BUTTON_SELECT_PLAYER_LIST, Button.class);
                 button.setText(Component.literal(playerName));
                 button.setEnabled(true);
@@ -536,7 +536,7 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
 
         try
         {
-            final Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(inputText));
+            final Block block = BuiltInRegistries.BLOCK.getValue(ResourceLocation.parse(inputText));
 
             if (block != null && !block.defaultBlockState().isAir())
             {
@@ -653,12 +653,17 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
             {
                 final ColonyPlayer player = users.get(index);
                 Rank rank = player.getRank();
-                rowPane.findPaneOfTypeByID(NAME_LABEL, Text.class).setText(Component.literal(player.getName()));
+                final Text nameLabel = rowPane.findPaneOfTypeByID(NAME_LABEL, Text.class);
+                nameLabel.setText(Component.literal(player.getName()));
+                // Opaque white so names stay visible on the permissions list rows.
+                nameLabel.setColors(0xFFFFFFFF);
                 DropDownList dropdown = rowPane.findPaneOfTypeByID(TOWNHALL_RANK_PICKER, DropDownList.class);
                 if (rank.getId() == buildingView.getColony().getPermissions().OWNER_RANK_ID)
                 {
                     rowPane.findPaneOfTypeByID(BUTTON_REMOVE_PLAYER, Button.class).setEnabled(false);
-                    rowPane.findPaneOfTypeByID("rank", Text.class).setText(Component.literal(rank.getName()));
+                    final Text rankLabel = rowPane.findPaneOfTypeByID("rank", Text.class);
+                    rankLabel.setText(Component.literal(rank.getName()));
+                    rankLabel.setColors(0xFFFFFFFF);
                     dropdown.setEnabled(false);
                 }
                 else
@@ -718,7 +723,19 @@ public class WindowPermissionsPage extends AbstractWindowTownHall
     private void addPlayerCLicked()
     {
         final TextField input = findPaneOfTypeByID(INPUT_ADDPLAYER_NAME, TextField.class);
-        new PermissionsMessage.AddPlayer(buildingView.getColony(), input.getText()).sendToServer();
+        final String name = input.getText() == null ? "" : input.getText().trim();
+        if (name.isEmpty())
+        {
+            return;
+        }
+        final boolean already = users.stream().anyMatch(u -> u.getName() != null && u.getName().equalsIgnoreCase(name));
+        if (already)
+        {
+            Minecraft.getInstance().player.displayClientMessage(
+              Component.translatableEscape("com.minecolonies.core.permissions.addplayer.already", name), false);
+            return;
+        }
+        new PermissionsMessage.AddPlayer(buildingView.getColony(), name).sendToServer();
         input.setText("");
     }
 

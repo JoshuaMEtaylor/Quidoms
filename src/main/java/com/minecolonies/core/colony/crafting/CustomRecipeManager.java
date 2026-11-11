@@ -327,7 +327,7 @@ public class CustomRecipeManager
         {
             for (final Block source : crop.getDroppedFrom())
             {
-                lootIds.add(source.getLootTable());
+                lootIds.add(source.getLootTable().orElse(null));
             }
         }
 
@@ -364,7 +364,7 @@ public class CustomRecipeManager
                 .filter(Objects::nonNull)   // just in case
                 .distinct()
                 .collect(Collectors.toConcurrentMap(Function.identity(),
-                        id -> LootTableAnalyzer.toDrops(level.getServer().reloadableRegistries().get(), id))));
+                        id -> LootTableAnalyzer.toDrops(level.getServer().reloadableRegistries().lookup(), id))));
     }
 
     /**

@@ -9,7 +9,7 @@
 
     <text id="text1" size="300 30" color="black" pos="60 40"/>
 
-    <input id="colonyname" size="200 18" pos="100 70" maxlength="32"/>
+    <input id="colonyname" size="200 18" pos="100 70" maxlength="32" color="white"/>
 
     <text id="text2" size="300 30" color="black" pos="60 90" label="$(com.minecolonies.core.settlementcovenant2)"/>
 

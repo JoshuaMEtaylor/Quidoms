@@ -200,7 +200,7 @@ public class EntityAICombatTraining extends AbstractEntityAITraining<JobCombatTr
                 final int shieldSlot = InventoryUtils.findFirstSlotInItemHandlerWith(getInventory(), Items.SHIELD);
                 if (shieldSlot != -1)
                 {
-                    worker.playSound(SoundEvents.SHIELD_BLOCK, (float) BASIC_VOLUME, (float) SoundUtils.getRandomPitch(worker.getRandom()));
+                    worker.playSound(SoundEvents.SHIELD_BLOCK.value(), (float) BASIC_VOLUME, (float) SoundUtils.getRandomPitch(worker.getRandom()));
                     CitizenItemUtils.setHeldItem(worker, InteractionHand.OFF_HAND, shieldSlot);
                     worker.startUsingItem(InteractionHand.OFF_HAND);
                     worker.getLookControl().setLookAt(trainingPartner, (float) TURN_AROUND, (float) TURN_AROUND);
@@ -306,7 +306,7 @@ public class EntityAICombatTraining extends AbstractEntityAITraining<JobCombatTr
                   Items.SHIELD);
                 if (shieldSlot != -1)
                 {
-                    worker.playSound(SoundEvents.SHIELD_BLOCK, (float) BASIC_VOLUME, (float) SoundUtils.getRandomPitch(worker.getRandom()));
+                    worker.playSound(SoundEvents.SHIELD_BLOCK.value(), (float) BASIC_VOLUME, (float) SoundUtils.getRandomPitch(worker.getRandom()));
                     CitizenItemUtils.setHeldItem(worker, InteractionHand.OFF_HAND, shieldSlot);
                     worker.startUsingItem(InteractionHand.OFF_HAND);
                 }

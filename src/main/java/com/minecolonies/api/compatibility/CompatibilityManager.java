@@ -1,5 +1,7 @@
 package com.minecolonies.api.compatibility;
 
+import com.minecolonies.api.util.ItemStackUtils;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -20,7 +22,6 @@ import com.minecolonies.core.colony.crafting.LootTableAnalyzer;
 import com.minecolonies.core.util.FurnaceRecipes;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
@@ -47,8 +48,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.NotNull;
@@ -195,8 +194,23 @@ public class CompatibilityManager implements ICompatibilityManager
     @Override
     public void serialize(@NotNull final RegistryFriendlyByteBuf buf)
     {
-        buf.writeInt(CHECKED_NBT_KEYS.size());
+        // Filter null DataComponentType keys — BuiltInRegistries can yield null for legacy ids from
+        // itemnbtmatching.json; encoding null throws IllegalArgumentException and aborts player join.
+        final List<Map.Entry<Item, Set<DataComponentType<?>>>> safeEntries = new ArrayList<>();
         for (final var entry : CHECKED_NBT_KEYS.entrySet())
+        {
+            if (entry.getKey() == null)
+            {
+                continue;
+            }
+            final Set<DataComponentType<?>> cleaned = entry.getValue() == null
+              ? Set.of()
+              : entry.getValue().stream().filter(Objects::nonNull).collect(Collectors.toSet());
+            safeEntries.add(Map.entry(entry.getKey(), cleaned));
+        }
+
+        buf.writeInt(safeEntries.size());
+        for (final var entry : safeEntries)
         {
             buf.writeInt(BuiltInRegistries.ITEM.getId(entry.getKey()));
             buf.writeInt(entry.getValue().size());
@@ -221,8 +235,7 @@ public class CompatibilityManager implements ICompatibilityManager
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void deserialize(@NotNull final RegistryFriendlyByteBuf buf, final ClientLevel level)
+    public void deserialize(@NotNull final RegistryFriendlyByteBuf buf, final Level level)
     {
         clear();
 
@@ -232,7 +245,11 @@ public class CompatibilityManager implements ICompatibilityManager
             Set<DataComponentType<?>> nbtKeys = new HashSet<>();
             for (int j = 0, children = buf.readInt(); j < children; j++)
             {
-                nbtKeys.add(Utils.deserializeCodecMess(DataComponentType.STREAM_CODEC, buf));
+                final DataComponentType<?> key = Utils.deserializeCodecMess(DataComponentType.STREAM_CODEC, buf);
+                if (key != null)
+                {
+                    nbtKeys.add(key);
+                }
             }
 
             CHECKED_NBT_KEYS.put(item, nbtKeys);
@@ -434,7 +451,7 @@ public class CompatibilityManager implements ICompatibilityManager
         final Set<ItemStorage> filteredEdibles = new HashSet<>();
         for (final ItemStorage storage : edibles)
         {
-            if ((storage.getItemStack().getFoodProperties(null) != null && storage.getItemStack().getFoodProperties(null).nutrition() >= minNutrition))
+            if ((com.minecolonies.api.util.FoodCompat.getFoodProperties(storage.getItemStack()) != null && com.minecolonies.api.util.FoodCompat.getFoodProperties(storage.getItemStack()).nutrition() >= minNutrition))
             {
                 filteredEdibles.add(storage);
             }
@@ -535,7 +552,7 @@ public class CompatibilityManager implements ICompatibilityManager
             final Block block = Block.byItem(stack.getItem());
             if (!block.defaultBlockState().isAir())
             {
-                final List<LootTableAnalyzer.LootDrop> drops = CustomRecipeManager.getInstance().getLootDrops(block.getLootTable());
+                final List<LootTableAnalyzer.LootDrop> drops = CustomRecipeManager.getInstance().getLootDrops(block.getLootTable().orElse(null));
                 for (final LootTableAnalyzer.LootDrop drop : drops)
                 {
                     for (final ItemStack dropStack : drop.getItemStacks())
@@ -567,7 +584,7 @@ public class CompatibilityManager implements ICompatibilityManager
     @Override
     public void read(@NotNull final HolderLookup.Provider provider, @NotNull final CompoundTag compound)
     {
-        NBTUtils.streamCompound(compound.getList(TAG_SAP_LEAF, Tag.TAG_COMPOUND))
+        NBTUtils.streamCompound(compound.getListOrEmpty(TAG_SAP_LEAF))
           .map(nbt -> CompatibilityManager.readLeafSaplingEntryFromNBT(provider, nbt))
           .filter(key -> !key.getA().isAir() && !leavesToSaplingMap.containsKey(key.getA().getBlock()) && !leavesToSaplingMap.containsValue(key.getB()))
           .forEach(key -> leavesToSaplingMap.put(key.getA().getBlock(), key.getB()));
@@ -751,7 +768,7 @@ public class CompatibilityManager implements ICompatibilityManager
     {
         if (compostRecipes.isEmpty())
         {
-            discoverCompostRecipes(recipeManager.getAllRecipesFor(ModRecipeSerializer.CompostRecipeType.get()));
+            discoverCompostRecipes(new ArrayList<>(RecipeCompat.getAllRecipesFor(recipeManager, ModRecipeSerializer.CompostRecipeType.get())));
             Log.getLogger().info("Finished discovering compostables " + compostRecipes.size());
         }
     }
@@ -760,7 +777,7 @@ public class CompatibilityManager implements ICompatibilityManager
     {
         for (final RecipeHolder<CompostRecipe> recipe : recipes)
         {
-            for (final ItemStack stack : recipe.value().getInput().getItems())
+            for (final ItemStack stack : IngredientCompat.getItems(recipe.value().getInput()))
             {
                 // there can be duplicates due to overlapping tags.  weakest one wins.
                 compostRecipes.merge(stack.getItem(), recipe,
@@ -788,7 +805,8 @@ public class CompatibilityManager implements ICompatibilityManager
      */
     private void discoverFuel(final ItemStack stack)
     {
-        if (FurnaceBlockEntity.isFuel(stack))
+        // Vanilla fuel table moved to FuelValues; ItemStack.getBurnTime covers NeoForge overrides.
+        if (!stack.isEmpty()) // TODO: FuelValues
         {
             fuel.add(new ItemStorage(stack));
         }
@@ -812,13 +830,13 @@ public class CompatibilityManager implements ICompatibilityManager
     private static CompoundTag writeLeafSaplingEntryToNBT(@NotNull final HolderLookup.Provider provider, final BlockState state, final ItemStorage storage)
     {
         final CompoundTag compound = NbtUtils.writeBlockState(state);
-        compound.put(NbtTagConstants.STACK, storage.getItemStack().saveOptional(provider));
+        compound.put(NbtTagConstants.STACK, com.minecolonies.api.util.ItemStackUtils.saveOptional(storage.getItemStack(), provider));
         return compound;
     }
 
     private static Tuple<BlockState, ItemStorage> readLeafSaplingEntryFromNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        return new Tuple<>(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compound), new ItemStorage(ItemStack.parseOptional(provider, compound.getCompound(NbtTagConstants.STACK)), false, true));
+        return new Tuple<>(NbtUtils.readBlockState(BuiltInRegistries.BLOCK, compound), new ItemStorage(com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compound.getCompoundOrEmpty(NbtTagConstants.STACK)), false, true));
     }
 
     /**

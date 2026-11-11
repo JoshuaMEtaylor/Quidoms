@@ -2,8 +2,10 @@ package com.minecolonies.core.recipes;
 
 import com.minecolonies.apiimp.initializer.ModIngredientTypeInitializer;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.CropBlock;
@@ -31,14 +33,14 @@ public class PlantIngredient implements ICustomIngredient
 
     public static final MapCodec<PlantIngredient> CODEC = MapCodec.unit(INSTANCE);
 
-    private final List<ItemStack> items;
+    private final List<Holder<Item>> items;
 
     private PlantIngredient()
     {
-        items = BuiltInRegistries.ITEM.stream()
-                .filter(item -> item instanceof final BlockItem block &&
+        items = BuiltInRegistries.ITEM.listElements()
+                .filter(holder -> holder.value() instanceof final BlockItem block &&
                         (block.getBlock() instanceof CropBlock || block.getBlock() instanceof StemBlock))
-                .map(ItemStack::new)
+                .map(h -> (Holder<Item>) h)
                 .toList();
     }
 
@@ -56,12 +58,12 @@ public class PlantIngredient implements ICustomIngredient
             return false;
         }
 
-        return getItems().anyMatch(s -> stack.is(s.getItem()));
+        return items().anyMatch(stack::is);
     }
 
     @NotNull
     @Override
-    public Stream<ItemStack> getItems()
+    public Stream<Holder<Item>> items()
     {
         return items.stream();
     }

@@ -93,7 +93,7 @@ public final class FireworkUtils
             {
                 colors.add(dyeColors[rand.nextInt(15)]);
             }
-            explosionTag.putIntArray(TAG_COLORS, colors);
+            explosionTag.putIntArray(TAG_COLORS, colors.toIntArray());
             list.add(new FireworkExplosion(FireworkExplosion.Shape.values()[rand.nextInt(FireworkExplosion.Shape.values().length)], colors, colors, rand.nextInt(2) == 0, rand.nextInt(2) == 0));
         }
 

@@ -29,12 +29,12 @@ public interface IModelType
      *
      * @return The male model
      */
-    CitizenModel<AbstractEntityCitizen> getMaleModel();
+    CitizenModel<CitizenRenderState> getMaleModel();
 
     /**
      * Get the female model for this model type
      *
      * @return The female model
      */
-    CitizenModel<AbstractEntityCitizen> getFemaleModel();
+    CitizenModel<CitizenRenderState> getFemaleModel();
 }

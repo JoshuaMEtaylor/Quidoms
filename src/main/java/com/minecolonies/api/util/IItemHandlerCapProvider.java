@@ -4,8 +4,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities.ItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -38,9 +41,28 @@ public interface IItemHandlerCapProvider
     @Nullable
     IItemHandler getItemHandlerCap(final Direction direction);
 
+    /**
+     * ResourceHandler view for NeoForge {@code Capabilities.Item} registration.
+     */
+    @Nullable
+    default ResourceHandler<ItemResource> getItemResourceHandler(@Nullable final Direction direction)
+    {
+        return LegacyItemHandlerAdapter.of(getItemHandlerCap(direction));
+    }
+
+    @Nullable
+    default ResourceHandler<ItemResource> getItemResourceHandler(final Void nothing)
+    {
+        return LegacyItemHandlerAdapter.of(getItemHandlerCap(nothing));
+    }
+
     public static IItemHandlerCapProvider wrap(final BlockEntity blockEntity)
     {
-        return direction -> ItemHandler.BLOCK.getCapability(blockEntity.getLevel(), blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity, direction);
+        return direction -> {
+            final ResourceHandler<ItemResource> handler = Capabilities.Item.BLOCK.getCapability(
+                blockEntity.getLevel(), blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity, direction);
+            return handler == null ? null : IItemHandler.of(handler);
+        };
     }
 
     /**
@@ -48,12 +70,22 @@ public interface IItemHandlerCapProvider
      */
     public static IItemHandlerCapProvider wrap(final Entity entity, final boolean sided)
     {
-        return sided ? direction -> ItemHandler.ENTITY_AUTOMATION.getCapability(entity, direction) :
-            direction -> ItemHandler.ENTITY.getCapability(entity, null);
+        return sided
+            ? direction -> {
+                final ResourceHandler<ItemResource> handler = Capabilities.Item.ENTITY_AUTOMATION.getCapability(entity, direction);
+                return handler == null ? null : IItemHandler.of(handler);
+            }
+            : direction -> {
+                final ResourceHandler<ItemResource> handler = Capabilities.Item.ENTITY.getCapability(entity, null);
+                return handler == null ? null : IItemHandler.of(handler);
+            };
     }
 
     public static IItemHandlerCapProvider wrap(final ItemStack itemStack)
     {
-        return direction -> ItemHandler.ITEM.getCapability(itemStack, null);
+        return direction -> {
+            final ResourceHandler<ItemResource> handler = Capabilities.Item.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack));
+            return handler == null ? null : IItemHandler.of(handler);
+        };
     }
 }

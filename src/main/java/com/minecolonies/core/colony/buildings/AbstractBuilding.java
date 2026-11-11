@@ -331,7 +331,7 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
         loadRequestSystemFromNBT(provider, compound);
         if (compound.contains(TAG_IS_BUILT))
         {
-            isBuilt = compound.getBoolean(TAG_IS_BUILT);
+            isBuilt = compound.getBooleanOr(TAG_IS_BUILT, false);
         }
         else if (getBuildingLevel() > 0)
         {
@@ -339,20 +339,20 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
         }
         if (compound.contains(TAG_CUSTOM_NAME))
         {
-            this.customName = compound.getString(TAG_CUSTOM_NAME);
+            this.customName = compound.getStringOr(TAG_CUSTOM_NAME, "");
         }
         if (compound.contains(TAG_PRESTIGE))
         {
-            this.prestige = compound.getInt(TAG_PRESTIGE);
+            this.prestige = compound.getIntOr(TAG_PRESTIGE, 0);
         }
 
         if (compound.contains(TAG_BUILDING_MODULES))
         {
             for (IPersistentModule module : getModulesByType(IPersistentModule.class))
             {
-                if (compound.getCompound(TAG_BUILDING_MODULES).contains(module.getProducer().key))
+                if (compound.getCompoundOrEmpty(TAG_BUILDING_MODULES).contains(module.getProducer().key))
                 {
-                    module.deserializeNBT(provider, compound.getCompound(TAG_BUILDING_MODULES).getCompound(module.getProducer().key));
+                    module.deserializeNBT(provider, compound.getCompoundOrEmpty(TAG_BUILDING_MODULES).getCompoundOrEmpty(module.getProducer().key));
                 }
                 else
                 {
@@ -471,8 +471,8 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
             return;
         }
 
-        final int min = colony.getWorld().getMinBuildHeight();
-        final int max = colony.getWorld().getMaxBuildHeight();
+        final int min = colony.getWorld().getMinY();
+        final int max = colony.getWorld().getMaxY();
         if (getCorners().getA().getY() >= max || getCorners().getB().getY() >= max)
         {
             MessageUtils.format(BUILDER_BUILDING_TOO_HIGH, max).sendTo(colony).forAllPlayers();
@@ -998,35 +998,28 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
     public void calculateCorners()
     {
         final AbstractTileEntityColonyBuilding te = getTileEntity();
-        if (te != null && !te.getSchematicName().isEmpty())
+        // Built buildings: TE schematic corners are authoritative.
+        final boolean trustTeCorners = te != null
+                                         && !te.getSchematicName().isEmpty()
+                                         && getBuildingLevel() > 0
+                                         && !isDeconstructed();
+        if (trustTeCorners)
         {
             setCorners(te.getInWorldCorners().getA(), te.getInWorldCorners().getB());
             return;
         }
 
+        // Unbuilt huts: never sync-load blueprints here (getCorners can run often during ticks).
+        // Set a temporary non-ZERO footprint so AbstractSchematicProvider.getCorners does not
+        // re-enter, then queue a single async blueprint load to replace with real bounds.
+        setCorners(getPosition(), getPosition());
         try
         {
-            final Blueprint blueprint = StructurePacks.getBlueprint(getStructurePack(), getBlueprintPath(), te.getLevel().registryAccess());
-            if (blueprint == null)
-            {
-                setCorners(getPosition(), getPosition());
-                return;
-            }
-            final Tuple<BlockPos, BlockPos> corners
-              = ColonyUtils.calculateCorners(this.getPosition(),
-              colony.getWorld(),
-              blueprint,
-              getRotationMirror());
-            this.setCorners(corners.getA(), corners.getB());
-
-            if (te != null)
-            {
-                this.getTileEntity().setSchematicCorners(corners.getA().subtract(getPosition()), corners.getB().subtract(getPosition()));
-            }
+            final int level = Math.max(1, getBuildingLevel() == 0 ? 1 : getBuildingLevel());
+            com.minecolonies.core.util.HutBlueprintResolver.ensureAndQueueCornerSync(this, level, colony.getWorld());
         }
-        catch (final Exception ex)
+        catch (final Exception ignored)
         {
-            setCorners(getPosition(), getPosition());
         }
     }
 
@@ -1318,7 +1311,7 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
     {
         if (compound.contains(TAG_REQUESTOR_ID))
         {
-            this.requester = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompound(TAG_REQUESTOR_ID));
+            this.requester = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompoundOrEmpty(TAG_REQUESTOR_ID));
         }
         else
         {
@@ -1327,7 +1320,7 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
 
         if (compound.contains(TAG_RS_BUILDING_DATASTORE))
         {
-            this.rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompound(TAG_RS_BUILDING_DATASTORE));
+            this.rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompoundOrEmpty(TAG_RS_BUILDING_DATASTORE));
         }
         else
         {

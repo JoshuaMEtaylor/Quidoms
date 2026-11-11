@@ -40,7 +40,7 @@ public class WindowReactivateBuilding extends AbstractWindowSkeleton
 
         if (Minecraft.getInstance().level.getBlockEntity(pos) instanceof TileEntityColonyBuilding tileEntityColonyBuilding)
         {
-            final BuildingEntry buildingEntry = IBuildingRegistry.getInstance().get(tileEntityColonyBuilding.getBuildingName());
+            final BuildingEntry buildingEntry = IBuildingRegistry.getInstance().getValue(tileEntityColonyBuilding.getBuildingName());
             if (buildingEntry == ModBuildings.home.get() || buildingEntry == ModBuildings.tavern.get())
             {
                 findPaneOfTypeByID("text", Text.class).setText(Component.translatable("com.minecolonies.core.gui.reactivate.message.living", Component.translatable(buildingEntry.getTranslationKey())));

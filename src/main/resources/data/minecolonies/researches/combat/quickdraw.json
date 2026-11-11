@@ -1,0 +1,25 @@
+{
+  "branch": "minecolonies:combat",
+  "costs": [
+    {
+      "ingredient": "minecraft:iron_block",
+      "count": 2
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/meleedamageaddition",
+      "level": 1
+    }
+  ],
+  "icon": "minecraft:wooden_sword",
+  "parentResearch": "minecolonies:combat/accuracy",
+  "requirements": [
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:barracks",
+      "level": 3
+    }
+  ],
+  "researchLevel": 2
+}

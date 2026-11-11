@@ -23,7 +23,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.core.BlockPos;
@@ -39,6 +38,8 @@ import java.util.*;
 import static com.minecolonies.api.research.util.ResearchConstants.STANDARD;
 import static com.minecolonies.api.util.constant.TranslationConstants.*;
 import static com.minecolonies.api.util.constant.translation.ToolTranslationConstants.*;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Rally Guards Banner Item class. Used to give tasks to guards.
@@ -113,7 +114,7 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
                 }
                 rallyData.withActive(true).writeToItemStack(banner);
                 final int numGuards =
-                  broadcastPlayerToRally(banner, context.getPlayer().getCommandSenderWorld(), new StaticLocation(context.getClickedPos(), context.getLevel().dimension()));
+                  broadcastPlayerToRally(banner, context.getPlayer().level(), new StaticLocation(context.getClickedPos(), context.getLevel().dimension()));
                 if (numGuards > 0)
                 {
                     MessageUtils.format(TOOL_RALLY_BANNER_ACTIVATED, numGuards).sendTo(context.getPlayer());
@@ -147,20 +148,20 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
 
     @NotNull
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level worldIn, final Player playerIn, final InteractionHand handIn)
+    public InteractionResult use(final Level worldIn, final Player playerIn, final InteractionHand handIn)
     {
         final ItemStack banner = playerIn.getItemInHand(handIn);
         handleRightClick(banner, playerIn);
-        return InteractionResultHolder.success(banner);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
     public boolean onDroppedByPlayer(final ItemStack item, final Player player)
     {
-        if (!player.getCommandSenderWorld().isClientSide())
+        if (!player.level().isClientSide())
         {
             RallyData.updateItemStack(item, rally -> rally.withActive(false));
-            broadcastPlayerToRally(item, player.getCommandSenderWorld(), null);
+            broadcastPlayerToRally(item, player.level(), null);
         }
 
         return super.onDroppedByPlayer(item, player);
@@ -174,11 +175,11 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
      */
     private void handleRightClick(final ItemStack banner, final Player playerIn)
     {
-        if (playerIn.isShiftKeyDown() && !playerIn.getCommandSenderWorld().isClientSide())
+        if (playerIn.isShiftKeyDown() && !playerIn.level().isClientSide())
         {
             toggleBanner(banner, playerIn);
         }
-        else if (!playerIn.isShiftKeyDown() && playerIn.getCommandSenderWorld().isClientSide())
+        else if (!playerIn.isShiftKeyDown() && playerIn.level().isClientSide())
         {
             if (getGuardTowerLocations(banner).isEmpty())
             {
@@ -200,7 +201,7 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
      */
     public static void toggleBanner(final ItemStack banner, final Player playerIn)
     {
-        if (playerIn.getCommandSenderWorld().isClientSide())
+        if (playerIn.level().isClientSide())
         {
             Log.getLogger().error("Tried to run server-side function #toggleBanner() on the client-side!");
             return;
@@ -220,7 +221,7 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
         else if (rallyData.active())
         {
             rallyData.withActive(false).writeToItemStack(banner);
-            broadcastPlayerToRally(banner, playerIn.getCommandSenderWorld(), null);
+            broadcastPlayerToRally(banner, playerIn.level(), null);
             MessageUtils.format(TOOL_RALLY_BANNER_DEACTIVATED).sendTo(playerIn);
         }
         else
@@ -229,7 +230,7 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
            final IColony colony = getColony(banner, playerIn.level());
            if (colony != null && colony.getPermissions().hasPermission(playerIn, Action.RALLY_GUARDS))
            {
-               final int numGuards = broadcastPlayerToRally(banner, playerIn.getCommandSenderWorld(), playerIn == null ? null : new EntityLocation(playerIn.getUUID()));
+               final int numGuards = broadcastPlayerToRally(banner, playerIn.level(), playerIn == null ? null : new EntityLocation(playerIn.getUUID()));
 
                if (numGuards > 0)
                {
@@ -435,15 +436,15 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         final MutableComponent guiHint = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_BANNER_RALLY_GUARDS_TOOLTIP_GUI);
         guiHint.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-        tooltip.add(guiHint);
+        tooltip.accept(guiHint);
 
         final MutableComponent rallyHint = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_BANNER_RALLY_GUARDS_TOOLTIP_RALLY);
         rallyHint.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-        tooltip.add(rallyHint);
+        tooltip.accept(rallyHint);
 
         final List<BlockPos> guardTowerPositions = getGuardTowerLocations(stack);
 
@@ -451,16 +452,16 @@ public class ItemBannerRallyGuards extends AbstractItemMinecolonies
         {
             final MutableComponent emptyTooltip = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_BANNER_RALLY_GUARDS_TOOLTIP_EMPTY);
             emptyTooltip.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-            tooltip.add(emptyTooltip);
+            tooltip.accept(emptyTooltip);
         }
         else
         {
             final MutableComponent numGuardTowers = Component.translatableEscape(TranslationConstants.COM_MINECOLONIES_BANNER_RALLY_GUARDS_TOOLTIP, guardTowerPositions.size());
             numGuardTowers.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_AQUA));
-            tooltip.add(numGuardTowers);
+            tooltip.accept(numGuardTowers);
         }
 
 
-        super.appendHoverText(stack, ctx, tooltip, flagIn);
+        super.appendHoverText(stack, ctx, display, tooltip, flagIn);
     }
 }

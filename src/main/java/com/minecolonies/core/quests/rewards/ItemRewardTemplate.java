@@ -41,6 +41,10 @@ public class ItemRewardTemplate implements IQuestRewardTemplate
     {
         JsonObject details = jsonObject.getAsJsonObject(DETAILS_KEY);
         final ItemStack item = Utils.deserializeCodecMessFromJson(ItemStack.CODEC, provider, details.get(ITEM_KEY));
+        if (item == null || item.isEmpty())
+        {
+            throw new IllegalArgumentException("Quest item reward has invalid item JSON");
+        }
         return new ItemRewardTemplate(item);
     }
     @Override

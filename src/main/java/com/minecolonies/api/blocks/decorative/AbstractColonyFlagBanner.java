@@ -1,5 +1,7 @@
 package com.minecolonies.api.blocks.decorative;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
 import com.minecolonies.api.blocks.interfaces.IBlockMinecolonies;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.IColonyManager;
@@ -30,7 +32,7 @@ public abstract class AbstractColonyFlagBanner<B extends AbstractColonyFlagBanne
 
     public AbstractColonyFlagBanner(final DyeColor dyeColor, final Properties properties)
     {
-        super(dyeColor, properties);
+        super(dyeColor, MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 
     @Override
@@ -42,7 +44,7 @@ public abstract class AbstractColonyFlagBanner<B extends AbstractColonyFlagBanne
     @Override
     public void setPlacedBy(final Level worldIn, final @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack)
     {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
         {
             return;
         }

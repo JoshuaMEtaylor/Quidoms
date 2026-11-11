@@ -1,5 +1,7 @@
 package com.minecolonies.api.blocks.decorative;
 
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
 import com.minecolonies.api.blocks.AbstractBlockMinecoloniesFalling;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,7 +13,7 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -32,7 +34,7 @@ public abstract class AbstractBlockMinecoloniesConstructionTape<B extends Abstra
     /**
      * The default face for when there are no connections.
      */
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     /**
      * Implies that the tape should revert to a corner if there are no connections. Must be set explicitly. For use by the builder handler.
@@ -41,7 +43,7 @@ public abstract class AbstractBlockMinecoloniesConstructionTape<B extends Abstra
 
     public AbstractBlockMinecoloniesConstructionTape(final Properties properties)
     {
-        super(properties);
+        super(MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 
     @NotNull

@@ -10,8 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -36,37 +35,37 @@ public final class Compatibility
         throw new IllegalAccessError("Utility class");
     }
 
-    private record TierEntry(@NotNull Tier tier, int level) {}
+    private record TierEntry(@NotNull ToolMaterial material, int level) {}
 
     private static final Map<ItemStorage, TierEntry> itemTierRegistry = new HashMap<>();
     private static final List<Predicate<ItemStack>> customWeaponRecognizers = new ArrayList<>();
 
-    // Ordered by level 0–5. Level 5 maps to Netherite (the highest vanilla Tier).
-    private static final Tiers[] LEVEL_TO_TIER = {
-        Tiers.WOOD, Tiers.STONE, Tiers.IRON, Tiers.DIAMOND, Tiers.NETHERITE, Tiers.NETHERITE
+    // Ordered by level 0–5. Level 5 maps to Netherite (the highest vanilla ToolMaterial).
+    private static final ToolMaterial[] LEVEL_TO_MATERIAL = {
+        ToolMaterial.WOOD, ToolMaterial.STONE, ToolMaterial.IRON, ToolMaterial.DIAMOND, ToolMaterial.NETHERITE, ToolMaterial.NETHERITE
     };
 
-    private static Tiers tierForLevel(final int level)
+    private static ToolMaterial materialForLevel(final int level)
     {
-        return LEVEL_TO_TIER[Math.min(Math.max(level, 0), LEVEL_TO_TIER.length - 1)];
+        return LEVEL_TO_MATERIAL[Math.min(Math.max(level, 0), LEVEL_TO_MATERIAL.length - 1)];
     }
 
     /**
-     * Register an item with an explicit Tier object and pre-computed level.
+     * Register an item with an explicit ToolMaterial and pre-computed level.
      * Always overwrites any existing entry — intended for mod compat hooks.
      *
-     * @param item  the item to register.
-     * @param tier  the Tier object to associate.
-     * @param level the equipment level integer.
+     * @param item     the item to register.
+     * @param material the ToolMaterial to associate.
+     * @param level    the equipment level integer.
      */
-    public static void registerItemTier(@NotNull final Item item, @NotNull final Tier tier, final int level)
+    public static void registerItemTier(@NotNull final Item item, @NotNull final ToolMaterial material, final int level)
     {
-        itemTierRegistry.put(new ItemStorage(new ItemStack(item), true, true), new TierEntry(tier, level));
+        itemTierRegistry.put(new ItemStorage(new ItemStack(item), true, true), new TierEntry(material, level));
     }
 
     /**
      * Register an item by level only.
-     * The closest matching vanilla {@link Tiers} instance is stored so that
+     * The closest matching vanilla {@link ToolMaterial} instance is stored so that
      * {@link #getItemTier} never returns null for a registered item.
      * Always overwrites any existing entry — intended for mod compat hooks.
      *
@@ -75,25 +74,25 @@ public final class Compatibility
      */
     public static void registerItemTier(@NotNull final Item item, final int level)
     {
-        itemTierRegistry.put(new ItemStorage(new ItemStack(item), true, true), new TierEntry(tierForLevel(level), level));
+        itemTierRegistry.put(new ItemStorage(new ItemStack(item), true, true), new TierEntry(materialForLevel(level), level));
     }
 
     /**
-     * Register an item with an explicit Tier and level only if not already registered.
+     * Register an item with an explicit ToolMaterial and level only if not already registered.
      * Used by auto-population so explicit mod registrations are never overwritten.
      *
-     * @param item  the item to register.
-     * @param tier  the Tier object to associate.
-     * @param level the equipment level integer.
+     * @param item     the item to register.
+     * @param material the ToolMaterial to associate.
+     * @param level    the equipment level integer.
      */
-    public static void registerItemTierIfAbsent(@NotNull final Item item, @NotNull final Tier tier, final int level)
+    public static void registerItemTierIfAbsent(@NotNull final Item item, @NotNull final ToolMaterial material, final int level)
     {
-        itemTierRegistry.putIfAbsent(new ItemStorage(new ItemStack(item), true, true), new TierEntry(tier, level));
+        itemTierRegistry.putIfAbsent(new ItemStorage(new ItemStack(item), true, true), new TierEntry(material, level));
     }
 
     /**
      * Register an item by level only if not already registered.
-     * The closest matching vanilla {@link Tiers} instance is stored.
+     * The closest matching vanilla {@link ToolMaterial} instance is stored.
      * Used by auto-population so explicit mod registrations are never overwritten.
      *
      * @param item  the item to register.
@@ -101,23 +100,23 @@ public final class Compatibility
      */
     public static void registerItemTierIfAbsent(@NotNull final Item item, final int level)
     {
-        itemTierRegistry.putIfAbsent(new ItemStorage(new ItemStack(item), true, true), new TierEntry(tierForLevel(level), level));
+        itemTierRegistry.putIfAbsent(new ItemStorage(new ItemStack(item), true, true), new TierEntry(materialForLevel(level), level));
     }
 
     /**
-     * Return the Tier associated with this stack.
+     * Return the ToolMaterial associated with this stack.
      * Returns {@code null} only when the item has not been registered.
-     * Items registered without a real Tier (armor, bow, etc.) return the closest
-     * matching vanilla {@link Tiers} instance.
+     * Items registered without a real material (armor, bow, etc.) return the closest
+     * matching vanilla {@link ToolMaterial} instance.
      *
      * @param stack the item stack.
-     * @return the registered Tier, or null if not registered.
+     * @return the registered ToolMaterial, or null if not registered.
      */
     @Nullable
-    public static Tier getItemTier(final ItemStack stack)
+    public static ToolMaterial getItemTier(final ItemStack stack)
     {
         final TierEntry entry = itemTierRegistry.get(new ItemStorage(stack, true));
-        return entry != null ? entry.tier() : null;
+        return entry != null ? entry.material() : null;
     }
 
     /**
@@ -128,8 +127,39 @@ public final class Compatibility
      */
     public static int getItemLevel(final ItemStack stack)
     {
-        final TierEntry entry = itemTierRegistry.get(new ItemStorage(stack, true));
-        return entry != null ? entry.level() : -1;
+        // Match register flags (ignore damage + NBT) so lookup hits the tier map for damaged tools.
+        TierEntry entry = itemTierRegistry.get(new ItemStorage(stack, true, true));
+        if (entry == null)
+        {
+            entry = itemTierRegistry.get(new ItemStorage(stack, true));
+        }
+        if (entry != null)
+        {
+            return entry.level();
+        }
+
+        // Quidoms fallback: infer wood/stone/iron/diamond/netherite level from durability when
+        // the tier registry missed the item (common on 1.21.10 ToolMaterial ports).
+        if (stack.isEmpty() || !stack.isDamageableItem())
+        {
+            return -1;
+        }
+        final int durability = stack.getMaxDamage();
+        ToolMaterial best = null;
+        int bestDiff = Integer.MAX_VALUE;
+        for (final ToolMaterial material : new ToolMaterial[] {
+          ToolMaterial.WOOD, ToolMaterial.STONE, ToolMaterial.COPPER, ToolMaterial.IRON,
+          ToolMaterial.DIAMOND, ToolMaterial.GOLD, ToolMaterial.NETHERITE
+        })
+        {
+            final int diff = Math.abs(material.durability() - durability);
+            if (diff < bestDiff)
+            {
+                bestDiff = diff;
+                best = material;
+            }
+        }
+        return best == null ? -1 : (int) best.attackDamageBonus();
     }
 
     /**

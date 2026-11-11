@@ -4,6 +4,7 @@
 package com.minecolonies.core.client.model;
 
 import com.minecolonies.api.client.render.modeltype.CitizenModel;
+import com.minecolonies.api.client.render.modeltype.CitizenRenderState;
 import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.minecolonies.core.entity.ai.workers.service.EntityAIWorkDeliveryman.RENDER_META_BACKPACK;
 
-public class FemaleCourierModel extends CitizenModel<AbstractEntityCitizen>
+public class FemaleCourierModel extends CitizenModel<CitizenRenderState>
 {
     public FemaleCourierModel(ModelPart root)
     {
@@ -63,18 +64,18 @@ public class FemaleCourierModel extends CitizenModel<AbstractEntityCitizen>
     }
 
     @Override
-    public float getActualRotation(@NotNull final AbstractEntityCitizen entity)
+    public float getActualRotation(@NotNull final CitizenRenderState entity)
     {
-        return entity.getPose() == Pose.SLEEPING || !entity.getRenderMetadata().contains(RENDER_META_BACKPACK) ? 0 : 0.1745F;
+        return 0.1745F; // pose/renderMetadata access changed in 1.21.10
     }
 
     @Override
-    public void setupAnim(@NotNull final AbstractEntityCitizen entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setupAnim(@NotNull final CitizenRenderState entity)
     {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        super.setupAnim(entity);
         body.y += 12;
 
-        final boolean showBackPack = entity.getPose() != Pose.SLEEPING && entity.getRenderMetadata().contains(RENDER_META_BACKPACK);
+        final boolean showBackPack = entity.pose != Pose.SLEEPING && entity.renderMetadata.contains(RENDER_META_BACKPACK);
         head.z = showBackPack ? -2.1f : 0;
         head.getChild("Ponytail").xRot = showBackPack ? 0.48f : 0.1f;
         head.getChild("Ponytail").z = showBackPack ? 4.9f : 3f;

@@ -118,7 +118,7 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
         final ListTag items = new ListTag();
         for (final Map.Entry<ItemStorage, Integer> item : secondaryOutputs.object2IntEntrySet())
         {
-            items.add(item.getKey().getItemStack().copyWithCount(item.getValue()).save(provider));
+            items.add(com.minecolonies.api.util.ItemStackUtils.saveOptional(item.getKey().getItemStack().copyWithCount(item.getValue()), provider));
         }
         compound.put(NbtTagConstants.TAG_SECONDARY_OUTPUTS, items);
         return compound;
@@ -131,7 +131,7 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
 
         if (compound.contains(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE))
         {
-            rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompound(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE));
+            rsDataStoreToken = StandardFactoryController.getInstance().deserializeTag(provider, compound.getCompoundOrEmpty(NbtTagConstants.TAG_RS_DMANJOB_DATASTORE));
         }
         else
         {
@@ -140,28 +140,28 @@ public abstract class AbstractJobCrafter<AI extends AbstractEntityAIBasic<J, ? e
 
         if (compound.contains(NbtTagConstants.TAG_PROGRESS))
         {
-            this.progress = compound.getInt(NbtTagConstants.TAG_PROGRESS);
+            this.progress = compound.getIntOr(NbtTagConstants.TAG_PROGRESS, 0);
         }
 
         if (compound.contains(NbtTagConstants.TAG_MAX_COUNTER))
         {
-            this.progress = compound.getInt(NbtTagConstants.TAG_MAX_COUNTER);
+            this.progress = compound.getIntOr(NbtTagConstants.TAG_MAX_COUNTER, 0);
         }
 
         if (compound.contains(NbtTagConstants.TAG_CRAFT_COUNTER))
         {
-            this.progress = compound.getInt(NbtTagConstants.TAG_CRAFT_COUNTER);
+            this.progress = compound.getIntOr(NbtTagConstants.TAG_CRAFT_COUNTER, 0);
         }
 
         if (compound.contains(NbtTagConstants.TAG_SECONDARY_OUTPUTS))
         {
             final HashMap<ItemStorage, Integer> newItems = new HashMap<>();
-            final ListTag list = compound.getList(NbtTagConstants.TAG_SECONDARY_OUTPUTS, ListTag.TAG_COMPOUND);
+            final ListTag list = compound.getListOrEmpty(NbtTagConstants.TAG_SECONDARY_OUTPUTS);
             for (final Tag tag : list)
             {
                 if (tag instanceof CompoundTag compoundTag)
                 {
-                    final ItemStorage item = new ItemStorage(ItemStackUtils.deserializeFromNBT(compoundTag, provider));
+                    final ItemStorage item = new ItemStorage(ItemStackUtils.parseOptional(provider, compoundTag));
                     newItems.put(item, item.getAmount());
                 }
             }

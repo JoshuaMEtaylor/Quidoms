@@ -1,148 +1,145 @@
 package com.minecolonies.core.client.render;
 
 import com.minecolonies.api.client.render.modeltype.CitizenModel;
-import com.minecolonies.api.client.render.modeltype.IModelType;
+import com.minecolonies.api.client.render.modeltype.CitizenRenderState;
 import com.minecolonies.api.client.render.modeltype.ModModelTypes;
 import com.minecolonies.api.client.render.modeltype.registry.IModelTypeRegistry;
 import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
 import com.minecolonies.apiimp.initializer.ModModelTypeInitializer;
-import com.minecolonies.core.client.render.worldevent.RenderTypes;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityAttachment;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix4f;
 
 /**
- * Renderer for the citizens.
+ * Renderer for citizens (MC 1.21.10 EntityRenderState pipeline).
+ * <p>
+ * Quidoms: force vanilla Steve/Alex {@link ModelLayers#PLAYER} / {@link ModelLayers#PLAYER_SLIM}
+ * geometry and default player skins. Job-specific CitizenModel meshes and pack textures are
+ * bypassed client-side only — entity spawn, jobs, and AI are unchanged.
  */
-public class RenderBipedCitizen extends MobRenderer<AbstractEntityCitizen, CitizenModel<AbstractEntityCitizen>>
+public class RenderBipedCitizen extends HumanoidMobRenderer<AbstractEntityCitizen, CitizenRenderState, CitizenModel<CitizenRenderState>>
 {
-    private static final double  SHADOW_SIZE   = 0.5F;
-    public static        boolean isItGhostTime = false;
+    private static final double SHADOW_SIZE = 0.5F;
 
-    /**
-     * Renders model, see {@link MobRenderer}.
-     *
-     * @param context the context for this Renderer.
-     */
+    /** Vanilla default wide (Steve-arm) skins. */
+    private static final String[] WIDE_SKINS = {
+      "steve", "alex", "ari", "efe", "kai", "makena", "noor", "sunny", "zuri"
+    };
+
+    /** Vanilla default slim (Alex-arm) skins. */
+    private static final String[] SLIM_SKINS = {
+      "alex", "steve", "ari", "efe", "kai", "makena", "noor", "sunny", "zuri"
+    };
+
+    public static boolean isItGhostTime = false;
+
+    private final CitizenModel<CitizenRenderState> wideModel;
+    private final CitizenModel<CitizenRenderState> slimModel;
+
     public RenderBipedCitizen(final EntityRendererProvider.Context context)
     {
         super(context, new CitizenModel<>(context.bakeLayer(ModelLayers.PLAYER)), (float) SHADOW_SIZE);
-        this.addLayer(new CitizenArmorLayer(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)), new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), context.getModelManager(), context.getModelSet()));
-        super.addLayer(new ItemInHandLayer<>(this, context.getItemInHandRenderer()));
+        this.wideModel = this.model;
+        this.slimModel = new CitizenModel<>(context.bakeLayer(ModelLayers.PLAYER_SLIM));
+        final ArmorModelSet<HumanoidModel<CitizenRenderState>> armor =
+          ArmorModelSet.bake(ModelLayers.PLAYER_ARMOR, context.getModelSet(), HumanoidModel::new);
+        this.addLayer(new HumanoidArmorLayer<>(this, armor, context.getEquipmentRenderer()));
+        this.addLayer(new ItemInHandLayer<>(this));
+        // Keep job model registry init for other systems / GUIs that may query model types.
         ModModelTypeInitializer.init(context);
     }
 
     @Override
-    public void render(
-      @NotNull final AbstractEntityCitizen citizen,
-      final float limbSwing,
-      final float partialTicks,
-      @NotNull final PoseStack matrixStack,
-      @NotNull final MultiBufferSource renderTypeBuffer,
-      final int light)
+    public CitizenRenderState createRenderState()
     {
+        return new CitizenRenderState();
+    }
 
-        setupMainModelFrom(citizen);
+    @Override
+    public void extractRenderState(@NotNull final AbstractEntityCitizen citizen, @NotNull final CitizenRenderState state, final float partialTicks)
+    {
+        super.extractRenderState(citizen, state, partialTicks);
+        state.renderMetadata = citizen.getRenderMetadata() == null ? "" : citizen.getRenderMetadata();
+        state.pose = citizen.getPose();
+        state.mainHandEmpty = citizen.getMainHandItem().isEmpty();
+        state.headSlotEmpty = citizen.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
+        state.civilianId = citizen.getCivilianID();
+        state.female = citizen.isFemale();
+        state.modelTypeId = citizen.getModelType();
+        state.isGhost = isItGhostTime;
+        state.bodyRotationOverride = 0.0F;
 
-        final CitizenModel<AbstractEntityCitizen> citizenModel = model;
-
-        citizenModel.rightArmPose = RenderUtils.getArmPose(citizen, InteractionHand.MAIN_HAND);
-        citizenModel.leftArmPose = RenderUtils.getArmPose(citizen, InteractionHand.OFF_HAND);
-
-        if (isItGhostTime)
+        if (citizen.getCitizenDataView() != null)
         {
-            RenderSystem.enableBlend();
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.3F);
-
-            super.render(citizen, limbSwing, partialTicks, matrixStack, renderTypeBuffer, light);
-
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-            RenderSystem.disableBlend();
+            state.customTextureUUID = citizen.getCitizenDataView().getCustomTextureUUID();
+            state.customTexture = citizen.getCitizenDataView().getCustomTexture();
+            final ItemStack displayHead = citizen.getCitizenDataView().getDisplayArmor(EquipmentSlot.HEAD);
+            state.displayHeadArmorEmpty = displayHead == null || displayHead.isEmpty();
         }
         else
         {
-            super.render(citizen, limbSwing, partialTicks, matrixStack, renderTypeBuffer, light);
+            state.customTextureUUID = null;
+            state.customTexture = null;
+            state.displayHeadArmorEmpty = true;
         }
+
+        // Prefer downloaded custom player skin when present; otherwise vanilla default skins.
+        // Full-body player skins draw the head from the same texture — clear UUID so CitizenModel
+        // does not hide head/hat (legacy path assumed a separate head overlay layer).
+        if (state.customTexture != null)
+        {
+            state.texture = state.customTexture;
+            state.customTextureUUID = null;
+        }
+        else
+        {
+            state.texture = vanillaPlayerSkin(citizen);
+            state.customTextureUUID = null;
+        }
+
+        setupMainModelFrom(citizen, state);
     }
 
-    private void setupMainModelFrom(@NotNull final AbstractEntityCitizen citizen)
+    private void setupMainModelFrom(@NotNull final AbstractEntityCitizen citizen, @NotNull final CitizenRenderState state)
     {
-        final IModelType modelType = IModelTypeRegistry.getInstance().getModelType(citizen.getModelType());
-        model = citizen.isFemale() ? modelType.getFemaleModel() : modelType.getMaleModel();
-        if (model == null)
-        {
-            //no if base, or the next condition, get player model!
-            model = citizen.isFemale() ? modelType.getFemaleModel() : modelType.getMaleModel();
-        }
-
         if (citizen.getCitizenDataView() != null && citizen.getCitizenDataView().getCustomTexture() != null)
         {
-            model = IModelTypeRegistry.getInstance().getModelType(ModModelTypes.CUSTOM_ID).getMaleModel();
+            // Custom skins are standard player-format; wide PLAYER mesh is the safe default.
+            final CitizenModel<CitizenRenderState> custom =
+              IModelTypeRegistry.getInstance().getModelType(ModModelTypes.CUSTOM_ID).getMaleModel();
+            this.model = custom != null ? custom : wideModel;
+            return;
         }
 
-        model.young = citizen.isBaby();
-        model.riding = citizen.getVehicle() != null;
-        model.attackTime = citizen.attackAnim;
+        // Female → slim (Alex arms); male → wide (Steve arms).
+        this.model = citizen.isFemale() ? slimModel : wideModel;
+    }
+
+    /**
+     * Pick a vanilla default player skin from textureId / gender.
+     */
+    private static ResourceLocation vanillaPlayerSkin(@NotNull final AbstractEntityCitizen citizen)
+    {
+        final boolean slim = citizen.isFemale();
+        final String[] pack = slim ? SLIM_SKINS : WIDE_SKINS;
+        final int idx = Math.floorMod(citizen.getTextureId(), pack.length);
+        final String folder = slim ? "slim" : "wide";
+        return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/entity/player/" + folder + "/" + pack[idx] + ".png");
     }
 
     @Override
-    protected void renderNameTag(
-      @NotNull final AbstractEntityCitizen entityIn,
-      @NotNull final Component str,
-      @NotNull final PoseStack matrixStack,
-      @NotNull final MultiBufferSource buffer,
-      final int packedLight,
-      final float partialTick)
+    public @NotNull ResourceLocation getTextureLocation(@NotNull final CitizenRenderState state)
     {
-        super.renderNameTag(entityIn, str, matrixStack, buffer, packedLight, partialTick);
-
-        if (entityIn.getCitizenDataView() != null && entityIn.getCitizenDataView().hasVisibleStatus())
-        {
-            double distance = this.entityRenderDispatcher.distanceToSqr(entityIn.getX(), entityIn.getY(), entityIn.getZ());
-            if (distance <= 4096.0D)
-            {
-                Vec3 vec3 = entityIn.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, entityIn.getViewYRot(partialTick));
-
-                matrixStack.pushPose();
-                matrixStack.translate(vec3.x, vec3.y + 0.9, vec3.z);
-                matrixStack.mulPose(entityRenderDispatcher.cameraOrientation());
-                matrixStack.scale(0.025F, -0.025F, 0.025F);
-
-                final Matrix4f pose = matrixStack.last().pose();
-
-                VertexConsumer r = buffer.getBuffer(RenderTypes.worldEntityIcon(entityIn.getCitizenDataView().getStatusIcon()));
-                r.addVertex(pose, -5, 0, 0).setUv(0, 0);
-                r.addVertex(pose, -5, 10, 0).setUv(0, 1);
-                r.addVertex(pose, 5, 10, 0).setUv(1, 1);
-                r.addVertex(pose, 5, 0, 0).setUv(1, 0);
-
-                matrixStack.popPose();
-            }
-        }
-    }
-
-    @NotNull
-    @Override
-    public ResourceLocation getTextureLocation(final AbstractEntityCitizen entity)
-    {
-        if (entity.getCitizenDataView() != null && entity.getCitizenDataView().getCustomTexture() != null)
-        {
-            return entity.getCitizenDataView().getCustomTexture();
-        }
-        return entity.getTexture();
+        return state.texture != null
+                 ? state.texture
+                 : ResourceLocation.fromNamespaceAndPath("minecraft", "textures/entity/player/wide/steve.png");
     }
 }

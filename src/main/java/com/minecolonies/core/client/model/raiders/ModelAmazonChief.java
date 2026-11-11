@@ -10,7 +10,7 @@ import net.minecraft.client.model.geom.builders.*;
 /**
  * Amazon Chief model.
  */
-public class ModelAmazonChief extends AmazonModel<AbstractEntityAmazonRaider>
+public class ModelAmazonChief extends AmazonModel<net.minecraft.client.renderer.entity.state.HumanoidRenderState>
 {
     /**
      * Create an instance of it.

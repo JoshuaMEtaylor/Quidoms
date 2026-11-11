@@ -5,31 +5,20 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Small utility class to run an executable on a chat click event.
+ * Implements ClickEvent (1.21.10+ interface) and triggers runnables when action() is queried.
  */
-public class ClickEventWithExecutable extends ClickEvent
+public class ClickEventWithExecutable implements ClickEvent
 {
-    /**
-     * The actions to run
-     */
     private Runnable[] actions;
 
-    /**
-     * Default constructor.
-     *
-     * @param actions the actions this event should execute.
-     */
     public ClickEventWithExecutable(@NotNull final Runnable... actions)
     {
-        super(ClickEvent.Action.RUN_COMMAND, "");
         this.actions = actions;
     }
 
-    /**
-     * Triggered when the chat component is clicked.
-     */
     @Override
     @NotNull
-    public Action getAction()
+    public Action action()
     {
         if (actions != null)
         {
@@ -39,6 +28,6 @@ public class ClickEventWithExecutable extends ClickEvent
             }
             actions = null;
         }
-        return super.getAction();
+        return Action.RUN_COMMAND;
     }
 }

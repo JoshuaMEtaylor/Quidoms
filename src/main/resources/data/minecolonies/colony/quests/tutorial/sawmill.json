@@ -1,9 +1,150 @@
 {
-  "name": "I saw that!",
   "max-occurrences": 1,
+  "name": "minecolonies.quests.tutorial.sawmill",
+  "objectives": [
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.tutorial.sawmill.obj0.answer0",
+          "result": {
+            "type": "minecolonies:dialogue",
+            "options": [
+              {
+                "answer": "minecolonies.quests.tutorial.sawmill.obj0.answer0.reply.answer0",
+                "result": {
+                  "type": "minecolonies:advanceobjective",
+                  "go-to": 1
+                }
+              },
+              {
+                "answer": "minecolonies.quests.tutorial.sawmill.obj0.answer0.reply.answer1",
+                "result": {
+                  "type": "minecolonies:dialogue",
+                  "options": [
+                    {
+                      "answer": "minecolonies.quests.tutorial.sawmill.obj0.answer0.reply.answer1.reply.answer0",
+                      "result": {
+                        "type": "minecolonies:advanceobjective",
+                        "go-to": 2
+                      }
+                    }
+                  ],
+                  "text": "minecolonies.quests.tutorial.sawmill.obj0.answer0.reply.answer1.reply"
+                }
+              }
+            ],
+            "text": "minecolonies.quests.tutorial.sawmill.obj0.answer0.reply"
+          }
+        },
+        {
+          "answer": "minecolonies.quests.tutorial.sawmill.obj0.answer1",
+          "result": {
+            "type": "minecolonies:return"
+          }
+        },
+        {
+          "answer": "minecolonies.quests.tutorial.sawmill.obj0.answer2",
+          "result": {
+            "type": "minecolonies:dialogue",
+            "options": [
+              {
+                "answer": "minecolonies.quests.tutorial.sawmill.obj0.answer2.reply.answer0",
+                "result": {
+                  "type": "minecolonies:advanceobjective",
+                  "go-to": 10
+                }
+              }
+            ],
+            "text": "minecolonies.quests.tutorial.sawmill.obj0.answer2.reply"
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.tutorial.sawmill.obj0"
+    },
+    {
+      "type": "minecolonies:research",
+      "details": {
+        "type": "minecolonies:technology/woodwork",
+        "next-objective": 2,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.tutorial.sawmill.obj2.answer0",
+          "result": {
+            "type": "minecolonies:advanceobjective",
+            "go-to": 3
+          }
+        },
+        {
+          "answer": "minecolonies.quests.tutorial.sawmill.obj2.answer1",
+          "result": {
+            "type": "minecolonies:return"
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.tutorial.sawmill.obj2"
+    },
+    {
+      "type": "minecolonies:buildbuilding",
+      "details": {
+        "type": "minecolonies:sawmill",
+        "count-existing": true,
+        "lvl": 1,
+        "next-objective": 4,
+        "qty": 1,
+        "target": 0
+      }
+    },
+    {
+      "type": "minecolonies:dialogue",
+      "options": [
+        {
+          "answer": "minecolonies.quests.tutorial.sawmill.obj4.answer0",
+          "result": {
+            "type": "minecolonies:dialogue",
+            "options": [
+              {
+                "answer": "minecolonies.quests.tutorial.sawmill.obj4.answer0.reply.answer0",
+                "result": {
+                  "type": "minecolonies:advanceobjective",
+                  "go-to": 10
+                }
+              }
+            ],
+            "text": "minecolonies.quests.tutorial.sawmill.obj4.answer0.reply"
+          }
+        }
+      ],
+      "target": 0,
+      "text": "minecolonies.quests.tutorial.sawmill.obj4",
+      "unlocks-rewards": [
+        0,
+        1
+      ]
+    }
+  ],
   "parents": [
     "minecolonies:tutorial/hospital"
   ],
+  "rewards": [
+    {
+      "type": "minecolonies:item",
+      "details": {
+        "item": {
+          "count": 3,
+          "id": "minecraft:diamond"
+        }
+      }
+    }
+  ],
+  "triggerOrder": "1 || 2",
   "triggers": [
     {
       "type": "minecolonies:citizen",
@@ -17,145 +158,7 @@
     },
     {
       "type": "minecolonies:citizen",
-      "state": { }
-    }
-  ],
-  "triggerOrder": "1 || 2",
-  "objectives": [
-    {
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "I see you working yourself to death crafting all these stairs and planks on your own. I think it's about time to get a sawmill to automate this task!",
-      "options": [
-        {
-          "answer": "Plleeeeeeassse!",
-          "result": {
-            "type": "minecolonies:dialogue",
-            "text": "The sawmill is able to craft most wood related blocks on demand and your couriers will make sure that they get all they need for it! But before we do that, we need to first research it at the university!'",
-            "options": [
-              {
-                "answer": "On it!",
-                "result": {
-                  "type": "minecolonies:advanceobjective",
-                  "go-to": 1
-                }
-              },
-              {
-                "answer": "Already done!",
-                "result": {
-                  "type": "minecolonies:dialogue",
-                  "text": "Alrighty then! You know the drill, craft the sawmill hut block in a crafting bench, place it and let your builder build it. This time put three wooden axes in the middle, put the build tool at the top and fill up the rest with planks.",
-                  "options": [
-                    {
-                      "answer": "Consider it done!",
-                      "result": {
-                        "type": "minecolonies:advanceobjective",
-                        "go-to": 2
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "answer": "Not right now. I will come back to you later!",
-          "result": {
-            "type": "minecolonies:return"
-          }
-        },
-        {
-          "answer": "Already done!",
-          "result": {
-            "type": "minecolonies:dialogue",
-            "text": "Oh nice, then we are done here and I will have more information on the next steps soon!",
-            "options": [
-              {
-                "answer": "Nice!",
-                "result": {
-                  "type": "minecolonies:advanceobjective",
-                  "go-to": 10
-                }
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "type": "minecolonies:research",
-      "details": {
-        "type": "minecolonies:technology/woodwork",
-        "target": 0,
-        "next-objective": 2
-      }
-    },
-    {
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Alrighty then! You know the drill, craft the sawmill hut block in a crafting bench, place it and let your builder build it. This time put three wooden axes in the middle, put the build tool at the top and fill up the rest with planks.",
-      "options": [
-        {
-          "answer": "On it!",
-          "result": {
-            "type": "minecolonies:advanceobjective",
-            "go-to": 3
-          }
-        },
-        {
-          "answer": "Not right now. I will come back to you later!",
-          "result": {
-            "type": "minecolonies:return"
-          }
-        }
-      ]
-    },
-    {
-      "type": "minecolonies:buildbuilding",
-      "details": {
-        "type": "minecolonies:sawmill",
-        "count-existing": true,
-        "lvl": 1,
-        "qty": 1,
-        "target": 0,
-        "next-objective": 4
-      }
-    },
-    {
-      "unlocks-rewards": [0,1],
-      "type": "minecolonies:dialogue",
-      "target": 0,
-      "text": "Great, the sawmill has a recipe page where you can teach all the recipes you want the sawmill to handle automatically. You can upgrade the hut to unlock more recipe slots, and research and build the other Crafters in a similar fashion.",
-      "options": [
-        {
-          "answer": "This is going to be so useful!",
-          "result": {
-            "type": "minecolonies:dialogue",
-            "text": "I have taught you everything I know. and you have become a far greater Mayor than I could ever hope to be. Good luck on this journey!",
-            "options": [
-              {
-                "answer": "Thank you!",
-                "result": {
-                  "type": "minecolonies:advanceobjective",
-                  "go-to": 10
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
-  ],
-  "rewards": [
-    {
-      "type": "minecolonies:item",
-      "details": {
-        "item": {
-          "id": "minecraft:diamond",
-          "count": 3
-        }
-      }
+      "state": {}
     }
   ]
 }

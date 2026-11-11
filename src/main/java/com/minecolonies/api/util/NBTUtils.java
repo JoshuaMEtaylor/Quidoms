@@ -42,7 +42,7 @@ public class NBTUtils
 
     public static BlockPos readBlockPos(@NotNull final CompoundTag compound, @NotNull final String name)
     {
-        int[] aint = compound.getIntArray(name);
+        int[] aint = compound.getIntArray(name).orElse(new int[0]);
         return aint.length == 3 ? new BlockPos(aint[0], aint[1], aint[2]) : null;
     }
 
@@ -74,7 +74,7 @@ public class NBTUtils
         @Override
         public Tag next()
         {
-            return list.getCompound(currentIndex++);
+            return list.getCompoundOrEmpty(currentIndex++);
         }
     }
 }

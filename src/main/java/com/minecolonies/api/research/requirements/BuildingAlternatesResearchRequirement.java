@@ -69,12 +69,12 @@ public class BuildingAlternatesResearchRequirement implements IResearchRequireme
     public BuildingAlternatesResearchRequirement(final CompoundTag nbt)
     {
         buildings = new HashSet<>();
-        buildingLevel = nbt.getInt(TAG_BUILDING_LVL);
-        final ListTag buildingsNBT = nbt.getList(TAG_BUILDINGS_LIST, Constants.TAG_COMPOUND);
+        buildingLevel = nbt.getIntOr(TAG_BUILDING_LVL, 0);
+        final ListTag buildingsNBT = nbt.getListOrEmpty(TAG_BUILDINGS_LIST);
         for (int i = 0; i < buildingsNBT.size(); i++)
         {
-            final CompoundTag buildingNBT = buildingsNBT.getCompound(i);
-            buildings.add(parseFallbackBuildingKey(buildingNBT.getString(TAG_BUILDING_NAME)));
+            final CompoundTag buildingNBT = buildingsNBT.getCompoundOrEmpty(i);
+            buildings.add(parseFallbackBuildingKey(buildingNBT.getStringOr(TAG_BUILDING_NAME, "")));
         }
     }
 
@@ -127,7 +127,7 @@ public class BuildingAlternatesResearchRequirement implements IResearchRequireme
         {
             final ResourceLocation building = iterator.next();
 
-            final BuildingEntry buildingEntry = IBuildingRegistry.getInstance().get(building);
+            final BuildingEntry buildingEntry = IBuildingRegistry.getInstance().getValue(building);
             final MutableComponent buildingName = buildingEntry != null ? Component.translatable(buildingEntry.getTranslationKey()) : Component.empty();
 
             requirementList.append(Component.translatable("com.minecolonies.coremod.research.requirement.building.level", buildingName, buildingLevel));

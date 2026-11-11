@@ -69,7 +69,7 @@ public class CommandDeleteColony implements IMCColonyOfficerCommand
      */
     private ClickEvent createClickEvent(final CommandContext<CommandSourceStack> context, final boolean confirm)
     {
-        return new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + context.getInput() + " " + confirm);
+        return new ClickEvent.RunCommand("/" + context.getInput() + " " + confirm);
     }
 
     /**

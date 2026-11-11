@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:cabbage",
+    "minecolonies:garlic",
+    "minecraft:bowl",
+    "minecolonies:cooked_rice"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:congee"
+  }
+}

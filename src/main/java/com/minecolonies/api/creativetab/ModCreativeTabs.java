@@ -3,7 +3,6 @@ package com.minecolonies.api.creativetab;
 import com.minecolonies.api.blocks.AbstractBlockHut;
 import com.minecolonies.api.blocks.AbstractColonyBlock;
 import com.minecolonies.api.blocks.ModBlocks;
-import com.minecolonies.api.entity.ModEntities;
 import com.minecolonies.api.items.ModItems;
 import com.minecolonies.api.util.constant.Constants;
 import net.minecraft.core.registries.Registries;
@@ -11,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -84,20 +82,7 @@ public final class ModCreativeTabs
           output.accept(ModItems.flagBanner);
 
           output.accept(ModItems.ancientTome);
-          output.accept(ModItems.chiefSword);
-          output.accept(ModItems.scimitar);
-          output.accept(ModItems.pharaoscepter);
-          output.accept(ModItems.firearrow);
           output.accept(ModItems.spear);
-          output.accept(ModItems.pirateHelmet_1);
-          output.accept(ModItems.pirateChest_1);
-          output.accept(ModItems.pirateLegs_1);
-          output.accept(ModItems.pirateBoots_1);
-
-          output.accept(ModItems.pirateHelmet_2);
-          output.accept(ModItems.pirateChest_2);
-          output.accept(ModItems.pirateLegs_2);
-          output.accept(ModItems.pirateBoots_2);
 
           output.accept(ModItems.plateArmorHelmet);
           output.accept(ModItems.plateArmorChest);
@@ -118,33 +103,6 @@ public final class ModCreativeTabs
           output.accept(ModItems.sugaryBread);
           output.accept(ModItems.goldenBread);
           output.accept(ModItems.chorusBread);
-
-          if (SpawnEggItem.byId(ModEntities.CAMP_BARBARIAN) != null)
-          {
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_BARBARIAN));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_ARCHERBARBARIAN));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_CHIEFBARBARIAN));
-
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_PIRATE));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_ARCHERPIRATE));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_CHIEFPIRATE));
-
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_MUMMY));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_ARCHERMUMMY));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_PHARAO));
-
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_SHIELDMAIDEN));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_NORSEMEN_ARCHER));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_NORSEMEN_CHIEF));
-
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_AMAZON));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_AMAZONSPEARMAN));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_AMAZONCHIEF));
-
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_DROWNED_PIRATE));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_DROWNED_ARCHERPIRATE));
-                output.accept(SpawnEggItem.byId(ModEntities.CAMP_DROWNED_CHIEFPIRATE));
-          }
 
       }).build());
 

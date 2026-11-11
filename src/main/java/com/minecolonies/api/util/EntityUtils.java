@@ -269,14 +269,14 @@ public final class EntityUtils
 
         if (!isLivingAtSite(entity, x, y, z, TELEPORT_RANGE))
         {
-            BlockPos spawnPoint = getSpawnPoint(entity.getCommandSenderWorld(), new BlockPos(x,y,z));
+            BlockPos spawnPoint = getSpawnPoint(entity.level(), new BlockPos(x,y,z));
 
             if (spawnPoint == null)
             {
                 spawnPoint = new BlockPos(x, y, z);
             }
 
-            entity.moveTo(
+            entity.snapTo(
               spawnPoint.getX() + MIDDLE_BLOCK_OFFSET,
               spawnPoint.getY(),
               spawnPoint.getZ() + MIDDLE_BLOCK_OFFSET,
@@ -328,7 +328,7 @@ public final class EntityUtils
             }
             else
             {
-                return !localEntity.level().isClientSide || localEntity instanceof Player && ((Player) localEntity).isLocalPlayer();
+                return !localEntity.level().isClientSide() || localEntity instanceof Player && ((Player) localEntity).isLocalPlayer();
             }
         });
     }

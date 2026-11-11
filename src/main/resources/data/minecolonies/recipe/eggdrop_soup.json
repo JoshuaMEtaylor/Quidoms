@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:onion",
+    "minecolonies:onion",
+    "minecolonies:garlic",
+    "minecraft:egg",
+    "minecraft:egg",
+    "minecraft:chicken",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:eggdrop_soup"
+  }
+}

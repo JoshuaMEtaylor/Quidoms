@@ -8,7 +8,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import com.minecolonies.core.datalistener.GsonEventReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * Loads and listens to get custom nbt matching rules.
  */
-public class ItemNbtListener extends SimpleJsonResourceReloadListener
+public class ItemNbtListener extends GsonEventReloadListener
 {
     /**
      * Gson instance
@@ -61,14 +61,24 @@ public class ItemNbtListener extends SimpleJsonResourceReloadListener
                     final JsonArray jsonArray = jsonObj.getAsJsonArray("checkednbtkeys");
                     for (final JsonElement subElement : jsonArray)
                     {
-                        set.add(BuiltInRegistries.DATA_COMPONENT_TYPE.get(ResourceLocation.parse(subElement.getAsString())));
+                        final ResourceLocation keyId = migrateComponentId(ResourceLocation.parse(subElement.getAsString()));
+                        final DataComponentType<?> type = BuiltInRegistries.DATA_COMPONENT_TYPE.getValue(keyId);
+                        // Unknown/legacy component ids resolve to null — never store nulls (breaks login sync).
+                        if (type != null)
+                        {
+                            set.add(type);
+                        }
+                        else
+                        {
+                            Log.getLogger().debug("Skipping unknown data component '{}' for item {}", keyId, itemLoc);
+                        }
                     }
 
-                    ItemStackUtils.CHECKED_NBT_KEYS.put(BuiltInRegistries.ITEM.get(itemLoc), set);
+                    ItemStackUtils.CHECKED_NBT_KEYS.put(BuiltInRegistries.ITEM.getValue(itemLoc), set);
                 }
                 else
                 {
-                    ItemStackUtils.CHECKED_NBT_KEYS.put(BuiltInRegistries.ITEM.get(itemLoc), new HashSet<>());
+                    ItemStackUtils.CHECKED_NBT_KEYS.put(BuiltInRegistries.ITEM.getValue(itemLoc), new HashSet<>());
                 }
             }
             catch (Exception e)
@@ -77,5 +87,23 @@ public class ItemNbtListener extends SimpleJsonResourceReloadListener
             }
         }
         Log.getLogger().warn("Read " + ItemStackUtils.CHECKED_NBT_KEYS.size() + " items with their nbt keys for compatibility.");
+    }
+
+    /**
+     * Map removed/renamed 1.20–1.21 component ids onto 1.21.10 equivalents.
+     */
+    @NotNull
+    private static ResourceLocation migrateComponentId(@NotNull final ResourceLocation id)
+    {
+        if ("minecraft".equals(id.getNamespace()))
+        {
+            return switch (id.getPath())
+            {
+                case "fire_resistant" -> ResourceLocation.withDefaultNamespace("damage_resistant");
+                case "hide_additional_tooltip", "hide_tooltip" -> ResourceLocation.withDefaultNamespace("tooltip_display");
+                default -> id;
+            };
+        }
+        return id;
     }
 }

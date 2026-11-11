@@ -14,7 +14,7 @@
     <button id="assign" size="129 17" pos="30 92" color="black"
                  source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
                  label="$(com.minecolonies.coremod.gui.home.manage)"/>
-    <button id="recall" size="129 17" pos="30 128" color="black"
+    <button id="recall" size="129 17" pos="30 147" color="black"
                  source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
                  label="$(com.minecolonies.coremod.gui.townhall.recall)"/>
 </window>

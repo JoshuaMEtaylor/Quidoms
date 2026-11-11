@@ -4,7 +4,7 @@ import com.minecolonies.api.entity.mobs.AbstractEntityMinecoloniesMonster;
 import com.minecolonies.api.entity.mobs.RaiderType;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 
@@ -45,7 +45,7 @@ public abstract class AbstractEntityEgyptian extends AbstractEntityMinecoloniesM
     }
 
     @Override
-    public boolean checkSpawnRules(final LevelAccessor worldIn, final MobSpawnType spawnReasonIn)
+    public boolean checkSpawnRules(final LevelAccessor worldIn, final EntitySpawnReason spawnReasonIn)
     {
         return true;
     }

@@ -170,8 +170,8 @@ public class StaticLocation implements ILocation
         @Override
         public StaticLocation deserialize(@NotNull final HolderLookup.Provider provider, @NotNull final IFactoryController controller, @NotNull final CompoundTag nbt)
         {
-            final BlockPos pos = BlockPos.of(nbt.getLong(NBT_POS));
-            final String dim = nbt.getString(NBT_DIM);
+            final BlockPos pos = BlockPos.of(nbt.getLongOr(NBT_POS, 0L));
+            final String dim = nbt.getStringOr(NBT_DIM, "");
             return new StaticLocation(pos, ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(dim)));
         }
 

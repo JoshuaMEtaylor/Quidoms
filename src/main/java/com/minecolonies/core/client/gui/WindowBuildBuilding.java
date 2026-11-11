@@ -14,6 +14,7 @@ import com.ldtteam.structurize.placement.StructurePhasePlacementResult;
 import com.ldtteam.structurize.placement.StructurePlacer;
 import com.ldtteam.structurize.placement.structure.IStructureHandler;
 import com.ldtteam.structurize.storage.ClientFutureProcessor;
+import com.ldtteam.structurize.storage.StructurePackMeta;
 import com.ldtteam.structurize.storage.StructurePacks;
 import com.ldtteam.structurize.util.BlueprintPositionInfo;
 import com.minecolonies.api.blocks.AbstractBlockHut;
@@ -21,10 +22,12 @@ import com.minecolonies.api.colony.IColonyView;
 import com.minecolonies.api.colony.buildings.ModBuildings;
 import com.minecolonies.api.colony.buildings.views.IBuildingView;
 import com.minecolonies.api.colony.jobs.ModJobs;
+import com.minecolonies.api.compatibility.newstruct.BlueprintMapping;
 import com.minecolonies.api.crafting.ItemStorage;
 import com.minecolonies.api.entity.ai.workers.util.IBuilderUndestroyable;
 import com.minecolonies.api.util.ItemStackUtils;
 import com.minecolonies.api.util.LoadOnlyStructureHandler;
+import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.colony.buildings.views.AbstractBuildingBuilderView;
 import com.minecolonies.core.network.messages.server.colony.building.BuildPickUpMessage;
@@ -44,6 +47,7 @@ import net.neoforged.neoforge.common.util.TriPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -90,9 +94,9 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
     private DropDownList buildersDropDownList;
 
     /**
-     * White color.
+     * Ink on parchment (opaque black — BlockUI name colors are RGB|0xFF000000).
      */
-    private static final int WHITE = Color.getByName("white", 0);
+    private static final int INK = Color.getByName("black", 0xFF000000);
 
     /**
      * List of style for the section.
@@ -110,6 +114,11 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      * Update delay.
      */
     private int tick;
+
+    /**
+     * Monotonic id so stale async blueprint callbacks cannot overwrite a newer style selection.
+     */
+    private int resourceRequestId = 0;
 
     /**
      * Constructor for the window when the player wants to hire a worker for a certain job.
@@ -215,7 +224,16 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      */
     private void triggerConfirmAction(final BlockPos builder)
     {
-        new BuildingSetStyleMessage(building, styles.get(stylesDropDownList.getSelectedIndex())).sendToServer();
+        final int styleIndex = stylesDropDownList.getSelectedIndex();
+        if (styleIndex < 0 || styleIndex >= styles.size())
+        {
+            Log.getLogger().warn("Build Building: no valid style selected; refusing empty claim");
+            return;
+        }
+        final String stylePack = styles.get(styleIndex);
+        final String blueprintPath = resolveBlueprintPathForPack(stylePack);
+        // Always push pack+path so orphan/empty-path huts still create a work order.
+        new BuildingSetStyleMessage(building, stylePack, blueprintPath == null ? "" : blueprintPath).sendToServer();
         if (building.getBuildingLevel() == building.getBuildingMaxLevel())
         {
             new BuildRequestMessage(building, BuildRequestMessage.Mode.REPAIR, builder).sendToServer();
@@ -254,75 +272,342 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
         initBuilderNavigation();
     }
 
+    /** Preferred fallback packs when the building's stored pack is invalid (e.g. Decorations). */
+    private static final List<String> PREFERRED_PACKS = List.of(
+      "Medieval Oak",
+      "Minecolonies Original",
+      "Colonial",
+      "Nordic Spruce",
+      "Desert Oasis");
+
     /**
      * Update the styles list but try to keep the same one.
+     * Quidoms: only packs that actually contain this hut's blueprint — never keep Decorations /
+     * decoration-only packs or empty paths on the Build UI.
      */
     private void updateStyles()
     {
-        if (!building.getParent().equals(BlockPos.ZERO) && building.getColony().getClientBuildingManager().getBuilding(building.getParent()) != null)
+        styles = new ArrayList<>();
+
+        final IBuildingView parentBuilding = building.getParent().equals(BlockPos.ZERO)
+                                               ? null
+                                               : building.getColony().getClientBuildingManager().getBuilding(building.getParent());
+        final List<String> pathCandidates = blueprintPathCandidates();
+        if (pathCandidates.isEmpty())
         {
-            styles = new ArrayList<>();
-            styles.add(building.getColony().getClientBuildingManager().getBuilding(building.getParent()).getStructurePack());
-            if (!styles.isEmpty())
+            Log.getLogger().warn("Build UI: no blueprint path for building at {} (pack='{}' path='{}')",
+              building.getPosition(), building.getStructurePack(), building.getStructurePath());
+        }
+
+        if (parentBuilding != null)
+        {
+            final String parentPack = resolveValidPackName(parentBuilding.getStructurePack(), pathCandidates);
+            if (parentPack != null)
             {
-                stylesDropDownList.setSelectedIndex(0);
+                styles.add(parentPack);
             }
         }
         else
         {
-            styles = new ArrayList<>();
-            styles.add(building.getStructurePack());
-
-            if (!styles.isEmpty())
+            for (final StructurePackMeta pack : StructurePacks.getPackMetas())
             {
-                int newIndex = styles.indexOf(building.getStructurePack());
-                if (newIndex == -1)
+                if (packHasAnyBlueprint(pack, pathCandidates))
                 {
-                    newIndex = 0;
+                    styles.add(pack.getName());
                 }
-                stylesDropDownList.setSelectedIndex(newIndex);
+            }
+            styles.sort(String.CASE_INSENSITIVE_ORDER);
+        }
+
+        // Never fall back to an unverified pack name (that stuck us on "Decorations").
+        if (styles.isEmpty())
+        {
+            for (final String preferred : PREFERRED_PACKS)
+            {
+                final StructurePackMeta pack = StructurePacks.getStructurePack(preferred);
+                if (pack != null && packHasAnyBlueprint(pack, pathCandidates))
+                {
+                    styles.add(pack.getName());
+                    break;
+                }
             }
         }
 
-        findPaneOfTypeByID(BUTTON_PREVIOUS_STYLE_ID, Button.class).setEnabled(enabled);
-        findPaneOfTypeByID(DROPDOWN_STYLE_ID, DropDownList.class).setEnabled(enabled);
-        findPaneOfTypeByID(BUTTON_NEXT_STYLE_ID, Button.class).setEnabled(enabled);
+        if (!styles.isEmpty())
+        {
+            int newIndex = indexOfValidStoredPack(pathCandidates);
+            if (newIndex < 0)
+            {
+                newIndex = preferredStyleIndex();
+            }
+            stylesDropDownList.setSelectedIndex(Math.max(0, newIndex));
+        }
+        else
+        {
+            stylesDropDownList.setSelectedIndex(-1);
+        }
+
+        final boolean canSwitch = styles.size() > 1;
+        findPaneOfTypeByID(BUTTON_PREVIOUS_STYLE_ID, Button.class).setEnabled(canSwitch);
+        findPaneOfTypeByID(DROPDOWN_STYLE_ID, DropDownList.class).setEnabled(canSwitch || !styles.isEmpty());
+        findPaneOfTypeByID(BUTTON_NEXT_STYLE_ID, Button.class).setEnabled(canSwitch);
     }
 
     /**
-     * Clears and resets/updates all resources.
+     * Index of the building's stored pack if it is in {@link #styles}; else -1.
      */
-    private void updateResources()
+    private int indexOfValidStoredPack(final List<String> pathCandidates)
     {
-        tick = 20;
+        final String stored = building.getStructurePack();
+        if (stored == null || stored.isEmpty())
+        {
+            return -1;
+        }
+        int idx = styles.indexOf(stored);
+        if (idx >= 0)
+        {
+            return idx;
+        }
+        final StructurePackMeta resolved = StructurePacks.getStructurePack(stored);
+        if (resolved != null)
+        {
+            idx = styles.indexOf(resolved.getName());
+            if (idx >= 0 && packHasAnyBlueprint(resolved, pathCandidates))
+            {
+                return idx;
+            }
+        }
+        return -1;
+    }
 
-        if (stylesDropDownList.getSelectedIndex() == -1)
+    private int preferredStyleIndex()
+    {
+        for (final String preferred : PREFERRED_PACKS)
+        {
+            final int idx = styles.indexOf(preferred);
+            if (idx >= 0)
+            {
+                return idx;
+            }
+        }
+        return 0;
+    }
+
+    @Nullable
+    private static String resolveValidPackName(@Nullable final String packName, final List<String> pathCandidates)
+    {
+        if (packName == null || packName.isEmpty())
+        {
+            return null;
+        }
+        final StructurePackMeta pack = StructurePacks.getStructurePack(packName);
+        if (pack != null && packHasAnyBlueprint(pack, pathCandidates))
+        {
+            return pack.getName();
+        }
+        return null;
+    }
+
+    /**
+     * Blueprint sub-paths to probe. Derives {@code fundamentals/&lt;hut&gt;N.blueprint} when the
+     * building's stored path is empty/corrupt (recreated orphan huts).
+     */
+    @NotNull
+    private List<String> blueprintPathCandidates()
+    {
+        final List<String> candidates = new ArrayList<>();
+        final String structurePath = building.getStructurePath();
+        if (structurePath != null && !structurePath.isBlank())
+        {
+            candidates.add(structurePath.trim());
+            addLeveledVariants(candidates, structurePath.trim());
+        }
+
+        final String derived = deriveHutBlueprintBase();
+        if (derived != null)
+        {
+            addLeveledVariants(candidates, derived + ".blueprint");
+        }
+
+        final List<String> withAlts = new ArrayList<>(candidates);
+        for (final String path : candidates)
+        {
+            withAlts.addAll(StructurePacks.alternateBlueprintPaths(building.getStructurePack(), path));
+        }
+        return withAlts.stream().filter(p -> p != null && !p.isBlank()).distinct().collect(Collectors.toList());
+    }
+
+    private void addLeveledVariants(final List<String> candidates, final String structurePath)
+    {
+        String name = structurePath.replace(".blueprint", "");
+        if (name.isEmpty())
         {
             return;
         }
+        // Strip trailing level digit when present (townhall1 → townhall).
+        final char last = name.charAt(name.length() - 1);
+        final String base = Character.isDigit(last) ? name.substring(0, name.length() - 1) : name;
 
-        final Level world = Minecraft.getInstance().level;
         int nextLevel = building.getBuildingLevel();
         if (canBeUpgraded())
         {
             nextLevel = building.getBuildingLevel() + 1;
         }
-
-        String name = building.getStructurePath().replace(".blueprint", "");
-        if (name.isEmpty())
+        if (nextLevel < 1)
         {
+            nextLevel = 1;
+        }
+        candidates.add(base + nextLevel + ".blueprint");
+        candidates.add(base + "1.blueprint");
+    }
+
+    /**
+     * Default blueprint folder/name for this hut type when TE path is missing.
+     */
+    @Nullable
+    private String deriveHutBlueprintBase()
+    {
+        try
+        {
+            if (building.getBuildingType() == null || building.getBuildingType().getRegistryName() == null)
+            {
+                return null;
+            }
+            final String hut = building.getBuildingType().getRegistryName().getPath();
+            if (hut.isEmpty())
+            {
+                return null;
+            }
+            final String mapped = BlueprintMapping.getPathMapping("", hut);
+            if (mapped == null || mapped.isEmpty())
+            {
+                return "fundamentals/" + hut;
+            }
+            return mapped;
+        }
+        catch (final Exception e)
+        {
+            return null;
+        }
+    }
+
+    /**
+     * Blueprint path used for the currently selected style (first existing candidate in that pack).
+     */
+    @Nullable
+    private String resolveBlueprintPathForPack(@NotNull final String stylePack)
+    {
+        final StructurePackMeta pack = StructurePacks.getStructurePack(stylePack);
+        if (pack == null)
+        {
+            return null;
+        }
+        for (final String path : blueprintPathCandidates())
+        {
+            if (packHasBlueprint(pack, path))
+            {
+                return path;
+            }
+        }
+        // Still return best leveled guess so StructurePacks can try aliases.
+        final List<String> candidates = blueprintPathCandidates();
+        return candidates.isEmpty() ? null : candidates.get(0);
+    }
+
+    private static boolean packHasAnyBlueprint(@NotNull final StructurePackMeta pack, @NotNull final List<String> paths)
+    {
+        for (final String path : paths)
+        {
+            if (packHasBlueprint(pack, path))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * True when the pack contains the given blueprint sub-path.
+     */
+    private static boolean packHasBlueprint(@NotNull final StructurePackMeta pack, @Nullable final String structurePath)
+    {
+        if (structurePath == null || structurePath.isBlank())
+        {
+            return false;
+        }
+        try
+        {
+            return Files.exists(pack.getPath().resolve(pack.getNormalizedSubPath(structurePath)));
+        }
+        catch (final Exception ignored)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Clears and resets/updates all resources for the currently selected style pack.
+     */
+    private void updateResources()
+    {
+        tick = 20;
+
+        if (stylesDropDownList.getSelectedIndex() == -1 || styles.isEmpty())
+        {
+            resources.clear();
+            updateResourceList();
             return;
         }
 
-        name = name.substring(0, name.length() - 1) + nextLevel + ".blueprint";
-        ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(StructurePacks.getBlueprintFuture(styles.get(stylesDropDownList.getSelectedIndex()), name, world.registryAccess()), (blueprint -> {
+        final Level world = Minecraft.getInstance().level;
+        final String stylePack = styles.get(stylesDropDownList.getSelectedIndex());
+        final String blueprintPath = resolveBlueprintPathForPack(stylePack);
+        if (blueprintPath == null || blueprintPath.isBlank())
+        {
+            // Selected pack cannot serve this hut — drop it and jump to a valid pack.
+            skipInvalidStyle(stylePack);
+            return;
+        }
+
+        final int requestId = ++resourceRequestId;
+
+        // Drop stale rows immediately so a slow/failed load cannot leave the previous style's list up.
+        resources.clear();
+        updateResourceList();
+
+        // Soft-fail + pack/path alias inside StructurePacks.getBlueprint so Alternative packs still fill the list.
+        ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(
+          StructurePacks.getBlueprintFuture(stylePack, blueprintPath, true, world.registryAccess()), (blueprint -> {
+            if (requestId != resourceRequestId)
+            {
+                return;
+            }
+
             resources.clear();
             if (blueprint == null)
             {
-                findPaneOfTypeByID(BUTTON_BUILD, Button.class).hide();
+                skipInvalidStyle(stylePack);
+                return;
+            }
+
+            // Restore action buttons after a previous missing-blueprint style hid them.
+            if (building.getBuildingLevel() == 0)
+            {
+                findPaneOfTypeByID(BUTTON_BUILD, Button.class).show();
                 findPaneOfTypeByID(BUTTON_REPAIR, Button.class).hide();
                 findPaneOfTypeByID(BUTTON_PICKUP_BUILDING, Button.class).show();
-                return;
+            }
+            else
+            {
+                if (canBeUpgraded())
+                {
+                    findPaneOfTypeByID(BUTTON_BUILD, Button.class).show();
+                }
+                findPaneOfTypeByID(BUTTON_REPAIR, Button.class).show();
+                if (!building.isDeconstructed())
+                {
+                    findPaneOfTypeByID(BUTTON_PICKUP_BUILDING, Button.class).hide();
+                }
             }
 
             blueprint.setRotationMirror(building.getRotationMirror(), Minecraft.getInstance().level);
@@ -343,11 +628,50 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
             }
             while (result != null && result.getBlockResult().getResult() != BlockPlacementResult.Result.FINISHED);
 
+            if (requestId != resourceRequestId)
+            {
+                return;
+            }
+
             window.findPaneOfTypeByID(LIST_RESOURCES, ScrollingList.class).refreshElementPanes();
             updateResourceList();
 
         })));
 
+    }
+
+    /**
+     * Drop a pack that cannot load this hut's blueprint and select the next valid style.
+     */
+    private void skipInvalidStyle(@Nullable final String badPack)
+    {
+        if (badPack != null)
+        {
+            styles.removeIf(s -> s.equalsIgnoreCase(badPack));
+            Log.getLogger().info("Build UI: skipped style '{}' (no hut blueprint); {} pack(s) remain",
+              badPack, styles.size());
+        }
+        if (styles.isEmpty())
+        {
+            updateStyles();
+        }
+        if (styles.isEmpty())
+        {
+            resources.clear();
+            updateResourceList();
+            findPaneOfTypeByID(BUTTON_BUILD, Button.class).hide();
+            findPaneOfTypeByID(BUTTON_REPAIR, Button.class).hide();
+            findPaneOfTypeByID(BUTTON_PREVIOUS_STYLE_ID, Button.class).setEnabled(false);
+            findPaneOfTypeByID(BUTTON_NEXT_STYLE_ID, Button.class).setEnabled(false);
+            return;
+        }
+        final boolean canSwitch = styles.size() > 1;
+        findPaneOfTypeByID(BUTTON_PREVIOUS_STYLE_ID, Button.class).setEnabled(canSwitch);
+        findPaneOfTypeByID(DROPDOWN_STYLE_ID, DropDownList.class).setEnabled(true);
+        findPaneOfTypeByID(BUTTON_NEXT_STYLE_ID, Button.class).setEnabled(canSwitch);
+        stylesDropDownList.setSelectedIndex(preferredStyleIndex());
+        // Force resource refresh for the newly selected pack.
+        updateResources();
     }
 
     /**
@@ -363,7 +687,7 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
             return;
         }
         final int hashCode = res.getComponentsPatch().hashCode();
-        final String key = res.getDescriptionId() + "-" + hashCode;
+        final String key = res.getItem().getDescriptionId() + "-" + hashCode;
         ItemStorage resource = resources.get(key);
         if (resource == null)
         {
@@ -448,7 +772,18 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      */
     private void nextStyle()
     {
-        stylesDropDownList.selectNext();
+        if (styles.isEmpty())
+        {
+            return;
+        }
+        final int current = stylesDropDownList.getSelectedIndex();
+        final int next = (Math.max(current, 0) + 1) % styles.size();
+        stylesDropDownList.setSelectedIndex(next);
+        // Handler fires on index change; force refresh if setSelectedIndex no-ops (same index edge cases).
+        if (stylesDropDownList.getSelectedIndex() == current)
+        {
+            updateResources();
+        }
     }
 
     /**
@@ -456,7 +791,17 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      */
     private void previousStyle()
     {
-        stylesDropDownList.selectPrevious();
+        if (styles.isEmpty())
+        {
+            return;
+        }
+        final int current = stylesDropDownList.getSelectedIndex();
+        final int prev = current <= 0 ? styles.size() - 1 : current - 1;
+        stylesDropDownList.setSelectedIndex(prev);
+        if (stylesDropDownList.getSelectedIndex() == current)
+        {
+            updateResources();
+        }
     }
 
     /**
@@ -511,13 +856,19 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
                 final ItemStorage resource = tempRes.get(index);
                 final Text resourceLabel = rowPane.findPaneOfTypeByID(RESOURCE_NAME, Text.class);
                 final Text quantityLabel = rowPane.findPaneOfTypeByID(RESOURCE_QUANTITY_MISSING, Text.class);
-                resourceLabel.setText(resource.getItemStack().getHoverName());
+                final ItemIcon icon = rowPane.findPaneOfTypeByID(RESOURCE_ICON, ItemIcon.class);
+                final ItemStack displayStack = resource.getItemStack();
+                // Plain translated string (Domum nested components) + force panes visible/opaque.
+                resourceLabel.setText(Component.literal(displayStack.getHoverName().getString()));
                 quantityLabel.setText(Component.literal(Integer.toString(resource.getAmount())));
-                resourceLabel.setColors(WHITE);
-                quantityLabel.setColors(WHITE);
-                final ItemStack itemIcon = resource.getItemStack().copy();
+                resourceLabel.setColors(INK);
+                quantityLabel.setColors(INK);
+                resourceLabel.show();
+                quantityLabel.show();
+                final ItemStack itemIcon = displayStack.copy();
                 itemIcon.setCount(1);
-                rowPane.findPaneOfTypeByID(RESOURCE_ICON, ItemIcon.class).setItem(itemIcon);
+                icon.setItem(itemIcon);
+                icon.show();
             }
         });
     }

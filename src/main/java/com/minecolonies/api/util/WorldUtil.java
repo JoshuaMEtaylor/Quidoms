@@ -86,7 +86,7 @@ public class WorldUtil
     {
         if (WorldUtil.isBlockLoaded(world, pos))
         {
-            world.getChunk(pos.getX() >> 4, pos.getZ() >> 4).setUnsaved(true);
+            world.getChunk(pos.getX() >> 4, pos.getZ() >> 4).markUnsaved();
             final BlockState state = world.getBlockState(pos);
             world.sendBlockUpdated(pos, state, state, 3);
         }
@@ -222,10 +222,10 @@ public class WorldUtil
     public static boolean isOfWorldType(@NotNull final Level world, @NotNull final ResourceKey<DimensionType> type)
     {
         RegistryAccess dynRegistries = world.registryAccess();
-        ResourceLocation loc = dynRegistries.registry(Registries.DIMENSION_TYPE).get().getKey(world.dimensionType());
+        ResourceLocation loc = dynRegistries.lookupOrThrow(Registries.DIMENSION_TYPE).getKey(world.dimensionType());
         if (loc == null)
         {
-            if (world.isClientSide)
+            if (world.isClientSide())
             {
                 return world.dimensionType().effectsLocation().equals(type.location());
             }
@@ -245,7 +245,8 @@ public class WorldUtil
      */
     public static boolean isPeaceful(@NotNull final Level world)
     {
-        return !world.getLevelData().getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) || world.getDifficulty().equals(Difficulty.PEACEFUL);
+        final var server = world.getServer();
+        return (server != null && !server.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) || world.getDifficulty().equals(Difficulty.PEACEFUL);
     }
 
     /**

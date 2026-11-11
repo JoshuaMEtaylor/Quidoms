@@ -149,7 +149,7 @@ public class BuildingStable extends AbstractBuildingGuards
     public void deserializeNBT(final HolderLookup.Provider provider, final CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        this.lastPatrolTime = compound.getLong(NBT_LAST_PATROL_TAG);
+        this.lastPatrolTime = compound.getLongOr(NBT_LAST_PATROL_TAG, 0L);
     }
 
     /**

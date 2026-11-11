@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:yogurt",
+    "minecraft:sweet_berries",
+    "minecraft:sweet_berries",
+    "minecraft:sweet_berries",
+    "minecraft:sweet_berries",
+    "minecraft:bowl",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "count": 2,
+    "id": "minecolonies:yogurt_with_berries"
+  }
+}

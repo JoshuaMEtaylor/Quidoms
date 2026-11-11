@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * This class handles all permission checks on events and cancels them if needed.
  */
-@EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public class QuestObjectiveEventHandler
 {
     /**

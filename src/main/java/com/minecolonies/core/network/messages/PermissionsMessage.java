@@ -17,14 +17,20 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.server.players.UserNameToIdResolver;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.mojang.authlib.GameProfile;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -179,7 +185,74 @@ public class PermissionsMessage
         @Override
         protected void onExecute(final IPayloadContext ctxIn, final ServerPlayer player, final IColony colony)
         {
-            colony.getPermissions().addPlayer(playerName, colony.getPermissions().getRank(IPermissions.NEUTRAL_RANK_ID), colony.getWorld());
+            final String name = playerName == null ? "" : playerName.trim();
+            if (name.isEmpty())
+            {
+                player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.empty"));
+                return;
+            }
+
+            final boolean already =
+              colony.getPermissions().getPlayers().values().stream().anyMatch(p -> p.getName() != null && p.getName().equalsIgnoreCase(name));
+            if (already)
+            {
+                player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.already", name));
+                return;
+            }
+
+            // Resolve online first, then an *existing* name→UUID cache entry.
+            // Do NOT call Permissions.addPlayer(String) / cache.get with offline invent enabled:
+            // CachedUserNameToIdResolver fabricates offline UUIDs for any unknown name and would
+            // falsely report success for made-up singleplayer names.
+            boolean added = false;
+            final MinecraftServer server = colony.getWorld().getServer();
+            if (server != null)
+            {
+                final Rank neutral = colony.getPermissions().getRank(IPermissions.NEUTRAL_RANK_ID);
+                final ServerPlayer online = server.getPlayerList().getPlayerByName(name);
+                if (online != null)
+                {
+                    added = colony.getPermissions().addPlayer(online.getGameProfile(), neutral);
+                }
+                else
+                {
+                    final Optional<NameAndId> known = resolveKnownPlayer(server, name);
+                    if (known.isPresent())
+                    {
+                        final NameAndId id = known.get();
+                        added = colony.getPermissions().addPlayer(new GameProfile(id.id(), id.name()), neutral);
+                    }
+                }
+            }
+
+            if (added)
+            {
+                player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.success", name));
+            }
+            else
+            {
+                player.sendSystemMessage(Component.translatableEscape("com.minecolonies.core.permissions.addplayer.notfound", name));
+            }
+        }
+
+        /**
+         * Looks up a player name in the server's name cache without inventing offline UUIDs.
+         * Temporarily disables {@link UserNameToIdResolver#resolveOfflineUsers(boolean)} so
+         * unknown names return empty instead of {@link NameAndId#createOffline(String)}.
+         */
+        private static Optional<NameAndId> resolveKnownPlayer(final MinecraftServer server, final String name)
+        {
+            final UserNameToIdResolver cache = server.services().nameToIdCache();
+            cache.resolveOfflineUsers(false);
+            try
+            {
+                return cache.get(name);
+            }
+            finally
+            {
+                // Integrated/offline servers need offline invent for normal joins; restore it.
+                cache.resolveOfflineUsers(true);
+            }
         }
 
         @Override

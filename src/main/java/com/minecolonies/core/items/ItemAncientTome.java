@@ -3,9 +3,10 @@ package com.minecolonies.core.items;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.IColonyManager;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 import static com.minecolonies.api.util.constant.Constants.STACKSIZE;
 
@@ -25,16 +26,15 @@ public class ItemAncientTome extends AbstractItemMinecolonies
     }
 
     @Override
-    public void inventoryTick(final ItemStack stack, final Level worldIn, final Entity entityIn, final int itemSlot, final boolean isSelected)
+    public void inventoryTick(final ItemStack stack, final ServerLevel worldIn, final Entity entityIn, final EquipmentSlot slot)
     {
-        super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
-        if (!worldIn.isClientSide)
+        super.inventoryTick(stack, worldIn, entityIn, slot);
+        // Quidoms: raids disabled; keep glint off.
+        stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, false);
+        final IColony colony = IColonyManager.getInstance().getClosestColony(worldIn, entityIn.blockPosition());
+        if (colony != null)
         {
-            final IColony colony = IColonyManager.getInstance().getClosestColony(worldIn, entityIn.blockPosition());
-            if (colony != null)
-            {
-                stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, colony.getRaiderManager().willRaidTonight());
-            }
+            // retained colony lookup for future non-raid use; glint stays false under Quidoms cuts
         }
     }
 }

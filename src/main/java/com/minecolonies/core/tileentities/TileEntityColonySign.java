@@ -15,6 +15,8 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -100,52 +102,46 @@ public class TileEntityColonySign extends BlockEntity implements ITickable
     }
 
     @Override
-    public void loadAdditional(@NotNull final CompoundTag compound, final HolderLookup.Provider provider)
+    public void loadAdditional(@NotNull final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
-        this.colonyId = compound.getInt(TAG_COLONY_ID);
-        this.colonyNameCache = compound.getString(TAG_NAME);
-        if (compound.contains(TAG_POS))
+        super.loadAdditional(input);
+        this.colonyId = input.getIntOr(TAG_COLONY_ID, 0);
+        this.colonyNameCache = input.getStringOr(TAG_NAME, "");
+        if (input.child(TAG_POS).isPresent())
         {
-            this.anchor = BlockPosUtil.read(compound, TAG_POS);
+            this.anchor = BlockPosUtil.read(input, TAG_POS);
         }
-        this.rotation = compound.getFloat(TAG_ROTATION);
-        this.targetColonyId = compound.getInt(TAG_TARGET_COLONY_ID);
-        this.targetColonyNameCache = compound.getString(TAG_TARGET_COLONY_NAME);
-        this.distance = compound.getInt(TAG_DISTANCE);
-        this.targetColonyDistance = compound.getInt(TAG_TARGET_DISTANCE);
-        if (compound.contains(TAG_CACHED_ABOVE))
+        this.rotation = input.getFloatOr(TAG_ROTATION, 0.0F);
+        this.targetColonyId = input.getIntOr(TAG_TARGET_COLONY_ID, 0);
+        this.targetColonyNameCache = input.getStringOr(TAG_TARGET_COLONY_NAME, "");
+        this.distance = input.getIntOr(TAG_DISTANCE, 0);
+        this.targetColonyDistance = input.getIntOr(TAG_TARGET_DISTANCE, 0);
+        input.getInt(TAG_CACHED_ABOVE).ifPresent(v -> this.cachedSignAboveColony = v);
+        if (input.child(TAG_PREV_POS).isPresent())
         {
-            this.cachedSignAboveColony = compound.getInt(TAG_CACHED_ABOVE);
+            this.previousPosition = BlockPosUtil.read(input, TAG_PREV_POS);
         }
-        if (compound.contains(TAG_PREV_POS))
+        if (input.child(TAG_NEXT_POS).isPresent())
         {
-            this.previousPosition = BlockPosUtil.read(compound, TAG_PREV_POS);
-        }
-        if (compound.contains(TAG_NEXT_POS))
-        {
-            this.nextPosition = BlockPosUtil.read(compound, TAG_NEXT_POS);
+            this.nextPosition = BlockPosUtil.read(input, TAG_NEXT_POS);
         }
     }
 
     @Override
-    public void saveAdditional(@NotNull final CompoundTag compound, final HolderLookup.Provider provider)
+    public void saveAdditional(@NotNull final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
-        compound.putInt(TAG_COLONY_ID, this.colonyId);
-        compound.putString(TAG_NAME, this.colonyNameCache);
-        if (anchor != null)
-        {
-            BlockPosUtil.write(compound, TAG_POS, anchor);
-        }
-        compound.putFloat(TAG_ROTATION, this.rotation);
-        compound.putInt(TAG_TARGET_COLONY_ID, this.targetColonyId);
-        compound.putString(TAG_TARGET_COLONY_NAME, this.targetColonyNameCache);
-        compound.putInt(TAG_DISTANCE, this.distance);
-        compound.putInt(TAG_TARGET_DISTANCE, this.targetColonyDistance);
-        compound.putInt(TAG_CACHED_ABOVE, this.cachedSignAboveColony);
-        BlockPosUtil.write(compound, TAG_NEXT_POS, nextPosition);
-        BlockPosUtil.write(compound, TAG_PREV_POS, previousPosition);
+        super.saveAdditional(output);
+        output.putInt(TAG_COLONY_ID, this.colonyId);
+        output.putString(TAG_NAME, this.colonyNameCache);
+        BlockPosUtil.writeOptional(output, TAG_POS, anchor);
+        output.putFloat(TAG_ROTATION, this.rotation);
+        output.putInt(TAG_TARGET_COLONY_ID, this.targetColonyId);
+        output.putString(TAG_TARGET_COLONY_NAME, this.targetColonyNameCache);
+        output.putInt(TAG_DISTANCE, this.distance);
+        output.putInt(TAG_TARGET_DISTANCE, this.targetColonyDistance);
+        output.putInt(TAG_CACHED_ABOVE, this.cachedSignAboveColony);
+        BlockPosUtil.write(output, TAG_NEXT_POS, nextPosition);
+        BlockPosUtil.write(output, TAG_PREV_POS, previousPosition);
     }
 
     @Nullable
@@ -159,14 +155,13 @@ public class TileEntityColonySign extends BlockEntity implements ITickable
     @Override
     public CompoundTag getUpdateTag(final HolderLookup.Provider provider)
     {
-        return this.saveWithId(provider);
+        return this.saveWithoutMetadata(provider);
     }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket packet, final HolderLookup.Provider provider)
+    public void onDataPacket(final Connection net, final ValueInput input)
     {
-        final CompoundTag compound = packet.getTag();
-        this.loadAdditional(compound, provider);
+        this.loadAdditional(input);
     }
 
     /**
@@ -175,7 +170,7 @@ public class TileEntityColonySign extends BlockEntity implements ITickable
     @Override
     public void tick()
     {
-        if (!level.isClientSide && (level.getGameTime() + tickOffset) % TICKS_PER_SECOND * 60 == 0)
+        if (!level.isClientSide() && (level.getGameTime() + tickOffset) % TICKS_PER_SECOND * 60 == 0)
         {
             final BlockEntity blockEntity = level.getBlockEntity(getBlockPos().above());
             if (blockEntity instanceof TileEntityColonySign tileEntityColonySign)

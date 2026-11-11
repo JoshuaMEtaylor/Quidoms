@@ -56,8 +56,8 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
-        currentStage = compound.getInt(TAG_CURR_STAGE);
-        totalStages = compound.getInt(TAG_TOTAL_STAGES);
+        currentStage = compound.getIntOr(TAG_CURR_STAGE, 0);
+        totalStages = compound.getIntOr(TAG_TOTAL_STAGES, 0);
     }
 
     @Override
@@ -220,7 +220,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             return;
         }
         final int hashCode = res.getComponentsPatch().hashCode();
-        final String key = res.getDescriptionId() + "-" + hashCode;
+        final String key = res.getItem().getDescriptionId() + "-" + hashCode;
         BuildingBuilderResource resource = this.neededResources.get(key);
         if (resource == null)
         {
@@ -272,7 +272,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     public void reduceNeededResource(final ItemStack res, final int amount)
     {
         final int hashCode = res.getComponentsPatch().hashCode();
-        final String name = res.getDescriptionId() + "-" + hashCode;
+        final String name = res.getItem().getDescriptionId() + "-" + hashCode;
 
         final BuilderBucket last = buckets.isEmpty() ? null : getRequiredResources();
 
@@ -334,7 +334,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     public boolean requiresResourceForBuilding(final ItemStack stack)
     {
         final int hashCode = stack.getComponentsPatch().hashCode();
-        return neededResources.containsKey(stack.getDescriptionId() + "-" + hashCode);
+        return neededResources.containsKey(stack.getItem().getDescriptionId() + "-" + hashCode);
     }
 
     /**
@@ -381,7 +381,24 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             }
 
             int requestCount = entry.getValue() - count;
-            if (requestedItems.contains(new ItemStorage(itemStack.getItemStack())))
+            // QD-76: structure builders provision exact shortage from QuidCraft before colony requests.
+            // (They do not go through AbstractEntityAIBasic.checkIfRequestForItemExistOrCreate.)
+            final String citizenName = worker == null ? "" : worker.getName();
+            if (com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+              building, itemStack.getItemStack(), requestCount, true, citizenName, worker))
+            {
+                count = InventoryUtils.hasBuildingEnoughElseCount(building,
+                  stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, itemStack.getItemStack()), entry.getValue());
+                count += InventoryUtils.getItemCountInItemHandler(worker.getInventory(),
+                  stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, itemStack.getItemStack()));
+                if (count >= entry.getValue())
+                {
+                    continue;
+                }
+                requestCount = entry.getValue() - count;
+            }
+
+            if (requestCount <= 0 || requestedItems.contains(new ItemStorage(itemStack.getItemStack())))
             {
                 continue;
             }

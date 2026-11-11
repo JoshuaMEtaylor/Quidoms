@@ -9,11 +9,11 @@ import com.ldtteam.structurize.util.IOPool;
 import com.minecolonies.api.colony.IColonyManager;
 import com.minecolonies.api.colony.claim.IChunkClaimData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,8 +67,8 @@ public final class ColonyUtils
         final Consumer<String> errorHandler)
     {
         final CompletableFuture<Blueprint> future =
-            CompletableFuture.supplyAsync(() -> StructurePacks.getBlueprint(structurePack, structurePath, FMLEnvironment.production, world.registryAccess()), IOPool.getExecutor());
-        if (world.isClientSide)
+            CompletableFuture.supplyAsync(() -> loadBlueprintSoft(structurePack, structurePath, world.registryAccess()), IOPool.getExecutor());
+        if (world.isClientSide())
         {
             ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(future,
                 (blueprint ->
@@ -102,6 +102,55 @@ public final class ColonyUtils
 
             return future;
         }
+    }
+
+    /**
+     * Soft-fail blueprint load. Always suppresses NoSuchFileException spam, and aliases common
+     * profile pack names like {@code Medieval Oak Alternative} → {@code Medieval Oak} + alttownhall.
+     */
+    private static Blueprint loadBlueprintSoft(final String structurePack, final String structurePath, final HolderLookup.Provider provider)
+    {
+        // StructurePacks.getBlueprint aliases Alternative packs/paths and soft-fails missing files.
+        Blueprint blueprint = StructurePacks.getBlueprint(structurePack, structurePath, true, provider);
+        if (blueprint == null)
+        {
+            // Last chance: scan jar packs for fundamentals/<hut>N.blueprint (builder/townhall).
+            String hut = "builder";
+            int level = 1;
+            try
+            {
+                if (structurePath != null && !structurePath.isBlank())
+                {
+                    final String file = structurePath.contains("/")
+                                          ? structurePath.substring(structurePath.lastIndexOf('/') + 1)
+                                          : structurePath;
+                    String name = file.replace(".blueprint", "");
+                    if (!name.isEmpty() && Character.isDigit(name.charAt(name.length() - 1)))
+                    {
+                        level = Character.getNumericValue(name.charAt(name.length() - 1));
+                        name = name.substring(0, name.length() - 1);
+                    }
+                    if (name.startsWith("alt"))
+                    {
+                        name = name.substring(3);
+                    }
+                    if (!name.isBlank())
+                    {
+                        hut = name;
+                    }
+                }
+            }
+            catch (final Exception ignored)
+            {
+            }
+            blueprint = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
+              structurePack, structurePath, hut, Math.max(1, level), provider);
+            if (blueprint == null)
+            {
+                Log.getLogger().warn("Missing blueprint (soft-fail): pack='{}' path='{}'", structurePack, structurePath);
+            }
+        }
+        return blueprint;
     }
 
     /**

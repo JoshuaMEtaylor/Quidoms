@@ -40,7 +40,7 @@ public class CitizenItemUtils
      */
     public static void tryPickupItemEntity(@NotNull final AbstractEntityCitizen citizen, @NotNull final ItemEntity itemEntity)
     {
-        if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide)
+        if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide())
         {
             if (itemEntity.hasPickUpDelay())
             {
@@ -91,7 +91,15 @@ public class CitizenItemUtils
      */
     public static void removeHeldItem(AbstractEntityCitizen citizen)
     {
+        // Quidoms: clear inventory held index + entity MAINHAND, and flush equipment to clients
+        // so world + inventory preview do not keep a ghost tool (or stale empty hand).
+        if (citizen.getCitizenData() != null)
+        {
+            citizen.getCitizenData().getInventory().setHeldItem(InteractionHand.MAIN_HAND, -1);
+        }
+        citizen.setItemInHand(InteractionHand.MAIN_HAND, ItemStackUtils.EMPTY);
         citizen.setItemSlot(EquipmentSlot.MAINHAND, ItemStackUtils.EMPTY);
+        citizen.forceSyncEquipment();
     }
 
     /**
@@ -102,14 +110,21 @@ public class CitizenItemUtils
      */
     public static void setHeldItem(@NotNull final AbstractEntityCitizen citizen, final InteractionHand hand, final int slot)
     {
+        final ItemStack stack = citizen.getCitizenData().getInventory().getStackInSlot(slot);
         citizen.getCitizenData().getInventory().setHeldItem(hand, slot);
         if (hand.equals(InteractionHand.MAIN_HAND))
         {
-            citizen.setItemSlot(EquipmentSlot.MAINHAND, citizen.getCitizenData().getInventory().getStackInSlot(slot));
+            // Quidoms: set both LivingEntity hand + equipment slot, then flush ClientboundSetEquipmentPacket
+            // so world render and citizen inventory preview show the tool immediately.
+            citizen.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            citizen.setItemSlot(EquipmentSlot.MAINHAND, stack);
+            citizen.forceSyncEquipment();
         }
         else if (hand.equals(InteractionHand.OFF_HAND))
         {
-            citizen.setItemSlot(EquipmentSlot.OFFHAND, citizen.getCitizenData().getInventory().getStackInSlot(slot));
+            citizen.setItemInHand(InteractionHand.OFF_HAND, stack);
+            citizen.setItemSlot(EquipmentSlot.OFFHAND, stack);
+            citizen.forceSyncEquipment();
         }
     }
 
@@ -120,8 +135,7 @@ public class CitizenItemUtils
      */
     public static void setMainHeldItem(@NotNull final AbstractEntityCitizen citizen, final int slot)
     {
-        citizen.getCitizenData().getInventory().setHeldItem(InteractionHand.MAIN_HAND, slot);
-        citizen.setItemSlot(EquipmentSlot.MAINHAND, citizen.getCitizenData().getInventory().getStackInSlot(slot));
+        setHeldItem(citizen, InteractionHand.MAIN_HAND, slot);
     }
 
     /**
@@ -164,7 +178,7 @@ public class CitizenItemUtils
         final Block block = blockState.getBlock();
         if (breakBlock)
         {
-            if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide)
+            if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide())
             {
                 new BlockParticleEffectMessage(blockPos, CompatibilityUtils.getWorldFromCitizen(citizen).getBlockState(blockPos), BlockParticleEffectMessage.BREAK_BLOCK)
                     .sendToTargetPoint((ServerLevel) citizen.level(), null, blockPos.getX(), blockPos.getY(), blockPos.getZ(), BLOCK_BREAK_SOUND_RANGE);
@@ -181,7 +195,7 @@ public class CitizenItemUtils
         }
         else
         {
-            if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide)
+            if (!CompatibilityUtils.getWorldFromCitizen(citizen).isClientSide())
             {
                 final BlockPos vector = blockPos.subtract(citizen.blockPosition());
                 final Direction facing = BlockPosUtil.directionFromDelta(vector.getX(), vector.getY(), vector.getZ()).getOpposite();
@@ -215,7 +229,7 @@ public class CitizenItemUtils
         // Quidoms: colonist tools/weapons stay unbreakable; never apply durability loss.
         if (heldItem.isDamageableItem())
         {
-            heldItem.set(net.minecraft.core.component.DataComponents.UNBREAKABLE, new net.minecraft.world.item.component.Unbreakable(true));
+            heldItem.set(net.minecraft.core.component.DataComponents.UNBREAKABLE, net.minecraft.util.Unit.INSTANCE);
             if (heldItem.isDamaged())
             {
                 heldItem.setDamageValue(0);
@@ -264,7 +278,7 @@ public class CitizenItemUtils
      */
     public static ItemEntity entityDropItem(@NotNull final AbstractEntityCitizen citizen, @NotNull final ItemStack itemstack)
     {
-        return citizen.spawnAtLocation(itemstack, 0.0F);
+        return citizen.spawnAtLocation((net.minecraft.server.level.ServerLevel) citizen.level(), itemstack, 0.0F);
     }
 
     /**

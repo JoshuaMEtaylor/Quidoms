@@ -42,6 +42,8 @@ import java.util.List;
 
 import static com.minecolonies.api.util.constant.Constants.TICKS_SECOND;
 import static com.minecolonies.api.util.constant.translation.ToolTranslationConstants.TOOL_GUARD_SCROLL_NO_GUARD_BUILDING;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Magic scroll which summons guards to the users aid, with a limited duration. Only works within the same world as the colony.
@@ -75,7 +77,7 @@ public class ItemScrollGuardHelp extends AbstractItemScroll
         if (world.random.nextInt(10) == 0 || colony.getWorld() != world)
         {
             // Fail
-            final Llama entity = EntityType.LLAMA.create(world);
+            final Llama entity = EntityType.LLAMA.create(world, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
             entity.setPos(player.getX(), player.getY(), player.getZ());
             world.addFreshEntity(entity);
 
@@ -159,7 +161,7 @@ public class ItemScrollGuardHelp extends AbstractItemScroll
     {
         final InteractionResult result = super.useOn(ctx);
 
-        if (ctx.getLevel().isClientSide)
+        if (ctx.getLevel().isClientSide())
         {
             return result;
         }
@@ -180,7 +182,7 @@ public class ItemScrollGuardHelp extends AbstractItemScroll
     @Override
     public void onUseTick(Level worldIn, LivingEntity entity, ItemStack stack, int count)
     {
-        if (!worldIn.isClientSide && worldIn.getGameTime() % 5 == 0)
+        if (!worldIn.isClientSide() && worldIn.getGameTime() % 5 == 0)
         {
             final Entity entity1 = entity;
             new VanillaParticleMessage(entity.getX(), entity.getY(), entity.getZ(), ParticleTypes.ENCHANT).sendToTrackingEntity(entity1);
@@ -189,11 +191,11 @@ public class ItemScrollGuardHelp extends AbstractItemScroll
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
         final MutableComponent guiHint = Component.translatableEscape("item.minecolonies.scroll_guard_help.tip");
         guiHint.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GREEN));
-        tooltip.add(guiHint);
+        tooltip.accept(guiHint);
 
         String colonyDesc = Component.translatableEscape("item.minecolonies.scroll.colony.none").getString();
 
@@ -205,6 +207,6 @@ public class ItemScrollGuardHelp extends AbstractItemScroll
 
         final MutableComponent guiHint2 = Component.translatableEscape("item.minecolonies.scroll.colony.tip", colonyDesc);
         guiHint2.setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD));
-        tooltip.add(guiHint2);
+        tooltip.accept(guiHint2);
     }
 }

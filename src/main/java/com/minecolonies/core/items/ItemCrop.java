@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * A custom item class for crop blocks.
@@ -58,7 +60,7 @@ public class ItemCrop extends BlockItem
         {
             final BlockPos clickedPos = ctx.getClickedPos().below();
             final BlockState worldState = ctx.getLevel().getBlockState(clickedPos);
-            if (ctx.getLevel().isClientSide && (worldState.getBlock() instanceof MinecoloniesFarmland || worldState.getBlock() instanceof FarmBlock))
+            if (ctx.getLevel().isClientSide() && (worldState.getBlock() instanceof MinecoloniesFarmland || worldState.getBlock() instanceof FarmBlock))
             {
                 MessageUtils.format(Component.translatable("com.minecolonies.core.crop.cantplant")).sendTo(player);
             }
@@ -69,22 +71,22 @@ public class ItemCrop extends BlockItem
     }
 
     @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final TooltipContext ctx, @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flagIn)
+    public void appendHoverText(@NotNull final ItemStack stack, @Nullable final net.minecraft.world.item.Item.TooltipContext ctx, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flagIn)
     {
-        tooltip.add(Component.translatable(TranslationConstants.CROP_TOOLTIP).withStyle(ChatFormatting.GRAY));
+        tooltip.accept(Component.translatable(TranslationConstants.CROP_TOOLTIP).withStyle(ChatFormatting.GRAY));
         if (preferredBiome != null && ctx.level() != null)
         {
-            tooltip.add(Component.translatable(TranslationConstants.BIOME_TOOLTIP + "." + preferredBiome.location().getPath()));
+            tooltip.accept(Component.translatable(TranslationConstants.BIOME_TOOLTIP + "." + preferredBiome.location().getPath()));
             if (ctx.level().getBiome(Minecraft.getInstance().player.blockPosition()).is(preferredBiome))
             {
-                tooltip.add(Component.translatable("com.minecolonies.core.item.crop.tooltip.biome.match").withStyle(ChatFormatting.GREEN));
+                tooltip.accept(Component.translatable("com.minecolonies.core.item.crop.tooltip.biome.match").withStyle(ChatFormatting.GREEN));
             }
             else
             {
-                tooltip.add(Component.translatable("com.minecolonies.core.item.crop.tooltip.biome.nomatch").withStyle(ChatFormatting.RED));
+                tooltip.accept(Component.translatable("com.minecolonies.core.item.crop.tooltip.biome.nomatch").withStyle(ChatFormatting.RED));
             }
         }
-        tooltip.add(Component.translatable(TranslationConstants.CROP_TOOLTIP_HOE).withStyle(ChatFormatting.DARK_AQUA).withStyle(ChatFormatting.ITALIC));
+        tooltip.accept(Component.translatable(TranslationConstants.CROP_TOOLTIP_HOE).withStyle(ChatFormatting.DARK_AQUA).withStyle(ChatFormatting.ITALIC));
     }
 
     /**

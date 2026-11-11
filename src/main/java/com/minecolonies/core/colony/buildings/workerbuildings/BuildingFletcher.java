@@ -5,6 +5,7 @@ import com.minecolonies.api.colony.buildings.modules.ICraftingBuildingModule;
 import com.minecolonies.api.colony.jobs.registry.JobEntry;
 import com.minecolonies.api.crafting.IGenericRecipe;
 import com.minecolonies.api.util.CraftingUtils;
+import com.minecolonies.api.util.ItemStackUtils;
 import com.minecolonies.api.util.OptionalPredicate;
 import com.minecolonies.core.colony.buildings.AbstractBuilding;
 import com.minecolonies.core.colony.buildings.modules.AbstractCraftingBuildingModule;
@@ -81,7 +82,9 @@ public class BuildingFletcher extends AbstractBuilding
             if (isRecipeAllowed.isPresent()) return isRecipeAllowed.get();
 
             final Item output = recipe.getPrimaryOutput().getItem();
-            return output instanceof ArrowItem || (output instanceof ArmorItem armorItem && recipe.getPrimaryOutput().has(DataComponents.DYED_COLOR) && armorItem.getMaterial() == ArmorMaterials.LEATHER);
+            return output instanceof ArrowItem
+                     || (ItemStackUtils.isHumanoidArmorItem(output)
+                           && recipe.getPrimaryOutput().has(DataComponents.DYED_COLOR));
         }
     }
 

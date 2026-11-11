@@ -55,6 +55,7 @@ public final class TagConstants
     public static final ResourceLocation RAW_MEAT                  = new ResourceLocation(MOD_ID, "rawmeat");
     public static final ResourceLocation FEED                      = new ResourceLocation(MOD_ID, "feed");
     public static final ResourceLocation LEATHER                   = new ResourceLocation(MOD_ID, "leather");
+    public static final ResourceLocation REPAIRS_COSMETIC_ARMOR    = new ResourceLocation(MOD_ID, "repairs_cosmetic_armor");
 
     public static final String CRAFTING_BAKER                = ModJobs.BAKER_ID.getPath();
     public static final String CRAFTING_BLACKSMITH           = ModJobs.BLACKSMITH_ID.getPath();

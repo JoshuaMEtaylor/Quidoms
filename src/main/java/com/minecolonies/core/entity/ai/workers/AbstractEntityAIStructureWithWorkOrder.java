@@ -195,15 +195,28 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
      */
     private void requestMaterialsState()
     {
-        if (Constants.BUILDER_INF_RESOURECES || building.getWorkOrder().isRequested() || building.getWorkOrder().getWorkOrderType() == WorkOrderType.REMOVE)
+        if (Constants.BUILDER_INF_RESOURECES || building.getWorkOrder().getWorkOrderType() == WorkOrderType.REMOVE)
         {
             recalculated = true;
             return;
         }
 
         final AbstractBuildingStructureBuilder buildingWorker = building;
+        final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
+        // QD-76: once materials are listed, keep retrying QuidCraft provision while shortages remain
+        // (isRequested used to early-return forever after a silent first miss).
+        if (building.getWorkOrder().isRequested())
+        {
+            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
+              building, citizenName, worker.getCitizenData());
+            recalculated = true;
+            return;
+        }
+
         if (requestMaterials())
         {
+            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
+              building, citizenName, worker.getCitizenData());
             building.getWorkOrder().setRequested(true);
         }
         int newQuantity = buildingWorker.getNeededResources().values().stream().mapToInt(ItemStorage::getAmount).sum();
@@ -345,7 +358,7 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
     public void registerBlockAsNeeded(final ItemStack stack)
     {
         final int hashCode = stack.getComponentsPatch().hashCode();
-        if (building.getNeededResources().get(stack.getDescriptionId() + "-" + hashCode) == null)
+        if (building.getNeededResources().get(stack.getItem().getDescriptionId() + "-" + hashCode) == null)
         {
             building.addNeededResource(stack, 1);
         }
@@ -359,7 +372,7 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
             return 0;
         }
         final int hashCode = deliveredItemStack.getComponentsPatch().hashCode();
-        final BuildingBuilderResource resource = building.getNeededResources().get(deliveredItemStack.getDescriptionId() + "-" + hashCode);
+        final BuildingBuilderResource resource = building.getNeededResources().get(deliveredItemStack.getItem().getDescriptionId() + "-" + hashCode);
         if (resource != null)
         {
             return resource.getAmount();
@@ -516,12 +529,12 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         }
         final int hashCode = stack.getComponentsPatch().hashCode();
         final AbstractBuildingStructureBuilder buildingWorker = building;
-        BuildingBuilderResource resource = buildingWorker.getNeededResources().get(stack.getDescriptionId() + "-" + hashCode);
+        BuildingBuilderResource resource = buildingWorker.getNeededResources().get(stack.getItem().getDescriptionId() + "-" + hashCode);
 
         if (resource == null)
         {
             requestMaterials();
-            resource = buildingWorker.getNeededResources().get(stack.getDescriptionId() + "-" + hashCode);
+            resource = buildingWorker.getNeededResources().get(stack.getItem().getDescriptionId() + "-" + hashCode);
         }
 
         if (resource == null)

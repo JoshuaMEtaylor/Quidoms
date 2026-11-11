@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecolonies:onion",
+    "minecolonies:nether_pepper",
+    "minecraft:stick",
+    "minecraft:mutton"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:kebab"
+  }
+}

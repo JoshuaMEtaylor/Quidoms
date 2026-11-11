@@ -1,0 +1,25 @@
+{
+  "branch": "minecolonies:civilian",
+  "costs": [
+    {
+      "ingredient": "minecraft:hay_block",
+      "count": 64
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/healthaddition",
+      "level": 4
+    }
+  ],
+  "icon": "minecolonies:textures/icons/research/hp4.png",
+  "parentResearch": "minecolonies:civilian/lifesaver",
+  "requirements": [
+    {
+      "type": "minecolonies:single-building",
+      "building": "minecolonies:townhall",
+      "level": 4
+    }
+  ],
+  "researchLevel": 4
+}

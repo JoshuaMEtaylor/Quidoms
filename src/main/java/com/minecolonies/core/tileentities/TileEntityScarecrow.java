@@ -10,6 +10,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -74,20 +76,17 @@ public class TileEntityScarecrow extends AbstractTileEntityScarecrow
     }
 
     @Override
-    public void saveAdditional(final CompoundTag compoundTag, final HolderLookup.Provider provider)
+    public void saveAdditional(final ValueOutput output)
     {
-        super.saveAdditional(compoundTag, provider);
-        compoundTag.putIntArray(TAG_RADIUS, fieldSize);
+        super.saveAdditional(output);
+        output.putIntArray(TAG_RADIUS, fieldSize);
     }
 
     @Override
-    public void loadAdditional(final CompoundTag compoundTag, final HolderLookup.Provider provider)
+    public void loadAdditional(final ValueInput input)
     {
-        super.loadAdditional(compoundTag, provider);
-        if (compoundTag.contains(TAG_RADIUS))
-        {
-            fieldSize = compoundTag.getIntArray(TAG_RADIUS);
-        }
+        super.loadAdditional(input);
+        input.getIntArray(TAG_RADIUS).ifPresent(arr -> fieldSize = arr);
     }
 
     /**
@@ -110,7 +109,7 @@ public class TileEntityScarecrow extends AbstractTileEntityScarecrow
     @Override
     public CompoundTag getUpdateTag(@NotNull final HolderLookup.Provider provider)
     {
-        return saveWithId(provider);
+        return saveWithoutMetadata(provider);
     }
 
     /**

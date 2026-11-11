@@ -14,35 +14,35 @@ public class TileEntityInitializer
 
     static
     {
-        MinecoloniesTileEntities.SCARECROW = BLOCK_ENTITIES.register("scarecrow", () -> BlockEntityType.Builder.of(TileEntityScarecrow::new, ModBlocks.blockScarecrow).build(null));
+        MinecoloniesTileEntities.SCARECROW = BLOCK_ENTITIES.register("scarecrow", () -> new BlockEntityType<>(TileEntityScarecrow::new, ModBlocks.blockScarecrow));
 
-        MinecoloniesTileEntities.PLANTATION_FIELD = BLOCK_ENTITIES.register("plantationfield", () -> BlockEntityType.Builder.of(TileEntityPlantationField::new, ModBlocks.blockPlantationField).build(null));
+        MinecoloniesTileEntities.PLANTATION_FIELD = BLOCK_ENTITIES.register("plantationfield", () -> new BlockEntityType<>(TileEntityPlantationField::new, ModBlocks.blockPlantationField));
 
-        MinecoloniesTileEntities.BARREL = BLOCK_ENTITIES.register("barrel", () -> BlockEntityType.Builder.of(TileEntityBarrel::new, ModBlocks.blockBarrel).build(null));
+        MinecoloniesTileEntities.BARREL = BLOCK_ENTITIES.register("barrel", () -> new BlockEntityType<>(TileEntityBarrel::new, ModBlocks.blockBarrel));
 
-        MinecoloniesTileEntities.BUILDING = BLOCK_ENTITIES.register("colonybuilding", () -> BlockEntityType.Builder.of(TileEntityColonyBuilding::new, ModBlocks.getHuts()).build(null));
+        MinecoloniesTileEntities.BUILDING = BLOCK_ENTITIES.register("colonybuilding", () -> new BlockEntityType<>(TileEntityColonyBuilding::new, ModBlocks.getHuts()));
 
-        MinecoloniesTileEntities.DECO_CONTROLLER = BLOCK_ENTITIES.register("decorationcontroller", () -> BlockEntityType.Builder
-                                                     .of(TileEntityDecorationController::new, ModBlocks.blockDecorationPlaceholder)
-                                                     .build(null));
+        MinecoloniesTileEntities.DECO_CONTROLLER = BLOCK_ENTITIES.register("decorationcontroller",
+          () -> new BlockEntityType<>(TileEntityDecorationController::new, ModBlocks.blockDecorationPlaceholder));
 
-        MinecoloniesTileEntities.RACK = BLOCK_ENTITIES.register("rack", () -> BlockEntityType.Builder.of(TileEntityRack::new, ModBlocks.blockRack).build(null));
+        MinecoloniesTileEntities.RACK = BLOCK_ENTITIES.register("rack", () -> new BlockEntityType<>(TileEntityRack::new, ModBlocks.blockRack));
 
-        MinecoloniesTileEntities.GRAVE = BLOCK_ENTITIES.register("grave", () -> BlockEntityType.Builder.of(TileEntityGrave::new, ModBlocks.blockGrave).build(null));
+        MinecoloniesTileEntities.GRAVE = BLOCK_ENTITIES.register("grave", () -> new BlockEntityType<>(TileEntityGrave::new, ModBlocks.blockGrave));
 
-        MinecoloniesTileEntities.NAMED_GRAVE = BLOCK_ENTITIES.register("namedgrave", () -> BlockEntityType.Builder.of(TileEntityNamedGrave::new, ModBlocks.blockNamedGrave).build(null));
+        MinecoloniesTileEntities.NAMED_GRAVE = BLOCK_ENTITIES.register("namedgrave", () -> new BlockEntityType<>(TileEntityNamedGrave::new, ModBlocks.blockNamedGrave));
 
-        MinecoloniesTileEntities.WAREHOUSE = BLOCK_ENTITIES.register("warehouse", () -> BlockEntityType.Builder.of(TileEntityWareHouse::new, ModBlocks.blockHutWareHouse).build(null));
+        MinecoloniesTileEntities.WAREHOUSE = BLOCK_ENTITIES.register("warehouse", () -> new BlockEntityType<>(TileEntityWareHouse::new, ModBlocks.blockHutWareHouse));
 
-        MinecoloniesTileEntities.COMPOSTED_DIRT = BLOCK_ENTITIES.register("composteddirt", () -> BlockEntityType.Builder.of(TileEntityCompostedDirt::new, ModBlocks.blockCompostedDirt)
-                                                    .build(null));
+        MinecoloniesTileEntities.COMPOSTED_DIRT = BLOCK_ENTITIES.register("composteddirt",
+          () -> new BlockEntityType<>(TileEntityCompostedDirt::new, ModBlocks.blockCompostedDirt));
 
-        MinecoloniesTileEntities.ENCHANTER = BLOCK_ENTITIES.register("enchanter", () -> BlockEntityType.Builder.of(TileEntityEnchanter::new, ModBlocks.blockHutEnchanter).build(null));
+        MinecoloniesTileEntities.ENCHANTER = BLOCK_ENTITIES.register("enchanter", () -> new BlockEntityType<>(TileEntityEnchanter::new, ModBlocks.blockHutEnchanter));
 
-        MinecoloniesTileEntities.STASH = BLOCK_ENTITIES.register("stash", () -> BlockEntityType.Builder.of(TileEntityStash::new, ModBlocks.blockStash).build(null));
+        MinecoloniesTileEntities.STASH = BLOCK_ENTITIES.register("stash", () -> new BlockEntityType<>(TileEntityStash::new, ModBlocks.blockStash));
 
-        MinecoloniesTileEntities.COLONY_FLAG = BLOCK_ENTITIES.register("colony_flag", () -> BlockEntityType.Builder.of(TileEntityColonyFlag::new, ModBlocks.blockColonyBanner, ModBlocks.blockColonyWallBanner).build(null));
+        MinecoloniesTileEntities.COLONY_FLAG = BLOCK_ENTITIES.register("colony_flag",
+          () -> new BlockEntityType<>(TileEntityColonyFlag::new, ModBlocks.blockColonyBanner, ModBlocks.blockColonyWallBanner));
 
-        MinecoloniesTileEntities.COLONY_SIGN = BLOCK_ENTITIES.register("colonysign", () -> BlockEntityType.Builder.of(TileEntityColonySign::new, ModBlocks.blockColonySign).build(null));
+        MinecoloniesTileEntities.COLONY_SIGN = BLOCK_ENTITIES.register("colonysign", () -> new BlockEntityType<>(TileEntityColonySign::new, ModBlocks.blockColonySign));
     }
 }

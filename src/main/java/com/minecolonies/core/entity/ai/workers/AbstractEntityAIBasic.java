@@ -355,8 +355,8 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
         try
         {
             final int timeout = EXCEPTION_TIMEOUT * exceptionTimer;
-            this.setDelay(FMLEnvironment.production ? timeout : EXCEPTION_TIMEOUT);
-            setCurrentDelay(FMLEnvironment.production ? timeout : EXCEPTION_TIMEOUT);
+            this.setDelay(FMLEnvironment.isProduction() ? timeout : EXCEPTION_TIMEOUT);
+            setCurrentDelay(FMLEnvironment.isProduction() ? timeout : EXCEPTION_TIMEOUT);
             // wait for longer now
             exceptionTimer *= 2;
             if (worker != null)
@@ -963,42 +963,21 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
      */
     public boolean checkForToolOrWeapon(@NotNull final EquipmentTypeEntry toolType)
     {
-        final boolean needTool = checkForToolOrWeapon(toolType, TOOL_LEVEL_WOOD_OR_GOLD);
-        if (needTool)
-        {
-            worker.getCitizenData().setJobStatus(JobStatus.STUCK);
-        }
-        else
+        // Quidoms: tools are optional — bare hands are fine; never block the job.
+        checkForToolOrWeapon(toolType, TOOL_LEVEL_WOOD_OR_GOLD);
+        if (worker.getCitizenData() != null)
         {
             worker.getCitizenData().setJobStatus(JobStatus.WORKING);
         }
-        return needTool;
+        return false;
     }
 
     protected boolean checkForToolOrWeapon(@NotNull final EquipmentTypeEntry toolType, final int minimalLevel)
     {
-        final ImmutableList<IRequest<? extends Tool>> openToolRequests =
-          building.getOpenRequestsOfTypeFiltered(
-            worker.getCitizenData(),
-            TypeToken.of(Tool.class),
-            r -> r.getRequest().getEquipmentType().equals(toolType) && r.getRequest().getMinLevel() >= minimalLevel);
-        final ImmutableList<IRequest<? extends Tool>> completedToolRequests =
-          building.getCompletedRequestsOfTypeFiltered(
-            worker.getCitizenData(),
-            TypeToken.of(Tool.class),
-            r -> r.getRequest().getEquipmentType().equals(toolType) && r.getRequest().getMinLevel() >= minimalLevel);
-
-        if (checkForNeededTool(toolType, minimalLevel))
-        {
-            if (openToolRequests.isEmpty() && completedToolRequests.isEmpty())
-            {
-                final Tool request = new Tool(toolType, minimalLevel, building.getMaxEquipmentLevel() < minimalLevel ? minimalLevel : building.getMaxEquipmentLevel());
-                worker.getCitizenData().createRequest(request);
-            }
-            delay = 0;
-            return true;
-        }
-
+        // Quidoms: never create Tool requests / stuck popups ("Hoe with minimal level…").
+        // Cancel leftover open requests, still pull tools from the hut when present, then continue.
+        cancelOpenToolRequests(toolType);
+        checkForNeededTool(toolType, minimalLevel);
         return false;
     }
 
@@ -1011,35 +990,28 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
      */
     protected void checkForToolOrWeaponAsync(@NotNull final EquipmentTypeEntry toolType, final int minLevel, final int maxLevel)
     {
+        // Quidoms: no async tool requests — workers keep going bare-handed if unequipped.
+        cancelOpenToolRequests(toolType);
+    }
+
+    /**
+     * Quidoms: drop open Tool requests for this type so citizen request chat / request board popups clear.
+     */
+    private void cancelOpenToolRequests(@NotNull final EquipmentTypeEntry toolType)
+    {
+        if (building == null || worker.getCitizenData() == null || ModEquipmentTypes.none.get().equals(toolType))
+        {
+            return;
+        }
+
         final ImmutableList<IRequest<? extends Tool>> openToolRequests =
           building.getOpenRequestsOfTypeFiltered(
             worker.getCitizenData(),
             TypeToken.of(Tool.class),
             r -> r.getRequest().getEquipmentType().equals(toolType));
-
-        final ImmutableList<IRequest<? extends Tool>> completedToolRequests =
-          building.getCompletedRequestsOfTypeFiltered(
-            worker.getCitizenData(),
-            TypeToken.of(Tool.class),
-            r -> r.getRequest().getEquipmentType().equals(toolType) && r.getRequest().getMinLevel() >= minLevel);
-
-        final List<IRequest<? extends Tool>> actualOpen = new ArrayList<>();
         for (final IRequest<? extends Tool> req : openToolRequests)
         {
-            if (req.getRequest().getMinLevel() < minLevel || req.getRequest().getMaxLevel() < maxLevel)
-            {
-                worker.getCitizenColonyHandler().getColonyOrRegister().getRequestManager().updateRequestState(req.getId(), RequestState.CANCELLED);
-            }
-            else
-            {
-                actualOpen.add(req);
-            }
-        }
-
-        if (actualOpen.isEmpty() && completedToolRequests.isEmpty())
-        {
-            final Tool request = new Tool(toolType, minLevel, maxLevel);
-            worker.getCitizenData().createRequestAsync(request);
+            worker.getCitizenColonyHandler().getColonyOrRegister().getRequestManager().updateRequestState(req.getId(), RequestState.CANCELLED);
         }
     }
 
@@ -1325,7 +1297,8 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
     /**
      * Check and ensure that we hold the most efficient tool for the job.
      * <p>
-     * If we have no tool for the job, we will request on, return immediately.
+     * Quidoms: pick the best matching tool (wood→axe, stone→pickaxe, …), show it equipped,
+     * and only fall back to bare hands when inventory and hut have none. Never create Tool requests.
      *
      * @param target the BlockState to mine
      * @param pos    the pos to mine
@@ -1337,6 +1310,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
         if (bestSlot >= 0)
         {
             worker.getCitizenData().setJobStatus(JobStatus.WORKING);
+            // Visible equip on the citizen entity (vanilla player model renders MAINHAND).
             CitizenItemUtils.setHeldItem(worker, InteractionHand.MAIN_HAND, bestSlot);
             return true;
         }
@@ -1410,20 +1384,63 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
             return NO_TOOL;
         }
 
-        int bestSlot = TOOL_NOT_FOUND;
-        int bestLevel = Integer.MAX_VALUE;
-        @NotNull final InventoryCitizen inventory = worker.getInventoryCitizen();
-        final int maxToolLevel = worker.getCitizenColonyHandler().getWorkBuilding().getMaxEquipmentLevel();
+        int bestSlot = findBestToolSlot(toolType, required, target);
 
-        for (int i = 0; i < worker.getInventoryCitizen().getSlots(); i++)
+        // Quidoms: if inventory lacks the right tool, silently pull one from hut racks/chests
+        // (wood→axe, stone→pickaxe, …) before falling back to bare hands. Never Tool-request.
+        if (bestSlot == TOOL_NOT_FOUND && retrieveToolInHut(toolType, required))
+        {
+            bestSlot = findBestToolSlot(toolType, required, target);
+        }
+
+        // Quidoms: missing tool → bare hands (NO_TOOL), never TOOL_NOT_FOUND → requestTool popups.
+        return bestSlot == TOOL_NOT_FOUND ? NO_TOOL : bestSlot;
+    }
+
+    /**
+     * Quidoms: pick the fastest matching tool for {@code toolType} (wood→axe, stone→pickaxe, …).
+     * <p>
+     * Do <b>not</b> require {@link EquipmentTypeEntry#getMiningLevel} &gt; -1 — the tier registry
+     * often misses vanilla tools on 1.21.10, which previously forced bare hands despite axes/shovels
+     * sitting in inventory. Match by {@link EquipmentTypeEntry#checkIsEquipment}, rank by destroy speed.
+     *
+     * @param toolType required equipment type for the block
+     * @param required minimum harvest level (ignored when tier unknown; Quidoms accepts any tier)
+     * @param target   block being mined (for destroy-speed ranking)
+     * @return inventory slot or {@link #TOOL_NOT_FOUND}
+     */
+    private int findBestToolSlot(@NotNull final EquipmentTypeEntry toolType, final int required, @NotNull final BlockState target)
+    {
+        int bestSlot = TOOL_NOT_FOUND;
+        int bestLevel = Integer.MIN_VALUE;
+        float bestSpeed = -1.0F;
+        @NotNull final InventoryCitizen inventory = worker.getInventoryCitizen();
+
+        for (int i = 0; i < inventory.getSlots(); i++)
         {
             final ItemStack item = inventory.getStackInSlot(i);
-            final int level = toolType.getMiningLevel(item);
+            if (ItemStackUtils.isEmpty(item) || !toolType.checkIsEquipment(item))
+            {
+                continue;
+            }
 
-            if (level > -1 && level >= required && level < bestLevel && ItemStackUtils.verifyEquipmentLevel(item, level, required, maxToolLevel))
+            // Tier registry may return -1 for valid tools; treat as usable wood-tier (0).
+            int level = toolType.getMiningLevel(item);
+            if (level < 0)
+            {
+                level = 0;
+            }
+            if (level < required)
+            {
+                continue;
+            }
+
+            final float speed = item.getDestroySpeed(target);
+            if (speed > bestSpeed || (speed == bestSpeed && level > bestLevel))
             {
                 bestSlot = i;
                 bestLevel = level;
+                bestSpeed = speed;
             }
         }
 
@@ -1695,6 +1712,20 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
                 worker.getInventoryCitizen()) >= minCount)
         {
             return true;
+        }
+
+        // Quidoms + QuidCraft (optional): try materials-market buy before colony request/deliveryman.
+        final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
+        if (com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(building, stack, updatedCount, matchNBT, citizenName))
+        {
+            if (InventoryUtils.hasBuildingEnoughElseCount(building, new ItemStorage(stack, true, matchNBT), updatedMinCount) >= updatedMinCount &&
+                  updatedCount - InventoryUtils.transferXOfFirstSlotInProviderWithIntoNextFreeSlotInItemHandlerWithResult(
+                    building, itemStack -> ItemStackUtils.compareItemStacksIgnoreStackSize(itemStack, stack, true, matchNBT),
+                    updatedCount,
+                    worker.getInventoryCitizen()) >= minCount)
+            {
+                return true;
+            }
         }
 
         if (building.getOpenRequestsOfTypeFiltered(worker.getCitizenData(), TypeConstants.DELIVERABLE,

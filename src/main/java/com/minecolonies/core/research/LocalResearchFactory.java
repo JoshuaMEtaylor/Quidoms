@@ -60,11 +60,11 @@ public class LocalResearchFactory implements ILocalResearchFactory
     @Override
     public ILocalResearch deserialize(@NotNull final HolderLookup.Provider provider, @NotNull final IFactoryController controller, @NotNull final CompoundTag nbt)
     {
-        final int state = nbt.getInt(TAG_STATE);
-        final ResourceLocation id = ResourceLocation.parse(nbt.getString(TAG_ID));
-        final ResourceLocation branch = ResourceLocation.parse(nbt.getString(TAG_BRANCH));
-        final int depth = nbt.getInt(TAG_RESEARCH_LVL);
-        final int progress = nbt.getInt(TAG_PROGRESS);
+        final int state = nbt.getIntOr(TAG_STATE, 0);
+        final ResourceLocation id = ResourceLocation.parse(nbt.getStringOr(TAG_ID, ""));
+        final ResourceLocation branch = ResourceLocation.parse(nbt.getStringOr(TAG_BRANCH, ""));
+        final int depth = nbt.getIntOr(TAG_RESEARCH_LVL, 0);
+        final int progress = nbt.getIntOr(TAG_PROGRESS, 0);
 
         final ILocalResearch research = getNewInstance(id, branch, depth);
         research.setState(ResearchState.values()[state]);

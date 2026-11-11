@@ -76,7 +76,7 @@ public class BuildingSmeltery extends AbstractBuilding
         super(c, l);
         keepX.put(IColonyManager.getInstance().getCompatibilityManager()::isOre, new Tuple<>(Integer.MAX_VALUE, true));
         keepX.put(stack -> !ItemStackUtils.isEmpty(stack)
-                             && (stack.getItem() instanceof SwordItem || stack.getItem() instanceof DiggerItem || stack.getItem() instanceof ArmorItem)
+                             && (ItemStackUtils.isSword(stack) || ItemStackUtils.isDigger(stack) || ItemStackUtils.isHumanoidArmor(stack))
           , new Tuple<>(STUFF_TO_KEEP, true));
     }
 
@@ -254,7 +254,7 @@ public class BuildingSmeltery extends AbstractBuilding
             if (item instanceof BlockItem)
             {
                 Block itemBlock = Block.byItem(item);
-                return itemBlock.getLootTable();
+                return itemBlock.getLootTable().orElse(null);
             }
             return null;
         }

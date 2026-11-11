@@ -202,12 +202,12 @@ public class GlobalResearchBranch implements IGlobalResearchBranch
      */
     public GlobalResearchBranch(final CompoundTag nbt)
     {
-        this.name = new TranslatableContents(nbt.getString(RESEARCH_BRANCH_NAME_PROP), null, TranslatableContents.NO_ARGS);
-        this.subtitle = new TranslatableContents(nbt.getString(RESEARCH_SUBTITLE_PROP), null, TranslatableContents.NO_ARGS);
-        this.type = ResearchBranchType.valueOfTag(nbt.getString(RESEARCH_BRANCH_TYPE_PROP));
-        this.baseTime = nbt.getDouble(RESEARCH_BASE_TIME_PROP);
-        this.sortOrder = nbt.getInt(RESEARCH_SORT_PROP);
-        this.hidden = nbt.getBoolean(RESEARCH_HIDDEN_PROP);
+        this.name = new TranslatableContents(nbt.getStringOr(RESEARCH_BRANCH_NAME_PROP, ""), null, TranslatableContents.NO_ARGS);
+        this.subtitle = new TranslatableContents(nbt.getStringOr(RESEARCH_SUBTITLE_PROP, ""), null, TranslatableContents.NO_ARGS);
+        this.type = ResearchBranchType.valueOfTag(nbt.getStringOr(RESEARCH_BRANCH_TYPE_PROP, ""));
+        this.baseTime = nbt.getDoubleOr(RESEARCH_BASE_TIME_PROP, 0.0);
+        this.sortOrder = nbt.getIntOr(RESEARCH_SORT_PROP, 0);
+        this.hidden = nbt.getBooleanOr(RESEARCH_HIDDEN_PROP, false);
     }
 
     @Override

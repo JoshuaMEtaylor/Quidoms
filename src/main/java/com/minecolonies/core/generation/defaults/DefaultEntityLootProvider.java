@@ -165,7 +165,7 @@ public class DefaultEntityLootProvider extends EntityLootSubProvider
                 .setRolls(ConstantValue.exactly(1));
         builder.accept(pool);
 
-        add(entity, entity.getDefaultLootTable(), LootTable.lootTable().withPool(pool));
+        add(entity, entity.getDefaultLootTable().orElse(null), LootTable.lootTable().withPool(pool));
     }
 
     @Override
