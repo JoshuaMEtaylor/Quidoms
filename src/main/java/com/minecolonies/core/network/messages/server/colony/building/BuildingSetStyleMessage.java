@@ -74,10 +74,12 @@ public class BuildingSetStyleMessage extends AbstractBuildingServerMessage<IBuil
         if (preferred != null)
         {
             HutBlueprintResolver.apply(building, preferred);
+            HutBlueprintResolver.syncCornersFromBlueprint(
+              building, colony.getWorld(), preferred.pack(), preferred.path(), building.getRotationMirror());
             return;
         }
 
         // Fallback: any pack that has this hut schematic.
-        HutBlueprintResolver.ensure(building, level);
+        HutBlueprintResolver.ensureAndSyncCorners(building, level, colony.getWorld());
     }
 }

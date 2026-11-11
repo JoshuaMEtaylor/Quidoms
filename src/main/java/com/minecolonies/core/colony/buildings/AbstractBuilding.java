@@ -998,7 +998,13 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
     public void calculateCorners()
     {
         final AbstractTileEntityColonyBuilding te = getTileEntity();
-        if (te != null && !te.getSchematicName().isEmpty())
+        // Unbuilt / deconstructed huts often carry hut-block TE corners that do not match the
+        // style blueprint the builder will place — always recompute from the loadable schematic.
+        final boolean trustTeCorners = te != null
+                                         && !te.getSchematicName().isEmpty()
+                                         && getBuildingLevel() > 0
+                                         && !isDeconstructed();
+        if (trustTeCorners)
         {
             setCorners(te.getInWorldCorners().getA(), te.getInWorldCorners().getB());
             return;
@@ -1006,7 +1012,16 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
 
         try
         {
-            final Blueprint blueprint = StructurePacks.getBlueprint(getStructurePack(), getBlueprintPath(), te.getLevel().registryAccess());
+            final int level = Math.max(1, getBuildingLevel() == 0 ? 1 : getBuildingLevel());
+            final Tuple<BlockPos, BlockPos> synced =
+              com.minecolonies.core.util.HutBlueprintResolver.ensureAndSyncCorners(this, level, colony.getWorld());
+            if (synced != null)
+            {
+                return;
+            }
+
+            final Blueprint blueprint = StructurePacks.getBlueprint(getStructurePack(), getBlueprintPath(), true,
+              te != null && te.getLevel() != null ? te.getLevel().registryAccess() : colony.getWorld().registryAccess());
             if (blueprint == null)
             {
                 setCorners(getPosition(), getPosition());

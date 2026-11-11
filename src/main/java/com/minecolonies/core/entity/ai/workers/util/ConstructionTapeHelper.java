@@ -56,6 +56,16 @@ public final class ConstructionTapeHelper
     public static void placeConstructionTape(@NotNull final IBuilding building)
     {
         final int level = Math.max(1, building.getBuildingLevel() == 0 ? 1 : building.getBuildingLevel());
+        // Prefer sync path so fence matches the schematic the builder will use immediately.
+        final Tuple<BlockPos, BlockPos> synced =
+          com.minecolonies.core.util.HutBlueprintResolver.ensureAndSyncCorners(
+            building, level, building.getColony() == null ? null : building.getColony().getWorld());
+        if (synced != null)
+        {
+            placeConstructionTape(synced, building.getColony());
+            return;
+        }
+
         final com.minecolonies.core.util.HutBlueprintResolver.Resolved resolved =
           com.minecolonies.core.util.HutBlueprintResolver.ensure(building, level);
         final String pack = resolved != null ? resolved.pack() : building.getStructurePack();
@@ -66,7 +76,6 @@ public final class ConstructionTapeHelper
           (blueprint -> {
             if (blueprint == null)
             {
-                // Last chance: search all packs for this hut.
                 final String hut = building.getBuildingType() == null || building.getBuildingType().getRegistryName() == null
                                      ? "builder"
                                      : building.getBuildingType().getRegistryName().getPath();
@@ -80,9 +89,12 @@ public final class ConstructionTapeHelper
                 return;
             }
             final Tuple<BlockPos, BlockPos> corners =
-              ColonyUtils.calculateCorners(building.getPosition(), building.getColony().getWorld(), blueprint, building.getRotationMirror());
-            building.setCorners(corners.getA(), corners.getB());
-            placeConstructionTape(corners, building.getColony());
+              com.minecolonies.core.util.HutBlueprintResolver.syncCornersFromBlueprint(
+                building, building.getColony().getWorld(), pack, path, building.getRotationMirror());
+            if (corners != null)
+            {
+                placeConstructionTape(corners, building.getColony());
+            }
         })));
     }
 

@@ -295,7 +295,32 @@ public class WorkOrderBuilding extends AbstractWorkOrder
             final IBuilding building = colony.getServerBuildingManager().getBuilding(getLocation());
             if (building != null)
             {
-                ConstructionTapeHelper.placeConstructionTape(building.getCorners(), colony);
+                // Corners must match the WO blueprint the builder will clear/place — not stale hut TE bounds.
+                ConstructionTapeHelper.removeConstructionTape(building.getCorners(), colony.getWorld());
+                final net.minecraft.util.Tuple<net.minecraft.core.BlockPos, net.minecraft.core.BlockPos> corners =
+                  com.minecolonies.core.util.HutBlueprintResolver.syncCornersFromBlueprint(
+                    building,
+                    colony.getWorld(),
+                    getStructurePack(),
+                    getStructurePath(),
+                    getRotationMirror());
+                if (corners != null)
+                {
+                    // Keep WO bounding box in lockstep with the same blueprint.
+                    final com.ldtteam.structurize.blueprints.v1.Blueprint bp =
+                      com.ldtteam.structurize.storage.StructurePacks.getBlueprint(
+                        getStructurePack(), getStructurePath(), true, colony.getWorld().registryAccess());
+                    if (bp != null)
+                    {
+                        setBlueprint(bp, colony.getWorld());
+                    }
+                    ConstructionTapeHelper.placeConstructionTape(corners, colony);
+                }
+                else
+                {
+                    // Async fallback: load pack/path and tape from resolved corners.
+                    ConstructionTapeHelper.placeConstructionTape(building);
+                }
             }
         }
     }

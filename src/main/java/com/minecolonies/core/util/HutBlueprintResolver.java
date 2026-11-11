@@ -1,12 +1,18 @@
 package com.minecolonies.core.util;
 
+import com.ldtteam.structurize.api.RotationMirror;
 import com.ldtteam.structurize.blueprints.v1.Blueprint;
 import com.ldtteam.structurize.storage.StructurePackMeta;
 import com.ldtteam.structurize.storage.StructurePacks;
 import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.compatibility.newstruct.BlueprintMapping;
+import com.minecolonies.api.tileentities.AbstractTileEntityColonyBuilding;
+import com.minecolonies.api.util.ColonyUtils;
 import com.minecolonies.api.util.Log;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -152,6 +158,107 @@ public final class HutBlueprintResolver
         final Resolved resolved = resolve(building, schematicLevel);
         apply(building, resolved);
         return resolved;
+    }
+
+    /**
+     * Recalculate building (+ TE) corners from a concrete pack/path blueprint so construction
+     * tape matches what the builder will clear/place. Returns the corners used, or null.
+     */
+    @Nullable
+    public static Tuple<BlockPos, BlockPos> syncCornersFromBlueprint(
+      @NotNull final IBuilding building,
+      @Nullable final Level world,
+      @Nullable final String pack,
+      @Nullable final String path,
+      @Nullable final RotationMirror rotMir)
+    {
+        if (world == null || world.isClientSide())
+        {
+            return null;
+        }
+
+        final String hut = hutId(building);
+        final int level = Math.max(1, building.getBuildingLevel() == 0 ? 1 : building.getBuildingLevel());
+        Blueprint blueprint = null;
+        String usePack = pack;
+        String usePath = path;
+
+        if (usePack != null && !usePack.isBlank() && usePath != null && !usePath.isBlank())
+        {
+            blueprint = StructurePacks.getBlueprint(usePack, usePath, true, world.registryAccess());
+        }
+        if (blueprint == null)
+        {
+            final Resolved resolved = resolve(hut, usePack != null ? usePack : building.getStructurePack(),
+              usePath != null ? usePath : building.getBlueprintPath(), level);
+            if (resolved != null)
+            {
+                usePack = resolved.pack();
+                usePath = resolved.path();
+                apply(building, resolved);
+                blueprint = StructurePacks.getBlueprint(usePack, usePath, true, world.registryAccess());
+            }
+        }
+        if (blueprint == null)
+        {
+            Log.getLogger().warn("HutBlueprintResolver.syncCorners: no blueprint for {} pack='{}' path='{}'",
+              hut, usePack, usePath);
+            return null;
+        }
+
+        final RotationMirror rotation = rotMir != null
+                                          ? rotMir
+                                          : (building.getRotationMirror() != null
+                                               ? building.getRotationMirror()
+                                               : RotationMirror.NONE);
+        final Tuple<BlockPos, BlockPos> corners =
+          ColonyUtils.calculateCorners(building.getPosition(), world, blueprint, rotation);
+        building.setCorners(corners.getA(), corners.getB());
+
+        try
+        {
+            final AbstractTileEntityColonyBuilding te = building.getTileEntity();
+            if (te != null)
+            {
+                te.setSchematicCorners(corners.getA().subtract(building.getPosition()),
+                  corners.getB().subtract(building.getPosition()));
+                if (usePack != null && !usePack.isBlank())
+                {
+                    final StructurePackMeta meta = StructurePacks.getStructurePack(usePack);
+                    if (meta != null)
+                    {
+                        te.setStructurePack(meta);
+                    }
+                }
+                if (usePath != null && !usePath.isBlank())
+                {
+                    te.setBlueprintPath(usePath);
+                }
+            }
+        }
+        catch (final Exception e)
+        {
+            Log.getLogger().debug("HutBlueprintResolver.syncCorners: TE update skipped", e);
+        }
+        return corners;
+    }
+
+    /**
+     * Ensure pack/path then sync corners from that blueprint.
+     */
+    @Nullable
+    public static Tuple<BlockPos, BlockPos> ensureAndSyncCorners(
+      @NotNull final IBuilding building,
+      final int schematicLevel,
+      @Nullable final Level world)
+    {
+        final Resolved resolved = ensure(building, schematicLevel);
+        if (resolved == null)
+        {
+            return syncCornersFromBlueprint(building, world, building.getStructurePack(), building.getBlueprintPath(),
+              building.getRotationMirror());
+        }
+        return syncCornersFromBlueprint(building, world, resolved.pack(), resolved.path(), building.getRotationMirror());
     }
 
     /**

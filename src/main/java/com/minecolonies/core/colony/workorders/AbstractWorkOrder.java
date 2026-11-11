@@ -610,7 +610,28 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
                 blueprint,
                 getRotationMirror());
 
-            box = new AABB(Vec3.atBottomCenterOf(corners.getA()), Vec3.atBottomCenterOf(corners.getB()));
+            // Inclusive block AABB (atBottomCenterOf shrinks max by 0.5 and desyncs tape vs placer).
+            box = new AABB(
+              corners.getA().getX(), corners.getA().getY(), corners.getA().getZ(),
+              corners.getB().getX() + 1.0D, corners.getB().getY() + 1.0D, corners.getB().getZ() + 1.0D);
+
+            // Keep building fence/corners aligned with the exact blueprint the builder uses.
+            if (colony != null && world != null && !world.isClientSide())
+            {
+                try
+                {
+                    final com.minecolonies.api.colony.buildings.IBuilding building =
+                      colony.getServerBuildingManager() == null ? null : colony.getServerBuildingManager().getBuilding(location);
+                    if (building != null)
+                    {
+                        com.minecolonies.core.util.HutBlueprintResolver.syncCornersFromBlueprint(
+                          building, world, getStructurePack(), getStructurePath(), getRotationMirror());
+                    }
+                }
+                catch (final Exception ignored)
+                {
+                }
+            }
         }
     }
 
