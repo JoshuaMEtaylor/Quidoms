@@ -1,5 +1,6 @@
 package com.minecolonies.core.compatibility.quidcraft;
 
+import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.util.InventoryUtils;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.UUID;
@@ -23,8 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Soft QuidCraft marketplace bridge. Uses reflection so Quidoms compiles and runs without QuidCraft.
  * <p>
- * QD-73: builders/citizens provision exact shortage qty via {@code QuidAccess.provisionMarketBuy} —
+ * QD-73/76: builders provision exact shortage qty via {@code QuidAccess.provisionMarketBuy} —
  * payment is treated as completed (no Quid debit), but CommodityMarket fill + price walk still apply.
+ * Structure builders hit this from {@code BuildingResourcesModule.checkOrRequestBucket} (not AIBasic).
  * Non-catalogue items are skipped so the normal request flow can run.
  */
 public final class QuidCraftMarketBridge
@@ -32,7 +35,7 @@ public final class QuidCraftMarketBridge
     public static final String MOD_ID = "quidcraft";
 
     /** Per colony+item cooldown after an attempt (ms). */
-    private static final long COOLDOWN_MS = 5_000L;
+    private static final long COOLDOWN_MS = 3_000L;
 
     private static final Map<String, Long> COOLDOWNS = new ConcurrentHashMap<>();
 
@@ -55,19 +58,30 @@ public final class QuidCraftMarketBridge
 
     public static boolean tryBuyForBuilding(@NotNull final IBuilding building, @NotNull final ItemStack stack, final int count, final boolean matchNBT)
     {
-        return tryBuyForBuilding(building, stack, count, matchNBT, "");
+        return tryBuyForBuilding(building, stack, count, matchNBT, "", null);
     }
 
-    /**
-     * Attempt to provision exact {@code count} of {@code stack}'s item from QuidCraft into the building.
-     * No owner inventory / Quid balance required. Returns true if the building holds enough afterwards.
-     */
     public static boolean tryBuyForBuilding(
       @NotNull final IBuilding building,
       @NotNull final ItemStack stack,
       final int count,
       final boolean matchNBT,
       @NotNull final String citizenName)
+    {
+        return tryBuyForBuilding(building, stack, count, matchNBT, citizenName, null);
+    }
+
+    /**
+     * Attempt to provision exact {@code count} of {@code stack}'s item from QuidCraft into the
+     * builder inventory and/or building. No Quid debit. Returns true if enough is held afterwards.
+     */
+    public static boolean tryBuyForBuilding(
+      @NotNull final IBuilding building,
+      @NotNull final ItemStack stack,
+      final int count,
+      final boolean matchNBT,
+      @NotNull final String citizenName,
+      @Nullable final ICitizenData worker)
     {
         if (!isPresent() || stack.isEmpty() || count <= 0 || building.getColony() == null || building.getColony().getWorld() == null)
         {
@@ -98,6 +112,8 @@ public final class QuidCraftMarketBridge
         {
             if (!quidReady())
             {
+                // Economy not open yet — brief cooldown then retry.
+                COOLDOWNS.put(coolKey, nowMs + 1_000L);
                 return false;
             }
 
@@ -108,7 +124,7 @@ public final class QuidCraftMarketBridge
             final ProvisionResult provision = invokeProvision(itemId, count, dimension, pos.getX(), pos.getZ(), nowMs);
             if (!provision.onCatalogue())
             {
-                // Not listed — fall through to normal requests; short cooldown avoids spam.
+                // Not listed / no API — fall through; short cooldown avoids spam.
                 COOLDOWNS.put(coolKey, nowMs + 2_000L);
                 return false;
             }
@@ -117,20 +133,32 @@ public final class QuidCraftMarketBridge
 
             if (provision.filled() <= 0)
             {
+                // Still record so Colonies tab shows the attempt (room empty, etc.).
                 recordOrder(orderId, colony.getID(), colonyName, safeOwner, ownerName, citizenName, itemId, count, false, 0L,
                   provision.detail().isEmpty() ? "no-fill" : provision.detail(), nowMs);
                 return false;
             }
 
-            final int delivered = depositIntoBuilding(building, stack, provision.filled(), matchNBT);
-            final boolean enough = InventoryUtils.hasBuildingEnoughElseCount(building,
-              new com.minecolonies.api.crafting.ItemStorage(stack, true, matchNBT), count) >= count;
+            final int delivered = deposit(building, worker, stack, provision.filled(), matchNBT);
+            final int haveBuilding = InventoryUtils.hasBuildingEnoughElseCount(building,
+              new com.minecolonies.api.crafting.ItemStorage(stack, true, matchNBT), count);
+            int haveWorker = 0;
+            if (worker != null && worker.getInventory() != null)
+            {
+                haveWorker = InventoryUtils.getItemCountInItemHandler(worker.getInventory(),
+                  s -> ItemStackUtils.compareItemStacksIgnoreStackSize(s, stack, true, matchNBT));
+            }
+            final boolean enough = haveBuilding + haveWorker >= count;
             final String detail = (provision.detail().isEmpty() ? "provision" : provision.detail())
                                    + ";delivered=" + delivered
                                    + (enough ? ";ok" : ";partial");
-            // Payment always treated completed when catalogue fill ran; cost is notional only.
             recordOrder(orderId, colony.getID(), colonyName, safeOwner, ownerName, citizenName, itemId, count, enough || delivered > 0,
               provision.notionalCostMinor(), detail, nowMs);
+            if (delivered > 0)
+            {
+                Log.getLogger().info("QuidCraft provisioned {} x{} for colony {} (delivered={}, enough={})",
+                  itemId, provision.filled(), colonyName, delivered, enough);
+            }
             return enough;
         }
         catch (final ClassNotFoundException | NoSuchMethodException | NoClassDefFoundError e)
@@ -143,15 +171,23 @@ public final class QuidCraftMarketBridge
         {
             COOLDOWNS.put(coolKey, nowMs + COOLDOWN_MS);
             recordOrder(orderId, colony.getID(), colonyName, safeOwner, ownerName, citizenName, itemId, count, false, 0L, t.toString(), nowMs);
-            Log.getLogger().debug("QuidCraft provision buy failed for {}: {}", itemId, t.toString());
+            Log.getLogger().warn("QuidCraft provision buy failed for {}: {}", itemId, t.toString());
             return false;
         }
     }
 
-    /**
-     * After a structure lists needed resources, try to provision each shortage into the building.
-     */
     public static void tryProvisionNeededResources(@NotNull final IBuilding building, @NotNull final String citizenName)
+    {
+        tryProvisionNeededResources(building, citizenName, null);
+    }
+
+    /**
+     * Sweep structure needed-resources and provision each shortage.
+     */
+    public static void tryProvisionNeededResources(
+      @NotNull final IBuilding building,
+      @NotNull final String citizenName,
+      @Nullable final ICitizenData worker)
     {
         if (!isPresent() || !(building instanceof AbstractBuildingStructureBuilder structureBuilder))
         {
@@ -171,18 +207,23 @@ public final class QuidCraftMarketBridge
                     continue;
                 }
                 final ItemStack stack = entry.getItemStack();
-                final int have = InventoryUtils.hasBuildingEnoughElseCount(building,
+                int have = InventoryUtils.hasBuildingEnoughElseCount(building,
                   new com.minecolonies.api.crafting.ItemStorage(stack, true, false), entry.getAmount());
+                if (worker != null && worker.getInventory() != null)
+                {
+                    have += InventoryUtils.getItemCountInItemHandler(worker.getInventory(),
+                      s -> ItemStackUtils.compareItemStacksIgnoreStackSize(s, stack, true, false));
+                }
                 final int shortage = entry.getAmount() - have;
                 if (shortage > 0)
                 {
-                    tryBuyForBuilding(building, stack, shortage, false, citizenName);
+                    tryBuyForBuilding(building, stack, shortage, false, citizenName, worker);
                 }
             }
         }
         catch (final Throwable t)
         {
-            Log.getLogger().debug("QuidCraft structure provision sweep failed: {}", t.toString());
+            Log.getLogger().warn("QuidCraft structure provision sweep failed: {}", t.toString());
         }
     }
 
@@ -256,7 +297,7 @@ public final class QuidCraftMarketBridge
         }
         if (!Boolean.TRUE.equals(provisionApiCached))
         {
-            // Older QuidCraft without provision API — treat as absent catalogue for fallthrough.
+            Log.getLogger().warn("QuidCraft loaded but provisionMarketBuy is missing — need QuidCraft >= 1.0.29 for builder buys.");
             return new ProvisionResult(false, 0, 0L, "no-provision-api");
         }
         final Object result = access.getClass().getMethod(
@@ -274,8 +315,9 @@ public final class QuidCraftMarketBridge
         return new ProvisionResult(onCatalogue, filled, cost, detail == null ? "" : detail.toString());
     }
 
-    private static int depositIntoBuilding(
+    private static int deposit(
       @NotNull final IBuilding building,
+      @Nullable final ICitizenData worker,
       @NotNull final ItemStack prototype,
       final int amount,
       final boolean matchNBT)
@@ -285,17 +327,33 @@ public final class QuidCraftMarketBridge
             return 0;
         }
         final Item item = prototype.getItem();
-        // Prefer plain stacks unless NBT matching was requested.
-        ItemStack toGive = matchNBT ? prototype.copyWithCount(amount) : new ItemStack(item, amount);
-        if (toGive.isEmpty())
+        ItemStack remaining = matchNBT ? prototype.copyWithCount(amount) : new ItemStack(item, amount);
+        if (remaining.isEmpty())
         {
-            toGive = new ItemStack(item, amount);
+            remaining = new ItemStack(item, amount);
         }
-        int remaining = amount;
-        while (remaining > 0 && !toGive.isEmpty())
+        int placed = 0;
+
+        // Prefer builder inventory — Required Resources "available" counts citizen + hut.
+        if (worker != null && worker.getInventory() != null && !remaining.isEmpty())
         {
-            final int batch = Math.min(remaining, Math.max(1, toGive.getMaxStackSize()));
-            ItemStack slice = toGive.copyWithCount(batch);
+            final int before = remaining.getCount();
+            remaining = InventoryUtils.addItemStackToItemHandlerWithResult(worker.getInventory(), remaining);
+            if (remaining == null || remaining.isEmpty())
+            {
+                placed += before;
+                remaining = ItemStack.EMPTY;
+            }
+            else
+            {
+                placed += Math.max(0, before - remaining.getCount());
+            }
+        }
+
+        while (!remaining.isEmpty() && remaining.getCount() > 0)
+        {
+            final int batch = Math.min(remaining.getCount(), Math.max(1, remaining.getMaxStackSize()));
+            ItemStack slice = remaining.copyWithCount(batch);
             ItemStack leftover = slice;
             if (building instanceof AbstractBuilding abstractBuilding)
             {
@@ -313,15 +371,15 @@ public final class QuidCraftMarketBridge
                     leftover = ItemStack.EMPTY;
                 }
             }
-            final int placed = batch - (leftover.isEmpty() ? 0 : leftover.getCount());
-            if (placed <= 0)
+            final int got = batch - (leftover.isEmpty() ? 0 : leftover.getCount());
+            if (got <= 0)
             {
                 break;
             }
-            remaining -= placed;
-            toGive.setCount(remaining);
+            placed += got;
+            remaining.shrink(got);
         }
-        return amount - remaining;
+        return placed;
     }
 
     private record ProvisionResult(boolean onCatalogue, int filled, long notionalCostMinor, String detail)

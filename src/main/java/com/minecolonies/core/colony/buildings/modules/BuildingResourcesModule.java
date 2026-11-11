@@ -381,7 +381,24 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             }
 
             int requestCount = entry.getValue() - count;
-            if (requestedItems.contains(new ItemStorage(itemStack.getItemStack())))
+            // QD-76: structure builders provision exact shortage from QuidCraft before colony requests.
+            // (They do not go through AbstractEntityAIBasic.checkIfRequestForItemExistOrCreate.)
+            final String citizenName = worker == null ? "" : worker.getName();
+            if (com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+              building, itemStack.getItemStack(), requestCount, true, citizenName, worker))
+            {
+                count = InventoryUtils.hasBuildingEnoughElseCount(building,
+                  stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, itemStack.getItemStack()), entry.getValue());
+                count += InventoryUtils.getItemCountInItemHandler(worker.getInventory(),
+                  stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, itemStack.getItemStack()));
+                if (count >= entry.getValue())
+                {
+                    continue;
+                }
+                requestCount = entry.getValue() - count;
+            }
+
+            if (requestCount <= 0 || requestedItems.contains(new ItemStorage(itemStack.getItemStack())))
             {
                 continue;
             }
