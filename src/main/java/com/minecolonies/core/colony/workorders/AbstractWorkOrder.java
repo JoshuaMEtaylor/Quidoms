@@ -424,31 +424,61 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
         return packName;
     }
 
+    /**
+     * Update pack+path after a soft-fail resolve so later loads hit the real schematic.
+     */
+    public void updateStructurePackAndPath(@Nullable final String pack, @Nullable final String structurePath)
+    {
+        if (pack != null && !pack.isBlank())
+        {
+            this.packName = pack;
+        }
+        if (structurePath != null && !structurePath.isBlank())
+        {
+            this.path = structurePath;
+        }
+        changed = true;
+    }
+
     @Override
     public void loadBlueprint(final Level world, final Consumer<Blueprint> afterLoad)
     {
         if (blueprint != null)
         {
             afterLoad.accept(blueprint);
+            return;
         }
-        else if (future == null || future.isDone())
+
+        // In-flight load from requestWorkOrder / onAdded — NEVER treat as failure.
+        // Returning null here made the builder AI cancel a freshly claimed WO (QD-94).
+        if (future != null && !future.isDone())
         {
-            future = ColonyUtils.queueBlueprintLoad(world, getStructurePack(), getStructurePath(), blueprint ->
-                {
-                    // Soft-fail / pack search already happened on the IO pool inside ColonyUtils.
-                    // Do not sync-load again on the server tick callback.
-                    if (blueprint != null)
+            final CompletableFuture<Blueprint> inFlight = future;
+            com.ldtteam.structurize.storage.ServerFutureProcessor.queueBlueprint(
+              new com.ldtteam.structurize.storage.ServerFutureProcessor.BlueprintProcessingData(
+                inFlight,
+                world,
+                loaded -> {
+                    if (loaded != null)
                     {
-                        setBlueprint(blueprint, world);
+                        setBlueprint(loaded, world);
                     }
-                    afterLoad.accept(blueprint);
-                },
-                e -> afterLoad.accept(null));
+                    afterLoad.accept(blueprint != null ? blueprint : loaded);
+                }));
+            return;
         }
-        else
-        {
-            afterLoad.accept(null);
-        }
+
+        future = ColonyUtils.queueBlueprintLoad(world, getStructurePack(), getStructurePath(), loaded ->
+            {
+                // Soft-fail / pack search already happened on the IO pool inside ColonyUtils.
+                // Do not sync-load again on the server tick callback.
+                if (loaded != null)
+                {
+                    setBlueprint(loaded, world);
+                }
+                afterLoad.accept(loaded);
+            },
+            e -> afterLoad.accept(null));
     }
 
     @Override

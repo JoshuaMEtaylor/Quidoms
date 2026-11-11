@@ -1078,10 +1078,13 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         workOrder.loadBlueprint(world, (blueprint -> {
             if (blueprint == null)
             {
-                handleSpecificCancelActions();
+                // Keep the claim — in-flight/pack-not-ready misses used to cancel the WO (QD-94).
+                // Clear placer and let LOAD_STRUCTURE retry on a later tick.
                 Log.getLogger()
-                  .warn("Couldn't find structure with name: " + workOrder.getStructurePath() + " in: " + workOrder.getStructurePack() + ". Aborting loading procedure");
+                  .warn("Couldn't find structure with name: " + workOrder.getStructurePath() + " in: " + workOrder.getStructurePack()
+                          + ". Will retry; work order kept claimed.");
                 this.loadingBlueprint = false;
+                resetCurrentStructure();
                 return;
             }
 

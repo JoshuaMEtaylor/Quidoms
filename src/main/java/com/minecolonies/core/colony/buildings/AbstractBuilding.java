@@ -487,8 +487,12 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
         if (!builder.equals(BlockPos.ZERO))
         {
             final IBuilding building = colony.getServerBuildingManager().getBuilding(builder);
+            // Allow a level-0 builder hut to take its own BUILD WO (canBeBuiltByBuilder),
+            // and also when the selected builder hut itself is the construction site.
             if (building instanceof AbstractBuildingStructureBuilder &&
-                  (building.getBuildingLevel() >= workOrder.getTargetLevel() || canBeBuiltByBuilder(workOrder.getTargetLevel())))
+                  (building.getBuildingLevel() >= workOrder.getTargetLevel()
+                     || canBeBuiltByBuilder(workOrder.getTargetLevel())
+                     || building.getID().equals(getID())))
             {
                 workOrder.setClaimedBy(builder);
             }
@@ -500,10 +504,22 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
         }
 
         colony.getWorkManager().addWorkOrder(workOrder, false);
-        workOrder.loadBlueprint(colony.getWorld(), b -> {});
 
+        // Prefetch blueprint async (must not race-cancel claim — see AbstractWorkOrder.loadBlueprint).
         if (workOrder.getID() != 0)
         {
+            workOrder.loadBlueprint(colony.getWorld(), b -> {});
+
+            // Belt-and-suspenders: if auto-assign missed (manual mode / tick order), bind claimed hut now.
+            if (workOrder.isClaimed())
+            {
+                final IBuilding claimedHut = colony.getServerBuildingManager().getBuilding(workOrder.getClaimedBy());
+                if (claimedHut instanceof AbstractBuildingStructureBuilder structureBuilder && !structureBuilder.hasWorkOrder())
+                {
+                    structureBuilder.setWorkOrder(workOrder);
+                }
+            }
+
             MessageUtils.format(WORK_ORDER_CREATED,
                 workOrder.getDisplayName(),
                 colony.getName(),
