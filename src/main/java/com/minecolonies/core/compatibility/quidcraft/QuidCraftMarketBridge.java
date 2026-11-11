@@ -6,39 +6,39 @@ import com.minecolonies.api.util.InventoryUtils;
 import com.minecolonies.api.util.ItemStackUtils;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.core.colony.buildings.AbstractBuilding;
+import com.minecolonies.core.colony.buildings.AbstractBuildingStructureBuilder;
+import com.minecolonies.core.colony.buildings.utils.BuildingBuilderResource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Soft QuidCraft marketplace bridge. Uses reflection so Quidoms compiles and runs without QuidCraft.
- * When QuidCraft is loaded and ready, missing worker materials can be bought from the materials market
- * against the colony owner's Quid account before/alongside the normal request system.
- * Purchase attempts are recorded for QuidCraft's Colonies screen tab when the API is available.
+ * <p>
+ * QD-73: builders/citizens provision exact shortage qty via {@code QuidAccess.provisionMarketBuy} —
+ * payment is treated as completed (no Quid debit), but CommodityMarket fill + price walk still apply.
+ * Non-catalogue items are skipped so the normal request flow can run.
  */
 public final class QuidCraftMarketBridge
 {
     public static final String MOD_ID = "quidcraft";
 
     /** Per colony+item cooldown after an attempt (ms). */
-    private static final long COOLDOWN_MS = 15_000L;
+    private static final long COOLDOWN_MS = 5_000L;
 
     private static final Map<String, Long> COOLDOWNS = new ConcurrentHashMap<>();
 
     private static Boolean presentCached;
     private static boolean reflectFailed;
+    private static Boolean provisionApiCached;
 
     private QuidCraftMarketBridge()
     {
@@ -59,8 +59,8 @@ public final class QuidCraftMarketBridge
     }
 
     /**
-     * Attempt to buy {@code count} of {@code stack}'s item from QuidCraft into the colony owner's inventory,
-     * then move matching stacks into the building. Returns true if the building now holds enough.
+     * Attempt to provision exact {@code count} of {@code stack}'s item from QuidCraft into the building.
+     * No owner inventory / Quid balance required. Returns true if the building holds enough afterwards.
      */
     public static boolean tryBuyForBuilding(
       @NotNull final IBuilding building,
@@ -87,12 +87,12 @@ public final class QuidCraftMarketBridge
         {
             return false;
         }
-        COOLDOWNS.put(coolKey, nowMs + COOLDOWN_MS);
 
         final UUID orderId = UUID.randomUUID();
         final UUID ownerId = colony.getPermissions().getOwner();
         final String ownerName = colony.getPermissions().getOwnerName() == null ? "colony-owner" : colony.getPermissions().getOwnerName();
         final String colonyName = colony.getName() == null ? ("colony-" + colony.getID()) : colony.getName();
+        final UUID safeOwner = ownerId == null ? new UUID(0L, 0L) : ownerId;
 
         try
         {
@@ -100,85 +100,89 @@ public final class QuidCraftMarketBridge
             {
                 return false;
             }
-            if (ownerId == null)
-            {
-                recordOrder(orderId, colony.getID(), colonyName, new UUID(0L, 0L), ownerName, citizenName, itemId, count, false, 0L, "no-owner", nowMs);
-                return false;
-            }
 
             final Level world = colony.getWorld();
-            final ServerPlayer owner = world.getServer() == null ? null : world.getServer().getPlayerList().getPlayer(ownerId);
-
             final BlockPos pos = building.getPosition();
             final String dimension = world.dimension().location().toString();
-            final Object economy = economyHostGet();
-            if (economy == null)
+
+            final ProvisionResult provision = invokeProvision(itemId, count, dimension, pos.getX(), pos.getZ(), nowMs);
+            if (!provision.onCatalogue())
             {
-                recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, false, 0L, "economy-null", nowMs);
+                // Not listed — fall through to normal requests; short cooldown avoids spam.
+                COOLDOWNS.put(coolKey, nowMs + 2_000L);
                 return false;
             }
 
-            final Object actor = newActor(ownerId, ownerName, false, 0);
-            final Object buySide = tradeSideBuy();
-            final UUID requestId = UUID.randomUUID();
+            COOLDOWNS.put(coolKey, nowMs + COOLDOWN_MS);
 
-            final int before = owner == null ? 0 : countMatching(owner, stack, matchNBT);
-
-            final Object outcome = invokeTrade(economy, actor, requestId, itemId, buySide, count, dimension, pos.getX(), pos.getZ(), System.currentTimeMillis());
-            final boolean ok = outcome != null && outcomeOk(outcome);
-            final long cost = outcomeCost(outcome);
-            final String detail = outcomeDetail(outcome);
-
-            if (!ok)
+            if (provision.filled() <= 0)
             {
-                recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, false, cost, detail.isEmpty() ? "trade-failed" : detail, nowMs);
+                recordOrder(orderId, colony.getID(), colonyName, safeOwner, ownerName, citizenName, itemId, count, false, 0L,
+                  provision.detail().isEmpty() ? "no-fill" : provision.detail(), nowMs);
                 return false;
             }
 
-            // Pull Claims into inventory when the owner is online.
-            if (owner != null)
-            {
-                tryClaimAll(economy, actor);
-            }
-
-            if (owner == null)
-            {
-                recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, true, cost,
-                  detail.isEmpty() ? "ok-claims-offline" : detail, nowMs);
-                Log.getLogger().info("QuidCraft bought {} x{} for colony {} (owner offline — Claims).", itemId, count, colony.getName());
-                return false;
-            }
-
-            final int after = countMatching(owner, stack, matchNBT);
-            final int gained = Math.max(0, after - before);
-            if (gained <= 0)
-            {
-                recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, true, cost,
-                  detail.isEmpty() ? "ok-pending-delivery" : detail, nowMs);
-                return false;
-            }
-
-            final int toMove = Math.min(gained, count);
-            moveFromPlayerToBuilding(owner, building, stack, toMove, matchNBT);
-
-            final int inBuilding = InventoryUtils.hasBuildingEnoughElseCount(building,
-              new com.minecolonies.api.crafting.ItemStorage(stack, true, matchNBT), Math.min(toMove, count));
-            final boolean delivered = inBuilding >= Math.min(toMove, count);
-            recordOrder(orderId, colony.getID(), colonyName, ownerId, ownerName, citizenName, itemId, count, delivered, cost,
-              delivered ? (detail.isEmpty() ? "ok-delivered" : detail) : "ok-partial-hut", nowMs);
-            return delivered;
+            final int delivered = depositIntoBuilding(building, stack, provision.filled(), matchNBT);
+            final boolean enough = InventoryUtils.hasBuildingEnoughElseCount(building,
+              new com.minecolonies.api.crafting.ItemStorage(stack, true, matchNBT), count) >= count;
+            final String detail = (provision.detail().isEmpty() ? "provision" : provision.detail())
+                                   + ";delivered=" + delivered
+                                   + (enough ? ";ok" : ";partial");
+            // Payment always treated completed when catalogue fill ran; cost is notional only.
+            recordOrder(orderId, colony.getID(), colonyName, safeOwner, ownerName, citizenName, itemId, count, enough || delivered > 0,
+              provision.notionalCostMinor(), detail, nowMs);
+            return enough;
         }
         catch (final ClassNotFoundException | NoSuchMethodException | NoClassDefFoundError e)
         {
             reflectFailed = true;
-            Log.getLogger().warn("QuidCraft present but market API reflect failed; disabling bridge: " + e);
+            Log.getLogger().warn("QuidCraft present but provision API reflect failed; disabling bridge: " + e);
             return false;
         }
         catch (final Throwable t)
         {
-            recordOrder(orderId, colony.getID(), colonyName, ownerId == null ? new UUID(0L, 0L) : ownerId, ownerName, citizenName, itemId, count, false, 0L, t.toString(), nowMs);
-            Log.getLogger().debug("QuidCraft market buy failed for {}: {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), t.toString());
+            COOLDOWNS.put(coolKey, nowMs + COOLDOWN_MS);
+            recordOrder(orderId, colony.getID(), colonyName, safeOwner, ownerName, citizenName, itemId, count, false, 0L, t.toString(), nowMs);
+            Log.getLogger().debug("QuidCraft provision buy failed for {}: {}", itemId, t.toString());
             return false;
+        }
+    }
+
+    /**
+     * After a structure lists needed resources, try to provision each shortage into the building.
+     */
+    public static void tryProvisionNeededResources(@NotNull final IBuilding building, @NotNull final String citizenName)
+    {
+        if (!isPresent() || !(building instanceof AbstractBuildingStructureBuilder structureBuilder))
+        {
+            return;
+        }
+        try
+        {
+            final Map<String, BuildingBuilderResource> needed = structureBuilder.getNeededResources();
+            if (needed == null || needed.isEmpty())
+            {
+                return;
+            }
+            for (final BuildingBuilderResource entry : needed.values())
+            {
+                if (entry == null || entry.getItemStack() == null || entry.getItemStack().isEmpty() || entry.getAmount() <= 0)
+                {
+                    continue;
+                }
+                final ItemStack stack = entry.getItemStack();
+                final int have = InventoryUtils.hasBuildingEnoughElseCount(building,
+                  new com.minecolonies.api.crafting.ItemStorage(stack, true, false), entry.getAmount());
+                final int shortage = entry.getAmount() - have;
+                if (shortage > 0)
+                {
+                    tryBuyForBuilding(building, stack, shortage, false, citizenName);
+                }
+            }
+        }
+        catch (final Throwable t)
+        {
+            Log.getLogger().debug("QuidCraft structure provision sweep failed: {}", t.toString());
         }
     }
 
@@ -223,141 +227,79 @@ public final class QuidCraftMarketBridge
     private static boolean quidReady() throws Exception
     {
         final Class<?> api = Class.forName("com.quidcraft.api.QuidApi");
-        final Method ready = api.getMethod("ready");
-        return Boolean.TRUE.equals(ready.invoke(null));
+        return Boolean.TRUE.equals(api.getMethod("ready").invoke(null));
     }
 
-    private static Object economyHostGet() throws Exception
-    {
-        final Class<?> host = Class.forName("com.quidcraft.server.EconomyHost");
-        return host.getMethod("get").invoke(null);
-    }
-
-    private static Object newActor(final UUID id, final String name, final boolean spectator, final int perm) throws Exception
-    {
-        final Class<?> actorCl = Class.forName("com.quidcraft.economy.Actor");
-        final Constructor<?> ctor = actorCl.getConstructor(UUID.class, String.class, boolean.class, int.class);
-        return ctor.newInstance(id, name, spectator, perm);
-    }
-
-    private static Object tradeSideBuy() throws Exception
-    {
-        final Class<?> sideCl = Class.forName("com.quidcraft.market.TradeSide");
-        return Enum.valueOf(sideCl.asSubclass(Enum.class), "BUY");
-    }
-
-    private static Object invokeTrade(
-      final Object economy,
-      final Object actor,
-      final UUID requestId,
+    private static ProvisionResult invokeProvision(
       final String itemId,
-      final Object side,
       final int quantity,
       final String dimension,
       final int x,
       final int z,
       final long now) throws Exception
     {
-        final Method trade = economy.getClass().getMethod(
-          "trade",
-          Class.forName("com.quidcraft.economy.Actor"),
-          UUID.class,
-          String.class,
-          Class.forName("com.quidcraft.market.TradeSide"),
-          int.class,
-          String.class,
-          int.class,
-          int.class,
-          long.class);
-        return trade.invoke(economy, actor, requestId, itemId, side, quantity, dimension, x, z, now);
-    }
-
-    private static boolean outcomeOk(final Object outcome) throws Exception
-    {
-        final Method ok = outcome.getClass().getMethod("ok");
-        return Boolean.TRUE.equals(ok.invoke(outcome));
-    }
-
-    private static String outcomeDetail(final Object outcome)
-    {
-        if (outcome == null)
+        final Class<?> api = Class.forName("com.quidcraft.api.QuidApi");
+        final Object access = api.getMethod("get").invoke(null);
+        if (provisionApiCached == null)
         {
-            return "";
-        }
-        try
-        {
-            final Object key = outcome.getClass().getMethod("messageKey").invoke(outcome);
-            final Object detail = outcome.getClass().getMethod("detail").invoke(outcome);
-            final String k = key == null ? "" : key.toString();
-            final String d = detail == null ? "" : detail.toString();
-            if (k.isEmpty())
+            try
             {
-                return d;
+                access.getClass().getMethod(
+                  "provisionMarketBuy",
+                  UUID.class, String.class, int.class, String.class, int.class, int.class, long.class);
+                provisionApiCached = true;
             }
-            return d.isEmpty() ? k : (k + ":" + d);
+            catch (final NoSuchMethodException e)
+            {
+                provisionApiCached = false;
+            }
         }
-        catch (final Throwable t)
+        if (!Boolean.TRUE.equals(provisionApiCached))
         {
-            return "";
+            // Older QuidCraft without provision API — treat as absent catalogue for fallthrough.
+            return new ProvisionResult(false, 0, 0L, "no-provision-api");
         }
-    }
-
-    private static long outcomeCost(final Object outcome)
-    {
-        // Outcome does not expose goods total; leave 0 unless a future API adds it.
-        return 0L;
-    }
-
-    private static void tryClaimAll(final Object economy, final Object actor)
-    {
-        try
+        final Object result = access.getClass().getMethod(
+          "provisionMarketBuy",
+          UUID.class, String.class, int.class, String.class, int.class, int.class, long.class
+        ).invoke(access, UUID.randomUUID(), itemId, quantity, dimension, x, z, now);
+        if (result == null)
         {
-            final Method claimAll = economy.getClass().getMethod(
-              "claimAll",
-              Class.forName("com.quidcraft.economy.Actor"),
-              UUID.class,
-              long.class);
-            claimAll.invoke(economy, actor, UUID.randomUUID(), System.currentTimeMillis());
+            return new ProvisionResult(false, 0, 0L, "null-result");
         }
-        catch (final Throwable ignored)
-        {
-            // Optional nicety; buy may already have delivered to inventory.
-        }
+        final boolean onCatalogue = Boolean.TRUE.equals(result.getClass().getMethod("onCatalogue").invoke(result));
+        final int filled = ((Number) result.getClass().getMethod("filled").invoke(result)).intValue();
+        final long cost = ((Number) result.getClass().getMethod("notionalCostMinor").invoke(result)).longValue();
+        final Object detail = result.getClass().getMethod("detail").invoke(result);
+        return new ProvisionResult(onCatalogue, filled, cost, detail == null ? "" : detail.toString());
     }
 
-    private static int countMatching(@NotNull final ServerPlayer player, @NotNull final ItemStack stack, final boolean matchNBT)
-    {
-        final IItemHandler handler = new InvWrapper(player.getInventory());
-        return InventoryUtils.getItemCountInItemHandler(handler,
-          s -> ItemStackUtils.compareItemStacksIgnoreStackSize(s, stack, true, matchNBT));
-    }
-
-    private static void moveFromPlayerToBuilding(
-      @NotNull final ServerPlayer player,
+    private static int depositIntoBuilding(
       @NotNull final IBuilding building,
-      @NotNull final ItemStack stack,
-      final int count,
+      @NotNull final ItemStack prototype,
+      final int amount,
       final boolean matchNBT)
     {
-        final IItemHandler playerInv = new InvWrapper(player.getInventory());
-        int remaining = count;
-        for (int slot = 0; slot < playerInv.getSlots() && remaining > 0; slot++)
+        if (amount <= 0)
         {
-            final ItemStack inSlot = playerInv.getStackInSlot(slot);
-            if (!ItemStackUtils.compareItemStacksIgnoreStackSize(inSlot, stack, true, matchNBT))
-            {
-                continue;
-            }
-            final int take = Math.min(remaining, inSlot.getCount());
-            final ItemStack extracted = playerInv.extractItem(slot, take, false);
-            if (extracted.isEmpty())
-            {
-                continue;
-            }
-            ItemStack leftover = extracted;
+            return 0;
+        }
+        final Item item = prototype.getItem();
+        // Prefer plain stacks unless NBT matching was requested.
+        ItemStack toGive = matchNBT ? prototype.copyWithCount(amount) : new ItemStack(item, amount);
+        if (toGive.isEmpty())
+        {
+            toGive = new ItemStack(item, amount);
+        }
+        int remaining = amount;
+        while (remaining > 0 && !toGive.isEmpty())
+        {
+            final int batch = Math.min(remaining, Math.max(1, toGive.getMaxStackSize()));
+            ItemStack slice = toGive.copyWithCount(batch);
+            ItemStack leftover = slice;
             if (building instanceof AbstractBuilding abstractBuilding)
             {
-                leftover = abstractBuilding.forceTransferStack(extracted, building.getColony().getWorld());
+                leftover = abstractBuilding.forceTransferStack(slice, building.getColony().getWorld());
                 if (leftover == null)
                 {
                     leftover = ItemStack.EMPTY;
@@ -365,21 +307,24 @@ public final class QuidCraftMarketBridge
             }
             else if (building.getTileEntity() != null)
             {
-                leftover = InventoryUtils.addItemStackToProviderWithResult(building.getTileEntity(), extracted);
+                leftover = InventoryUtils.addItemStackToProviderWithResult(building.getTileEntity(), slice);
                 if (leftover == null)
                 {
                     leftover = ItemStack.EMPTY;
                 }
             }
-            if (!leftover.isEmpty())
+            final int placed = batch - (leftover.isEmpty() ? 0 : leftover.getCount());
+            if (placed <= 0)
             {
-                playerInv.insertItem(slot, leftover, false);
-                remaining -= (take - leftover.getCount());
+                break;
             }
-            else
-            {
-                remaining -= take;
-            }
+            remaining -= placed;
+            toGive.setCount(remaining);
         }
+        return amount - remaining;
+    }
+
+    private record ProvisionResult(boolean onCatalogue, int filled, long notionalCostMinor, String detail)
+    {
     }
 }
