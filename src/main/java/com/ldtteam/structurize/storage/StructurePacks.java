@@ -467,6 +467,11 @@ public class StructurePacks
         {
             return null;
         }
+        if (subPath == null || subPath.isBlank())
+        {
+            // Empty path is a corrupt building TE — callers should derive a hut path; do not spam.
+            return null;
+        }
 
         final StructurePackMeta packMeta = getStructurePack(structurePackId);
         if (packMeta == null)
