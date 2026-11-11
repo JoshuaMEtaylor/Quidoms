@@ -91,13 +91,15 @@ public class CitizenItemUtils
      */
     public static void removeHeldItem(AbstractEntityCitizen citizen)
     {
-        // Quidoms: clear both the inventory held-slot index and the entity equipment slot so
-        // bare-handed work does not leave a ghost tool rendered on the citizen.
+        // Quidoms: clear inventory held index + entity MAINHAND, and flush equipment to clients
+        // so world + inventory preview do not keep a ghost tool (or stale empty hand).
         if (citizen.getCitizenData() != null)
         {
             citizen.getCitizenData().getInventory().setHeldItem(InteractionHand.MAIN_HAND, -1);
         }
+        citizen.setItemInHand(InteractionHand.MAIN_HAND, ItemStackUtils.EMPTY);
         citizen.setItemSlot(EquipmentSlot.MAINHAND, ItemStackUtils.EMPTY);
+        citizen.forceSyncEquipment();
     }
 
     /**
@@ -108,14 +110,21 @@ public class CitizenItemUtils
      */
     public static void setHeldItem(@NotNull final AbstractEntityCitizen citizen, final InteractionHand hand, final int slot)
     {
+        final ItemStack stack = citizen.getCitizenData().getInventory().getStackInSlot(slot);
         citizen.getCitizenData().getInventory().setHeldItem(hand, slot);
         if (hand.equals(InteractionHand.MAIN_HAND))
         {
-            citizen.setItemSlot(EquipmentSlot.MAINHAND, citizen.getCitizenData().getInventory().getStackInSlot(slot));
+            // Quidoms: set both LivingEntity hand + equipment slot, then flush ClientboundSetEquipmentPacket
+            // so world render and citizen inventory preview show the tool immediately.
+            citizen.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            citizen.setItemSlot(EquipmentSlot.MAINHAND, stack);
+            citizen.forceSyncEquipment();
         }
         else if (hand.equals(InteractionHand.OFF_HAND))
         {
-            citizen.setItemSlot(EquipmentSlot.OFFHAND, citizen.getCitizenData().getInventory().getStackInSlot(slot));
+            citizen.setItemInHand(InteractionHand.OFF_HAND, stack);
+            citizen.setItemSlot(EquipmentSlot.OFFHAND, stack);
+            citizen.forceSyncEquipment();
         }
     }
 
@@ -126,8 +135,7 @@ public class CitizenItemUtils
      */
     public static void setMainHeldItem(@NotNull final AbstractEntityCitizen citizen, final int slot)
     {
-        citizen.getCitizenData().getInventory().setHeldItem(InteractionHand.MAIN_HAND, slot);
-        citizen.setItemSlot(EquipmentSlot.MAINHAND, citizen.getCitizenData().getInventory().getStackInSlot(slot));
+        setHeldItem(citizen, InteractionHand.MAIN_HAND, slot);
     }
 
     /**

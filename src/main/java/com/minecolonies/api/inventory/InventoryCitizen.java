@@ -135,12 +135,15 @@ public class InventoryCitizen implements IItemHandlerModifiable, Nameable
      */
     public void setHeldItem(final InteractionHand hand, final int slot)
     {
+        // Quidoms: MAIN and OFF hands are independent (was wrongly writing offhand on every MAIN set).
         if (hand.equals(InteractionHand.MAIN_HAND))
         {
             this.mainItem = slot;
         }
-
-        this.offhandItem = slot;
+        else
+        {
+            this.offhandItem = slot;
+        }
     }
 
     /**

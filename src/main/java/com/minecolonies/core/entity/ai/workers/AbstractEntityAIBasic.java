@@ -1398,11 +1398,15 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
     }
 
     /**
-     * Quidoms: pick the highest-tier matching tool for {@code toolType} so mining uses full tool speed.
+     * Quidoms: pick the fastest matching tool for {@code toolType} (wood→axe, stone→pickaxe, …).
+     * <p>
+     * Do <b>not</b> require {@link EquipmentTypeEntry#getMiningLevel} &gt; -1 — the tier registry
+     * often misses vanilla tools on 1.21.10, which previously forced bare hands despite axes/shovels
+     * sitting in inventory. Match by {@link EquipmentTypeEntry#checkIsEquipment}, rank by destroy speed.
      *
      * @param toolType required equipment type for the block
-     * @param required minimum harvest level
-     * @param target   block being mined (for destroy-speed tiebreak)
+     * @param required minimum harvest level (ignored when tier unknown; Quidoms accepts any tier)
+     * @param target   block being mined (for destroy-speed ranking)
      * @return inventory slot or {@link #TOOL_NOT_FOUND}
      */
     private int findBestToolSlot(@NotNull final EquipmentTypeEntry toolType, final int required, @NotNull final BlockState target)
@@ -1411,22 +1415,32 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
         int bestLevel = Integer.MIN_VALUE;
         float bestSpeed = -1.0F;
         @NotNull final InventoryCitizen inventory = worker.getInventoryCitizen();
-        final int maxToolLevel = worker.getCitizenColonyHandler().getWorkBuilding().getMaxEquipmentLevel();
 
         for (int i = 0; i < inventory.getSlots(); i++)
         {
             final ItemStack item = inventory.getStackInSlot(i);
-            final int level = toolType.getMiningLevel(item);
-
-            if (level > -1 && level >= required && ItemStackUtils.verifyEquipmentLevel(item, level, required, maxToolLevel))
+            if (ItemStackUtils.isEmpty(item) || !toolType.checkIsEquipment(item))
             {
-                final float speed = item.getItem().getDestroySpeed(item, target);
-                if (level > bestLevel || (level == bestLevel && speed > bestSpeed))
-                {
-                    bestSlot = i;
-                    bestLevel = level;
-                    bestSpeed = speed;
-                }
+                continue;
+            }
+
+            // Tier registry may return -1 for valid tools; treat as usable wood-tier (0).
+            int level = toolType.getMiningLevel(item);
+            if (level < 0)
+            {
+                level = 0;
+            }
+            if (level < required)
+            {
+                continue;
+            }
+
+            final float speed = item.getDestroySpeed(target);
+            if (speed > bestSpeed || (speed == bestSpeed && level > bestLevel))
+            {
+                bestSlot = i;
+                bestLevel = level;
+                bestSpeed = speed;
             }
         }
 

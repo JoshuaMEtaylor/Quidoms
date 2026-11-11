@@ -127,8 +127,39 @@ public final class Compatibility
      */
     public static int getItemLevel(final ItemStack stack)
     {
-        final TierEntry entry = itemTierRegistry.get(new ItemStorage(stack, true));
-        return entry != null ? entry.level() : -1;
+        // Match register flags (ignore damage + NBT) so lookup hits the tier map for damaged tools.
+        TierEntry entry = itemTierRegistry.get(new ItemStorage(stack, true, true));
+        if (entry == null)
+        {
+            entry = itemTierRegistry.get(new ItemStorage(stack, true));
+        }
+        if (entry != null)
+        {
+            return entry.level();
+        }
+
+        // Quidoms fallback: infer wood/stone/iron/diamond/netherite level from durability when
+        // the tier registry missed the item (common on 1.21.10 ToolMaterial ports).
+        if (stack.isEmpty() || !stack.isDamageableItem())
+        {
+            return -1;
+        }
+        final int durability = stack.getMaxDamage();
+        ToolMaterial best = null;
+        int bestDiff = Integer.MAX_VALUE;
+        for (final ToolMaterial material : new ToolMaterial[] {
+          ToolMaterial.WOOD, ToolMaterial.STONE, ToolMaterial.COPPER, ToolMaterial.IRON,
+          ToolMaterial.DIAMOND, ToolMaterial.GOLD, ToolMaterial.NETHERITE
+        })
+        {
+            final int diff = Math.abs(material.durability() - durability);
+            if (diff < bestDiff)
+            {
+                bestDiff = diff;
+                best = material;
+            }
+        }
+        return best == null ? -1 : (int) best.attackDamageBonus();
     }
 
     /**

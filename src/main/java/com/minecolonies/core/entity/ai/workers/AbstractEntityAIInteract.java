@@ -304,7 +304,7 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
     public int getBlockMiningTime(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
         return MineColonies.getConfig().getServer().pvp_mode.get()
-                 ? BLOCK_MINING_DELAY / 2
+                 ? Math.max(1, calculateVanillaMiningTicks(state, pos) / 2)
                  : calculateWorkerMiningDelay(state, pos);
     }
 
@@ -318,22 +318,43 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
     private int calculateWorkerMiningDelay(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
         // Quidoms: soft foliage/plants break on contact (structure AI also spam-clears these).
-        final double hardness = world.getBlockState(pos).getDestroySpeed(world, pos);
-        if (hardness >= 0.0D && hardness <= 0.25D && !state.blocksMotion())
+        final float hardness = world.getBlockState(pos).getDestroySpeed(world, pos);
+        if (hardness >= 0.0F && hardness <= 0.25F && !state.blocksMotion())
         {
             return 1;
         }
 
+        // Quidoms: 100% vanilla player destroy-speed stats for the equipped tool (research still applies).
         final double reduction = 1 - worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(BLOCK_BREAK_SPEED);
-        final double safeHardness = Math.max(0.05D, hardness);
-        // Quidoms: use the currently equipped tool's full destroy speed (bare hands only when empty).
-        final ItemStack held = worker.getMainHandItem();
-        final double toolSpeed = Math.max(0.1D, held.isEmpty()
-                                                  ? 1.0D
-                                                  : held.getItem().getDestroySpeed(held, state));
+        return Math.max(1, (int) Math.ceil(calculateVanillaMiningTicks(state, pos) * Math.max(0.0D, reduction)));
+    }
 
-        // Quidoms: break as fast as tools allow — hardness/toolSpeed only (Athletics skill flattened).
-        return Math.max(1, (int) ((BLOCK_MINING_DELAY * safeHardness / toolSpeed) * reduction));
+    /**
+     * Vanilla player break ticks for the currently held tool at 100% tool stats (no Athletics).
+     * Mirrors {@code BlockBehaviour.getDestroyProgress}: {@code speed / hardness / (canHarvest ? 30 : 100)}.
+     */
+    private int calculateVanillaMiningTicks(@NotNull final BlockState state, @NotNull final BlockPos pos)
+    {
+        final float hardness = state.getDestroySpeed(world, pos);
+        if (hardness < 0.0F)
+        {
+            return Integer.MAX_VALUE / 2;
+        }
+        if (hardness == 0.0F)
+        {
+            return 1;
+        }
+
+        final ItemStack held = worker.getMainHandItem();
+        final float toolSpeed = held.isEmpty() ? 1.0F : Math.max(0.0F, held.getDestroySpeed(state));
+        final boolean canHarvest = !state.requiresCorrectToolForDrops() || (!held.isEmpty() && held.isCorrectToolForDrops(state));
+        final float divisor = canHarvest ? 30.0F : 100.0F;
+        final float progress = (toolSpeed <= 0.0F ? 1.0F : toolSpeed) / hardness / divisor;
+        if (progress >= 1.0F)
+        {
+            return 1;
+        }
+        return Math.max(1, (int) Math.ceil(1.0F / progress));
     }
 
     /**

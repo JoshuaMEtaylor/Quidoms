@@ -648,19 +648,33 @@ public abstract class AbstractEntityCitizen extends AbstractCivilianEntity imple
     @Override
     public void detectEquipmentUpdates()
     {
-        if (this.isEquipmentDirty && tickCount % 20 == randomVariance)
+        // Quidoms: flush as soon as dirty so held tools appear in-world / inventory preview without
+        // waiting up to a second for tickCount % 20 == randomVariance.
+        if (this.isEquipmentDirty)
         {
-            this.isEquipmentDirty = false;
-            List<Pair<EquipmentSlot, ItemStack>> list = Lists.newArrayListWithCapacity(6);
-
-            list.add(new Pair<>(EquipmentSlot.CHEST, getItemBySlot(EquipmentSlot.CHEST)));
-            list.add(new Pair<>(EquipmentSlot.FEET, getItemBySlot(EquipmentSlot.FEET)));
-            list.add(new Pair<>(EquipmentSlot.HEAD, getItemBySlot(EquipmentSlot.HEAD)));
-            list.add(new Pair<>(EquipmentSlot.LEGS, getItemBySlot(EquipmentSlot.LEGS)));
-            list.add(new Pair<>(EquipmentSlot.OFFHAND, getItemBySlot(EquipmentSlot.OFFHAND)));
-            list.add(new Pair<>(EquipmentSlot.MAINHAND, getItemBySlot(EquipmentSlot.MAINHAND)));
-            ((ServerLevel) this.level()).getChunkSource().sendToTrackingPlayersAndSelf(this, new ClientboundSetEquipmentPacket(this.getId(), list));
+            forceSyncEquipment();
         }
+    }
+
+    /**
+     * Quidoms: immediately broadcast all equipment slots (especially MAINHAND) to tracking clients.
+     */
+    public void forceSyncEquipment()
+    {
+        if (this.level().isClientSide())
+        {
+            return;
+        }
+
+        this.isEquipmentDirty = false;
+        final List<Pair<EquipmentSlot, ItemStack>> list = Lists.newArrayListWithCapacity(6);
+        list.add(new Pair<>(EquipmentSlot.CHEST, getItemBySlot(EquipmentSlot.CHEST)));
+        list.add(new Pair<>(EquipmentSlot.FEET, getItemBySlot(EquipmentSlot.FEET)));
+        list.add(new Pair<>(EquipmentSlot.HEAD, getItemBySlot(EquipmentSlot.HEAD)));
+        list.add(new Pair<>(EquipmentSlot.LEGS, getItemBySlot(EquipmentSlot.LEGS)));
+        list.add(new Pair<>(EquipmentSlot.OFFHAND, getItemBySlot(EquipmentSlot.OFFHAND)));
+        list.add(new Pair<>(EquipmentSlot.MAINHAND, getItemBySlot(EquipmentSlot.MAINHAND)));
+        ((ServerLevel) this.level()).getChunkSource().sendToTrackingPlayersAndSelf(this, new ClientboundSetEquipmentPacket(this.getId(), list));
     }
 
     @Override
