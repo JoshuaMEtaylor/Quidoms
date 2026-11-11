@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.minecolonies.api.research.util.ResearchConstants.BLOCK_BREAK_SPEED;
 import static com.minecolonies.core.placementhandlers.DoBlockPlacementHandler.getCorrectDOItem;
 
 /**
@@ -87,9 +86,9 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
     private List<BlockPos> items;
 
     /**
-     * Block mining delay scale (Quidoms: tool/hardness driven; was 500 skill-floored ticks).
+     * Legacy constant retained for callers; mining delay is vanilla destroy-progress only (tools/enchants).
      */
-    public static final int BLOCK_MINING_DELAY = 20;
+    public static final int BLOCK_MINING_DELAY = 0;
 
     /**
      * Creates the abstract part of the AI. Always use this constructor!
@@ -291,7 +290,13 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
         }
         currentWorkingLocation = blockToMine;
 
-        return hasNotDelayed(getBlockMiningTime(curBlock, blockToMine));
+        // Quidoms: vanilla instamine (progress >= 1) → 0 wait ticks, break this AI tick (no min delay).
+        final int mineTime = getBlockMiningTime(curBlock, blockToMine);
+        if (mineTime <= 0)
+        {
+            return false;
+        }
+        return hasNotDelayed(mineTime);
     }
 
     /**
@@ -299,39 +304,22 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
      *
      * @param state the blockstate
      * @param pos   coordinate
-     * @return the delay in ticks
+     * @return the delay in ticks ({@code 0} = instamine / break immediately)
      */
     public int getBlockMiningTime(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
-        return MineColonies.getConfig().getServer().pvp_mode.get()
-                 ? Math.max(1, calculateVanillaMiningTicks(state, pos) / 2)
-                 : calculateWorkerMiningDelay(state, pos);
+        final int ticks = calculateVanillaMiningTicks(state, pos);
+        return MineColonies.getConfig().getServer().pvp_mode.get() ? Math.max(0, ticks / 2) : ticks;
     }
 
     /**
-     * Calculate the worker mining delay for a block at a pos.
-     *
-     * @param state the blockstate.
-     * @param pos   the pos.
-     * @return the mining delay of the worker.
-     */
-    private int calculateWorkerMiningDelay(@NotNull final BlockState state, @NotNull final BlockPos pos)
-    {
-        // Quidoms: soft foliage/plants break on contact (structure AI also spam-clears these).
-        final float hardness = world.getBlockState(pos).getDestroySpeed(world, pos);
-        if (hardness >= 0.0F && hardness <= 0.25F && !state.blocksMotion())
-        {
-            return 1;
-        }
-
-        // Quidoms: 100% vanilla player destroy-speed stats for the equipped tool (research still applies).
-        final double reduction = 1 - worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(BLOCK_BREAK_SPEED);
-        return Math.max(1, (int) Math.ceil(calculateVanillaMiningTicks(state, pos) * Math.max(0.0D, reduction)));
-    }
-
-    /**
-     * Vanilla player break ticks for the currently held tool at 100% tool stats (no Athletics).
-     * Mirrors {@code BlockBehaviour.getDestroyProgress}: {@code speed / hardness / (canHarvest ? 30 : 100)}.
+     * Vanilla player break ticks for the currently held tool — tools + Efficiency only.
+     * No Adaptability/Athletics/hut level/research/min-delay floors.
+     * <p>
+     * Matches {@code Player.getDestroySpeed} + {@code BlockBehaviour.getDestroyProgress}:
+     * base {@link ItemStack#getDestroySpeed}, plus Efficiency as {@code level² + 1} when base &gt; 1
+     * (same as {@code minecraft:levels_squared} on {@code mining_efficiency}), then
+     * {@code progress = speed / hardness / (canHarvest ? 30 : 100)}. Progress ≥ 1 → {@code 0} ticks.
      */
     private int calculateVanillaMiningTicks(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
@@ -342,17 +330,31 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
         }
         if (hardness == 0.0F)
         {
-            return 1;
+            return 0;
         }
 
         final ItemStack held = worker.getMainHandItem();
-        final float toolSpeed = held.isEmpty() ? 1.0F : Math.max(0.0F, held.getDestroySpeed(state));
+        float speed = held.isEmpty() ? 1.0F : Math.max(0.0F, held.getDestroySpeed(state));
+        if (speed <= 0.0F)
+        {
+            speed = 1.0F;
+        }
+
+        // Player adds Attributes.MINING_EFFICIENCY when base speed > 1; Efficiency enchant = level²+1.
+        if (!held.isEmpty() && speed > 1.0F)
+        {
+            final int efficiency = held.getEnchantmentLevel(Utils.getRegistryValue(Enchantments.EFFICIENCY, world));
+            if (efficiency > 0)
+            {
+                speed += (float) (efficiency * efficiency + 1);
+            }
+        }
+
         final boolean canHarvest = !state.requiresCorrectToolForDrops() || (!held.isEmpty() && held.isCorrectToolForDrops(state));
-        final float divisor = canHarvest ? 30.0F : 100.0F;
-        final float progress = (toolSpeed <= 0.0F ? 1.0F : toolSpeed) / hardness / divisor;
+        final float progress = speed / hardness / (canHarvest ? 30.0F : 100.0F);
         if (progress >= 1.0F)
         {
-            return 1;
+            return 0;
         }
         return Math.max(1, (int) Math.ceil(1.0F / progress));
     }
