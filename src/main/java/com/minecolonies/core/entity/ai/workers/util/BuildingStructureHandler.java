@@ -280,7 +280,8 @@ public class BuildingStructureHandler<J extends AbstractJobStructure<?, J>, B ex
     @Override
     public int getStepsPerCall()
     {
-        return 1;
+        // Quidoms: scan/place more cells per AI tick so break-vs-place advances faster.
+        return 12;
     }
 
     @Override

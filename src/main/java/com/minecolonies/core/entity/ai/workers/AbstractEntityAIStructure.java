@@ -80,6 +80,16 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
     protected static final int BUILD_BLOCK_DELAY = 1;
 
     /**
+     * Soft leaves/grass/flowers cleared per structure tick (spam/cycle, not one-by-one walk).
+     */
+    protected static final int SOFT_CLEAR_BATCH = 24;
+
+    /**
+     * 2D reach for instant soft-obstruction clears without repathing.
+     */
+    protected static final int SOFT_CLEAR_REACH = 12;
+
+    /**
      * The current structure task to be build.
      */
     protected Tuple<StructurePlacer, BuildingStructureHandler<J, B>> structurePlacer;
@@ -168,7 +178,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
           /*
            * Select the appropriate State to do next.
            */
-          new AITarget(MINE_BLOCK, this::doMining, 10),
+          // Quidoms: hard-break cadence matches place/clear loop (was 10).
+          new AITarget(MINE_BLOCK, this::doMining, 1),
           /*
            * Check if we have to build something.
            */
@@ -343,7 +354,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
 
         //Fill workFrom with the position from where the builder should build.
         //also ensure we are at that position.
-        final BlockPos progress = getProgressPos() == null ? NULL_POS : getProgressPos().getA();
+        BlockPos progress = getProgressPos() == null ? NULL_POS : getProgressPos().getA();
         final BlockPos worldPos = getPosToWorkAt();
 
         if (getProgressPos() != null)
@@ -351,81 +362,42 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             structurePlacer.getB().setStage(getProgressPos().getB());
         }
 
-        if ((worldPos != null || blockToMine != null) && !limitReached && (blockToMine == null
-                                                                             ? !walkToConstructionSite(worldPos)
-                                                                             : !walkToConstructionSite(blockToMine)))
+        // Quidoms: soft clears / in-reach hard breaks skip slow repath; otherwise approach site.
+        if (!limitReached && !isReadyForStructureAction(worldPos, blockToMine))
         {
             return getState();
         }
 
         limitReached = false;
 
-        final StructurePhasePlacementResult result;
-        final StructurePlacer placer = structurePlacer.getA();
         final BuildingProgressStage currentStage = structurePlacer.getB().getStage();
-        switch (currentStage)
-        {
-            case BUILD_SOLID:
-                //structure
-                result = placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_PLACEMENT,
-                  () -> placer.getIterator().increment(this::skipBuilding), false);
-                break;
-            case WEAK_SOLID:
+        StructurePhasePlacementResult result = executeCurrentStructureStage(progress, currentStage);
 
-                // not solid
-                result = placer.executeStructureStep(world,
-                  null,
-                  progress,
-                  StructurePlacer.Operation.BLOCK_PLACEMENT,
-                  () -> placer.getIterator()
-                          .increment(((info, pos, handler) -> !BlockUtils.isWeakSolidBlock(info.getBlockInfo().getState()) || DONT_TOUCH_PREDICATE.test(info, pos, handler))),
-                  false);
-                break;
-            case CLEAR_WATER:
-                //water
-                result = placer.clearWaterStep(world, progress);
-                break;
-            case CLEAR_NON_SOLIDS:
-                // clear air
-                result = placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_PLACEMENT,
-                  () -> placer.getIterator().decrement((info, pos, handler) ->
-                                                         !(info.getBlockInfo().getState().getBlock() instanceof AirBlock)
-                                                           || (handler.getWorld().isEmptyBlock(pos))
-                                                           || DONT_TOUCH_PREDICATE.test(info, pos, handler)), false);
-                break;
-            case DECORATE:
-                // not solid
-                result = placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_PLACEMENT,
-                  () -> placer.getIterator().increment(this::skipDecorate), false);
-                break;
-            case SPAWN:
-                if (placer.getHandler().getBluePrint().getEntities().length == 0)
-                {
-                    result = new StructurePhasePlacementResult(BlockPos.ZERO, new BlockPlacementResult(BlockPos.ZERO, BlockPlacementResult.Result.FINISHED));
-                }
-                else
-                {
-                    // entities
-                    result = placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.SPAWN_ENTITY,
-                      () -> placer.getIterator().increment((info, pos, handler) -> info.getEntities().length == 0 || DONT_TOUCH_PREDICATE.test(info, pos, handler)), true);
-                }
-                break;
-            case REMOVE_WATER:
-                //water
-                placer.getIterator().setRemoving();
-                result = placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.WATER_REMOVAL,
-                  () -> placer.getIterator().decrement((info, pos, handler) -> info.getBlockInfo().getState().getFluidState().isEmpty()), false);
-                break;
-            case REMOVE:
-                placer.getIterator().setRemoving();
-                result = placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_REMOVAL,
-                  () -> placer.getIterator().decrement(this::skipRemoval), true);
-                break;
-            case CLEAR:
-            default:
-                result =
-                  placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_REMOVAL, () -> placer.getIterator().decrement(this::skipClearing), false);
-                break;
+        // Quidoms: spam-cycle soft obstructions (leaves/grass/flowers) without walk/mine AI.
+        int softCleared = 0;
+        while (result.getBlockResult().getResult() == BlockPlacementResult.Result.BREAK_BLOCK
+                 && softCleared < SOFT_CLEAR_BATCH
+                 && isSoftObstruction(world.getBlockState(result.getBlockResult().getWorldPos())))
+        {
+            final BlockPos softPos = result.getBlockResult().getWorldPos();
+            if (!isWithinSoftClearReach(softPos) && !walkToConstructionSite(softPos))
+            {
+                blockToMine = softPos;
+                worker.getCitizenData().setStatusPosition(softPos);
+                return getState();
+            }
+
+            instantClearSoftObstruction(softPos);
+            softCleared++;
+            worker.swing(InteractionHand.MAIN_HAND);
+
+            if (!result.getIteratorPos().equals(NULL_POS))
+            {
+                this.storeProgressPos(result.getIteratorPos(), currentStage);
+                progress = result.getIteratorPos();
+            }
+
+            result = executeCurrentStructureStage(progress, currentStage);
         }
 
         if (result.getBlockResult().getResult() == BlockPlacementResult.Result.FAIL)
@@ -491,6 +463,12 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         {
             blockToMine = result.getBlockResult().getWorldPos();
             worker.getCitizenData().setStatusPosition(blockToMine);
+
+            // Quidoms: if already in place-reach, mine now; otherwise move then break.
+            if (isWithinSoftClearReach(blockToMine))
+            {
+                return doMining();
+            }
             return MINE_BLOCK;
         }
         else
@@ -498,11 +476,161 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             blockToMine = null;
         }
 
+        // Quidoms: after a soft-spam batch, resume immediately (no place-delay stall).
+        if (softCleared > 0)
+        {
+            setDelay(1);
+            return getState();
+        }
+
         // Quidoms: place delay skill-decoupled (no Adaptability); fixed high place speed.
         final double decrease = 1 - worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(BLOCK_PLACE_SPEED);
         setDelay(Math.max(1, (int) (BUILD_BLOCK_DELAY * decrease)));
 
         return getState();
+    }
+
+    /**
+     * Run one StructurePlacer step for the active building stage.
+     */
+    private StructurePhasePlacementResult executeCurrentStructureStage(final BlockPos progress, final BuildingProgressStage currentStage)
+    {
+        final StructurePlacer placer = structurePlacer.getA();
+        switch (currentStage)
+        {
+            case BUILD_SOLID:
+                return placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_PLACEMENT,
+                  () -> placer.getIterator().increment(this::skipBuilding), false);
+            case WEAK_SOLID:
+                return placer.executeStructureStep(world,
+                  null,
+                  progress,
+                  StructurePlacer.Operation.BLOCK_PLACEMENT,
+                  () -> placer.getIterator()
+                          .increment(((info, pos, handler) -> !BlockUtils.isWeakSolidBlock(info.getBlockInfo().getState()) || DONT_TOUCH_PREDICATE.test(info, pos, handler))),
+                  false);
+            case CLEAR_WATER:
+                return placer.clearWaterStep(world, progress);
+            case CLEAR_NON_SOLIDS:
+                return placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_PLACEMENT,
+                  () -> placer.getIterator().decrement((info, pos, handler) ->
+                                                         !(info.getBlockInfo().getState().getBlock() instanceof AirBlock)
+                                                           || (handler.getWorld().isEmptyBlock(pos))
+                                                           || DONT_TOUCH_PREDICATE.test(info, pos, handler)), false);
+            case DECORATE:
+                return placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_PLACEMENT,
+                  () -> placer.getIterator().increment(this::skipDecorate), false);
+            case SPAWN:
+                if (placer.getHandler().getBluePrint().getEntities().length == 0)
+                {
+                    return new StructurePhasePlacementResult(BlockPos.ZERO, new BlockPlacementResult(BlockPos.ZERO, BlockPlacementResult.Result.FINISHED));
+                }
+                return placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.SPAWN_ENTITY,
+                  () -> placer.getIterator().increment((info, pos, handler) -> info.getEntities().length == 0 || DONT_TOUCH_PREDICATE.test(info, pos, handler)), true);
+            case REMOVE_WATER:
+                placer.getIterator().setRemoving();
+                return placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.WATER_REMOVAL,
+                  () -> placer.getIterator().decrement((info, pos, handler) -> info.getBlockInfo().getState().getFluidState().isEmpty()), false);
+            case REMOVE:
+                placer.getIterator().setRemoving();
+                return placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_REMOVAL,
+                  () -> placer.getIterator().decrement(this::skipRemoval), true);
+            case CLEAR:
+            default:
+                return placer.executeStructureStep(world, null, progress, StructurePlacer.Operation.BLOCK_REMOVAL,
+                  () -> placer.getIterator().decrement(this::skipClearing), false);
+        }
+    }
+
+    /**
+     * Choose approach vs act-in-place: soft clears and in-reach hard breaks skip repath.
+     */
+    private boolean isReadyForStructureAction(@Nullable final BlockPos worldPos, @Nullable final BlockPos minePos)
+    {
+        if (minePos != null)
+        {
+            if (isSoftObstruction(world.getBlockState(minePos)) && isWithinSoftClearReach(minePos))
+            {
+                return true;
+            }
+            return walkToConstructionSite(minePos);
+        }
+
+        if (worldPos == null)
+        {
+            return true;
+        }
+
+        // Already standing in a good work pocket — scan/place/break without repathing each cell.
+        if (workFrom != null && BlockPosUtil.getDistance2D(worker.blockPosition(), worldPos) <= SOFT_CLEAR_REACH)
+        {
+            return true;
+        }
+
+        return walkToConstructionSite(worldPos);
+    }
+
+    /**
+     * Leaves, grass, flowers, and other cheap replaceable foliage — spam-cleared.
+     */
+    protected boolean isSoftObstruction(@NotNull final BlockState state)
+    {
+        if (state.isAir() || state.getBlock() instanceof AirBlock || state.getBlock() instanceof IBuilderUndestroyable
+              || state.getBlock() == Blocks.BEDROCK || !state.getFluidState().isEmpty())
+        {
+            return false;
+        }
+
+        if (state.is(BlockTags.LEAVES)
+              || state.is(BlockTags.FLOWERS)
+              || state.is(BlockTags.SAPLINGS)
+              || state.is(BlockTags.REPLACEABLE)
+              || state.is(BlockTags.WOOL_CARPETS)
+              || state.getBlock() == Blocks.SHORT_GRASS
+              || state.getBlock() == Blocks.TALL_GRASS
+              || state.getBlock() == Blocks.FERN
+              || state.getBlock() == Blocks.LARGE_FERN
+              || state.getBlock() == Blocks.DEAD_BUSH
+              || state.getBlock() == Blocks.VINE
+              || state.getBlock() == Blocks.GLOW_LICHEN
+              || state.getBlock() == Blocks.SNOW
+              || state.getBlock() == Blocks.MOSS_CARPET
+              || state.getBlock() == Blocks.PINK_PETALS
+              || state.getBlock() == Blocks.SEAGRASS
+              || state.getBlock() == Blocks.TALL_SEAGRASS
+              || state.getBlock() == Blocks.KELP
+              || state.getBlock() == Blocks.KELP_PLANT)
+        {
+            return true;
+        }
+
+        if (state.canBeReplaced())
+        {
+            return true;
+        }
+
+        // Very soft solids (e.g. leftover foliage) — not dirt/wood/stone.
+        final float hardness = state.getDestroySpeed(world, worker.blockPosition());
+        return hardness >= 0.0F && hardness <= 0.25F && !BlockUtils.isAnySolid(state);
+    }
+
+    private boolean isWithinSoftClearReach(@NotNull final BlockPos pos)
+    {
+        return BlockPosUtil.getDistance2D(worker.blockPosition(), pos) <= SOFT_CLEAR_REACH
+                 && Math.abs(worker.blockPosition().getY() - pos.getY()) <= SOFT_CLEAR_REACH;
+    }
+
+    private void instantClearSoftObstruction(@NotNull final BlockPos pos)
+    {
+        final BlockState state = world.getBlockState(pos);
+        if (!isSoftObstruction(state))
+        {
+            return;
+        }
+
+        world.removeBlock(pos, false);
+        worker.getCitizenExperienceHandler().addExperience(0.05D);
+        this.incrementActionsDone();
     }
 
     /**
@@ -653,6 +781,16 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         final BlockState worldState = world.getBlockState(blockToMine);
         if (worldState.getBlock() instanceof AirBlock || worldState.getBlock() == Blocks.WATER)
         {
+            blockToMine = null;
+            return BUILDING_STEP;
+        }
+
+        // Quidoms: soft leftovers clear instantly; resume structure scan same tick.
+        if (isSoftObstruction(worldState) && isWithinSoftClearReach(blockToMine))
+        {
+            instantClearSoftObstruction(blockToMine);
+            blockToMine = null;
+            worker.swing(InteractionHand.MAIN_HAND);
             return BUILDING_STEP;
         }
 
@@ -672,6 +810,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             return getState();
         }
         worker.decreaseSaturationForContinuousAction();
+        blockToMine = null;
         return BUILDING_STEP;
     }
 
