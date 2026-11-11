@@ -2047,6 +2047,12 @@ public class CitizenData implements ICitizenData
     @Override
     public void openDialogue(final IQuestInstance quest, final int index)
     {
+        // Quidoms: never open first-settler welcome guidance on interact.
+        if (quest != null && quest.getId() != null
+              && ("tutorial/welcome".equals(quest.getId().getPath()) || quest.getId().getPath().startsWith("tutorial/welcome/")))
+        {
+            return;
+        }
         final Component comp = Component.literal(quest.getId().toString());
         if (IQuestManager.GLOBAL_SERVER_QUESTS.get(quest.getId()).getObjective(index) instanceof IQuestDeliveryObjective)
         {

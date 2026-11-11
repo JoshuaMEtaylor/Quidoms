@@ -252,10 +252,5 @@
       }
     }
   ],
-  "triggers": [
-    {
-      "type": "minecolonies:citizen",
-      "state": {}
-    }
-  ]
+  "triggers": []
 }

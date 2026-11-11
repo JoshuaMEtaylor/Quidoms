@@ -110,12 +110,78 @@ public class StructurePacks
     @Nullable
     public static StructurePackMeta getStructurePack(final String key)
     {
+        if (key == null || key.isEmpty())
+        {
+            return null;
+        }
         if (packMetas.containsKey(key))
         {
             return packMetas.get(key);
         }
+        StructurePackMeta client = clientPackMetas.get(key);
+        if (client != null)
+        {
+            return client;
+        }
+        // Quidoms: profile folders sometimes register as "Medieval Oak Alternative" while the
+        // real pack is "Medieval Oak" — resolve so Build UI style/resources still load.
+        final String alias = aliasPackName(key);
+        if (!alias.equals(key))
+        {
+            if (packMetas.containsKey(alias))
+            {
+                return packMetas.get(alias);
+            }
+            return clientPackMetas.get(alias);
+        }
+        return null;
+    }
 
-        return clientPackMetas.get(key);
+    /**
+     * Strip trailing {@code Alternative} suffixes from profile/style pack names.
+     */
+    public static String aliasPackName(final String pack)
+    {
+        if (pack == null)
+        {
+            return "";
+        }
+        String name = pack.trim();
+        if (name.endsWith(" Alternative"))
+        {
+            name = name.substring(0, name.length() - " Alternative".length()).trim();
+        }
+        else if (name.endsWith("Alternative") && name.length() > "Alternative".length())
+        {
+            name = name.substring(0, name.length() - "Alternative".length()).trim();
+        }
+        return name.isEmpty() ? pack : name;
+    }
+
+    /**
+     * Alternate blueprint sub-paths when an Alternative-style pack/path is missing.
+     */
+    public static List<String> alternateBlueprintPaths(final String packName, final String subPath)
+    {
+        final List<String> alts = new ArrayList<>();
+        if (subPath == null || subPath.isEmpty())
+        {
+            return alts;
+        }
+        final boolean altPack = packName != null && packName.contains("Alternative");
+        if (altPack && subPath.contains("townhall") && !subPath.contains("alttownhall"))
+        {
+            alts.add(subPath.replace("townhall", "alttownhall"));
+        }
+        if (subPath.contains("alttownhall"))
+        {
+            alts.add(subPath.replace("alttownhall", "townhall"));
+        }
+        else if (subPath.contains("townhall"))
+        {
+            alts.add(subPath.replace("townhall", "alttownhall"));
+        }
+        return alts;
     }
 
     /**
@@ -401,16 +467,43 @@ public class StructurePacks
         {
             return null;
         }
+        if (subPath == null || subPath.isBlank())
+        {
+            // Empty path is a corrupt building TE — callers should derive a hut path; do not spam.
+            return null;
+        }
 
         final StructurePackMeta packMeta = getStructurePack(structurePackId);
         if (packMeta == null)
         {
+            if (!suppressError)
+            {
+                Log.getLogger().warn("Unknown structure pack (soft-fail): '{}'", structurePackId);
+            }
             return null;
         }
 
         //todo, here similarly as in the other places we could query a remote server for this if we don't have it locally.
 
-        return getBlueprint(structurePackId, packMeta.getPath().resolve(packMeta.getNormalizedSubPath(subPath)), suppressError, provider);
+        Blueprint blueprint = getBlueprint(packMeta.getName(), packMeta.getPath().resolve(packMeta.getNormalizedSubPath(subPath)), true, provider);
+        if (blueprint != null)
+        {
+            return blueprint;
+        }
+        for (final String altPath : alternateBlueprintPaths(structurePackId, subPath))
+        {
+            blueprint = getBlueprint(packMeta.getName(), packMeta.getPath().resolve(packMeta.getNormalizedSubPath(altPath)), true, provider);
+            if (blueprint != null)
+            {
+                Log.getLogger().info("Blueprint path fallback: '{}' / '{}' → '{}'", structurePackId, subPath, altPath);
+                return blueprint;
+            }
+        }
+        if (!suppressError)
+        {
+            Log.getLogger().warn("Missing blueprint (soft-fail): pack='{}' path='{}'", structurePackId, subPath);
+        }
+        return null;
     }
 
     /**
@@ -467,6 +560,11 @@ public class StructurePacks
         try
         {
             return Files.readAllBytes(packMeta.getPath().resolve(packMeta.getNormalizedSubPath(subPath)));
+        }
+        catch (final java.nio.file.NoSuchFileException e)
+        {
+            // Quidoms: profile/style packs often reference missing Alternative blueprints — soft-fail.
+            Log.getLogger().warn("Missing blueprint data (soft-fail): {}:{}", structurePackId, subPath);
         }
         catch (final IOException e)
         {

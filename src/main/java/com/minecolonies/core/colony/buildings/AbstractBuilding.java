@@ -998,35 +998,28 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
     public void calculateCorners()
     {
         final AbstractTileEntityColonyBuilding te = getTileEntity();
-        if (te != null && !te.getSchematicName().isEmpty())
+        // Built buildings: TE schematic corners are authoritative.
+        final boolean trustTeCorners = te != null
+                                         && !te.getSchematicName().isEmpty()
+                                         && getBuildingLevel() > 0
+                                         && !isDeconstructed();
+        if (trustTeCorners)
         {
             setCorners(te.getInWorldCorners().getA(), te.getInWorldCorners().getB());
             return;
         }
 
+        // Unbuilt huts: never sync-load blueprints here (getCorners can run often during ticks).
+        // Set a temporary non-ZERO footprint so AbstractSchematicProvider.getCorners does not
+        // re-enter, then queue a single async blueprint load to replace with real bounds.
+        setCorners(getPosition(), getPosition());
         try
         {
-            final Blueprint blueprint = StructurePacks.getBlueprint(getStructurePack(), getBlueprintPath(), te.getLevel().registryAccess());
-            if (blueprint == null)
-            {
-                setCorners(getPosition(), getPosition());
-                return;
-            }
-            final Tuple<BlockPos, BlockPos> corners
-              = ColonyUtils.calculateCorners(this.getPosition(),
-              colony.getWorld(),
-              blueprint,
-              getRotationMirror());
-            this.setCorners(corners.getA(), corners.getB());
-
-            if (te != null)
-            {
-                this.getTileEntity().setSchematicCorners(corners.getA().subtract(getPosition()), corners.getB().subtract(getPosition()));
-            }
+            final int level = Math.max(1, getBuildingLevel() == 0 ? 1 : getBuildingLevel());
+            com.minecolonies.core.util.HutBlueprintResolver.ensureAndQueueCornerSync(this, level, colony.getWorld());
         }
-        catch (final Exception ex)
+        catch (final Exception ignored)
         {
-            setCorners(getPosition(), getPosition());
         }
     }
 

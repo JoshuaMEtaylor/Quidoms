@@ -118,8 +118,16 @@ public class QuestManager implements IQuestManager
     @Override
     public void onColonyTick()
     {
+        // Quidoms: strip tutorial/welcome (and leftover saves) so first settler never opens guidance dialog.
+        purgeDisabledTutorialQuests();
+
         for (final Map.Entry<ResourceLocation, IQuestTemplate> quest : GLOBAL_SERVER_QUESTS.entrySet())
         {
+            if (isDisabledTutorialQuest(quest.getKey()))
+            {
+                continue;
+            }
+
             if (availableQuests.containsKey(quest.getKey())
                   || inProgressQuests.containsKey(quest.getKey())
                   || finishedQuests.getOrDefault(quest.getKey(), 0) >= quest.getValue().getMaxOccurrence())
@@ -152,7 +160,9 @@ public class QuestManager implements IQuestManager
 
         for (final Map.Entry<ResourceLocation, IQuestInstance> availableQuest : new ArrayList<>(availableQuests.entrySet()))
         {
-            if (!GLOBAL_SERVER_QUESTS.containsKey(availableQuest.getKey()) || !availableQuest.getValue().isValid(colony))
+            if (isDisabledTutorialQuest(availableQuest.getKey())
+                  || !GLOBAL_SERVER_QUESTS.containsKey(availableQuest.getKey())
+                  || !availableQuest.getValue().isValid(colony))
             {
                 availableQuest.getValue().onDeletion();
                 this.availableQuests.remove(availableQuest.getKey());
@@ -162,12 +172,62 @@ public class QuestManager implements IQuestManager
 
         for (final Map.Entry<ResourceLocation, IQuestInstance> inProgressQuest : new ArrayList<>(inProgressQuests.entrySet()))
         {
-            if (!GLOBAL_SERVER_QUESTS.containsKey(inProgressQuest.getKey()) || !inProgressQuest.getValue().isValid(colony))
+            if (isDisabledTutorialQuest(inProgressQuest.getKey())
+                  || !GLOBAL_SERVER_QUESTS.containsKey(inProgressQuest.getKey())
+                  || !inProgressQuest.getValue().isValid(colony))
             {
                 inProgressQuest.getValue().onDeletion();
                 this.inProgressQuests.remove(inProgressQuest.getKey());
                 markDirty();
             }
+        }
+    }
+
+    /** Welcome / first-settler guidance quests Quidoms never starts. */
+    private static boolean isDisabledTutorialQuest(final ResourceLocation questId)
+    {
+        if (questId == null)
+        {
+            return false;
+        }
+        final String path = questId.getPath();
+        return path.equals("tutorial/welcome") || path.startsWith("tutorial/welcome/");
+    }
+
+    private void purgeDisabledTutorialQuests()
+    {
+        boolean changed = false;
+        for (final ResourceLocation id : new ArrayList<>(availableQuests.keySet()))
+        {
+            if (isDisabledTutorialQuest(id))
+            {
+                final IQuestInstance quest = availableQuests.remove(id);
+                if (quest != null)
+                {
+                    quest.onDeletion();
+                }
+                // Mark finished so attemptStart never re-offers from old saves.
+                finishedQuests.put(id, Math.max(1, finishedQuests.getOrDefault(id, 0)));
+                changed = true;
+            }
+        }
+        for (final ResourceLocation id : new ArrayList<>(inProgressQuests.keySet()))
+        {
+            if (isDisabledTutorialQuest(id))
+            {
+                final IQuestInstance quest = inProgressQuests.remove(id);
+                if (quest != null)
+                {
+                    quest.onDeletion();
+                }
+                finishedQuests.put(id, Math.max(1, finishedQuests.getOrDefault(id, 0)));
+                changed = true;
+            }
+        }
+        if (changed)
+        {
+            finishedQuestsCache = null;
+            markDirty();
         }
     }
 

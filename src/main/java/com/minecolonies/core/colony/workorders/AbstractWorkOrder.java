@@ -435,7 +435,12 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
         {
             future = ColonyUtils.queueBlueprintLoad(world, getStructurePack(), getStructurePath(), blueprint ->
                 {
-                    setBlueprint(blueprint, world);
+                    // Soft-fail / pack search already happened on the IO pool inside ColonyUtils.
+                    // Do not sync-load again on the server tick callback.
+                    if (blueprint != null)
+                    {
+                        setBlueprint(blueprint, world);
+                    }
                     afterLoad.accept(blueprint);
                 },
                 e -> afterLoad.accept(null));
@@ -570,7 +575,28 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
                 blueprint,
                 getRotationMirror());
 
-            box = new AABB(Vec3.atBottomCenterOf(corners.getA()), Vec3.atBottomCenterOf(corners.getB()));
+            // Inclusive block AABB (atBottomCenterOf shrinks max by 0.5 and desyncs tape vs placer).
+            box = new AABB(
+              corners.getA().getX(), corners.getA().getY(), corners.getA().getZ(),
+              corners.getB().getX() + 1.0D, corners.getB().getY() + 1.0D, corners.getB().getZ() + 1.0D);
+
+            // Apply corners from this already-loaded blueprint (no extra disk I/O).
+            if (colony != null && world != null && !world.isClientSide())
+            {
+                try
+                {
+                    final com.minecolonies.api.colony.buildings.IBuilding building =
+                      colony.getServerBuildingManager() == null ? null : colony.getServerBuildingManager().getBuilding(location);
+                    if (building != null)
+                    {
+                        com.minecolonies.core.util.HutBlueprintResolver.applyCorners(
+                          building, blueprint, world, getRotationMirror());
+                    }
+                }
+                catch (final Exception ignored)
+                {
+                }
+            }
         }
     }
 

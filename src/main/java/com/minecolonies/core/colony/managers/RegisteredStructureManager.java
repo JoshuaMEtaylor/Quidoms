@@ -586,6 +586,14 @@ public class RegisteredStructureManager implements IRegisteredStructureManager
                 {
                     building.setStructurePack(colony.getStructurePack());
                 }
+                // Resolve a pack+path that actually exists (orphan/empty/Decorations → fundamentals/builder1.blueprint).
+                try
+                {
+                    com.minecolonies.core.util.HutBlueprintResolver.ensure(building, 1);
+                }
+                catch (final Exception ignored)
+                {
+                }
 
                 if (world != null && !(building instanceof IRSComponent))
                 {

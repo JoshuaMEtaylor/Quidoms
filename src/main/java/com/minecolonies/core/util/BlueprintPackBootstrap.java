@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  */
 public final class BlueprintPackBootstrap
 {
-    private static final String MARKER = ".quidoms-blueprints-0.0.23-1.21.10";
+    private static final String MARKER = ".quidoms-blueprints-0.0.31-1.21.10";
     private static final String JAR_PREFIX = "blueprints/minecolonies/";
 
     private BlueprintPackBootstrap()

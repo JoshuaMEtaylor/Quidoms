@@ -6,39 +6,40 @@ import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.buildings.views.IBuildingView;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.network.messages.server.AbstractBuildingServerMessage;
+import com.minecolonies.core.util.HutBlueprintResolver;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Message to set the style of a building.
+ * Message to set the style (and blueprint path) of a building before Build Building creates a work order.
  */
 public class BuildingSetStyleMessage extends AbstractBuildingServerMessage<IBuilding>
 {
     public static final PlayMessageType<?> TYPE = PlayMessageType.forServer(Constants.MOD_ID, "building_set_style", BuildingSetStyleMessage::new);
 
-    /**
-     * The style to set.
-     */
     private final String structurePack;
+    private final String blueprintPath;
 
-    /**
-     * Creates object for the style of a building.
-     *
-     * @param building View of the building to read data from.
-     * @param structurePack    style of the building.
-     */
     public BuildingSetStyleMessage(@NotNull final IBuildingView building, final String structurePack)
     {
+        this(building, structurePack, "");
+    }
+
+    public BuildingSetStyleMessage(@NotNull final IBuildingView building, final String structurePack, @Nullable final String blueprintPath)
+    {
         super(TYPE, building);
-        this.structurePack = structurePack;
+        this.structurePack = structurePack == null ? "" : structurePack;
+        this.blueprintPath = blueprintPath == null ? "" : blueprintPath;
     }
 
     protected BuildingSetStyleMessage(final RegistryFriendlyByteBuf buf, final PlayMessageType<?> type)
     {
         super(buf, type);
         structurePack = buf.readUtf(32767);
+        blueprintPath = buf.readableBytes() > 0 ? buf.readUtf(32767) : "";
     }
 
     @Override
@@ -46,6 +47,7 @@ public class BuildingSetStyleMessage extends AbstractBuildingServerMessage<IBuil
     {
         super.toBytes(buf);
         buf.writeUtf(structurePack);
+        buf.writeUtf(blueprintPath);
     }
 
     @Override
@@ -56,6 +58,27 @@ public class BuildingSetStyleMessage extends AbstractBuildingServerMessage<IBuil
             return;
         }
 
-        building.setStructurePack(structurePack);
+        final String hut = building.getBuildingType() == null || building.getBuildingType().getRegistryName() == null
+                             ? "builder"
+                             : building.getBuildingType().getRegistryName().getPath();
+        final int level = Math.max(1, building.getBuildingLevel() == 0 ? 1 : building.getBuildingLevel());
+
+        // Existence probes only — never sync-load blueprint NBT on the network thread.
+        final HutBlueprintResolver.Resolved preferred =
+          HutBlueprintResolver.resolve(
+            hut,
+            structurePack.isEmpty() ? building.getStructurePack() : structurePack,
+            blueprintPath.isBlank() ? building.getBlueprintPath() : blueprintPath,
+            level);
+
+        if (preferred != null)
+        {
+            HutBlueprintResolver.apply(building, preferred);
+            HutBlueprintResolver.queueCornerSync(
+              building, colony.getWorld(), preferred.pack(), preferred.path(), building.getRotationMirror());
+            return;
+        }
+
+        HutBlueprintResolver.ensureAndQueueCornerSync(building, level, colony.getWorld());
     }
 }

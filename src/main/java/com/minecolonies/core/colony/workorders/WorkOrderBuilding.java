@@ -7,6 +7,7 @@ import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.workorders.IWorkManager;
 import com.minecolonies.api.colony.workorders.WorkOrderType;
+import com.minecolonies.api.compatibility.newstruct.BlueprintMapping;
 import com.minecolonies.core.colony.buildings.workerbuildings.BuildingBuilder;
 import com.minecolonies.core.entity.ai.workers.util.ConstructionTapeHelper;
 import com.minecolonies.core.util.AdvancementUtils;
@@ -62,10 +63,18 @@ public class WorkOrderBuilding extends AbstractWorkOrder
         }
 
         final int targetSchematicLevel = type == WorkOrderType.REMOVE ? building.getBuildingLevel() : targetLevel;
-        String schemPath = building.getBlueprintPath().replace(".blueprint", "");
-        schemPath = schemPath.substring(0, schemPath.length() - 1) + targetSchematicLevel + ".blueprint";
+        final int pathLevel = Math.max(1, type == WorkOrderType.REMOVE ? building.getBuildingLevel() : targetSchematicLevel);
+        // Ensure building + WO share a pack/path that StructurePacks can actually load (not Decorations/empty).
+        final com.minecolonies.core.util.HutBlueprintResolver.Resolved resolved =
+          com.minecolonies.core.util.HutBlueprintResolver.ensure(building, pathLevel);
+        final String pack = resolved != null
+                              ? resolved.pack()
+                              : (building.getStructurePack() == null || building.getStructurePack().isEmpty()
+                                   ? (building.getColony() == null ? "" : building.getColony().getStructurePack())
+                                   : building.getStructurePack());
+        final String schemPath = resolved != null ? resolved.path() : fallbackSchematicPath(building, pathLevel);
         WorkOrderBuilding wo = new WorkOrderBuilding(
-          building.getStructurePack(),
+          pack,
           schemPath,
           building.getBuildingType().getTranslationKey(),
           type,
@@ -75,6 +84,28 @@ public class WorkOrderBuilding extends AbstractWorkOrder
           targetLevel);
         wo.setCustomName(building);
         return wo;
+    }
+
+    @NotNull
+    private static String fallbackSchematicPath(@NotNull final IBuilding building, final int targetSchematicLevel)
+    {
+        String hut = "builder";
+        try
+        {
+            if (building.getBuildingType() != null && building.getBuildingType().getRegistryName() != null)
+            {
+                hut = building.getBuildingType().getRegistryName().getPath();
+            }
+        }
+        catch (final Exception ignored)
+        {
+        }
+        String mapped = BlueprintMapping.getPathMapping("", hut);
+        if (mapped == null || mapped.isEmpty())
+        {
+            mapped = "fundamentals/" + hut;
+        }
+        return mapped + targetSchematicLevel + ".blueprint";
     }
 
     /**
@@ -264,7 +295,30 @@ public class WorkOrderBuilding extends AbstractWorkOrder
             final IBuilding building = colony.getServerBuildingManager().getBuilding(getLocation());
             if (building != null)
             {
-                ConstructionTapeHelper.placeConstructionTape(building.getCorners(), colony);
+                // Never sync-load blueprints on the server tick — queue IO + apply corners/tape async.
+                ConstructionTapeHelper.removeConstructionTape(building.getCorners(), colony.getWorld());
+                final String pack = getStructurePack();
+                final String path = getStructurePath();
+                com.ldtteam.structurize.storage.ServerFutureProcessor.queueBlueprint(
+                  new com.ldtteam.structurize.storage.ServerFutureProcessor.BlueprintProcessingData(
+                    com.ldtteam.structurize.storage.StructurePacks.getBlueprintFuture(
+                      pack, path, true, colony.getWorld().registryAccess()),
+                    colony.getWorld(),
+                    blueprint -> {
+                        if (blueprint == null)
+                        {
+                            ConstructionTapeHelper.placeConstructionTape(building);
+                            return;
+                        }
+                        setBlueprint(blueprint, colony.getWorld());
+                        final net.minecraft.util.Tuple<net.minecraft.core.BlockPos, net.minecraft.core.BlockPos> corners =
+                          com.minecolonies.core.util.HutBlueprintResolver.applyCorners(
+                            building, blueprint, colony.getWorld(), getRotationMirror());
+                        if (corners != null)
+                        {
+                            ConstructionTapeHelper.placeConstructionTape(corners, colony);
+                        }
+                    }));
             }
         }
     }

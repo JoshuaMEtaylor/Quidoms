@@ -195,18 +195,28 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
      */
     private void requestMaterialsState()
     {
-        if (Constants.BUILDER_INF_RESOURECES || building.getWorkOrder().isRequested() || building.getWorkOrder().getWorkOrderType() == WorkOrderType.REMOVE)
+        if (Constants.BUILDER_INF_RESOURECES || building.getWorkOrder().getWorkOrderType() == WorkOrderType.REMOVE)
         {
             recalculated = true;
             return;
         }
 
         final AbstractBuildingStructureBuilder buildingWorker = building;
+        final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
+        // QD-76: once materials are listed, keep retrying QuidCraft provision while shortages remain
+        // (isRequested used to early-return forever after a silent first miss).
+        if (building.getWorkOrder().isRequested())
+        {
+            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
+              building, citizenName, worker.getCitizenData());
+            recalculated = true;
+            return;
+        }
+
         if (requestMaterials())
         {
-            // QD-73: provision exact shortages from QuidCraft (no Quid debit; market walk still applies).
-            final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
-            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(building, citizenName);
+            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
+              building, citizenName, worker.getCitizenData());
             building.getWorkOrder().setRequested(true);
         }
         int newQuantity = buildingWorker.getNeededResources().values().stream().mapToInt(ItemStorage::getAmount).sum();

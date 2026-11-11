@@ -22,6 +22,7 @@ import com.minecolonies.api.tileentities.AbstractTileEntityRack;
 import com.minecolonies.api.tileentities.ITickable;
 import com.minecolonies.api.tileentities.MinecoloniesTileEntities;
 import com.minecolonies.api.util.ItemStackUtils;
+import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.WorldUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -202,6 +203,27 @@ public class TileEntityColonyBuilding extends AbstractTileEntityColonyBuilding i
             {
                 registryName = building.getBuildingType().getRegistryName();
                 building.setTileEntity(this);
+            }
+            else if (getBlockState().getBlock() instanceof com.minecolonies.api.blocks.AbstractBlockHut)
+            {
+                // Quidoms: hut block orphaned after AbstractBuilding remove — recreate registration so UI opens.
+                try
+                {
+                    if (registryName == null)
+                    {
+                        registryName = ((com.minecolonies.api.blocks.AbstractBlockHut<?>) getBlockState().getBlock()).getBuildingEntry().getRegistryName();
+                    }
+                    building = colony.getServerBuildingManager().addNewBuilding(this, getLevel());
+                    if (building != null)
+                    {
+                        Log.getLogger().info("Recreated missing colony building {} at {} for colony {}",
+                          building.getBuildingDisplayName(), getPosition(), colony.getID());
+                    }
+                }
+                catch (final Throwable t)
+                {
+                    Log.getLogger().warn("Failed to recreate orphaned hut building at {}: {}", getPosition(), t.toString());
+                }
             }
         }
     }
