@@ -4,9 +4,11 @@ import com.ldtteam.common.network.AbstractServerPlayMessage;
 import com.ldtteam.common.network.PlayMessageType;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.IColonyManager;
+import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.permissions.Action;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.colony.buildings.AbstractBuilding;
+import com.minecolonies.core.network.messages.client.colony.OpenBuildingUIMessage;
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -79,8 +81,13 @@ public class ReactivateBuildingMessage extends AbstractServerPlayMessage
                         return;
                     }
 
+                    // Deactivated tag path OR orphaned hut after building was removed while block stayed.
                     hut.reactivate();
-                    colony.getServerBuildingManager().addNewBuilding(hut, world);
+                    final IBuilding recreated = colony.getServerBuildingManager().addNewBuilding(hut, world);
+                    if (recreated != null)
+                    {
+                        new OpenBuildingUIMessage(recreated).sendToPlayer(player);
+                    }
                 }
             }
         }

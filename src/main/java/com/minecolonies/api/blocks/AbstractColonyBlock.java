@@ -14,6 +14,7 @@ import com.minecolonies.api.tileentities.MinecoloniesTileEntities;
 import com.minecolonies.api.util.*;
 import com.minecolonies.api.util.constant.Constants;
 
+import com.minecolonies.core.network.messages.server.ReactivateBuildingMessage;
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import net.minecraft.core.BlockPos;
 
@@ -212,6 +213,13 @@ public abstract class AbstractColonyBlock<B extends AbstractColonyBlock<B>> exte
 
             if (building == null)
             {
+                // Quidoms: orphaned hut (building removed, block remains) — ask server to recreate, don't spam chat.
+                if (entity instanceof TileEntityColonyBuilding te
+                      && (te.getColonyId() != 0 || ColonyUtils.getOwningColony(chunk) != 0))
+                {
+                    new ReactivateBuildingMessage(pos).sendToServer();
+                    return InteractionResult.SUCCESS;
+                }
                 MessageUtils.format(HUT_BLOCK_MISSING_BUILDING).sendTo(player);
                 return InteractionResult.FAIL;
             }

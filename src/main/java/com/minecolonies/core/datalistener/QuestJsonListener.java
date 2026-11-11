@@ -110,6 +110,11 @@ public class QuestJsonListener extends GsonEventReloadListener
 
             try
             {
+                // Quidoms: never register the first-settler welcome guidance quest.
+                if ("tutorial/welcome".equals(fileResLoc.getPath()) || fileResLoc.getPath().startsWith("tutorial/welcome/"))
+                {
+                    continue;
+                }
                 final IQuestTemplate data = loadDataFromJson(provider, fileResLoc, questDataJson);
                 IQuestManager.GLOBAL_SERVER_QUESTS.put(fileResLoc, data);
             }

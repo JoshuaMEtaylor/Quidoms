@@ -468,6 +468,11 @@ public class StructurePacks
         {
             return Files.readAllBytes(packMeta.getPath().resolve(packMeta.getNormalizedSubPath(subPath)));
         }
+        catch (final java.nio.file.NoSuchFileException e)
+        {
+            // Quidoms: profile/style packs often reference missing Alternative blueprints — soft-fail.
+            Log.getLogger().warn("Missing blueprint data (soft-fail): {}:{}", structurePackId, subPath);
+        }
         catch (final IOException e)
         {
             Log.getLogger().error("Error reading blueprint data: ", e);

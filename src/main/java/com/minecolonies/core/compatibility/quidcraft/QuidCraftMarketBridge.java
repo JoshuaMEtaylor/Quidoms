@@ -121,7 +121,7 @@ public final class QuidCraftMarketBridge
             final BlockPos pos = building.getPosition();
             final String dimension = world.dimension().location().toString();
 
-            final ProvisionResult provision = invokeProvision(itemId, count, dimension, pos.getX(), pos.getZ(), nowMs);
+            final QuidCraftProvisionOutcome provision = invokeProvision(itemId, count, dimension, pos.getX(), pos.getZ(), nowMs);
             if (!provision.onCatalogue())
             {
                 // Not listed / no API — fall through; short cooldown avoids spam.
@@ -161,10 +161,27 @@ public final class QuidCraftMarketBridge
             }
             return enough;
         }
-        catch (final ClassNotFoundException | NoSuchMethodException | NoClassDefFoundError e)
+        catch (final ClassNotFoundException | NoSuchMethodException e)
         {
+            // QuidCraft API missing / outdated — disable until reload.
             reflectFailed = true;
             Log.getLogger().warn("QuidCraft present but provision API reflect failed; disabling bridge: " + e);
+            return false;
+        }
+        catch (final NoClassDefFoundError e)
+        {
+            // Never permanently disable for our own missing nested/top-level types — brief cooldown and retry.
+            final String msg = String.valueOf(e.getMessage());
+            if (msg.contains("com.quidcraft.") || msg.contains("QuidApi") || msg.contains("QuidAccess"))
+            {
+                reflectFailed = true;
+                Log.getLogger().warn("QuidCraft present but provision API class missing; disabling bridge: " + e);
+            }
+            else
+            {
+                COOLDOWNS.put(coolKey, nowMs + COOLDOWN_MS);
+                Log.getLogger().warn("QuidCraft provision classload glitch (bridge stays enabled): {}", e.toString());
+            }
             return false;
         }
         catch (final Throwable t)
@@ -271,7 +288,7 @@ public final class QuidCraftMarketBridge
         return Boolean.TRUE.equals(api.getMethod("ready").invoke(null));
     }
 
-    private static ProvisionResult invokeProvision(
+    private static QuidCraftProvisionOutcome invokeProvision(
       final String itemId,
       final int quantity,
       final String dimension,
@@ -298,7 +315,7 @@ public final class QuidCraftMarketBridge
         if (!Boolean.TRUE.equals(provisionApiCached))
         {
             Log.getLogger().warn("QuidCraft loaded but provisionMarketBuy is missing — need QuidCraft >= 1.0.29 for builder buys.");
-            return new ProvisionResult(false, 0, 0L, "no-provision-api");
+            return new QuidCraftProvisionOutcome(false, 0, 0L, "no-provision-api");
         }
         final Object result = access.getClass().getMethod(
           "provisionMarketBuy",
@@ -306,13 +323,13 @@ public final class QuidCraftMarketBridge
         ).invoke(access, UUID.randomUUID(), itemId, quantity, dimension, x, z, now);
         if (result == null)
         {
-            return new ProvisionResult(false, 0, 0L, "null-result");
+            return new QuidCraftProvisionOutcome(false, 0, 0L, "null-result");
         }
         final boolean onCatalogue = Boolean.TRUE.equals(result.getClass().getMethod("onCatalogue").invoke(result));
         final int filled = ((Number) result.getClass().getMethod("filled").invoke(result)).intValue();
         final long cost = ((Number) result.getClass().getMethod("notionalCostMinor").invoke(result)).longValue();
         final Object detail = result.getClass().getMethod("detail").invoke(result);
-        return new ProvisionResult(onCatalogue, filled, cost, detail == null ? "" : detail.toString());
+        return new QuidCraftProvisionOutcome(onCatalogue, filled, cost, detail == null ? "" : detail.toString());
     }
 
     private static int deposit(
@@ -380,9 +397,5 @@ public final class QuidCraftMarketBridge
             remaining.shrink(got);
         }
         return placed;
-    }
-
-    private record ProvisionResult(boolean onCatalogue, int filled, long notionalCostMinor, String detail)
-    {
     }
 }

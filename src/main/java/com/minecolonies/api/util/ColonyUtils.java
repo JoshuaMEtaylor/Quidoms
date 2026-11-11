@@ -9,11 +9,11 @@ import com.ldtteam.structurize.util.IOPool;
 import com.minecolonies.api.colony.IColonyManager;
 import com.minecolonies.api.colony.claim.IChunkClaimData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,7 +67,7 @@ public final class ColonyUtils
         final Consumer<String> errorHandler)
     {
         final CompletableFuture<Blueprint> future =
-            CompletableFuture.supplyAsync(() -> StructurePacks.getBlueprint(structurePack, structurePath, FMLEnvironment.isProduction(), world.registryAccess()), IOPool.getExecutor());
+            CompletableFuture.supplyAsync(() -> loadBlueprintSoft(structurePack, structurePath, world.registryAccess()), IOPool.getExecutor());
         if (world.isClientSide())
         {
             ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(future,
@@ -102,6 +102,60 @@ public final class ColonyUtils
 
             return future;
         }
+    }
+
+    /**
+     * Soft-fail blueprint load. Always suppresses NoSuchFileException spam, and aliases common
+     * profile pack names like {@code Medieval Oak Alternative} → {@code Medieval Oak} + alttownhall.
+     */
+    private static Blueprint loadBlueprintSoft(final String structurePack, final String structurePath, final HolderLookup.Provider provider)
+    {
+        Blueprint blueprint = StructurePacks.getBlueprint(structurePack, structurePath, true, provider);
+        if (blueprint != null)
+        {
+            return blueprint;
+        }
+        final String aliasPack = aliasStructurePack(structurePack);
+        final String aliasPath = aliasStructurePath(structurePack, structurePath);
+        if (!aliasPack.equals(structurePack) || !aliasPath.equals(structurePath))
+        {
+            blueprint = StructurePacks.getBlueprint(aliasPack, aliasPath, true, provider);
+            if (blueprint != null)
+            {
+                Log.getLogger().info("Blueprint pack fallback: '{}' / '{}' → '{}' / '{}'",
+                  structurePack, structurePath, aliasPack, aliasPath);
+                return blueprint;
+            }
+        }
+        Log.getLogger().warn("Missing blueprint (soft-fail): pack='{}' path='{}'", structurePack, structurePath);
+        return null;
+    }
+
+    private static String aliasStructurePack(final String pack)
+    {
+        if (pack == null)
+        {
+            return "";
+        }
+        // Profile folders sometimes append " Alternative" to Medieval Oak / similar style names.
+        if (pack.endsWith(" Alternative"))
+        {
+            return pack.substring(0, pack.length() - " Alternative".length()).trim();
+        }
+        return pack;
+    }
+
+    private static String aliasStructurePath(final String pack, final String path)
+    {
+        if (path == null)
+        {
+            return "";
+        }
+        if (pack != null && pack.endsWith(" Alternative") && path.contains("townhall") && !path.contains("alttownhall"))
+        {
+            return path.replace("townhall", "alttownhall");
+        }
+        return path;
     }
 
     /**
