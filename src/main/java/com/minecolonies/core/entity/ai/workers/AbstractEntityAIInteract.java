@@ -322,12 +322,19 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
      */
     private int calculateWorkerMiningDelay(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
+        // Quidoms: soft foliage/plants break on contact (structure AI also spam-clears these).
+        final double hardness = world.getBlockState(pos).getDestroySpeed(world, pos);
+        if (hardness >= 0.0D && hardness <= 0.25D && !state.blocksMotion())
+        {
+            return 1;
+        }
+
         final double reduction = 1 - worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(BLOCK_BREAK_SPEED);
-        final double hardness = Math.max(0.05D, world.getBlockState(pos).getDestroySpeed(world, pos));
+        final double safeHardness = Math.max(0.05D, hardness);
         final double toolSpeed = Math.max(0.1D, worker.getMainHandItem().getItem().getDestroySpeed(worker.getMainHandItem(), state));
 
         // Quidoms: break as fast as tools allow — hardness/toolSpeed only (Athletics skill flattened).
-        return Math.max(1, (int) ((BLOCK_MINING_DELAY * hardness / toolSpeed) * reduction));
+        return Math.max(1, (int) ((BLOCK_MINING_DELAY * safeHardness / toolSpeed) * reduction));
     }
 
     /**
