@@ -2,7 +2,9 @@ package com.minecolonies.core.client.gui;
 
 import com.ldtteam.blockui.controls.Button;
 import com.ldtteam.blockui.controls.Text;
+import com.ldtteam.blockui.views.BOWindow;
 import com.minecolonies.api.colony.buildings.views.IBuildingView;
+import com.minecolonies.core.colony.buildings.moduleviews.BuildingResourcesModuleView;
 import com.minecolonies.core.colony.buildings.views.AbstractBuildingView;
 import com.minecolonies.core.network.messages.server.colony.OpenInventoryMessage;
 import com.minecolonies.core.network.messages.server.colony.building.BuildRequestMessage;
@@ -99,10 +101,51 @@ public abstract class AbstractBuildingMainWindow<B extends IBuildingView> extend
 
     /**
      * Action when build options button is clicked.
+     * Mid-build (or mid-repair/deconstruct) opens the builder contribution /
+     * resource-input UI so players can deposit required materials. Otherwise
+     * opens the style/requirements picker ({@link WindowBuildBuilding}).
      */
     private void buildClicked()
     {
+        if (isWorkUnderway() && openContributionMenuIfPresent())
+        {
+            return;
+        }
+
         new WindowBuildBuilding(buildingView.getColony(), buildingView).open();
+    }
+
+    /**
+     * @return true when this hut has an active build, repair, or deconstruct.
+     */
+    private boolean isWorkUnderway()
+    {
+        return buildingView.isBuilding() || buildingView.isRepairing() || buildingView.isDeconstructing();
+    }
+
+    /**
+     * Open {@code BuildingResourcesModuleView}'s contribution window when this
+     * building tracks required resources (builder / structure-builder huts).
+     *
+     * @return true if a contribution window was opened.
+     */
+    private boolean openContributionMenuIfPresent()
+    {
+        final BuildingResourcesModuleView resources =
+          buildingView.getModuleViewByType(BuildingResourcesModuleView.class);
+        if (resources == null)
+        {
+            return false;
+        }
+
+        final BOWindow contribution = resources.getWindow();
+        if (contribution == null)
+        {
+            return false;
+        }
+
+        contribution.open();
+        return true;
     }
 
     /**
