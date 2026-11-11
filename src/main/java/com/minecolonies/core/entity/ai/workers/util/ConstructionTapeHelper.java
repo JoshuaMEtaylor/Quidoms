@@ -56,32 +56,22 @@ public final class ConstructionTapeHelper
     public static void placeConstructionTape(@NotNull final IBuilding building)
     {
         final int level = Math.max(1, building.getBuildingLevel() == 0 ? 1 : building.getBuildingLevel());
-        // Prefer sync path so fence matches the schematic the builder will use immediately.
-        final Tuple<BlockPos, BlockPos> synced =
-          com.minecolonies.core.util.HutBlueprintResolver.ensureAndSyncCorners(
-            building, level, building.getColony() == null ? null : building.getColony().getWorld());
-        if (synced != null)
-        {
-            placeConstructionTape(synced, building.getColony());
-            return;
-        }
-
+        // Existence probes only on tick; blueprint NBT load stays on IO pool.
         final com.minecolonies.core.util.HutBlueprintResolver.Resolved resolved =
           com.minecolonies.core.util.HutBlueprintResolver.ensure(building, level);
         final String pack = resolved != null ? resolved.pack() : building.getStructurePack();
         final String path = resolved != null ? resolved.path() : building.getBlueprintPath();
+        if (pack == null || pack.isBlank() || path == null || path.isBlank()
+              || building.getColony() == null || building.getColony().getWorld() == null)
+        {
+            Log.getLogger().warn("Construction tape: missing pack/path for {}",
+              building.getBuildingType() == null ? "?" : building.getBuildingType().getRegistryName());
+            return;
+        }
         ServerFutureProcessor.queueBlueprint(new ServerFutureProcessor.BlueprintProcessingData(
           StructurePacks.getBlueprintFuture(pack, path, true, building.getColony().getWorld().registryAccess()),
           building.getColony().getWorld(),
           (blueprint -> {
-            if (blueprint == null)
-            {
-                final String hut = building.getBuildingType() == null || building.getBuildingType().getRegistryName() == null
-                                     ? "builder"
-                                     : building.getBuildingType().getRegistryName().getPath();
-                blueprint = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
-                  pack, path, hut, level, building.getColony().getWorld().registryAccess());
-            }
             if (blueprint == null)
             {
                 Log.getLogger().warn("Construction tape: still no blueprint for {} pack='{}' path='{}'",
@@ -89,8 +79,8 @@ public final class ConstructionTapeHelper
                 return;
             }
             final Tuple<BlockPos, BlockPos> corners =
-              com.minecolonies.core.util.HutBlueprintResolver.syncCornersFromBlueprint(
-                building, building.getColony().getWorld(), pack, path, building.getRotationMirror());
+              com.minecolonies.core.util.HutBlueprintResolver.applyCorners(
+                building, blueprint, building.getColony().getWorld(), building.getRotationMirror());
             if (corners != null)
             {
                 placeConstructionTape(corners, building.getColony());

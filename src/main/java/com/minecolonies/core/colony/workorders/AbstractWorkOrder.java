@@ -435,50 +435,15 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
         {
             future = ColonyUtils.queueBlueprintLoad(world, getStructurePack(), getStructurePath(), blueprint ->
                 {
-                    Blueprint resolved = blueprint;
-                    if (resolved == null)
+                    // Soft-fail / pack search already happened on the IO pool inside ColonyUtils.
+                    // Do not sync-load again on the server tick callback.
+                    if (blueprint != null)
                     {
-                        // Pack/path may be Decorations/empty — search jar packs for a real hut schematic.
-                        String hut = "builder";
-                        try
-                        {
-                            final String path = getStructurePath();
-                            if (path != null)
-                            {
-                                final String file = path.contains("/") ? path.substring(path.lastIndexOf('/') + 1) : path;
-                                hut = file.replace(".blueprint", "").replaceAll("\\d+$", "");
-                                if (hut.startsWith("alt"))
-                                {
-                                    hut = hut.substring(3);
-                                }
-                            }
-                        }
-                        catch (final Exception ignored)
-                        {
-                        }
-                        resolved = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
-                          getStructurePack(), getStructurePath(), hut, Math.max(1, getTargetLevel()), world.registryAccess());
-                        if (resolved != null)
-                        {
-                            final com.minecolonies.core.util.HutBlueprintResolver.Resolved hit =
-                              com.minecolonies.core.util.HutBlueprintResolver.resolve(hut, getStructurePack(), getStructurePath(), Math.max(1, getTargetLevel()));
-                            if (hit != null)
-                            {
-                                this.packName = hit.pack();
-                                this.path = hit.path();
-                            }
-                        }
+                        setBlueprint(blueprint, world);
                     }
-                    setBlueprint(resolved, world);
-                    afterLoad.accept(resolved);
+                    afterLoad.accept(blueprint);
                 },
-                e -> {
-                    // Soft-fail path still try resolver before giving up.
-                    final Blueprint resolved = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
-                      getStructurePack(), getStructurePath(), "builder", Math.max(1, getTargetLevel()), world.registryAccess());
-                    setBlueprint(resolved, world);
-                    afterLoad.accept(resolved);
-                });
+                e -> afterLoad.accept(null));
         }
         else
         {
@@ -615,7 +580,7 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
               corners.getA().getX(), corners.getA().getY(), corners.getA().getZ(),
               corners.getB().getX() + 1.0D, corners.getB().getY() + 1.0D, corners.getB().getZ() + 1.0D);
 
-            // Keep building fence/corners aligned with the exact blueprint the builder uses.
+            // Apply corners from this already-loaded blueprint (no extra disk I/O).
             if (colony != null && world != null && !world.isClientSide())
             {
                 try
@@ -624,8 +589,8 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
                       colony.getServerBuildingManager() == null ? null : colony.getServerBuildingManager().getBuilding(location);
                     if (building != null)
                     {
-                        com.minecolonies.core.util.HutBlueprintResolver.syncCornersFromBlueprint(
-                          building, world, getStructurePack(), getStructurePath(), getRotationMirror());
+                        com.minecolonies.core.util.HutBlueprintResolver.applyCorners(
+                          building, blueprint, world, getRotationMirror());
                     }
                 }
                 catch (final Exception ignored)

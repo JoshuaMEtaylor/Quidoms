@@ -63,7 +63,7 @@ public class BuildingSetStyleMessage extends AbstractBuildingServerMessage<IBuil
                              : building.getBuildingType().getRegistryName().getPath();
         final int level = Math.max(1, building.getBuildingLevel() == 0 ? 1 : building.getBuildingLevel());
 
-        // Prefer the client-chosen pack+path when it actually exists in StructurePacks.
+        // Existence probes only — never sync-load blueprint NBT on the network thread.
         final HutBlueprintResolver.Resolved preferred =
           HutBlueprintResolver.resolve(
             hut,
@@ -74,12 +74,11 @@ public class BuildingSetStyleMessage extends AbstractBuildingServerMessage<IBuil
         if (preferred != null)
         {
             HutBlueprintResolver.apply(building, preferred);
-            HutBlueprintResolver.syncCornersFromBlueprint(
+            HutBlueprintResolver.queueCornerSync(
               building, colony.getWorld(), preferred.pack(), preferred.path(), building.getRotationMirror());
             return;
         }
 
-        // Fallback: any pack that has this hut schematic.
-        HutBlueprintResolver.ensureAndSyncCorners(building, level, colony.getWorld());
+        HutBlueprintResolver.ensureAndQueueCornerSync(building, level, colony.getWorld());
     }
 }

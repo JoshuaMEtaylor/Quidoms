@@ -998,8 +998,7 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
     public void calculateCorners()
     {
         final AbstractTileEntityColonyBuilding te = getTileEntity();
-        // Unbuilt / deconstructed huts often carry hut-block TE corners that do not match the
-        // style blueprint the builder will place — always recompute from the loadable schematic.
+        // Built buildings: TE schematic corners are authoritative.
         final boolean trustTeCorners = te != null
                                          && !te.getSchematicName().isEmpty()
                                          && getBuildingLevel() > 0
@@ -1010,38 +1009,17 @@ public abstract class AbstractBuilding extends AbstractBuildingContainer
             return;
         }
 
+        // Unbuilt huts: never sync-load blueprints here (getCorners can run often during ticks).
+        // Set a temporary non-ZERO footprint so AbstractSchematicProvider.getCorners does not
+        // re-enter, then queue a single async blueprint load to replace with real bounds.
+        setCorners(getPosition(), getPosition());
         try
         {
             final int level = Math.max(1, getBuildingLevel() == 0 ? 1 : getBuildingLevel());
-            final Tuple<BlockPos, BlockPos> synced =
-              com.minecolonies.core.util.HutBlueprintResolver.ensureAndSyncCorners(this, level, colony.getWorld());
-            if (synced != null)
-            {
-                return;
-            }
-
-            final Blueprint blueprint = StructurePacks.getBlueprint(getStructurePack(), getBlueprintPath(), true,
-              te != null && te.getLevel() != null ? te.getLevel().registryAccess() : colony.getWorld().registryAccess());
-            if (blueprint == null)
-            {
-                setCorners(getPosition(), getPosition());
-                return;
-            }
-            final Tuple<BlockPos, BlockPos> corners
-              = ColonyUtils.calculateCorners(this.getPosition(),
-              colony.getWorld(),
-              blueprint,
-              getRotationMirror());
-            this.setCorners(corners.getA(), corners.getB());
-
-            if (te != null)
-            {
-                this.getTileEntity().setSchematicCorners(corners.getA().subtract(getPosition()), corners.getB().subtract(getPosition()));
-            }
+            com.minecolonies.core.util.HutBlueprintResolver.ensureAndQueueCornerSync(this, level, colony.getWorld());
         }
-        catch (final Exception ex)
+        catch (final Exception ignored)
         {
-            setCorners(getPosition(), getPosition());
         }
     }
 
