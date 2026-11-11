@@ -355,8 +355,8 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
         try
         {
             final int timeout = EXCEPTION_TIMEOUT * exceptionTimer;
-            this.setDelay(FMLEnvironment.production ? timeout : EXCEPTION_TIMEOUT);
-            setCurrentDelay(FMLEnvironment.production ? timeout : EXCEPTION_TIMEOUT);
+            this.setDelay(FMLEnvironment.isProduction() ? timeout : EXCEPTION_TIMEOUT);
+            setCurrentDelay(FMLEnvironment.isProduction() ? timeout : EXCEPTION_TIMEOUT);
             // wait for longer now
             exceptionTimer *= 2;
             if (worker != null)
@@ -963,42 +963,20 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
      */
     public boolean checkForToolOrWeapon(@NotNull final EquipmentTypeEntry toolType)
     {
-        final boolean needTool = checkForToolOrWeapon(toolType, TOOL_LEVEL_WOOD_OR_GOLD);
-        if (needTool)
-        {
-            worker.getCitizenData().setJobStatus(JobStatus.STUCK);
-        }
-        else
+        // Quidoms: tools are optional — bare hands are fine; never block the job.
+        checkForToolOrWeapon(toolType, TOOL_LEVEL_WOOD_OR_GOLD);
+        if (worker.getCitizenData() != null)
         {
             worker.getCitizenData().setJobStatus(JobStatus.WORKING);
         }
-        return needTool;
+        return false;
     }
 
     protected boolean checkForToolOrWeapon(@NotNull final EquipmentTypeEntry toolType, final int minimalLevel)
     {
-        final ImmutableList<IRequest<? extends Tool>> openToolRequests =
-          building.getOpenRequestsOfTypeFiltered(
-            worker.getCitizenData(),
-            TypeToken.of(Tool.class),
-            r -> r.getRequest().getEquipmentType().equals(toolType) && r.getRequest().getMinLevel() >= minimalLevel);
-        final ImmutableList<IRequest<? extends Tool>> completedToolRequests =
-          building.getCompletedRequestsOfTypeFiltered(
-            worker.getCitizenData(),
-            TypeToken.of(Tool.class),
-            r -> r.getRequest().getEquipmentType().equals(toolType) && r.getRequest().getMinLevel() >= minimalLevel);
-
-        if (checkForNeededTool(toolType, minimalLevel))
-        {
-            if (openToolRequests.isEmpty() && completedToolRequests.isEmpty())
-            {
-                final Tool request = new Tool(toolType, minimalLevel, building.getMaxEquipmentLevel() < minimalLevel ? minimalLevel : building.getMaxEquipmentLevel());
-                worker.getCitizenData().createRequest(request);
-            }
-            delay = 0;
-            return true;
-        }
-
+        // Quidoms: never create Tool requests / stuck popups ("Hoe with minimal level…").
+        // Cancel leftover open requests from older saves, then continue without requiring a tool.
+        cancelOpenToolRequests(toolType);
         return false;
     }
 
@@ -1011,35 +989,28 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
      */
     protected void checkForToolOrWeaponAsync(@NotNull final EquipmentTypeEntry toolType, final int minLevel, final int maxLevel)
     {
+        // Quidoms: no async tool requests — workers keep going bare-handed if unequipped.
+        cancelOpenToolRequests(toolType);
+    }
+
+    /**
+     * Quidoms: drop open Tool requests for this type so citizen request chat / request board popups clear.
+     */
+    private void cancelOpenToolRequests(@NotNull final EquipmentTypeEntry toolType)
+    {
+        if (building == null || worker.getCitizenData() == null || ModEquipmentTypes.none.get().equals(toolType))
+        {
+            return;
+        }
+
         final ImmutableList<IRequest<? extends Tool>> openToolRequests =
           building.getOpenRequestsOfTypeFiltered(
             worker.getCitizenData(),
             TypeToken.of(Tool.class),
             r -> r.getRequest().getEquipmentType().equals(toolType));
-
-        final ImmutableList<IRequest<? extends Tool>> completedToolRequests =
-          building.getCompletedRequestsOfTypeFiltered(
-            worker.getCitizenData(),
-            TypeToken.of(Tool.class),
-            r -> r.getRequest().getEquipmentType().equals(toolType) && r.getRequest().getMinLevel() >= minLevel);
-
-        final List<IRequest<? extends Tool>> actualOpen = new ArrayList<>();
         for (final IRequest<? extends Tool> req : openToolRequests)
         {
-            if (req.getRequest().getMinLevel() < minLevel || req.getRequest().getMaxLevel() < maxLevel)
-            {
-                worker.getCitizenColonyHandler().getColonyOrRegister().getRequestManager().updateRequestState(req.getId(), RequestState.CANCELLED);
-            }
-            else
-            {
-                actualOpen.add(req);
-            }
-        }
-
-        if (actualOpen.isEmpty() && completedToolRequests.isEmpty())
-        {
-            final Tool request = new Tool(toolType, minLevel, maxLevel);
-            worker.getCitizenData().createRequestAsync(request);
+            worker.getCitizenColonyHandler().getColonyOrRegister().getRequestManager().updateRequestState(req.getId(), RequestState.CANCELLED);
         }
     }
 
@@ -1427,7 +1398,8 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
             }
         }
 
-        return bestSlot;
+        // Quidoms: missing tool → bare hands (NO_TOOL), never TOOL_NOT_FOUND → requestTool popups.
+        return bestSlot == TOOL_NOT_FOUND ? NO_TOOL : bestSlot;
     }
 
     /**
@@ -1695,6 +1667,20 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
                 worker.getInventoryCitizen()) >= minCount)
         {
             return true;
+        }
+
+        // Quidoms + QuidCraft (optional): try materials-market buy before colony request/deliveryman.
+        final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
+        if (com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(building, stack, updatedCount, matchNBT, citizenName))
+        {
+            if (InventoryUtils.hasBuildingEnoughElseCount(building, new ItemStorage(stack, true, matchNBT), updatedMinCount) >= updatedMinCount &&
+                  updatedCount - InventoryUtils.transferXOfFirstSlotInProviderWithIntoNextFreeSlotInItemHandlerWithResult(
+                    building, itemStack -> ItemStackUtils.compareItemStacksIgnoreStackSize(itemStack, stack, true, matchNBT),
+                    updatedCount,
+                    worker.getInventoryCitizen()) >= minCount)
+            {
+                return true;
+            }
         }
 
         if (building.getOpenRequestsOfTypeFiltered(worker.getCitizenData(), TypeConstants.DELIVERABLE,

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "M": "minecolonies:large_milk_bottle"
+  },
+  "pattern": [
+    "MM"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecolonies:feta_cheese"
+  }
+}

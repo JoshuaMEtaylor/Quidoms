@@ -20,6 +20,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +39,12 @@ import net.minecraft.core.Direction.Plane;
 public class BlockConstructionTape extends AbstractBlockMinecoloniesConstructionTape<BlockConstructionTape>
 {
     public static final MapCodec<BlockConstructionTape> CODEC = simpleCodec(BlockConstructionTape::new);
+
+    @Override
+    public int getDustColor(final BlockState state, final BlockGetter level, final BlockPos pos)
+    {
+        return state.getMapColor(level, pos).col;
+    }
 
     /**
      * This blocks name.
@@ -54,7 +63,7 @@ public class BlockConstructionTape extends AbstractBlockMinecoloniesConstruction
                 .pushReaction(PushReaction.DESTROY)
                 .isRedstoneConductor((state, getter, pos) -> false)
                 .forceSolidOff()
-                .strength(0.0f).noCollission().noLootTable());
+                .strength(0.0f).noCollision().noLootTable());
     }
 
     public BlockConstructionTape(final Properties properties)
@@ -110,21 +119,15 @@ public class BlockConstructionTape extends AbstractBlockMinecoloniesConstruction
 
     @NotNull
     @Override
-    public BlockState updateShape(
-      @NotNull final BlockState stateIn,
-      final Direction dir,
-      final BlockState state,
-      final LevelAccessor worldIn,
-      @NotNull final BlockPos currentPos,
-      final BlockPos pos)
+    public BlockState updateShape(BlockState stateIn, LevelReader worldIn, ScheduledTickAccess scheduledTickAccess, BlockPos currentPos, Direction dir, BlockPos pos, BlockState state, RandomSource random)
     {
         if (stateIn.getValue(WATERLOGGED))
         {
-            worldIn.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+            scheduledTickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
         }
 
         return BlockConstructionTape.getPlacementState(
-          super.updateShape(stateIn, dir, state, worldIn, currentPos, pos), worldIn, currentPos, stateIn.getValue(FACING)
+          super.updateShape(stateIn, worldIn, scheduledTickAccess, currentPos, dir, pos, state, random), worldIn, currentPos, stateIn.getValue(FACING)
         );
     }
 
@@ -246,7 +249,7 @@ public class BlockConstructionTape extends AbstractBlockMinecoloniesConstruction
     }
 
     @Override
-    public boolean propagatesSkylightDown(final BlockState state, @NotNull final BlockGetter reader, @NotNull final BlockPos pos)
+    public boolean propagatesSkylightDown(BlockState state)
     {
         return true;
     }

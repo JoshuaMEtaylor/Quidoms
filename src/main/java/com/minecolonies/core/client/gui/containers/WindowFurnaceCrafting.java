@@ -181,7 +181,7 @@ public class WindowFurnaceCrafting extends AbstractContainerScreen<ContainerCraf
     @Override
     protected void renderBg(@NotNull final GuiGraphics stack, final float partialTicks, final int mouseX, final int mouseY)
     {
-        stack.blit(CRAFTING_FURNACE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+        stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, CRAFTING_FURNACE, this.leftPos, this.topPos, 0f, 0f, this.imageWidth, this.imageHeight, 256, 256);
     }
 
     @Override

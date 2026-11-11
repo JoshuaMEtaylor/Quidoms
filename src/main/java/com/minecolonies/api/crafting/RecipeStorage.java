@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -121,7 +121,7 @@ public class RecipeStorage implements IRecipeStorage
     /**
      * The loot parameter set definition
      */
-    public static final LootContextParamSet recipeLootParameters = (new LootContextParamSet.Builder())
+    public static final ContextKeySet recipeLootParameters = (new ContextKeySet.Builder())
                 .required(LootContextParams.ORIGIN)
                 .required(LootContextParams.THIS_ENTITY)
                 .required(LootContextParams.TOOL)
@@ -337,7 +337,7 @@ public class RecipeStorage implements IRecipeStorage
         final ResourceLocation type = builder.recipeType != null ? builder.recipeType
                 : builder.alternateOutputs.isEmpty() ? ModRecipeTypes.CLASSIC_ID : ModRecipeTypes.MULTI_OUTPUT_ID;
         final Registry<RecipeTypeEntry> recipeTypes = MinecoloniesAPIProxy.getInstance().getRecipeTypeRegistry();
-        this.recipeType = recipeTypes.get(type).getHandlerProducer().apply(this);
+        this.recipeType = recipeTypes.get(type).map(net.minecraft.core.Holder::value).orElseThrow().getHandlerProducer().apply(this);
 
         this.processInputsAndTools(builder.secondaryOutputs);
     }
@@ -372,7 +372,7 @@ public class RecipeStorage implements IRecipeStorage
                 continue;
             }
 
-            final ItemStack container = inputItem.getItemStack().getCraftingRemainingItem();
+            final ItemStack container = inputItem.getItemStack().getCraftingRemainder();
             if (secOutputs == null && !ItemStackUtils.isEmpty(container))
             {
                 container.setCount(inputItem.getAmount());
@@ -512,7 +512,7 @@ public class RecipeStorage implements IRecipeStorage
         }
         else
         {
-            final ItemStack container = stack.getCraftingRemainingItem();
+            final ItemStack container = stack.getCraftingRemainder();
             if(ItemStackUtils.isEmpty(container) || !ItemStackUtils.compareItemStacksIgnoreStackSize(stack, container, false, !storage.ignoreNBT()))
             {
                 neededCount = storage.getAmount() * qty;
@@ -647,7 +647,7 @@ public class RecipeStorage implements IRecipeStorage
         {
             for (final ItemStorage stack : input)
             {
-                final ItemStack container = stack.getItemStack().getCraftingRemainingItem();
+                final ItemStack container = stack.getItemStack().getCraftingRemainder();
                 if (!ItemStackUtils.isEmpty(container))
                 {
                     container.setCount(stack.getAmount());
@@ -685,7 +685,7 @@ public class RecipeStorage implements IRecipeStorage
             return null;
         }
 
-        final AbstractEntityCitizen citizen = (AbstractEntityCitizen) context.getParamOrNull(LootContextParams.THIS_ENTITY);
+        final AbstractEntityCitizen citizen = (AbstractEntityCitizen) context.contextMap().getOptional(LootContextParams.THIS_ENTITY);
 
         for (final ItemStorage storage : getCleanedInput())
         {

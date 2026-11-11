@@ -180,8 +180,8 @@ public class CachingBlockLookup implements BlockGetter
     }
 
     @Override
-    public int getMinBuildHeight()
+    public int getMinY()
     {
-        return world.getMinBuildHeight();
+        return world.getMinY();
     }
 }

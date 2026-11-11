@@ -1,0 +1,19 @@
+{
+  "branch": "minecolonies:combat",
+  "costs": [
+    {
+      "ingredient": "minecraft:golden_carrot",
+      "count": 4
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/sleeplessmultiplier",
+      "level": 1
+    }
+  ],
+  "icon": "minecraft:lime_bed",
+  "parentResearch": "minecolonies:combat/tactictraining",
+  "researchLevel": 2,
+  "subtitle": "com.minecolonies.research.combat.coffee.subtitle"
+}

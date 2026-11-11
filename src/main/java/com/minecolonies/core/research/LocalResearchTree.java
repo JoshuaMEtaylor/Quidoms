@@ -196,7 +196,7 @@ public class LocalResearchTree implements ILocalResearchTree
 
                 // ItemStorage needs an ItemStack; for tag-based ingredients we just pick any representative
                 // and set the count to the total required. Predicates will enforce the actual match.
-                final ItemStack[] candidates = cost.getItems();
+                final ItemStack[] candidates = com.minecolonies.api.util.IngredientCompat.getItems(cost);
                 if (candidates == null || candidates.length == 0)
                 {
                     continue;
@@ -384,7 +384,7 @@ public class LocalResearchTree implements ILocalResearchTree
         inProgress.clear();
         isComplete.clear();
         maxLevelResearchCompleted.clear();
-        NBTUtils.streamCompound(compound.getList(TAG_RESEARCH_TREE, Tag.TAG_COMPOUND))
+        NBTUtils.streamCompound(compound.getListOrEmpty(TAG_RESEARCH_TREE))
           .map(researchCompound -> (ILocalResearch) StandardFactoryController.getInstance().deserializeTag(provider, researchCompound))
           .forEach(research -> {
               /// region Updated ID helper.

@@ -1,29 +1,31 @@
 package com.minecolonies.core.items;
 
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import com.minecolonies.api.blocks.MinecoloniesBlockIds;
+
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Class handling the Plate Armor.
  */
-public class ItemPlateArmor extends ArmorItem
+public class ItemPlateArmor extends Item
 {
     /**
      * Constructor method for the Plate Armor
      *
-     * @param properties      the item properties.
-     * @param equipmentSlotIn the equipment slot of it.
-     * @param materialIn      the material of the armour.
      * @param name            the name.
+     * @param materialIn      the material of the armour.
+     * @param equipmentSlotIn the equipment slot of it.
+     * @param durability      custom max damage (overrides material formula).
      */
     public ItemPlateArmor(
       @NotNull final String name,
-      @NotNull final Holder<ArmorMaterial> materialIn,
-      @NotNull final ArmorItem.Type equipmentSlotIn,
-      final Properties properties)
+      @NotNull final ArmorMaterial materialIn,
+      @NotNull final ArmorType equipmentSlotIn,
+      final int durability)
     {
-        super(materialIn, equipmentSlotIn, properties);
+        super(MinecoloniesBlockIds.itemProps(name, new Item.Properties().humanoidArmor(materialIn, equipmentSlotIn).durability(durability)));
     }
 }

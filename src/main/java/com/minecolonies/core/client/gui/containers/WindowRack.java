@@ -117,13 +117,12 @@ public class WindowRack extends AbstractContainerScreen<ContainerRack>
         if (inventoryRows <= GOOD_SIZE)
         {
             final int rowsHeight = this.inventoryRows * PLAYER_INVENTORY_OFFSET_EACH + PLAYER_INVENTORY_OFFSET_EACH - 1;
-            stack.blit(loc, this.leftPos, this.topPos, 0, 0, this.imageWidth, rowsHeight, TEXTURE_SIZE, TEXTURE_SIZE);
-            stack.blit(loc, this.leftPos, this.topPos + rowsHeight, 0,
-              TEXTURE_OFFSET, this.imageWidth, TEXTURE_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
+            stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, loc, this.leftPos, this.topPos, 0f, 0f, this.imageWidth, rowsHeight, TEXTURE_SIZE, TEXTURE_SIZE);
+            stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, loc, this.leftPos, this.topPos + rowsHeight, 0f, (float)(TEXTURE_OFFSET), this.imageWidth, TEXTURE_HEIGHT, TEXTURE_SIZE, TEXTURE_SIZE);
         }
         else
         {
-            stack.blit(loc, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, TEXTURE_SIZE, TEXTURE_SIZE);
+            stack.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, loc, this.leftPos, this.topPos, 0f, 0f, this.imageWidth, this.imageHeight, TEXTURE_SIZE, TEXTURE_SIZE);
         }
     }
 

@@ -4,7 +4,6 @@ import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.IColonyManager;
 import com.minecolonies.api.colony.IColonyView;
 import com.minecolonies.api.tileentities.MinecoloniesTileEntities;
-import com.minecolonies.api.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -13,6 +12,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
 import static com.minecolonies.api.util.constant.NbtTagConstants.*;
@@ -42,26 +43,21 @@ public class TileEntityColonyFlag extends BlockEntity
     }
 
     @Override
-    public void saveAdditional(CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void saveAdditional(final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
+        super.saveAdditional(output);
 
-        compound.put(TAG_BANNER_PATTERNS, Utils.serializeCodecMess(BannerPatternLayers.CODEC, provider, this.patterns));
-
-        compound.putInt(TAG_COLONY_ID, colonyId);
+        output.store(TAG_BANNER_PATTERNS, BannerPatternLayers.CODEC, this.patterns);
+        output.putInt(TAG_COLONY_ID, colonyId);
     }
 
     @Override
-    public void loadAdditional(CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void loadAdditional(final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
+        super.loadAdditional(input);
 
-        if (compound.contains(TAG_BANNER_PATTERNS))
-        {
-            this.patterns = Utils.deserializeCodecMess(BannerPatternLayers.CODEC, provider, compound.get(TAG_BANNER_PATTERNS));
-        }
-
-        this.colonyId = compound.getInt(TAG_COLONY_ID);
+        this.patterns = input.read(TAG_BANNER_PATTERNS, BannerPatternLayers.CODEC).orElse(BannerPatternLayers.EMPTY);
+        this.colonyId = input.getIntOr(TAG_COLONY_ID, 0);
 
         if(this.colonyId == -1 && this.hasLevel())
         {
@@ -81,12 +77,11 @@ public class TileEntityColonyFlag extends BlockEntity
     }
 
     @Override
-    public CompoundTag getUpdateTag(@NotNull final HolderLookup.Provider provider) { return this.saveWithId(provider); }
+    public CompoundTag getUpdateTag(@NotNull final HolderLookup.Provider provider) { return this.saveWithoutMetadata(provider); }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket packet, @NotNull final HolderLookup.Provider provider)
+    public void onDataPacket(final Connection net, final ValueInput input)
     {
-        final CompoundTag compound = packet.getTag();
-        this.loadAdditional(compound, provider);
+        this.loadAdditional(input);
     }
 }

@@ -265,7 +265,7 @@ public class BuildingFarmer extends AbstractBuilding
         super.deserializeNBT(provider, compound);
         if (compound.contains(TAG_CELL))
         {
-            this.cell = compound.getInt(TAG_CELL);
+            this.cell = compound.getIntOr(TAG_CELL, 0);
         }
         if (compound.contains(TAG_WORKING_OFFSET))
         {
@@ -396,7 +396,7 @@ public class BuildingFarmer extends AbstractBuilding
                     recipes.add(GenericRecipe.builder()
                             .withInputs(List.of(List.of(cropItem.getDefaultInstance())))
                             .withIntermediate(crop.getPreferredFarmland())
-                            .withLootTable(crop.getLootTable())
+                            .withLootTable(crop.getLootTable().orElse(null))
                             .withRequiredTool(ModEquipmentTypes.hoe.get())
                             .withRestrictions(restrictions)
                             .build());
@@ -405,9 +405,9 @@ public class BuildingFarmer extends AbstractBuilding
                 {
                     // regular crop
                     recipes.add(GenericRecipe.builder()
-                            .withInputs(List.of(List.of(crop.getCloneItemStack(world, BlockPos.ZERO, crop.defaultBlockState()))))
+                            .withInputs(List.of(List.of(new ItemStack(crop.asItem()))))
                             .withIntermediate(Blocks.FARMLAND)
-                            .withLootTable(crop.getLootTable())
+                            .withLootTable(crop.getLootTable().orElse(null))
                             .withRequiredTool(ModEquipmentTypes.hoe.get())
                             .build());
                 }
@@ -417,7 +417,7 @@ public class BuildingFarmer extends AbstractBuilding
                     if (stack.getItem() instanceof BlockItem item && item.getBlock() instanceof StemBlock stem)
                     {
                         recipes.add(GenericRecipe.builder()
-                                .withOutput(BuiltInRegistries.BLOCK.get(stem.fruit))
+                                .withOutput(BuiltInRegistries.BLOCK.getValue(stem.fruit))
                                 .withInputs(List.of(List.of(stack)))
                                 .withIntermediate(Blocks.FARMLAND)
                                 .withRequiredTool(ModEquipmentTypes.hoe.get())
@@ -444,7 +444,7 @@ public class BuildingFarmer extends AbstractBuilding
 
             final Biome currentBiome = mc.level.getBiome(mc.player.blockPosition()).value();
 
-            final Registry<Biome> biomeRegistry = mc.level.registryAccess().registryOrThrow(preferredBiome.registry());
+            final Registry<Biome> biomeRegistry = mc.level.registryAccess().lookupOrThrow(preferredBiome.registry());
             final Object[] biomes = StreamSupport.stream(biomeRegistry.getTagOrEmpty(preferredBiome).spliterator(), false)
                     .map(b -> {
                         final MutableComponent name = Component.translatable(b.unwrapKey().get().location().toLanguageKey("biome"));
@@ -465,11 +465,11 @@ public class BuildingFarmer extends AbstractBuilding
             {
                 if (stack.getItem() instanceof ItemCrop cropItem && cropItem.getBlock() instanceof MinecoloniesCropBlock crop)
                 {
-                    tables.add(crop.getLootTable());
+                    tables.add(crop.getLootTable().orElse(null));
                 }
                 else if (stack.getItem() instanceof BlockItem item && item.getBlock() instanceof CropBlock crop)
                 {
-                    tables.add(crop.getLootTable());
+                    tables.add(crop.getLootTable().orElse(null));
                 }
             }
             return tables;

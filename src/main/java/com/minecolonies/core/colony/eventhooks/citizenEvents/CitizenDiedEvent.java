@@ -68,7 +68,7 @@ public class CitizenDiedEvent extends AbstractCitizenEvent
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        deathCause = compound.getString(TAG_DEATH_CAUSE);
+        deathCause = compound.getStringOr(TAG_DEATH_CAUSE, "");
     }
 
     @Override

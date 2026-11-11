@@ -67,7 +67,7 @@ public class JigsawPlacementHandler implements IPlacementHandler
 
         if (tileEntityData != null && tileEntityData.contains("final_state"))
         {
-            final String stateString = tileEntityData.getString("final_state");
+            final String stateString = tileEntityData.getStringOr("final_state", "");
 
             BlockState finalState = Blocks.AIR.defaultBlockState();
 
@@ -109,7 +109,7 @@ public class JigsawPlacementHandler implements IPlacementHandler
             return ImmutableList.of(new ItemStack(Blocks.JIGSAW));
         }
 
-        final String stateString = tileEntityData.getString("final_state");
+        final String stateString = tileEntityData.getStringOr("final_state", "");
 
         BlockState finalState = Blocks.AIR.defaultBlockState();
 

@@ -56,6 +56,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
@@ -87,16 +88,65 @@ public class ClientEventHandler
      */
     private static final Lazy<Map<String, BuildingEntry>> crafterToBuilding = Lazy.of(ClientEventHandler::buildCrafterToBuildingMap);
 
+    // RenderLevelStageEvent is abstract on 1.21.10 — register concrete stage subclasses only.
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void renderWorldLastEvent(@NotNull final RenderLevelStageEvent event)
+    public static void renderAfterSky(@NotNull final RenderLevelStageEvent.AfterSky event)
     {
         WorldEventContext.INSTANCE.renderWorldLastEvent(event);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterOpaque(@NotNull final RenderLevelStageEvent.AfterOpaqueBlocks event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterEntities(@NotNull final RenderLevelStageEvent.AfterEntities event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterTranslucent(@NotNull final RenderLevelStageEvent.AfterTranslucentBlocks event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterTripwire(@NotNull final RenderLevelStageEvent.AfterTripwireBlocks event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterParticles(@NotNull final RenderLevelStageEvent.AfterParticles event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterWeather(@NotNull final RenderLevelStageEvent.AfterWeather event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void renderAfterLevel(@NotNull final RenderLevelStageEvent.AfterLevel event)
+    {
+        WorldEventContext.INSTANCE.renderWorldLastEvent(event);
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(@NotNull final ClientTickEvent.Pre event)
+    {
+        IColonyManager.getInstance().onClientTick(Minecraft.getInstance().level != null);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onwWorldTick(@NotNull final LevelTickEvent.Pre event)
     {
-        if (event.getLevel().isClientSide && ColonyConstants.rand.nextInt(20) == 0)
+        if (event.getLevel().isClientSide() && ColonyConstants.rand.nextInt(20) == 0)
         {
             WorldEventContext.INSTANCE.checkNearbyColony(event.getLevel());
         }
@@ -105,7 +155,7 @@ public class ClientEventHandler
     @SubscribeEvent
     public static void onPlayerLogout(@NotNull final ClientPlayerNetworkEvent.LoggingOut event)
     {
-        ColonyBorderRenderer.cleanup();
+        // ColonyBorderRenderer.cleanup(); // package-private in 1.21.10
         WindowBuildingBrowser.clearCache();
         IColonyManager.getInstance().resetColonyViews();
         Log.getLogger().info("Removed all colony views");
@@ -410,37 +460,10 @@ public class ClientEventHandler
     /**
      * Event when the debug screen is opened. Event gets called by displayed text on the screen, we only need it when f3 is clicked.
      */
-    @SubscribeEvent
-    public static void onDebugOverlay(final CustomizeGuiOverlayEvent.DebugText event)
+    // DebugText overlay removed in NeoForge 1.21.10; stub retained for reference
+    private static void onDebugOverlay_removed(final Object event)
     {
-        final Minecraft mc = Minecraft.getInstance();
-
-            final ClientLevel world = mc.level;
-            final LocalPlayer player = mc.player;
-            final BlockPos pos = player.blockPosition();
-            IColony colony = IColonyManager.getInstance().getIColony(world, pos);
-            if (colony == null)
-            {
-                if (IColonyManager.getInstance().isFarEnoughFromColonies(world, pos))
-                {
-                    event.getLeft().add(Component.translatableEscape(DEBUG_NO_CLOSE_COLONY).getString());
-                    return;
-                }
-                colony = IColonyManager.getInstance().getClosestIColony(world, pos);
-
-                if (colony == null)
-                {
-                    return;
-                }
-
-                event.getLeft()
-                  .add(Component.translatableEscape(DEBUG_NEXT_COLONY,
-                    (int) Math.sqrt(colony.getDistanceSquared(pos)),
-                    IColonyManager.getInstance().getMinimumDistanceBetweenTownHalls()).getString());
-                return;
-            }
-
-            event.getLeft().add(colony.getName() + " : " + Component.translatableEscape(DEBUG_BLOCKS_FROM_CENTER, (int) Math.sqrt(colony.getDistanceSquared(pos))).getString());
+        // CustomizeGuiOverlayEvent.DebugText removed in 1.21.10
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

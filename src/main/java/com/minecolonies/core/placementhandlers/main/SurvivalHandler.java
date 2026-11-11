@@ -25,7 +25,6 @@ import com.minecolonies.core.event.EventHandler;
 import com.minecolonies.core.network.messages.client.OpenDecoBuildWindowMessage;
 import com.minecolonies.core.network.messages.client.OpenPlantationFieldBuildWindowMessage;
 import com.minecolonies.core.util.AdvancementUtils;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,8 +33,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -63,8 +60,7 @@ public class SurvivalHandler implements ISurvivalBlueprintHandler
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public boolean canHandle(final Blueprint blueprint, final ClientLevel clientLevel, final Player player, final BlockPos blockPos, final RotationMirror rotMir)
+    public boolean canHandle(final Blueprint blueprint, final Level clientLevel, final Player player, final BlockPos blockPos, final RotationMirror rotMir)
     {
         if (IMinecoloniesAPI.getInstance().getConfig().getServer().blueprintBuildMode.get())
         {

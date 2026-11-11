@@ -19,8 +19,6 @@ import com.minecolonies.api.util.*;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.api.util.constant.TranslationConstants;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -38,8 +36,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +46,8 @@ import java.util.Map;
 
 import static com.ldtteam.structurize.blockentities.interfaces.IBlueprintDataProviderBE.*;
 import static com.minecolonies.api.util.constant.TranslationConstants.*;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 
 /**
  * Base class for all Minecolonies Hut Blocks. Hut Blocks are the base blocks for Minecolonies buildings.
@@ -84,7 +82,7 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
      */
     public AbstractBlockHut(final Properties properties)
     {
-        super(properties);
+        super(MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 
     /**
@@ -124,13 +122,12 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
     @Override
     public boolean isVisible(@Nullable final CompoundTag beData)
     {
-        final Map<BlockPos, List<String>> data = readTagPosMapFrom(beData.getCompound(TAG_BLUEPRINTDATA));
+        final Map<BlockPos, List<String>> data = readTagPosMapFrom(beData.getCompoundOrEmpty(TAG_BLUEPRINTDATA));
         return !data.getOrDefault(BlockPos.ZERO, new ArrayList<>()).contains("invisible");
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public List<MutableComponent> getRequirements(final ClientLevel level, final BlockPos pos, final LocalPlayer player)
+    public List<MutableComponent> getRequirements(final Level level, final BlockPos pos, final Player player)
     {
         final List<MutableComponent> requirements = new ArrayList<>();
         final IColonyView colonyView = IColonyManager.getInstance().getClosestColonyView(level, pos);
@@ -162,8 +159,7 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public boolean areRequirementsMet(final ClientLevel level, final BlockPos pos, final LocalPlayer player)
+    public boolean areRequirementsMet(final Level level, final BlockPos pos, final Player player)
     {
         if (player.isCreative())
         {
@@ -187,6 +183,26 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
         return Component.translatableEscape(getBuildingEntry().getTranslationKey());
     }
 
+    /**
+     * Prefer building translation keys (e.g. "Town Hall") over raw registry description ids.
+     */
+    @Override
+    public MutableComponent getName()
+    {
+        try
+        {
+            if (getBuildingEntry() != null)
+            {
+                return Component.translatable(getBuildingEntry().getTranslationKey());
+            }
+        }
+        catch (final Exception ignored)
+        {
+            // Fall through.
+        }
+        return super.getName();
+    }
+
     @Override
     public int getLevel(final CompoundTag beData)
     {
@@ -197,7 +213,7 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
 
         try
         {
-            return Integer.parseInt(beData.getCompound(TAG_BLUEPRINTDATA).getString(TAG_SCHEMATIC_NAME).replaceAll("[^0-9]", ""));
+            return Integer.parseInt(beData.getCompoundOrEmpty(TAG_BLUEPRINTDATA).getStringOr(TAG_SCHEMATIC_NAME, "").replaceAll("[^0-9]", ""));
         }
         catch (final NumberFormatException exception)
         {
@@ -347,20 +363,24 @@ public abstract class AbstractBlockHut<B extends AbstractBlockHut<B>> extends Ab
         return getBuildingEntry().getRegistryName().getPath();
     }
 
-    @Override
-    public void appendHoverText(@NotNull final ItemStack stack, @NotNull final Item.TooltipContext context,
-        @NotNull final List<Component> tooltip, @NotNull final TooltipFlag flags)
+    public void appendHoverText(@NotNull final ItemStack stack, @NotNull final net.minecraft.world.item.Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, @NotNull final TooltipFlag flags)
     {
-        super.appendHoverText(stack, context, tooltip, flags);
-
-        stack.addToTooltip(ModDataComponents.HUT_COMPONENT, context, tooltip::add, flags);
-        stack.addToTooltip(ModDataComponents.COLONY_ID_COMPONENT, context, tooltip::add, flags);
+        stack.addToTooltip(ModDataComponents.HUT_COMPONENT, context, tooltip, flags);
+        stack.addToTooltip(ModDataComponents.COLONY_ID_COMPONENT, context, tooltip, flags);
     }
 
     @Override
     public void registerBlockItem(final Registry<Item> registry, final Item.Properties properties)
     {
-        Registry.register(registry, getRegistryName(), new ItemBlockHut(this, properties));
+        MinecoloniesBlockIds.pushItem(getRegistryName());
+        try
+        {
+            Registry.register(registry, getRegistryName(), new ItemBlockHut(this, MinecoloniesBlockIds.withPendingItemId(properties)));
+        }
+        finally
+        {
+            MinecoloniesBlockIds.popItem();
+        }
     }
 
     /**

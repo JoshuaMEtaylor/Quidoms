@@ -25,8 +25,11 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -44,6 +47,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
@@ -134,7 +138,7 @@ public final class ItemStackUtils
     public static final Predicate<ItemStack> IS_ANY_FOOD =
             stack ->
             {
-                final FoodProperties foodProperties = stack.getFoodProperties(null);
+                final FoodProperties foodProperties = com.minecolonies.api.util.FoodCompat.getFoodProperties(stack);
                 return ItemStackUtils.isNotEmpty(stack) && foodProperties != null && foodProperties.nutrition() > 0
                         && foodProperties.saturation() > 0;
             };
@@ -196,16 +200,22 @@ public final class ItemStackUtils
             }
             else if (entity instanceof ArmorStand)
             {
-                request.add(new ItemStorage(entity.getPickedResult(new EntityHitResult(placer))));
-                ((ArmorStand) entity).getArmorSlots().forEach(item -> request.add(new ItemStorage(item)));
-                ((ArmorStand) entity).getHandSlots().forEach(item -> request.add(new ItemStorage(item)));
+                request.add(new ItemStorage(entity.getPickResult()));
+                for (final EquipmentSlot slot : EquipmentSlot.values())
+                {
+                    final ItemStack equipped = ((ArmorStand) entity).getItemBySlot(slot);
+                    if (!equipped.isEmpty())
+                    {
+                        request.add(new ItemStorage(equipped.copy()));
+                    }
+                }
             }
 
             /*
             todo: deactivated until forge fixes this problem.
             else if (!(entity instanceof MobEntity))
             {
-                request.add(new ItemStorage(entity.getPickedResult(new EntityRayTraceResult(placer))));
+                request.add(new ItemStorage(entity.getPickResult()));
             }*/
 
             return request.stream().filter(stack -> !stack.getItemStack().isEmpty()).collect(Collectors.toList());
@@ -302,7 +312,7 @@ public final class ItemStackUtils
             return value;
         }
 
-        final EquipmentSlot targetEquipmentSlot = Optional.ofNullable(Equipable.get(itemStack)).map(Equipable::getEquipmentSlot).orElse(EquipmentSlot.MAINHAND);
+        final EquipmentSlot targetEquipmentSlot = Optional.ofNullable(getHumanoidArmorSlot(itemStack)).orElse(EquipmentSlot.MAINHAND);
         final List<Item> armorItems = VANILLA_ARMOR_MAPPING.get(targetEquipmentSlot);
         if (armorItems == null)
         {
@@ -313,17 +323,69 @@ public final class ItemStackUtils
 
         for (final Item item : armorItems)
         {
-            if (item instanceof ArmorItem armorItem)
+            final ItemStack reference = item.getDefaultInstance();
+            final EquipmentSlot slot = getHumanoidArmorSlot(reference);
+            if (slot != null)
             {
-                final double armorValue = getArmorValue(armorItem.getDefaultInstance(), armorItem.getEquipmentSlot());
+                final double armorValue = getArmorValue(reference, slot);
                 if (targetArmorLevel <= armorValue)
                 {
-                    return VANILLA_ARMOR_DISTRIBUTION.get(armorItem);
+                    return VANILLA_ARMOR_DISTRIBUTION.get(item);
                 }
             }
         }
 
         return 5;
+    }
+
+    /**
+     * @return the humanoid armor slot for this stack, or null if it is not humanoid armor.
+     */
+    @Nullable
+    public static EquipmentSlot getHumanoidArmorSlot(@NotNull final ItemStack stack)
+    {
+        final Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+        if (equippable == null)
+        {
+            return null;
+        }
+        final EquipmentSlot slot = equippable.slot();
+        return slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR ? slot : null;
+    }
+
+    /**
+     * @return true if the stack is humanoid armor (helmet/chest/legs/boots).
+     */
+    public static boolean isHumanoidArmor(@NotNull final ItemStack stack)
+    {
+        return getHumanoidArmorSlot(stack) != null;
+    }
+
+    /**
+     * @return true if the item's default stack is humanoid armor.
+     */
+    public static boolean isHumanoidArmorItem(@NotNull final Item item)
+    {
+        return isHumanoidArmor(item.getDefaultInstance());
+    }
+
+    /**
+     * @return true if the stack is tagged as a sword.
+     */
+    public static boolean isSword(@NotNull final ItemStack stack)
+    {
+        return stack.is(ItemTags.SWORDS);
+    }
+
+    /**
+     * @return true if the stack is a digger tool (pickaxe/axe/shovel/hoe).
+     */
+    public static boolean isDigger(@NotNull final ItemStack stack)
+    {
+        return stack.is(ItemTags.PICKAXES)
+                 || stack.is(ItemTags.AXES)
+                 || stack.is(ItemTags.SHOVELS)
+                 || stack.is(ItemTags.HOES);
     }
 
     /**
@@ -390,7 +452,7 @@ public final class ItemStackUtils
      */
     public static boolean doesItemServeAsWeapon(@NotNull final ItemStack stack)
     {
-        return stack.getItem() instanceof SwordItem || stack.getItem() instanceof DiggerItem || Compatibility.isTinkersWeapon(stack) || stack.getItem() instanceof ItemSpear;
+        return isSword(stack) || isDigger(stack) || Compatibility.isTinkersWeapon(stack) || stack.getItem() instanceof ItemSpear;
     }
 
     /**
@@ -654,6 +716,33 @@ public final class ItemStackUtils
     }
 
     /**
+     * 1.21.10 replacement for removed {@code ItemStack.saveOptional(Provider)}.
+     */
+    @NotNull
+    public static Tag saveOptional(@NotNull final ItemStack stack, @NotNull final HolderLookup.Provider provider)
+    {
+        return ItemStack.OPTIONAL_CODEC
+                 .encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), stack)
+                 .getOrThrow();
+    }
+
+    /**
+     * 1.21.10 replacement for removed {@code ItemStack.parseOptional(Provider, CompoundTag)}.
+     */
+    @NotNull
+    public static ItemStack parseOptional(@NotNull final HolderLookup.Provider provider, @Nullable final CompoundTag compound)
+    {
+        if (compound == null || compound.isEmpty())
+        {
+            return ItemStack.EMPTY;
+        }
+        return ItemStack.OPTIONAL_CODEC
+                 .parse(provider.createSerializationContext(NbtOps.INSTANCE), compound)
+                 .result()
+                 .orElse(ItemStack.EMPTY);
+    }
+
+    /**
      * Update method to allow for easy reading the ItemStack data from NBT.
      *
      * @param compound The compound to read from.
@@ -662,7 +751,7 @@ public final class ItemStackUtils
     @NotNull
     public static ItemStack deserializeFromNBT(@NotNull final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
     {
-        return ItemStack.parseOptional(provider, compound);
+        return parseOptional(provider, compound);
     }
 
     /**
@@ -768,7 +857,7 @@ public final class ItemStackUtils
         final Item item;
         try
         {
-            item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemId));
+            item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(itemId));
         }
         catch (Throwable t)
         {
@@ -780,7 +869,11 @@ public final class ItemStackUtils
         {
             try
             {
-                stack.applyComponents(Utils.deserializeCodecMessFromJson(DataComponentPatch.CODEC, provider, JsonParser.parseString(tag)));
+                final DataComponentPatch patch = Utils.deserializeCodecMessFromJson(DataComponentPatch.CODEC, provider, JsonParser.parseString(tag));
+                if (patch != null)
+                {
+                    stack.applyComponents(patch);
+                }
             }
             catch (Throwable t)
             {
@@ -819,9 +912,11 @@ public final class ItemStackUtils
         itemId = itemId.replace("[NS]", baseItemId.getNamespace());
         itemId = TEMPLATE_PATH_PATTERN.matcher(itemId).replaceAll(m ->
         {
-            if (m.group(1) != null && m.group(2) != null)
+            final String from = m.group(1);
+            final String to = m.group(2);
+            if (from != null && to != null)
             {
-                return baseItemId.getPath().replace(m.group(1), m.group(2));
+                return baseItemId.getPath().replace(from, to);
             }
             return baseItemId.getPath();
         });
@@ -852,7 +947,7 @@ public final class ItemStackUtils
         final Set<ItemStorage> allItems = new HashSet<>(IColonyManager.getInstance().getCompatibilityManager().getSetOfAllItems());
 
         // plus all items from the player's inventory not already listed (adds items with extra NBT)
-        for (final ItemStack stack : player.getInventory().items)
+        for (final ItemStack stack : player.getInventory().getNonEquipmentItems())
         {
             if (stack.isEmpty())
             {
@@ -942,12 +1037,12 @@ public final class ItemStackUtils
     @OnlyIn(Dist.CLIENT)
     public static Component getTranslatedName(@NotNull final SizedIngredient ingredient)
     {
-        if (ingredient.ingredient().hasNoItems())
+        if (ingredient.ingredient().isEmpty() || IngredientCompat.isEmpty(ingredient))
         {
             return Component.empty();
         }
 
-        final ItemStack[] items = ingredient.getItems();
+        final ItemStack[] items = IngredientCompat.getItems(ingredient);
         final Optional<TagKey<Item>> tag = getTagEquivalent(items);
 
         return Component.translatable("%sx %s", ingredient.count(), tag.map(t ->
@@ -962,10 +1057,10 @@ public final class ItemStackUtils
         {
             if (items.length == 1)
             {
-                return items[0].getItem().getDescription();
+                return items[0].getItem().getName();
             }
             return Component.translatable(String.join("/", Collections.nCopies(items.length, "%s")),
-                    Arrays.stream(items).map(ItemStack::getItem).map(Item::getDescription).toArray());
+                    Arrays.stream(items).map(ItemStack::getItem).map(Item::getName).toArray());
         }));
     }
 
@@ -986,12 +1081,8 @@ public final class ItemStackUtils
         }
 
         return BuiltInRegistries.ITEM.getTags()
-                .filter(e ->
-                {
-                    HolderSet.Named<Item> tag = e.getSecond();
-                    return areEquivalent(tag, values);
-                })
-                .map(Pair::getFirst)
+                .filter(tag -> areEquivalent(tag, values))
+                .map(HolderSet.Named::key)
                 .findFirst();
     }
 
@@ -1037,7 +1128,7 @@ public final class ItemStackUtils
         }
         catch (final Exception e)
         {
-            Log.getLogger().warn("Could not get attribute value for '{}' on item '{}'", attribute.value().getDescriptionId(), itemStack.getDescriptionId(), e);
+            Log.getLogger().warn("Could not get attribute value for '{}' on item '{}'", attribute.value().getDescriptionId(), itemStack.getItem().getDescriptionId(), e);
             return 0;
         }
     }

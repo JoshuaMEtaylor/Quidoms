@@ -9,6 +9,8 @@ import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.colony.Colony;
 import com.minecolonies.core.colony.ColonyList;
 import com.minecolonies.core.util.BackUpHelper;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -17,7 +19,9 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -32,16 +36,15 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
     /**
      * World save data name.
      */
-    public static final String NAME = new ResourceLocation(Constants.MOD_ID, "colony_manager").toDebugFileName();
+    public static final String NAME = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "colony_manager").toDebugFileName();
 
     /**
-     * Worldsavedata factory.
+     * 1.21.10 SavedDataType replacing removed SavedData.Factory.
      */
-    public static final SavedData.Factory<ServerColonySaveData> FACTORY = new SavedData.Factory<>(ServerColonySaveData::new, (d,a) -> {
-        final ServerColonySaveData colonyManagerData = new ServerColonySaveData();
-        colonyManagerData.readNBT(a, d);
-        return colonyManagerData;
-    });
+    public static final SavedDataType<ServerColonySaveData> TYPE = new SavedDataType<>(
+      NAME,
+      ServerColonySaveData::new,
+      ServerColonySaveData::makeCodec);
 
     /**
      * The list of all colonies.
@@ -54,21 +57,33 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
      */
     private boolean overworld;
 
+    @Nullable
+    private ServerLevel level;
+
     private ServerColonySaveData()
     {
-
     }
 
-    @NotNull
-    @Override
-    public CompoundTag save(final @NotNull CompoundTag tag, @NotNull final HolderLookup.Provider provider)
+    private ServerColonySaveData(final SavedData.Context context)
     {
-        return writeNBT(provider, tag);
+        this.level = context.level();
+    }
+
+    private static Codec<ServerColonySaveData> makeCodec(final SavedData.Context context)
+    {
+        return CompoundTag.CODEC.flatXmap(tag -> {
+            final ServerColonySaveData data = new ServerColonySaveData(context);
+            data.readNBT(context.levelOrThrow().registryAccess(), tag);
+            return DataResult.success(data);
+        }, data -> DataResult.success(data.writeNBT(
+          data.level != null ? data.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY,
+          new CompoundTag())));
     }
 
     @Override
     public IColony createColony(@NotNull final ServerLevel w, @NotNull final String name, @NotNull final BlockPos pos)
     {
+        this.level = w;
         return colonies.create(w, name, pos);
     }
 
@@ -147,7 +162,7 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
 
     private void readNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag inputTag)
     {
-        final CompoundTag compound = inputTag.getCompound(Constants.MOD_ID);
+        final CompoundTag compound = inputTag.getCompoundOrEmpty(Constants.MOD_ID);
 
         if (!compound.contains(TAG_COLONIES))
         {
@@ -157,9 +172,9 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
 
         // Load all colonies from Nbt
         Multimap<BlockPos, IColony> tempColonies = ArrayListMultimap.create();
-        for (final Tag tag : compound.getList(TAG_COLONIES, Tag.TAG_COMPOUND))
+        for (final Tag tag : compound.getListOrEmpty(TAG_COLONIES))
         {
-            final IColony colony = Colony.loadColony((CompoundTag) tag, null, provider);
+            final IColony colony = Colony.loadColony((CompoundTag) tag, this.level, provider);
             if (colony != null)
             {
                 tempColonies.put(colony.getCenter(), colony);
@@ -169,7 +184,7 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
 
         if (compound.contains(TAG_COLONY_MANAGER))
         {
-            IColonyManager.getInstance().read(provider, compound.getCompound(TAG_COLONY_MANAGER));
+            IColonyManager.getInstance().read(provider, compound.getCompoundOrEmpty(TAG_COLONY_MANAGER));
             this.overworld = true;
         }
 

@@ -16,7 +16,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.RecipesUpdatedEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
@@ -132,9 +131,9 @@ public class DataPackSyncEventHandler
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void sendOnLogin(final PlayerEvent.PlayerLoggedInEvent event)
         {
-            if (!event.getEntity().level().isClientSide && event.getEntity() instanceof ServerPlayer)
+            if (!event.getEntity().level().isClientSide() && event.getEntity() instanceof ServerPlayer)
             {
-                final MinecraftServer server = event.getEntity().getServer();
+                final MinecraftServer server = event.getEntity().level().getServer();
                 sendPackets((ServerPlayer) event.getEntity(), new UpdateClientWithCompatibilityMessage(server.registryAccess()));
             }
         }
@@ -164,18 +163,10 @@ public class DataPackSyncEventHandler
 
     /**
      * Events subscribed on client-side only.
+     * <p>NeoForge 1.21.10 removed {@code RecipesUpdatedEvent}; furnace/compat discovery
+     * is server-driven via {@link OnDatapackSyncEvent} and custom sync packets instead.
      */
     public static class ClientEvents
     {
-        /**
-         * Fired when the recipes are synched to client.  This happens after the {@link OnDatapackSyncEvent}.
-         *
-         * @param event {@link RecipesUpdatedEvent}
-         */
-        @SubscribeEvent
-        public static void onRecipesLoaded(@NotNull final RecipesUpdatedEvent event)
-        {
-            IColonyManager.getInstance().getCompatibilityManager().getFurnaceRecipes().loadRecipes(event.getRecipeManager(), Minecraft.getInstance().level);
-        }
     }
 }

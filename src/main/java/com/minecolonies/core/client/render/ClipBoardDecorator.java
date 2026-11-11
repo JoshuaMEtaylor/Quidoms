@@ -8,7 +8,6 @@ import com.minecolonies.api.colony.requestsystem.resolver.retrying.IRetryingRequ
 import com.minecolonies.api.colony.requestsystem.token.IToken;
 import com.minecolonies.api.items.component.ColonyId;
 import com.minecolonies.api.util.Log;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -64,15 +63,11 @@ public class ClipBoardDecorator implements IItemDecorator
 
                         if (!requestTokens.isEmpty())
                         {
-                            final PoseStack ps = graphics.pose();
-                            ps.pushPose();
-                            ps.translate(0, 0, 200);
                             graphics.drawCenteredString(font,
                                 Component.literal(requestTokens.size() + ""),
                                 xOffset + 15,
                                 yOffset - 2,
                                 0xFFFF4500);
-                            ps.popPose();
                             return true;
                         }
 

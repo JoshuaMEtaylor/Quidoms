@@ -2,7 +2,7 @@
   "sources": [
     {
       "type": "minecraft:single",
-      "resource": "minecraft:map/map_icons"
+      "resource": "minecolonies:map/map_icons"
     },
     {
       "type": "minecraft:single",
@@ -14,7 +14,7 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "minecraft:entity/chicken"
+      "resource": "minecraft:entity/chicken/temperate_chicken"
     },
     {
       "type": "minecraft:single",
@@ -26,7 +26,7 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "minecraft:models/armor/leather_layer_1"
+      "resource": "minecraft:entity/equipment/humanoid/leather"
     },
     {
       "type": "minecraft:single",

@@ -75,6 +75,15 @@ public class WindowInteraction extends AbstractWindowSkeleton
     {
         super.onOpened();
         interactions.removeIf(interaction -> !interaction.isVisible(Minecraft.getInstance().level));
+        // Quidoms: drop leftover welcome dialogue if an old save still has it assigned.
+        interactions.removeIf(interaction -> {
+            if (!(interaction instanceof QuestDialogueInteraction))
+            {
+                return false;
+            }
+            final String id = interaction.getInquiry() == null ? "" : interaction.getInquiry().getString();
+            return id.contains("tutorial/welcome");
+        });
         setupInteraction();
     }
 

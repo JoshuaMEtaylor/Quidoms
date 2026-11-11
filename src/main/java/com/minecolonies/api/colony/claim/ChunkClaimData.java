@@ -13,7 +13,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import com.minecolonies.api.compat.INBTSerializable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -68,7 +68,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             colony.addLoadedChunk(ChunkPos.asLong(chunk.getPos().x, chunk.getPos().z), chunk);
             owningColony = id;
         }
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             }
         }
 
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
         colonies.clear();
         owningColony = NO_COLONY_ID;
         claimingBuildings.clear();
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             colony.addLoadedChunk(ChunkPos.asLong(chunk.getPos().x, chunk.getPos().z), chunk);
         }
 
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -155,7 +155,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
             return;
         }
 
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
         final Set<BlockPos> buildings = claimingBuildings.get(colonyId);
         buildings.remove(pos);
 
@@ -216,7 +216,7 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
     public void setOwningColony(final int id, final LevelChunk chunk)
     {
         this.owningColony = id;
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
@@ -275,22 +275,22 @@ public class ChunkClaimData implements IChunkClaimData, INBTSerializable<Compoun
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         // Set owning
-        owningColony = compound.getInt(TAG_ID);
+        owningColony = compound.getIntOr(TAG_ID, 0);
 
-        final ListTag colonyClaim = compound.getList(TAG_COLONIES, Tag.TAG_INT);
+        final ListTag colonyClaim = compound.getListOrEmpty(TAG_COLONIES);
         for (int i = 0; i < colonyClaim.size(); i++)
         {
-            colonies.add(colonyClaim.getInt(i));
+            colonies.add(colonyClaim.getIntOr(i, 0));
         }
 
-        final ListTag buildingClaim = compound.getList(TAG_BUILDING_LIST_CLAIM, Tag.TAG_COMPOUND);
+        final ListTag buildingClaim = compound.getListOrEmpty(TAG_BUILDING_LIST_CLAIM);
         for (int i = 0; i < buildingClaim.size(); i++)
         {
-            final CompoundTag perColonyCompound = buildingClaim.getCompound(i);
-            final int id = perColonyCompound.getInt(TAG_ID);
+            final CompoundTag perColonyCompound = buildingClaim.getCompoundOrEmpty(i);
+            final int id = perColonyCompound.getIntOr(TAG_ID, 0);
             final Set<BlockPos> buildings = claimingBuildings.computeIfAbsent(id, HashSet::new);
 
-            final ListTag buildingList = perColonyCompound.getList(TAG_BUILDING_CLAIM, Tag.TAG_COMPOUND);
+            final ListTag buildingList = perColonyCompound.getListOrEmpty(TAG_BUILDING_CLAIM);
             for (int j = 0; j < buildingList.size(); j++)
             {
                 buildings.add(BlockPosUtil.readFromListNBT(buildingList, j));

@@ -1,0 +1,25 @@
+{
+  "branch": "minecolonies:technology",
+  "costs": [
+    {
+      "ingredient": "minecraft:diamond",
+      "count": 32
+    }
+  ],
+  "effects": [
+    {
+      "id": "minecolonies:effects/tooldurabilitymultiplier",
+      "level": 3
+    }
+  ],
+  "icon": "minecraft:iron_pickaxe",
+  "parentResearch": "minecolonies:technology/hardened",
+  "requirements": [
+    {
+      "type": "minecolonies:building",
+      "building": "minecolonies:blacksmith",
+      "level": 3
+    }
+  ],
+  "researchLevel": 4
+}

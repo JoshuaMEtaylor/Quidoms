@@ -131,7 +131,7 @@ public class PathfindingDebugRenderer
         ctx.poseStack.pushPose();
         ctx.poseStack.translate(0.0F, 0.6F, 0.0F);
 
-        ctx.poseStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+        ctx.poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
         ctx.poseStack.scale(0.014F, -0.014F, 0.014F);
         final Matrix4f mat = ctx.poseStack.last().pose();
 

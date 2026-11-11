@@ -20,6 +20,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -76,7 +78,7 @@ public class TileEntityGrave extends AbstractTileEntityGrave implements Clearabl
     @Override
     public void updateItemStorage()
     {
-        if (level != null && !level.isClientSide)
+        if (level != null && !level.isClientSide())
         {
             final boolean empty = content.isEmpty();
             updateContent();
@@ -141,32 +143,37 @@ public class TileEntityGrave extends AbstractTileEntityGrave implements Clearabl
     }
 
     @Override
-    public void loadAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void loadAdditional(final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
+        super.loadAdditional(input);
 
-        decay_timer         = compound.contains(TAG_DECAY_TIMER) ? compound.getInt(TAG_DECAY_TIMER) : DEFAULT_DECAY_TIMER;
-        decayed             = compound.contains(TAG_DECAYED) ? compound.getBoolean(TAG_DECAYED) :false;
+        decay_timer = input.getInt(TAG_DECAY_TIMER).orElse(DEFAULT_DECAY_TIMER);
+        decayed = input.getBooleanOr(TAG_DECAYED, false);
+        // Preserve "absent means false" for decayed only when key missing: getBooleanOr already defaults false.
 
-        if (compound.contains(TAG_GRAVE_DATA))
+        final var graveTag = input.read(TAG_GRAVE_DATA, CompoundTag.CODEC);
+        if (graveTag.isPresent())
         {
             graveData = new GraveData();
-            graveData.read(compound.getCompound(TAG_GRAVE_DATA));
+            graveData.read(graveTag.get());
         }
-        else graveData = null;
+        else
+        {
+            graveData = null;
+        }
     }
 
     @Override
-    public void saveAdditional(final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void saveAdditional(final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
+        super.saveAdditional(output);
 
-        compound.putInt(TAG_DECAY_TIMER, decay_timer);
-        compound.putBoolean(TAG_DECAYED, decayed);
+        output.putInt(TAG_DECAY_TIMER, decay_timer);
+        output.putBoolean(TAG_DECAYED, decayed);
 
-        if(graveData != null)
+        if (graveData != null)
         {
-            compound.put(TAG_GRAVE_DATA, graveData.write());
+            output.store(TAG_GRAVE_DATA, CompoundTag.CODEC, graveData.write());
         }
     }
 
@@ -180,19 +187,19 @@ public class TileEntityGrave extends AbstractTileEntityGrave implements Clearabl
     @Override
     public CompoundTag getUpdateTag(@NotNull final HolderLookup.Provider provider)
     {
-        return this.saveWithId(provider);
+        return this.saveWithoutMetadata(provider);
     }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket packet, @NotNull final HolderLookup.Provider provider)
+    public void onDataPacket(final Connection net, final ValueInput input)
     {
-        this.loadAdditional(packet.getTag(), provider);
+        this.loadAdditional(input);
     }
 
     @Override
-    public void handleUpdateTag(final CompoundTag tag, @NotNull final HolderLookup.Provider provider)
+    public void handleUpdateTag(final ValueInput input)
     {
-        this.loadAdditional(tag, provider);
+        this.loadAdditional(input);
     }
 
     @Override
@@ -230,7 +237,7 @@ public class TileEntityGrave extends AbstractTileEntityGrave implements Clearabl
      **/
     public boolean onColonyTick(final double delay)
     {
-        if (this.hasLevel() && !level.isClientSide && decay_timer != -1)
+        if (this.hasLevel() && !level.isClientSide() && decay_timer != -1)
         {
             decay_timer -= delay;
             if (decay_timer <= 0)

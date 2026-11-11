@@ -19,8 +19,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.ldtteam.structurize.blockentities.interfaces.IBlueprintDataProviderBE.TAG_BLUEPRINTDATA;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -263,11 +267,13 @@ public abstract class AbstractTileEntityColonyBuilding extends TileEntityRack im
     }
 
     @Override
-    public void loadAdditional(@NotNull final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void loadAdditional(@NotNull final ValueInput input)
     {
-        super.loadAdditional(compound, provider);
-        readSchematicDataFromNBT(compound);
-        this.version = compound.getInt(TAG_VERSION);
+        super.loadAdditional(input);
+        final CompoundTag schematic = new CompoundTag();
+        input.read(TAG_BLUEPRINTDATA, CompoundTag.CODEC).ifPresent(tag -> schematic.put(TAG_BLUEPRINTDATA, tag));
+        readSchematicDataFromNBT(schematic);
+        this.version = input.getIntOr(TAG_VERSION, 0);
     }
 
     @Override
@@ -276,7 +282,7 @@ public abstract class AbstractTileEntityColonyBuilding extends TileEntityRack im
         final String old = getSchematicName();
         IBlueprintDataProviderBE.super.readSchematicDataFromNBT(originalCompound);
 
-        if (level == null || level.isClientSide || getColony() == null || getColony().getServerBuildingManager() == null)
+        if (level == null || level.isClientSide() || getColony() == null || getColony().getServerBuildingManager() == null)
         {
             return;
         }
@@ -290,11 +296,13 @@ public abstract class AbstractTileEntityColonyBuilding extends TileEntityRack im
     }
 
     @Override
-    public void saveAdditional(@NotNull final CompoundTag compound, @NotNull final HolderLookup.Provider provider)
+    public void saveAdditional(@NotNull final ValueOutput output)
     {
-        super.saveAdditional(compound, provider);
-        writeSchematicDataToNBT(compound);
-        compound.putInt(TAG_VERSION, this.version);
+        super.saveAdditional(output);
+        final CompoundTag schematic = new CompoundTag();
+        writeSchematicDataToNBT(schematic);
+        output.store(schematic);
+        output.putInt(TAG_VERSION, this.version);
     }
 
     @Override

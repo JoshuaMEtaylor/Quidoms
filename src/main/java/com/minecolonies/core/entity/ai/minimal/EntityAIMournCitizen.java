@@ -254,13 +254,12 @@ public class EntityAIMournCitizen implements IStateAI
 
         if (closestEntity == null)
         {
-            closestEntity = this.citizen.level().getNearestEntity(EntityCitizen.class,
-              TargetingConditions.DEFAULT,
-              citizen,
-              citizen.getX(),
-              citizen.getY(),
-              citizen.getZ(),
-              citizen.getBoundingBox().inflate(3.0D, 3.0D, 3.0D));
+            closestEntity = this.citizen.level().getEntitiesOfClass(EntityCitizen.class,
+              citizen.getBoundingBox().inflate(3.0D, 3.0D, 3.0D),
+              e -> e != citizen && TargetingConditions.DEFAULT.test((net.minecraft.server.level.ServerLevel) citizen.level(), citizen, e))
+              .stream()
+              .min(java.util.Comparator.comparingDouble(citizen::distanceToSqr))
+              .orElse(null);
 
             if (closestEntity == null)
             {

@@ -558,7 +558,7 @@ public abstract class AbstractEntityAIHerder<J extends AbstractJob<?, J>, B exte
             worker.getMainHandItem().shrink(1);
             worker.getCitizenExperienceHandler().addExperience(XP_PER_ACTION);
             worker.level().broadcastEntityEvent(toFeed, (byte) 18);
-            toFeed.playSound(SoundEvents.GENERIC_EAT, 1.0F, 1.0F);
+            toFeed.playSound(SoundEvents.GENERIC_EAT.value(), 1.0F, 1.0F);
             CitizenItemUtils.removeHeldItem(worker);
             fedRecently.put(toFeed.getUUID(), worker.level().getGameTime());
 

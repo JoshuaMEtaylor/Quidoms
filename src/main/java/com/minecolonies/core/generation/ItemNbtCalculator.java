@@ -9,6 +9,7 @@ import com.ldtteam.domumornamentum.client.model.data.MaterialTextureData;
 import com.ldtteam.domumornamentum.client.model.data.MaterialTextureData.Builder;
 import com.minecolonies.api.items.component.ModDataComponents;
 import com.minecolonies.api.util.CraftingUtils;
+import com.minecolonies.api.util.ItemStackUtils;
 import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.core.Holder;
@@ -103,7 +104,7 @@ public class ItemNbtCalculator implements DataProvider
                             builder.setComponent(key.getId(), key.getDefault());
                         }
                         final ItemStack copy = item.copy();
-                        builder.writeToItemStack(copy);
+                        builder.build().writeToItemStack(copy);
                         listBuilder.add(copy);
                     }
                     else
@@ -135,7 +136,7 @@ public class ItemNbtCalculator implements DataProvider
                 final ResourceLocation resourceLocation = stack.getItemHolder().unwrapKey().get().location();
                 final Set<DataComponentType<?>> keys = new ReferenceArraySet<>(stack.getComponents().keySet());
 
-                if (stack.getItem() instanceof ArmorItem)
+                if (ItemStackUtils.isHumanoidArmor(stack))
                 {
                     keys.add(DataComponents.DYED_COLOR);
                 }

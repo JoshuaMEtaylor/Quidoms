@@ -117,8 +117,8 @@ public class BuildingCrusher extends AbstractBuilding
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         super.deserializeNBT(provider, compound);
-        this.currentDailyQuantity = compound.getInt(TAG_CURRENT_DAILY);
-        this.oneByOne = compound.getBoolean(TAG_CRUSHER_RATIO);
+        this.currentDailyQuantity = compound.getIntOr(TAG_CURRENT_DAILY, 0);
+        this.oneByOne = compound.getBooleanOr(TAG_CRUSHER_RATIO, false);
     }
 
     @Override

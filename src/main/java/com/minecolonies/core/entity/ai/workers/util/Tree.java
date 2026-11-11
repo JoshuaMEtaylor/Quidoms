@@ -330,7 +330,7 @@ public class Tree
     private BlockPos getFirstLeaf(final LevelAccessor world)
     {
         // Find the closest leaf above, stay below max height
-        for (int i = 1; (i + topLog.getY()) < world.getMaxBuildHeight() && i < 10; i++)
+        for (int i = 1; (i + topLog.getY()) < world.getMaxY() && i < 10; i++)
         {
             final BlockState blockState = world.getBlockState(topLog.offset(0, i, 0));
             if (blockState.is(BlockTags.LEAVES) || blockState.is(ModTags.hugeMushroomBlocks))
@@ -529,14 +529,14 @@ public class Tree
         tree.location = BlockPosUtil.read(compound, TAG_LOCATION);
 
         tree.woodBlocks = new LinkedList<>();
-        final ListTag logs = compound.getList(TAG_LOGS, Tag.TAG_COMPOUND);
+        final ListTag logs = compound.getListOrEmpty(TAG_LOGS);
         for (int i = 0; i < logs.size(); i++)
         {
             tree.woodBlocks.add(BlockPosUtil.readFromListNBT(logs, i));
         }
 
         tree.stumpLocations = new ArrayList<>();
-        final ListTag stumps = compound.getList(TAG_STUMPS, Tag.TAG_COMPOUND);
+        final ListTag stumps = compound.getListOrEmpty(TAG_STUMPS);
         for (int i = 0; i < stumps.size(); i++)
         {
             tree.stumpLocations.add(BlockPosUtil.readFromListNBT(stumps, i));
@@ -544,12 +544,12 @@ public class Tree
 
         tree.topLog = BlockPosUtil.read(compound, TAG_TOP_LOG);
 
-        tree.slimeTree = compound.getBoolean(TAG_IS_SLIME_TREE);
-        tree.dynamicTree = compound.getBoolean(TAG_DYNAMIC_TREE);
+        tree.slimeTree = compound.getBooleanOr(TAG_IS_SLIME_TREE, false);
+        tree.dynamicTree = compound.getBooleanOr(TAG_DYNAMIC_TREE, false);
 
         if (compound.contains(TAG_SAPLING))
         {
-            tree.sapling = ItemStack.parseOptional(provider, compound.getCompound(TAG_SAPLING));
+            tree.sapling = com.minecolonies.api.util.ItemStackUtils.parseOptional(provider, compound.getCompoundOrEmpty(TAG_SAPLING));
         }
         else
         {
@@ -558,7 +558,7 @@ public class Tree
 
         if (compound.contains(TAG_NETHER_TREE))
         {
-            tree.netherTree = compound.getBoolean(TAG_NETHER_TREE);
+            tree.netherTree = compound.getBooleanOr(TAG_NETHER_TREE, false);
         }
         else
         {
@@ -567,7 +567,7 @@ public class Tree
 
         if (compound.contains(TAG_LEAVES))
         {
-            final ListTag leavesBin = compound.getList(TAG_LEAVES, Tag.TAG_COMPOUND);
+            final ListTag leavesBin = compound.getListOrEmpty(TAG_LEAVES);
             for (int i = 0; i < leavesBin.size(); i++)
             {
                 tree.leaves.add(BlockPosUtil.readFromListNBT(leavesBin, i));
@@ -1005,7 +1005,7 @@ public class Tree
         compound.putBoolean(TAG_IS_SLIME_TREE, slimeTree);
         compound.putBoolean(TAG_DYNAMIC_TREE, dynamicTree);
 
-        compound.put(TAG_SAPLING, sapling.saveOptional(provider));
+        compound.put(TAG_SAPLING, com.minecolonies.api.util.ItemStackUtils.saveOptional(sapling, provider));
         compound.putBoolean(TAG_NETHER_TREE, netherTree);
 
         @NotNull final ListTag leavesBin = new ListTag();

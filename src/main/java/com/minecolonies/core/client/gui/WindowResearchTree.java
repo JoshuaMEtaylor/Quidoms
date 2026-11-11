@@ -810,7 +810,7 @@ public class WindowResearchTree extends AbstractWindowSkeleton
             for (ItemStorage cost : missingItems)
             {
                 undoTipBuilder.paragraphBreak().append(Component.translatableEscape("com.minecolonies.coremod.research.requirement.research",
-                  cost.getItem().getDescription())).color(COLOR_TEXT_UNFULFILLED);
+                  Component.translatable(cost.getItem().getDescriptionId()))).color(COLOR_TEXT_UNFULFILLED);
             }
         }
         else
@@ -867,7 +867,7 @@ public class WindowResearchTree extends AbstractWindowSkeleton
             final List<ItemStack> stacks = new ArrayList<>();
             for (final ResourceLocation building : requirement.getBuildings())
             {
-                stacks.add(Optional.ofNullable(IBuildingRegistry.getInstance().get(building))
+                stacks.add(Optional.ofNullable(IBuildingRegistry.getInstance().getValue(building))
                     .map(entry -> new ItemStack(entry.getBuildingBlock().asItem(), requirement.getBuildingLevel()))
                     .orElse(Items.AIR.getDefaultInstance()));
             }
@@ -890,7 +890,7 @@ public class WindowResearchTree extends AbstractWindowSkeleton
 
         for (final BuildingResearchRequirement requirement : buildingRequirements)
         {
-            final ItemStack stack = Optional.ofNullable(IBuildingRegistry.getInstance().get(requirement.getBuilding()))
+            final ItemStack stack = Optional.ofNullable(IBuildingRegistry.getInstance().getValue(requirement.getBuilding()))
                 .map(entry -> new ItemStack(entry.getBuildingBlock().asItem(), requirement.getBuildingLevel()))
                 .orElse(Items.AIR.getDefaultInstance());
             final ItemIcon icon = new ItemIcon();
@@ -916,12 +916,12 @@ public class WindowResearchTree extends AbstractWindowSkeleton
             final RotatingItemIcon icon = new RotatingItemIcon();
             icon.setPosition(offsetX + RESEARCH_WIDTH - storageXOffset - INITIAL_X_OFFSET, offsetY + NAME_LABEL_HEIGHT + TEXT_Y_OFFSET);
             icon.setSize(DEFAULT_COST_SIZE, DEFAULT_COST_SIZE);
-            if (cost.getItems().length == 0)
+            if (com.minecolonies.api.util.IngredientCompat.getItems(cost).length == 0)
             {
                 Log.getLogger().error("Found Empty list requirement for: " + research.getId() + ". Please report this to the developers.");
                 continue;
             }
-            icon.setItems(List.of(cost.getItems()));
+            icon.setItems(java.util.Arrays.asList(com.minecolonies.api.util.IngredientCompat.getItems(cost)));
             view.addChild(icon);
             storageXOffset += COST_OFFSET;
         }

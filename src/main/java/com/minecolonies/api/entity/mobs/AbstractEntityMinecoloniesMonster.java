@@ -10,14 +10,17 @@ import com.minecolonies.api.entity.ai.statemachine.tickratestatemachine.ITickRat
 import com.minecolonies.api.entity.ai.statemachine.tickratestatemachine.TickRateStateMachine;
 import com.minecolonies.api.entity.other.AbstractFastMinecoloniesEntity;
 import com.minecolonies.api.entity.pathfinding.registry.IPathNavigateRegistry;
-import com.minecolonies.api.sounds.RaiderSounds;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.MathUtils;
 import com.minecolonies.core.entity.pathfinding.navigation.AbstractAdvancedPathNavigate;
 import com.minecolonies.core.entity.pathfinding.navigation.PathingStuckHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -201,20 +204,21 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
     @Override
     protected SoundEvent getHurtSound(final DamageSource damageSourceIn)
     {
-        return RaiderSounds.raiderSounds.get(getRaiderType()).get(RaiderSounds.RaiderSoundTypes.HURT);
+        // RaiderSounds removed with raid content; keep entity hierarchy loadable.
+        return SoundEvents.HOSTILE_HURT;
     }
 
     @Override
     protected SoundEvent getDeathSound()
     {
-        return RaiderSounds.raiderSounds.get(getRaiderType()).get(RaiderSounds.RaiderSoundTypes.DEATH);
+        return SoundEvents.HOSTILE_DEATH;
     }
 
     @Nullable
     @Override
     protected SoundEvent getAmbientSound()
     {
-        return RaiderSounds.raiderSounds.get(getRaiderType()).get(RaiderSounds.RaiderSoundTypes.SAY);
+        return null;
     }
 
     /**
@@ -254,7 +258,7 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
             collisionCounter--;
         }
 
-        if (level().isClientSide)
+        if (level().isClientSide())
         {
             super.aiStep();
             return;
@@ -269,7 +273,7 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
     }
 
     @Override
-    public boolean hurt(@NotNull final DamageSource damageSource, final float damage)
+    public boolean hurtServer(final ServerLevel level, @NotNull final DamageSource damageSource, final float damage)
     {
         if (damageSource.getEntity() instanceof AbstractEntityMinecoloniesMonster)
         {
@@ -288,7 +292,7 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
             threatTable.addThreat(attacker, (int) damage);
         }
 
-        return super.hurt(damageSource, damage);
+        return super.hurtServer(level, damageSource, damage);
     }
 
     /**
@@ -307,7 +311,7 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundTag compound)
+    public void addAdditionalSaveData(final ValueOutput compound)
     {
         if (spawnPos != null)
         {
@@ -317,11 +321,11 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundTag compound)
+    public void readAdditionalSaveData(final ValueInput compound)
     {
-        if (compound.contains(TAG_SPAWN_POS))
+        if (compound.keySet().contains(TAG_SPAWN_POS))
         {
-            this.spawnPos = BlockPos.of(compound.getLong(TAG_SPAWN_POS));
+            this.spawnPos = BlockPos.of(compound.getLongOr(TAG_SPAWN_POS, 0L));
         }
         super.readAdditionalSaveData(compound);
     }
@@ -389,13 +393,6 @@ public abstract class AbstractEntityMinecoloniesMonster extends AbstractFastMine
     }
 
     /**
-     * Vanilla monster: Despawn in peaceful
-     *
-     * @return
+     * Vanilla monster: Despawn in peaceful (shouldDespawnInPeaceful removed in 1.21.10).
      */
-    @Override
-    protected boolean shouldDespawnInPeaceful()
-    {
-        return true;
-    }
 }

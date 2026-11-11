@@ -11,13 +11,21 @@ public abstract class AbstractBlockMinecoloniesHorizontal<B extends AbstractBloc
 {
     public AbstractBlockMinecoloniesHorizontal(final Properties properties)
     {
-        super(properties);
+        super(MinecoloniesBlockIds.withPendingBlockId(properties));
     }
 
     @Override
     public void registerBlockItem(final Registry<Item> registry, final Item.Properties properties)
     {
-        Registry.register(registry, getRegistryName(), new BlockItem(this, properties));
+        MinecoloniesBlockIds.pushItem(getRegistryName());
+        try
+        {
+            Registry.register(registry, getRegistryName(), new BlockItem(this, MinecoloniesBlockIds.withPendingItemId(properties)));
+        }
+        finally
+        {
+            MinecoloniesBlockIds.popItem();
+        }
     }
 
     @Override

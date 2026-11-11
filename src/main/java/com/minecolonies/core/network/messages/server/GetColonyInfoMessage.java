@@ -19,6 +19,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import static com.minecolonies.api.util.constant.BuildingConstants.DEACTIVATED;
@@ -64,8 +65,23 @@ public class GetColonyInfoMessage extends AbstractServerPlayMessage
         }
         final Level world = sender.level();
 
-        if (IColonyManager.getInstance().getColonyByPosFromWorld(world, pos) instanceof Colony)
+        if (IColonyManager.getInstance().getColonyByPosFromWorld(world, pos) instanceof Colony colonyAtPos)
         {
+            // Quidoms: orphaned hut inside a colony — recreate instead of "missing building" spam.
+            final BlockEntity te = world.getBlockEntity(pos);
+            if (te instanceof TileEntityColonyBuilding hut
+                  && colonyAtPos.getServerBuildingManager().getBuilding(pos) == null
+                  && colonyAtPos.getPermissions().hasPermission(sender, com.minecolonies.api.colony.permissions.Action.MANAGE_HUTS))
+            {
+                hut.reactivate();
+                final com.minecolonies.api.colony.buildings.IBuilding building =
+                  colonyAtPos.getServerBuildingManager().addNewBuilding(hut, world);
+                if (building != null)
+                {
+                    new com.minecolonies.core.network.messages.client.colony.OpenBuildingUIMessage(building).sendToPlayer(sender);
+                    return;
+                }
+            }
             MessageUtils.format(HUT_BLOCK_MISSING_BUILDING).sendTo(sender);
             return;
         }
@@ -79,7 +95,7 @@ public class GetColonyInfoMessage extends AbstractServerPlayMessage
         final IColony nextColony = IColonyManager.getInstance().getClosestColony(world, pos);
         if (IColonyManager.getInstance().isFarEnoughFromColonies(world, pos))
         {
-            final double spawnDistance = Math.sqrt(BlockPosUtil.getDistanceSquared2D(pos, world.getSharedSpawnPos()));
+            final double spawnDistance = Math.sqrt(BlockPosUtil.getDistanceSquared2D(pos, world.getRespawnData().pos()));
             if (spawnDistance < MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.get())
             {
                 new OpenCantFoundColonyWarningMessage(Component.translatable("com.minecolonies.core.founding.tooclosetospawn", (int) (MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.get() - spawnDistance)), pos, true).sendToPlayer(sender);

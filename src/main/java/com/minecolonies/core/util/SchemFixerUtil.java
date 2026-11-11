@@ -126,7 +126,7 @@ public class SchemFixerUtil
         if (compoundNBT != null && compoundNBT.contains(TAG_BLUEPRINTDATA))
         {
             final CompoundTag schemDataCompound = (CompoundTag) compoundNBT.get(TAG_BLUEPRINTDATA);
-            final String name = schemDataCompound.getString(TAG_SCHEMATIC_NAME);
+            final String name = schemDataCompound.getStringOr(TAG_SCHEMATIC_NAME, "");
             if (name.contains("citizen") || name.contains("home"))
             {
                 blueprint.setName(blueprint.getName().replace("home", "residence"));

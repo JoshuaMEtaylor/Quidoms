@@ -296,7 +296,7 @@ public abstract class AbstractEntityAIUsesFurnace<J extends AbstractJob<?, J>, B
                     {
                         if (furnace.isLit())
                         {
-                            furnace.serverTick(world, pos, world.getBlockState(pos), furnace);
+                            furnace.serverTick((net.minecraft.server.level.ServerLevel) world, pos, world.getBlockState(pos), furnace);
                         }
                     }
                 }

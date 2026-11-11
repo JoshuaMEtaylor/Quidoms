@@ -291,7 +291,7 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
             if (dest != null && !WorldUtil.isBlockLoaded(ourEntity.level(), dest) && pathResult.getJob() instanceof IDestinationPathJob destinationPathJob &&
                 !WorldUtil.isBlockLoaded(ourEntity.level(), destinationPathJob.getDestination()))
             {
-                if (!FMLEnvironment.production)
+                if (!FMLEnvironment.isProduction())
                 {
                     Log.getLogger().info("Unloaded citizen:" + ourEntity + " trying to path into unloaded position at: " + dest, new Exception());
                 }
@@ -320,11 +320,11 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
                     if (ourEntity instanceof AbstractEntityCitizen citizen)
                     {
                         final BlockPos tpPos = citizen.getCitizenData().getHomePosition();
-                        ourEntity.moveTo(tpPos.getX(), tpPos.getY(), tpPos.getZ());
+                        ourEntity.snapTo(tpPos.getX(), tpPos.getY(), tpPos.getZ());
                         return null;
                     }
 
-                    ourEntity.moveTo(dest.getX(), dest.getY(), dest.getZ());
+                    ourEntity.snapTo(dest.getX(), dest.getY(), dest.getZ());
                 }
 
                 pauseTicks = 20 * 300;
@@ -570,9 +570,15 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
     }
 
     @Override
-    protected PathFinder createPathFinder(final int p_179679_1_)
+    protected PathFinder createPathFinder(final int maxVisitedNodes)
     {
-        return null;
+        // PathNavigation.<init> requires a non-null PathFinder (visitor/mercenary/cavalry_horse NPE in 1.21.10).
+        // Quidoms uses async path jobs instead of vanilla PathFinder, but construction still needs a valid instance.
+        this.nodeEvaluator = new WalkNodeEvaluator();
+        this.nodeEvaluator.setCanPassDoors(true);
+        this.nodeEvaluator.setCanOpenDoors(true);
+        this.nodeEvaluator.setCanFloat(true);
+        return new PathFinder(this.nodeEvaluator, maxVisitedNodes);
     }
 
     @Override
@@ -940,7 +946,7 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
                     ? ((BaseRailBlock) blockstate.getBlock()).getRailDirection(blockstate, level, tempPos, null)
                     : RailShape.NORTH_SOUTH;
                 double yOffset = 0.0D;
-                if (railshape.isAscending())
+                if (railshape.isSlope())
                 {
                     yOffset = 0.5D;
                 }
@@ -951,7 +957,7 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
                 }
                 else
                 {
-                    MinecoloniesMinecart minecart = ModEntities.MINECART.create(level);
+                    MinecoloniesMinecart minecart = ModEntities.MINECART.create(level, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
                     final double x = pEx.x + 0.5D;
                     final double y = pEx.y + 0.625D + yOffset;
                     final double z = pEx.z + 0.5D;
@@ -964,7 +970,7 @@ public class MinecoloniesAdvancedPathNavigate extends AbstractAdvancedPathNaviga
 
                     level.addFreshEntity(minecart);
                     minecart.setHurtDir(1);
-                    mob.startRiding(minecart, true);
+                    mob.startRiding(minecart, true, false);
                 }
                 spawnedPos = tempPos.immutable();
             }
