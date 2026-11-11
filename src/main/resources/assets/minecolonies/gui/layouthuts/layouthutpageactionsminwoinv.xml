@@ -13,6 +13,9 @@
     <button id="build" size="129 17" pos="30 110" color="black"
             source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
             label="$(com.minecolonies.coremod.gui.workerhuts.buildrepair)"/>
+    <button id="cancelBuild" size="129 17" pos="30 129" color="black"
+            source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+            label="$(com.minecolonies.coremod.gui.workerhuts.cancelbuild)" visible="false"/>
     <button id="info" size="17 17" pos="14 214"
             source="minecolonies:textures/gui/red_wax_information.png" tooltip="$(com.minecolonies.core.building.help)"/>
 </window>

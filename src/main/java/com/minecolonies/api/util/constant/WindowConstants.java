@@ -554,6 +554,7 @@ public final class WindowConstants
 
 
     public static final String BUTTON_BUILD        = "build";
+    public static final String BUTTON_CANCEL_BUILD = "cancelBuild";
     public static final String BUTTON_REPAIR       = "repair";
     public static final String BUTTON_INVENTORY    = "inventory";
     public static final String BUTTON_ALLINVENTORY = "allinventory";

@@ -15,10 +15,14 @@
     <button id="build" size="129 17" pos="110 97"  color="black"
             label="🔨🔨🔨🔨$(com.minecolonies.coremod.gui.townhall.build)" source="minecolonies:textures/gui/builderhut/builder_button_medium_large_build.png"/>
 
-    <button id="map" size="129 17" pos="110 116"  color="black"
+    <button id="cancelBuild" size="129 17" pos="110 116" color="black" visible="false"
+            label="$(com.minecolonies.coremod.gui.workerhuts.cancelbuild)"
+            source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"/>
+
+    <button id="map" size="129 17" pos="110 135"  color="black"
                  label="$(com.minecolonies.coremod.gui.townHall.map)" source="minecolonies:textures/gui/builderhut/builder_button_medium_large_map.png"/>
 
-    <button id="mercenaries" size="129 17" pos="110 136"  color="black"
+    <button id="mercenaries" size="129 17" pos="110 155"  color="black"
                  label="$(com.minecolonies.coremod.gui.townhall.mercenary)" source="minecolonies:textures/gui/builderhut/builder_button_medium_large_merc.png"/>
 
     <!-- Visual Changes, Right Side -->
