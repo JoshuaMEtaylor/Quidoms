@@ -6,7 +6,6 @@ import com.ldtteam.structurize.items.ModItems;
 import com.minecolonies.api.IMinecoloniesAPI;
 import com.minecolonies.api.MinecoloniesAPIProxy;
 import com.minecolonies.api.blocks.AbstractBlockHut;
-import com.minecolonies.api.blocks.interfaces.IBuildingBrowsableBlock;
 import com.minecolonies.api.colony.ICitizenDataView;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.IColonyManager;
@@ -45,11 +44,8 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.EventPriority;
@@ -466,33 +462,13 @@ public class ClientEventHandler
         // CustomizeGuiOverlayEvent.DebugText removed in 1.21.10
     }
 
+    /**
+     * Quidoms: air RMB on hut/building items used to open {@link WindowBuildingBrowser}
+     * ("searching ..." parchment with missing magenta textures). Disabled — no-op.
+     */
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onUseItem(@NotNull final PlayerInteractEvent.RightClickItem event)
     {
-        if (!event.getLevel().isClientSide())
-        {
-            return;
-        }
-
-        if (event.getHand() == InteractionHand.MAIN_HAND && event.getItemStack().getItem() instanceof BlockItem blockItem)
-        {
-            // due to a Forge bug, this event still triggers on right-clicking a block (and there are no properties on
-            // the event itself to distinguish the two cases, even though there are likely-sounding ones), so we need
-            // to filter that out
-            if (Minecraft.getInstance().hitResult != null && Minecraft.getInstance().hitResult.getType() != HitResult.Type.MISS)
-            {
-                return;
-            }
-
-            final Block block = blockItem.getBlock();
-
-            if (block instanceof IBuildingBrowsableBlock browsable && browsable.shouldBrowseBuildings(event))
-            {
-                MinecoloniesAPIProxy.getInstance().getBuildingDataManager().openBuildingBrowser(block);
-
-                event.setCanceled(true);
-                event.setCancellationResult(InteractionResult.SUCCESS);
-            }
-        }
+        // intentionally empty — building browser on air right-click removed
     }
 }
