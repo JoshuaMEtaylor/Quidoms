@@ -204,6 +204,9 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         final AbstractBuildingStructureBuilder buildingWorker = building;
         if (requestMaterials())
         {
+            // QD-73: provision exact shortages from QuidCraft (no Quid debit; market walk still applies).
+            final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
+            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(building, citizenName);
             building.getWorkOrder().setRequested(true);
         }
         int newQuantity = buildingWorker.getNeededResources().values().stream().mapToInt(ItemStorage::getAmount).sum();
