@@ -586,22 +586,13 @@ public class RegisteredStructureManager implements IRegisteredStructureManager
                 {
                     building.setStructurePack(colony.getStructurePack());
                 }
-                // Orphan recreate often leaves an empty blueprint path — derive so Build Building can claim.
-                if (building.getBlueprintPath() == null || building.getBlueprintPath().isBlank())
+                // Resolve a pack+path that actually exists (orphan/empty/Decorations → fundamentals/builder1.blueprint).
+                try
                 {
-                    try
-                    {
-                        final String hut = building.getBuildingType().getRegistryName().getPath();
-                        String mapped = com.minecolonies.api.compatibility.newstruct.BlueprintMapping.getPathMapping("", hut);
-                        if (mapped == null || mapped.isEmpty())
-                        {
-                            mapped = "fundamentals/" + hut;
-                        }
-                        building.setBlueprintPath(mapped + "1.blueprint");
-                    }
-                    catch (final Exception ignored)
-                    {
-                    }
+                    com.minecolonies.core.util.HutBlueprintResolver.ensure(building, 1);
+                }
+                catch (final Exception ignored)
+                {
                 }
 
                 if (world != null && !(building instanceof IRSComponent))

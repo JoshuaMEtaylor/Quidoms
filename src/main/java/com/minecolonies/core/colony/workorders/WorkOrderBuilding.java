@@ -63,11 +63,18 @@ public class WorkOrderBuilding extends AbstractWorkOrder
         }
 
         final int targetSchematicLevel = type == WorkOrderType.REMOVE ? building.getBuildingLevel() : targetLevel;
-        String schemPath = resolveSchematicPath(building, Math.max(1, targetSchematicLevel));
+        final int pathLevel = Math.max(1, type == WorkOrderType.REMOVE ? building.getBuildingLevel() : targetSchematicLevel);
+        // Ensure building + WO share a pack/path that StructurePacks can actually load (not Decorations/empty).
+        final com.minecolonies.core.util.HutBlueprintResolver.Resolved resolved =
+          com.minecolonies.core.util.HutBlueprintResolver.ensure(building, pathLevel);
+        final String pack = resolved != null
+                              ? resolved.pack()
+                              : (building.getStructurePack() == null || building.getStructurePack().isEmpty()
+                                   ? (building.getColony() == null ? "" : building.getColony().getStructurePack())
+                                   : building.getStructurePack());
+        final String schemPath = resolved != null ? resolved.path() : fallbackSchematicPath(building, pathLevel);
         WorkOrderBuilding wo = new WorkOrderBuilding(
-          building.getStructurePack() == null || building.getStructurePack().isEmpty()
-            ? (building.getColony() == null ? "" : building.getColony().getStructurePack())
-            : building.getStructurePack(),
+          pack,
           schemPath,
           building.getBuildingType().getTranslationKey(),
           type,
@@ -79,46 +86,26 @@ public class WorkOrderBuilding extends AbstractWorkOrder
         return wo;
     }
 
-    /**
-     * Resolve a blueprint path for a work order. Orphaned/recreated huts may have an empty path —
-     * never throw; derive fundamentals/&lt;hut&gt;N.blueprint so Build Building still claims.
-     */
     @NotNull
-    private static String resolveSchematicPath(@NotNull final IBuilding building, final int targetSchematicLevel)
+    private static String fallbackSchematicPath(@NotNull final IBuilding building, final int targetSchematicLevel)
     {
-        String schemPath = building.getBlueprintPath();
-        if (schemPath == null)
+        String hut = "builder";
+        try
         {
-            schemPath = "";
+            if (building.getBuildingType() != null && building.getBuildingType().getRegistryName() != null)
+            {
+                hut = building.getBuildingType().getRegistryName().getPath();
+            }
         }
-        schemPath = schemPath.replace(".blueprint", "").trim();
-        if (schemPath.isEmpty())
+        catch (final Exception ignored)
         {
-            String hut = "";
-            try
-            {
-                if (building.getBuildingType() != null && building.getBuildingType().getRegistryName() != null)
-                {
-                    hut = building.getBuildingType().getRegistryName().getPath();
-                }
-            }
-            catch (final Exception ignored)
-            {
-            }
-            if (hut.isEmpty())
-            {
-                hut = "townhall";
-            }
-            String mapped = BlueprintMapping.getPathMapping("", hut);
-            if (mapped == null || mapped.isEmpty())
-            {
-                mapped = "fundamentals/" + hut;
-            }
-            return mapped + targetSchematicLevel + ".blueprint";
         }
-        final char last = schemPath.charAt(schemPath.length() - 1);
-        final String base = Character.isDigit(last) ? schemPath.substring(0, schemPath.length() - 1) : schemPath;
-        return base + targetSchematicLevel + ".blueprint";
+        String mapped = BlueprintMapping.getPathMapping("", hut);
+        if (mapped == null || mapped.isEmpty())
+        {
+            mapped = "fundamentals/" + hut;
+        }
+        return mapped + targetSchematicLevel + ".blueprint";
     }
 
     /**

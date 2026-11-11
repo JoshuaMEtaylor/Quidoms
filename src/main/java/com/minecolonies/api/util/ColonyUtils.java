@@ -111,10 +111,44 @@ public final class ColonyUtils
     private static Blueprint loadBlueprintSoft(final String structurePack, final String structurePath, final HolderLookup.Provider provider)
     {
         // StructurePacks.getBlueprint aliases Alternative packs/paths and soft-fails missing files.
-        final Blueprint blueprint = StructurePacks.getBlueprint(structurePack, structurePath, true, provider);
+        Blueprint blueprint = StructurePacks.getBlueprint(structurePack, structurePath, true, provider);
         if (blueprint == null)
         {
-            Log.getLogger().warn("Missing blueprint (soft-fail): pack='{}' path='{}'", structurePack, structurePath);
+            // Last chance: scan jar packs for fundamentals/<hut>N.blueprint (builder/townhall).
+            String hut = "builder";
+            int level = 1;
+            try
+            {
+                if (structurePath != null && !structurePath.isBlank())
+                {
+                    final String file = structurePath.contains("/")
+                                          ? structurePath.substring(structurePath.lastIndexOf('/') + 1)
+                                          : structurePath;
+                    String name = file.replace(".blueprint", "");
+                    if (!name.isEmpty() && Character.isDigit(name.charAt(name.length() - 1)))
+                    {
+                        level = Character.getNumericValue(name.charAt(name.length() - 1));
+                        name = name.substring(0, name.length() - 1);
+                    }
+                    if (name.startsWith("alt"))
+                    {
+                        name = name.substring(3);
+                    }
+                    if (!name.isBlank())
+                    {
+                        hut = name;
+                    }
+                }
+            }
+            catch (final Exception ignored)
+            {
+            }
+            blueprint = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
+              structurePack, structurePath, hut, Math.max(1, level), provider);
+            if (blueprint == null)
+            {
+                Log.getLogger().warn("Missing blueprint (soft-fail): pack='{}' path='{}'", structurePack, structurePath);
+            }
         }
         return blueprint;
     }

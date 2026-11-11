@@ -435,10 +435,50 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
         {
             future = ColonyUtils.queueBlueprintLoad(world, getStructurePack(), getStructurePath(), blueprint ->
                 {
-                    setBlueprint(blueprint, world);
-                    afterLoad.accept(blueprint);
+                    Blueprint resolved = blueprint;
+                    if (resolved == null)
+                    {
+                        // Pack/path may be Decorations/empty — search jar packs for a real hut schematic.
+                        String hut = "builder";
+                        try
+                        {
+                            final String path = getStructurePath();
+                            if (path != null)
+                            {
+                                final String file = path.contains("/") ? path.substring(path.lastIndexOf('/') + 1) : path;
+                                hut = file.replace(".blueprint", "").replaceAll("\\d+$", "");
+                                if (hut.startsWith("alt"))
+                                {
+                                    hut = hut.substring(3);
+                                }
+                            }
+                        }
+                        catch (final Exception ignored)
+                        {
+                        }
+                        resolved = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
+                          getStructurePack(), getStructurePath(), hut, Math.max(1, getTargetLevel()), world.registryAccess());
+                        if (resolved != null)
+                        {
+                            final com.minecolonies.core.util.HutBlueprintResolver.Resolved hit =
+                              com.minecolonies.core.util.HutBlueprintResolver.resolve(hut, getStructurePack(), getStructurePath(), Math.max(1, getTargetLevel()));
+                            if (hit != null)
+                            {
+                                this.packName = hit.pack();
+                                this.path = hit.path();
+                            }
+                        }
+                    }
+                    setBlueprint(resolved, world);
+                    afterLoad.accept(resolved);
                 },
-                e -> afterLoad.accept(null));
+                e -> {
+                    // Soft-fail path still try resolver before giving up.
+                    final Blueprint resolved = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
+                      getStructurePack(), getStructurePath(), "builder", Math.max(1, getTargetLevel()), world.registryAccess());
+                    setBlueprint(resolved, world);
+                    afterLoad.accept(resolved);
+                });
         }
         else
         {

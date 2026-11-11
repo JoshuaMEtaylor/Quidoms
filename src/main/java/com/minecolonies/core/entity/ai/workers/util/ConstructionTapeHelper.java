@@ -7,6 +7,7 @@ import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.workorders.IWorkOrder;
 import com.minecolonies.api.util.ColonyUtils;
+import com.minecolonies.api.util.Log;
 import com.minecolonies.core.blocks.decorative.BlockConstructionTape;
 import com.minecolonies.core.colony.Colony;
 import com.minecolonies.core.colony.buildings.workerbuildings.BuildingTownHall;
@@ -54,8 +55,30 @@ public final class ConstructionTapeHelper
      */
     public static void placeConstructionTape(@NotNull final IBuilding building)
     {
-        ServerFutureProcessor.queueBlueprint(new ServerFutureProcessor.BlueprintProcessingData(StructurePacks.getBlueprintFuture(building.getStructurePack(),
-          building.getBlueprintPath(), building.getColony().getWorld().registryAccess()), building.getColony().getWorld(), (blueprint -> {
+        final int level = Math.max(1, building.getBuildingLevel() == 0 ? 1 : building.getBuildingLevel());
+        final com.minecolonies.core.util.HutBlueprintResolver.Resolved resolved =
+          com.minecolonies.core.util.HutBlueprintResolver.ensure(building, level);
+        final String pack = resolved != null ? resolved.pack() : building.getStructurePack();
+        final String path = resolved != null ? resolved.path() : building.getBlueprintPath();
+        ServerFutureProcessor.queueBlueprint(new ServerFutureProcessor.BlueprintProcessingData(
+          StructurePacks.getBlueprintFuture(pack, path, true, building.getColony().getWorld().registryAccess()),
+          building.getColony().getWorld(),
+          (blueprint -> {
+            if (blueprint == null)
+            {
+                // Last chance: search all packs for this hut.
+                final String hut = building.getBuildingType() == null || building.getBuildingType().getRegistryName() == null
+                                     ? "builder"
+                                     : building.getBuildingType().getRegistryName().getPath();
+                blueprint = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
+                  pack, path, hut, level, building.getColony().getWorld().registryAccess());
+            }
+            if (blueprint == null)
+            {
+                Log.getLogger().warn("Construction tape: still no blueprint for {} pack='{}' path='{}'",
+                  building.getBuildingType() == null ? "?" : building.getBuildingType().getRegistryName(), pack, path);
+                return;
+            }
             final Tuple<BlockPos, BlockPos> corners =
               ColonyUtils.calculateCorners(building.getPosition(), building.getColony().getWorld(), blueprint, building.getRotationMirror());
             building.setCorners(corners.getA(), corners.getB());
