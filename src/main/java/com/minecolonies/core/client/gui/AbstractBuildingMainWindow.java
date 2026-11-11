@@ -11,7 +11,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
@@ -31,9 +30,14 @@ public abstract class AbstractBuildingMainWindow<B extends IBuildingView> extend
     private final Text title;
 
     /**
-     * The build button.
+     * Opens build options / resource requirements.
      */
     private final Button buttonBuild;
+
+    /**
+     * Cancels an in-progress build, upgrade, repair, or deconstruction.
+     */
+    private final Button buttonCancelBuild;
 
     /**
      * Constructor for the windows that are associated with buildings.
@@ -46,6 +50,7 @@ public abstract class AbstractBuildingMainWindow<B extends IBuildingView> extend
         super(buildingView, resource);
 
         registerButton(BUTTON_BUILD, this::buildClicked);
+        registerButton(BUTTON_CANCEL_BUILD, this::cancelBuildClicked);
         registerButton(BUTTON_INFO, this::infoClicked);
         registerButton(BUTTON_INVENTORY, this::inventoryClicked);
         registerButton(BUTTON_EDIT_NAME, this::editName);
@@ -53,6 +58,7 @@ public abstract class AbstractBuildingMainWindow<B extends IBuildingView> extend
 
         title = findPaneOfTypeByID(LABEL_BUILDING_NAME, Text.class);
         buttonBuild = findPaneOfTypeByID(BUTTON_BUILD, Button.class);
+        buttonCancelBuild = findPaneOfTypeByID(BUTTON_CANCEL_BUILD, Button.class);
         Button buttonInfo = findPaneOfTypeByID(BUTTON_INFO, Button.class);
         if (buttonInfo != null)
         {
@@ -92,29 +98,29 @@ public abstract class AbstractBuildingMainWindow<B extends IBuildingView> extend
     }
 
     /**
-     * Action when build button is clicked.
+     * Action when build options button is clicked.
      */
     private void buildClicked()
     {
-        final String buttonLabel = buttonBuild.getText().getContents() instanceof TranslatableContents
-            ? ((TranslatableContents) buttonBuild.getText().getContents()).getKey()
-            : buttonBuild.getTextAsString();
+        new WindowBuildBuilding(buildingView.getColony(), buildingView).open();
+    }
 
-        if (buttonLabel.equalsIgnoreCase(ACTION_CANCEL_BUILD) || buttonLabel.equalsIgnoreCase(ACTION_CANCEL_UPGRADE))
+    /**
+     * Action when cancel-build button is clicked.
+     */
+    private void cancelBuildClicked()
+    {
+        if (buildingView.isBuilding())
         {
             new BuildRequestMessage(buildingView, BuildRequestMessage.Mode.BUILD, BlockPos.ZERO).sendToServer();
         }
-        else if (buttonLabel.equalsIgnoreCase(ACTION_CANCEL_REPAIR))
+        else if (buildingView.isRepairing())
         {
             new BuildRequestMessage(buildingView, BuildRequestMessage.Mode.REPAIR, BlockPos.ZERO).sendToServer();
         }
-        else if (buttonLabel.equalsIgnoreCase(ACTION_CANCEL_DECONSTRUCTION))
+        else if (buildingView.isDeconstructing())
         {
             new BuildRequestMessage(buildingView, BuildRequestMessage.Mode.REMOVE, BlockPos.ZERO).sendToServer();
-        }
-        else
-        {
-            new WindowBuildBuilding(buildingView.getColony(), buildingView).open();
         }
     }
 
@@ -134,39 +140,47 @@ public abstract class AbstractBuildingMainWindow<B extends IBuildingView> extend
     }
 
     /**
-     * Update the state and label for the Build button.
+     * Keep Build Options available, and show Cancel beneath it while work is underway.
      *
      * @param buildingView the view to update from.
      */
     private void updateButtonBuild(final IBuildingView buildingView)
     {
-        if (buttonBuild == null)
+        if (buttonBuild != null)
+        {
+            buttonBuild.setText(Component.translatableEscape(ACTION_BUILD_REPAIR));
+        }
+
+        if (buttonCancelBuild == null)
         {
             return;
         }
 
         if (buildingView.isBuilding())
         {
+            buttonCancelBuild.setVisible(true);
             if (buildingView.getBuildingLevel() == 0)
             {
-                buttonBuild.setText(Component.translatableEscape(ACTION_CANCEL_BUILD));
+                buttonCancelBuild.setText(Component.translatableEscape(ACTION_CANCEL_BUILD));
             }
             else
             {
-                buttonBuild.setText(Component.translatableEscape(ACTION_CANCEL_UPGRADE));
+                buttonCancelBuild.setText(Component.translatableEscape(ACTION_CANCEL_UPGRADE));
             }
         }
         else if (buildingView.isRepairing())
         {
-            buttonBuild.setText(Component.translatableEscape(ACTION_CANCEL_REPAIR));
+            buttonCancelBuild.setVisible(true);
+            buttonCancelBuild.setText(Component.translatableEscape(ACTION_CANCEL_REPAIR));
         }
         else if (buildingView.isDeconstructing())
         {
-            buttonBuild.setText(Component.translatableEscape(ACTION_CANCEL_DECONSTRUCTION));
+            buttonCancelBuild.setVisible(true);
+            buttonCancelBuild.setText(Component.translatableEscape(ACTION_CANCEL_DECONSTRUCTION));
         }
         else
         {
-            buttonBuild.setText(Component.translatableEscape(ACTION_BUILD_REPAIR));
+            buttonCancelBuild.setVisible(false);
         }
     }
 
@@ -182,5 +196,7 @@ public abstract class AbstractBuildingMainWindow<B extends IBuildingView> extend
             final MutableComponent componentWithLevel = component.append(" ").append(String.valueOf(buildingView.getBuildingLevel()));
             title.setText(componentWithLevel);
         }
+
+        updateButtonBuild(buildingView);
     }
 }
