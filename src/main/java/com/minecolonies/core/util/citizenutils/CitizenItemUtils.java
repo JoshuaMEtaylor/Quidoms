@@ -91,6 +91,12 @@ public class CitizenItemUtils
      */
     public static void removeHeldItem(AbstractEntityCitizen citizen)
     {
+        // Quidoms: clear both the inventory held-slot index and the entity equipment slot so
+        // bare-handed work does not leave a ghost tool rendered on the citizen.
+        if (citizen.getCitizenData() != null)
+        {
+            citizen.getCitizenData().getInventory().setHeldItem(InteractionHand.MAIN_HAND, -1);
+        }
         citizen.setItemSlot(EquipmentSlot.MAINHAND, ItemStackUtils.EMPTY);
     }
 

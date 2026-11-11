@@ -303,11 +303,6 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
      */
     public int getBlockMiningTime(@NotNull final BlockState state, @NotNull final BlockPos pos)
     {
-        if (worker.getMainHandItem() == null)
-        {
-            return (int) state.getDestroySpeed(world, pos);
-        }
-
         return MineColonies.getConfig().getServer().pvp_mode.get()
                  ? BLOCK_MINING_DELAY / 2
                  : calculateWorkerMiningDelay(state, pos);
@@ -331,7 +326,11 @@ public abstract class AbstractEntityAIInteract<J extends AbstractJob<?, J>, B ex
 
         final double reduction = 1 - worker.getCitizenColonyHandler().getColonyOrRegister().getResearchManager().getResearchEffects().getEffectStrength(BLOCK_BREAK_SPEED);
         final double safeHardness = Math.max(0.05D, hardness);
-        final double toolSpeed = Math.max(0.1D, worker.getMainHandItem().getItem().getDestroySpeed(worker.getMainHandItem(), state));
+        // Quidoms: use the currently equipped tool's full destroy speed (bare hands only when empty).
+        final ItemStack held = worker.getMainHandItem();
+        final double toolSpeed = Math.max(0.1D, held.isEmpty()
+                                                  ? 1.0D
+                                                  : held.getItem().getDestroySpeed(held, state));
 
         // Quidoms: break as fast as tools allow — hardness/toolSpeed only (Athletics skill flattened).
         return Math.max(1, (int) ((BLOCK_MINING_DELAY * safeHardness / toolSpeed) * reduction));

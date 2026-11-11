@@ -975,8 +975,9 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
     protected boolean checkForToolOrWeapon(@NotNull final EquipmentTypeEntry toolType, final int minimalLevel)
     {
         // Quidoms: never create Tool requests / stuck popups ("Hoe with minimal level…").
-        // Cancel leftover open requests from older saves, then continue without requiring a tool.
+        // Cancel leftover open requests, still pull tools from the hut when present, then continue.
         cancelOpenToolRequests(toolType);
+        checkForNeededTool(toolType, minimalLevel);
         return false;
     }
 
@@ -1296,7 +1297,8 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
     /**
      * Check and ensure that we hold the most efficient tool for the job.
      * <p>
-     * If we have no tool for the job, we will request on, return immediately.
+     * Quidoms: pick the best matching tool (wood→axe, stone→pickaxe, …), show it equipped,
+     * and only fall back to bare hands when inventory and hut have none. Never create Tool requests.
      *
      * @param target the BlockState to mine
      * @param pos    the pos to mine
@@ -1308,6 +1310,7 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
         if (bestSlot >= 0)
         {
             worker.getCitizenData().setJobStatus(JobStatus.WORKING);
+            // Visible equip on the citizen entity (vanilla player model renders MAINHAND).
             CitizenItemUtils.setHeldItem(worker, InteractionHand.MAIN_HAND, bestSlot);
             return true;
         }
@@ -1381,25 +1384,53 @@ public abstract class AbstractEntityAIBasic<J extends AbstractJob<?, J>, B exten
             return NO_TOOL;
         }
 
-        int bestSlot = TOOL_NOT_FOUND;
-        int bestLevel = Integer.MAX_VALUE;
-        @NotNull final InventoryCitizen inventory = worker.getInventoryCitizen();
-        final int maxToolLevel = worker.getCitizenColonyHandler().getWorkBuilding().getMaxEquipmentLevel();
+        int bestSlot = findBestToolSlot(toolType, required, target);
 
-        for (int i = 0; i < worker.getInventoryCitizen().getSlots(); i++)
+        // Quidoms: if inventory lacks the right tool, silently pull one from hut racks/chests
+        // (wood→axe, stone→pickaxe, …) before falling back to bare hands. Never Tool-request.
+        if (bestSlot == TOOL_NOT_FOUND && retrieveToolInHut(toolType, required))
         {
-            final ItemStack item = inventory.getStackInSlot(i);
-            final int level = toolType.getMiningLevel(item);
-
-            if (level > -1 && level >= required && level < bestLevel && ItemStackUtils.verifyEquipmentLevel(item, level, required, maxToolLevel))
-            {
-                bestSlot = i;
-                bestLevel = level;
-            }
+            bestSlot = findBestToolSlot(toolType, required, target);
         }
 
         // Quidoms: missing tool → bare hands (NO_TOOL), never TOOL_NOT_FOUND → requestTool popups.
         return bestSlot == TOOL_NOT_FOUND ? NO_TOOL : bestSlot;
+    }
+
+    /**
+     * Quidoms: pick the highest-tier matching tool for {@code toolType} so mining uses full tool speed.
+     *
+     * @param toolType required equipment type for the block
+     * @param required minimum harvest level
+     * @param target   block being mined (for destroy-speed tiebreak)
+     * @return inventory slot or {@link #TOOL_NOT_FOUND}
+     */
+    private int findBestToolSlot(@NotNull final EquipmentTypeEntry toolType, final int required, @NotNull final BlockState target)
+    {
+        int bestSlot = TOOL_NOT_FOUND;
+        int bestLevel = Integer.MIN_VALUE;
+        float bestSpeed = -1.0F;
+        @NotNull final InventoryCitizen inventory = worker.getInventoryCitizen();
+        final int maxToolLevel = worker.getCitizenColonyHandler().getWorkBuilding().getMaxEquipmentLevel();
+
+        for (int i = 0; i < inventory.getSlots(); i++)
+        {
+            final ItemStack item = inventory.getStackInSlot(i);
+            final int level = toolType.getMiningLevel(item);
+
+            if (level > -1 && level >= required && ItemStackUtils.verifyEquipmentLevel(item, level, required, maxToolLevel))
+            {
+                final float speed = item.getItem().getDestroySpeed(item, target);
+                if (level > bestLevel || (level == bestLevel && speed > bestSpeed))
+                {
+                    bestSlot = i;
+                    bestLevel = level;
+                    bestSpeed = speed;
+                }
+            }
+        }
+
+        return bestSlot;
     }
 
     /**
