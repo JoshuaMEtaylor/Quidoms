@@ -224,7 +224,16 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
      */
     private void triggerConfirmAction(final BlockPos builder)
     {
-        new BuildingSetStyleMessage(building, styles.get(stylesDropDownList.getSelectedIndex())).sendToServer();
+        final int styleIndex = stylesDropDownList.getSelectedIndex();
+        if (styleIndex < 0 || styleIndex >= styles.size())
+        {
+            Log.getLogger().warn("Build Building: no valid style selected; refusing empty claim");
+            return;
+        }
+        final String stylePack = styles.get(styleIndex);
+        final String blueprintPath = resolveBlueprintPathForPack(stylePack);
+        // Always push pack+path so orphan/empty-path huts still create a work order.
+        new BuildingSetStyleMessage(building, stylePack, blueprintPath == null ? "" : blueprintPath).sendToServer();
         if (building.getBuildingLevel() == building.getBuildingMaxLevel())
         {
             new BuildRequestMessage(building, BuildRequestMessage.Mode.REPAIR, builder).sendToServer();

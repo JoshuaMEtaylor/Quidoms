@@ -7,6 +7,7 @@ import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.colony.workorders.IWorkManager;
 import com.minecolonies.api.colony.workorders.WorkOrderType;
+import com.minecolonies.api.compatibility.newstruct.BlueprintMapping;
 import com.minecolonies.core.colony.buildings.workerbuildings.BuildingBuilder;
 import com.minecolonies.core.entity.ai.workers.util.ConstructionTapeHelper;
 import com.minecolonies.core.util.AdvancementUtils;
@@ -62,10 +63,11 @@ public class WorkOrderBuilding extends AbstractWorkOrder
         }
 
         final int targetSchematicLevel = type == WorkOrderType.REMOVE ? building.getBuildingLevel() : targetLevel;
-        String schemPath = building.getBlueprintPath().replace(".blueprint", "");
-        schemPath = schemPath.substring(0, schemPath.length() - 1) + targetSchematicLevel + ".blueprint";
+        String schemPath = resolveSchematicPath(building, Math.max(1, targetSchematicLevel));
         WorkOrderBuilding wo = new WorkOrderBuilding(
-          building.getStructurePack(),
+          building.getStructurePack() == null || building.getStructurePack().isEmpty()
+            ? (building.getColony() == null ? "" : building.getColony().getStructurePack())
+            : building.getStructurePack(),
           schemPath,
           building.getBuildingType().getTranslationKey(),
           type,
@@ -75,6 +77,48 @@ public class WorkOrderBuilding extends AbstractWorkOrder
           targetLevel);
         wo.setCustomName(building);
         return wo;
+    }
+
+    /**
+     * Resolve a blueprint path for a work order. Orphaned/recreated huts may have an empty path —
+     * never throw; derive fundamentals/&lt;hut&gt;N.blueprint so Build Building still claims.
+     */
+    @NotNull
+    private static String resolveSchematicPath(@NotNull final IBuilding building, final int targetSchematicLevel)
+    {
+        String schemPath = building.getBlueprintPath();
+        if (schemPath == null)
+        {
+            schemPath = "";
+        }
+        schemPath = schemPath.replace(".blueprint", "").trim();
+        if (schemPath.isEmpty())
+        {
+            String hut = "";
+            try
+            {
+                if (building.getBuildingType() != null && building.getBuildingType().getRegistryName() != null)
+                {
+                    hut = building.getBuildingType().getRegistryName().getPath();
+                }
+            }
+            catch (final Exception ignored)
+            {
+            }
+            if (hut.isEmpty())
+            {
+                hut = "townhall";
+            }
+            String mapped = BlueprintMapping.getPathMapping("", hut);
+            if (mapped == null || mapped.isEmpty())
+            {
+                mapped = "fundamentals/" + hut;
+            }
+            return mapped + targetSchematicLevel + ".blueprint";
+        }
+        final char last = schemPath.charAt(schemPath.length() - 1);
+        final String base = Character.isDigit(last) ? schemPath.substring(0, schemPath.length() - 1) : schemPath;
+        return base + targetSchematicLevel + ".blueprint";
     }
 
     /**
