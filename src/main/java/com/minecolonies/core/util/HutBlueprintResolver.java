@@ -140,20 +140,36 @@ public final class HutBlueprintResolver
             }
         }
 
-        // Last resort: derive fundamentals/<hut>N without existence probe so WO still has a path.
-        String mapped = BlueprintMapping.getPathMapping("", hut);
-        if (mapped == null || mapped.isBlank())
+        // Last resort: bare pack-root layouts (legacy Stone/Asian/Wooden: townhall1.blueprint).
+        final List<String> bare = List.of(hut + level + ".blueprint", hut + "1.blueprint");
+        for (final String tryPack : preferredPackAliases(preferredPack))
         {
-            mapped = "fundamentals/" + hut;
+            final StructurePackMeta meta = StructurePacks.getStructurePack(tryPack);
+            if (meta == null)
+            {
+                continue;
+            }
+            final String hit = firstExistingPath(meta, bare);
+            if (hit != null)
+            {
+                return new Resolved(meta.getName(), hit);
+            }
         }
-        final String derived = mapped + level + ".blueprint";
-        final String packGuess = preferredPack != null && !preferredPack.isBlank()
-                                   ? StructurePacks.aliasPackName(preferredPack)
-                                   : (PREFERRED_PACKS.isEmpty() ? "" : PREFERRED_PACKS.get(0));
-        if (!packGuess.isBlank() && StructurePacks.getStructurePack(packGuess) != null)
+        for (final String name : PREFERRED_PACKS)
         {
-            return new Resolved(StructurePacks.getStructurePack(packGuess).getName(), derived);
+            final StructurePackMeta pack = StructurePacks.getStructurePack(name);
+            if (pack == null)
+            {
+                continue;
+            }
+            final String hit = firstExistingPath(pack, bare);
+            if (hit != null)
+            {
+                return new Resolved(pack.getName(), hit);
+            }
         }
+
+        // Never invent fundamentals/<hut> for a pack that does not have it (Stone soft-fail).
         Log.getLogger().warn("HutBlueprintResolver: no pack has hut '{}' candidates {}", hut, pathCandidates);
         return null;
     }
@@ -391,6 +407,24 @@ public final class HutBlueprintResolver
             final String folder = mapped.substring(0, mapped.lastIndexOf('/') + 1);
             candidates.add(folder + hut + level + ".blueprint");
             candidates.add(folder + hut + "1.blueprint");
+            // Legacy flat packs (Stone/Asian/Wooden): hut files sit at pack root, not fundamentals/.
+            candidates.add(hut + level + ".blueprint");
+            candidates.add(hut + "1.blueprint");
+        }
+        else
+        {
+            candidates.add(hut + level + ".blueprint");
+            candidates.add(hut + "1.blueprint");
+        }
+        // If caller passed fundamentals/… also try the bare filename for flat packs.
+        if (existingPath != null && existingPath.contains("/"))
+        {
+            final String file = existingPath.substring(existingPath.lastIndexOf('/') + 1).trim();
+            if (!file.isBlank())
+            {
+                candidates.add(file);
+                addLeveled(candidates, file, level);
+            }
         }
         return candidates.stream().filter(p -> p != null && !p.isBlank()).distinct().toList();
     }

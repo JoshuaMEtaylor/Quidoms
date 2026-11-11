@@ -472,13 +472,78 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
             {
                 // Soft-fail / pack search already happened on the IO pool inside ColonyUtils.
                 // Do not sync-load again on the server tick callback.
-                if (loaded != null)
+                Blueprint resolved = loaded;
+                if (resolved == null)
                 {
-                    setBlueprint(loaded, world);
+                    // Flat packs (Stone) store townhall1.blueprint at pack root — recover and rewrite WO path.
+                    resolved = recoverBlueprint(world);
                 }
-                afterLoad.accept(loaded);
+                if (resolved != null)
+                {
+                    setBlueprint(resolved, world);
+                }
+                afterLoad.accept(resolved);
             },
-            e -> afterLoad.accept(null));
+            e -> {
+                final Blueprint recovered = recoverBlueprint(world);
+                if (recovered != null)
+                {
+                    setBlueprint(recovered, world);
+                }
+                afterLoad.accept(recovered);
+            });
+    }
+
+    /**
+     * Recover a missing pack/path (e.g. Stone + fundamentals/…) via HutBlueprintResolver and rewrite WO.
+     * Runs only from IO-pool / ServerFutureProcessor callbacks — never on the raw server tick.
+     */
+    @Nullable
+    private Blueprint recoverBlueprint(final Level world)
+    {
+        try
+        {
+            String hut = "builder";
+            final String structurePath = getStructurePath();
+            if (structurePath != null && !structurePath.isBlank())
+            {
+                final String file = structurePath.contains("/")
+                                      ? structurePath.substring(structurePath.lastIndexOf('/') + 1)
+                                      : structurePath;
+                String name = file.replace(".blueprint", "");
+                if (!name.isEmpty() && Character.isDigit(name.charAt(name.length() - 1)))
+                {
+                    name = name.substring(0, name.length() - 1);
+                }
+                if (name.startsWith("alt"))
+                {
+                    name = name.substring(3);
+                }
+                if (!name.isBlank())
+                {
+                    hut = name;
+                }
+            }
+            final int level = Math.max(1, getTargetLevel() <= 0 ? 1 : getTargetLevel());
+            final com.minecolonies.core.util.HutBlueprintResolver.Resolved hit =
+              com.minecolonies.core.util.HutBlueprintResolver.resolve(hut, getStructurePack(), getStructurePath(), level);
+            if (hit == null)
+            {
+                return null;
+            }
+            final Blueprint bp = com.ldtteam.structurize.storage.StructurePacks.getBlueprint(
+              hit.pack(), hit.path(), true, world.registryAccess());
+            if (bp != null)
+            {
+                updateStructurePackAndPath(hit.pack(), hit.path());
+            }
+            return bp;
+        }
+        catch (final Exception e)
+        {
+            Log.getLogger().debug("WO blueprint recover failed for {}/{}", getStructurePack(), getStructurePath(), e);
+            return null;
+        }
     }
 
     @Override

@@ -181,6 +181,15 @@ public class StructurePacks
         {
             alts.add(subPath.replace("townhall", "alttownhall"));
         }
+        // Flat legacy packs (Stone/Asian/Wooden): hut files at pack root, not fundamentals/.
+        if (subPath.startsWith("fundamentals/"))
+        {
+            alts.add(subPath.substring("fundamentals/".length()));
+        }
+        else if (!subPath.contains("/"))
+        {
+            alts.add("fundamentals/" + subPath);
+        }
         return alts;
     }
 

@@ -513,11 +513,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             blockToMine = firstBreak;
             worker.getCitizenData().setStatusPosition(blockToMine);
 
-            // Quidoms: if already in place-reach, mine now; otherwise move then break.
-            if (isWithinSoftClearReach(blockToMine))
-            {
-                return doMining();
-            }
+            // Hard blocks: always go through MINE_BLOCK so out-of-range walks closer, then tool-break.
+            // Soft clears already handled above; do not spam-insta hard solids.
             return MINE_BLOCK;
         }
         else

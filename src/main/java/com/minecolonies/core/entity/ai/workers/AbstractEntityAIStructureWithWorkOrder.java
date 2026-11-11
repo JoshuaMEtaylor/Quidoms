@@ -490,13 +490,22 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
     @Override
     protected boolean checkIfCanceled()
     {
-        if ((building.getWorkOrder() == null && structurePlacer != null) || (structurePlacer != null && !structurePlacer.getB().hasBluePrint()))
+        // Placer lost its blueprint (async reload / flat-pack path miss) — do NOT destroy the claim.
+        // Clear placer so LOAD_STRUCTURE can recover; keep the work order assigned.
+        if (structurePlacer != null && !structurePlacer.getB().hasBluePrint())
         {
-            if (building.hasWorkOrder())
+            Log.getLogger().warn("Builder structure placer lost blueprint for WO {} — resetting placer to reload",
+              building.getWorkOrder() == null ? "?" : building.getWorkOrder().getID());
+            resetCurrentStructure();
+            if (building.getWorkOrder() != null)
             {
                 building.getWorkOrder().clearBlueprint();
-                building.getColony().getWorkManager().removeWorkOrder(building.getWorkOrder());
             }
+            return false;
+        }
+
+        if (building.getWorkOrder() == null && structurePlacer != null)
+        {
             building.setWorkOrder(null);
             resetCurrentStructure();
             building.cancelAllRequestsOfCitizenOrBuilding(worker.getCitizenData());
