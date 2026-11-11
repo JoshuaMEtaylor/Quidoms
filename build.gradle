@@ -74,7 +74,7 @@ neoForge {
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
+        minecraftVersion = project.parchment_mc_version
     }
 
     accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
