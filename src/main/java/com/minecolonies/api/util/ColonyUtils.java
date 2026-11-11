@@ -110,52 +110,13 @@ public final class ColonyUtils
      */
     private static Blueprint loadBlueprintSoft(final String structurePack, final String structurePath, final HolderLookup.Provider provider)
     {
-        Blueprint blueprint = StructurePacks.getBlueprint(structurePack, structurePath, true, provider);
-        if (blueprint != null)
+        // StructurePacks.getBlueprint aliases Alternative packs/paths and soft-fails missing files.
+        final Blueprint blueprint = StructurePacks.getBlueprint(structurePack, structurePath, true, provider);
+        if (blueprint == null)
         {
-            return blueprint;
+            Log.getLogger().warn("Missing blueprint (soft-fail): pack='{}' path='{}'", structurePack, structurePath);
         }
-        final String aliasPack = aliasStructurePack(structurePack);
-        final String aliasPath = aliasStructurePath(structurePack, structurePath);
-        if (!aliasPack.equals(structurePack) || !aliasPath.equals(structurePath))
-        {
-            blueprint = StructurePacks.getBlueprint(aliasPack, aliasPath, true, provider);
-            if (blueprint != null)
-            {
-                Log.getLogger().info("Blueprint pack fallback: '{}' / '{}' → '{}' / '{}'",
-                  structurePack, structurePath, aliasPack, aliasPath);
-                return blueprint;
-            }
-        }
-        Log.getLogger().warn("Missing blueprint (soft-fail): pack='{}' path='{}'", structurePack, structurePath);
-        return null;
-    }
-
-    private static String aliasStructurePack(final String pack)
-    {
-        if (pack == null)
-        {
-            return "";
-        }
-        // Profile folders sometimes append " Alternative" to Medieval Oak / similar style names.
-        if (pack.endsWith(" Alternative"))
-        {
-            return pack.substring(0, pack.length() - " Alternative".length()).trim();
-        }
-        return pack;
-    }
-
-    private static String aliasStructurePath(final String pack, final String path)
-    {
-        if (path == null)
-        {
-            return "";
-        }
-        if (pack != null && pack.endsWith(" Alternative") && path.contains("townhall") && !path.contains("alttownhall"))
-        {
-            return path.replace("townhall", "alttownhall");
-        }
-        return path;
+        return blueprint;
     }
 
     /**

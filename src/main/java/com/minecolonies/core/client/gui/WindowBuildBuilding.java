@@ -292,13 +292,23 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
 
             if (styles.isEmpty() && building.getStructurePack() != null && !building.getStructurePack().isEmpty())
             {
-                styles.add(building.getStructurePack());
+                // Resolve "Medieval Oak Alternative" → real registered pack so arrows/resources work.
+                final StructurePackMeta resolved = StructurePacks.getStructurePack(building.getStructurePack());
+                styles.add(resolved != null ? resolved.getName() : building.getStructurePack());
             }
         }
 
         if (!styles.isEmpty())
         {
             int newIndex = styles.indexOf(building.getStructurePack());
+            if (newIndex < 0)
+            {
+                final StructurePackMeta resolved = StructurePacks.getStructurePack(building.getStructurePack());
+                if (resolved != null)
+                {
+                    newIndex = styles.indexOf(resolved.getName());
+                }
+            }
             if (newIndex < 0)
             {
                 newIndex = 0;
@@ -343,7 +353,13 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
         }
         candidates.add(name.substring(0, name.length() - 1) + nextLevel + ".blueprint");
         candidates.add(name.substring(0, name.length() - 1) + "1.blueprint");
-        return candidates;
+        // Alternative townhall variants (Medieval Oak castle vs manor).
+        final List<String> withAlts = new ArrayList<>(candidates);
+        for (final String path : candidates)
+        {
+            withAlts.addAll(StructurePacks.alternateBlueprintPaths(building.getStructurePack(), path));
+        }
+        return withAlts.stream().distinct().collect(Collectors.toList());
     }
 
     /**
@@ -402,8 +418,9 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
         resources.clear();
         updateResourceList();
 
+        // Soft-fail + pack/path alias inside StructurePacks.getBlueprint so Alternative packs still fill the list.
         ClientFutureProcessor.queueBlueprint(new ClientFutureProcessor.BlueprintProcessingData(
-          StructurePacks.getBlueprintFuture(stylePack, name, world.registryAccess()), (blueprint -> {
+          StructurePacks.getBlueprintFuture(stylePack, name, true, world.registryAccess()), (blueprint -> {
             if (requestId != resourceRequestId)
             {
                 return;
