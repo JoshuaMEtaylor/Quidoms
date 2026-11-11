@@ -4,15 +4,17 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Right-clicking this block in the air triggers the building browser window interface.
+ * Marker for hut / building blocks that historically opened a style browser on air right-click.
+ * Quidoms disables that parchment search UI (missing texture); air RMB does nothing.
  */
 public interface IBuildingBrowsableBlock
 {
     /**
-     * Return false if you want to prevent the building search behaviour for some reason.  Client-side only.
+     * Whether air right-click opens {@code WindowBuildingBrowser}. Quidoms: always false.
+     * Client-side only.
      */
     default boolean shouldBrowseBuildings(@NotNull final PlayerInteractEvent.RightClickItem event)
     {
-        return true;
+        return false;
     }
 }
