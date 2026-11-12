@@ -209,8 +209,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             return;
         }
 
-        // Quidoms: request recursive crafting ingredients instead of exotic crafted blocks.
-        final java.util.List<ItemStack> expanded = com.minecolonies.api.util.IngredientBomExpand.expand(
+        // Quidoms QD-103: Domum framed → texture components, then crafting BOM (planks→logs).
+        // Required list / QuidCraft / courier see raw only — never framed products.
+        final java.util.List<ItemStack> expanded = com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
             building.getColony().getWorld(), res, amount);
         for (final ItemStack part : expanded)
         {
@@ -275,6 +276,31 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
      * @param amount the amount.
      */
     public void reduceNeededResource(final ItemStack res, final int amount)
+    {
+        if (ItemStackUtils.isEmpty(res) || amount <= 0)
+        {
+            return;
+        }
+
+        // QD-103: Domum framed places 1:1 with texture components on the needed map — reduce those.
+        // Vanilla convertibles (planks→logs) keep ceil-BOM on add; per-place log reduce would
+        // over-decrement (1 plank ≠ 1 log), so leave crafting BOM accounting as before.
+        if (com.minecolonies.core.util.DomumOrnamentumUtils.getBlock(res) != null
+              && !com.ldtteam.domumornamentum.client.model.data.MaterialTextureData.readFromItemStack(res).isEmpty())
+        {
+            final java.util.List<ItemStack> parts = com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
+                building.getColony().getWorld(), res, amount);
+            for (final ItemStack part : parts)
+            {
+                reduceNeededResourceRaw(part, part.getCount());
+            }
+            return;
+        }
+
+        reduceNeededResourceRaw(res, amount);
+    }
+
+    private void reduceNeededResourceRaw(final ItemStack res, final int amount)
     {
         final int hashCode = res.getComponentsPatch().hashCode();
         final String name = res.getItem().getDescriptionId() + "-" + hashCode;
