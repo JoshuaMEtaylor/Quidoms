@@ -49,9 +49,9 @@ public abstract class AbstractWindowCitizen extends AbstractWindowSkeleton
         registerButton("inventoryIcon", () -> new OpenInventoryMessage(citizen.getColony(), citizen.getName(), citizen.getEntityId()).sendToServer());
         PaneBuilders.tooltipBuilder().hoverPane(findPaneByID("inventoryIcon")).build().setText(Component.translatableEscape("com.minecolonies.coremod.gui.citizen.inventory"));
 
-        registerButton("happinessTab", () -> new HappinessWindowCitizen(citizen).open());
-        registerButton("happinessIcon", () -> new HappinessWindowCitizen(citizen).open());
-        PaneBuilders.tooltipBuilder().hoverPane(findPaneByID("happinessIcon")).build().setText(Component.translatableEscape("com.minecolonies.coremod.gui.citizen.happiness"));
+        // QD-109: happiness system removed — hide citizen happiness tab.
+        findPaneByID("happinessTab").setVisible(false);
+        findPaneByID("happinessIcon").setVisible(false);
 
         registerButton("familyTab", () -> new FamilyWindowCitizen(citizen).open());
         registerButton("familyIcon", () -> new FamilyWindowCitizen(citizen).open());

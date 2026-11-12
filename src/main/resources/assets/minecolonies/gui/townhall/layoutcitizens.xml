@@ -1,8 +1,9 @@
 <window size="524 243">
 
     <layout source="minecolonies:gui/townhall/windowtownhall.xml"/>
-    <text id="happinessTitle" size="120 11" color="black" pos="100 61" textalign="MIDDLE"/>
-    <list id="happinessList" size="148 136" pos="100 83">
+    <!-- QD-109: happiness aggregate UI removed -->
+    <text id="happinessTitle" size="120 11" color="black" pos="100 61" textalign="MIDDLE" visible="false"/>
+    <list id="happinessList" size="148 136" pos="100 83" visible="false">
         <view size="100% 11">
             <image id="icon" pos="0 0" size="11 11"/>
             <text id="name" pos="15 0" size="120 11" color="black"/>
@@ -13,11 +14,11 @@
     <image id="gender" size="11 11" pos="396 28" source="minecolonies:textures/gui/citizen/colonist_wax_male_smaller.png"/>
 
     <text id="health" size="35 8" color="black" pos="271 47" textalign="MIDDLE_RIGHT" textscale="0.7"/>
-    <text id="happinessLevel" size="25 8" color="black" pos="316 47" textalign="MIDDLE_RIGHT" textscale="0.7"/>
+    <text id="happinessLevel" size="25 8" color="black" pos="316 47" textalign="MIDDLE_RIGHT" textscale="0.7" visible="false"/>
     <text id="saturation" size="25 8" color="black" pos="351 47" textalign="MIDDLE_RIGHT" textscale="0.7"/>
 
     <image source="minecolonies:textures/gui/hud/heart/full.png" size="9 9" pos="306 46"/>
-    <image source="minecolonies:textures/gui/citizen/smiley_full.png" size="9 9" pos="341 46"/>
+    <image source="minecolonies:textures/gui/citizen/smiley_full.png" size="9 9" pos="341 46" visible="false"/>
     <image source="minecolonies:textures/gui/hud/food_full.png" size="9 9" pos="376 46"/>
 
     <entityicon id="entity" size="25 50" pos="396 38" visible="false" />

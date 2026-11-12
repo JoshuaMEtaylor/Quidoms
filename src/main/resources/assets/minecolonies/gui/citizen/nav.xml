@@ -14,9 +14,9 @@
     <button id="inventoryIcon" size="20 20" pos="5 95"
                  source="minecolonies:textures/gui/modules/inventory.png"/>
 
-    <button id="happinessTab" size="32 26" pos="0 118"
+    <button id="happinessTab" size="32 26" pos="0 118" visible="false"
                  source="minecolonies:textures/gui/modules/tab_left_side2.png"/>
-    <button id="happinessIcon" size="20 20" pos="5 121"
+    <button id="happinessIcon" size="20 20" pos="5 121" visible="false"
                  source="minecolonies:textures/gui/modules/happiness.png"/>
 
     <button id="familyTab" size="32 26" pos="0 144"

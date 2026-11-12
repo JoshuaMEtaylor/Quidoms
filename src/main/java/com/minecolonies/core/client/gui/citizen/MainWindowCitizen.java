@@ -80,7 +80,12 @@ public class MainWindowCitizen extends AbstractWindowCitizen
 
         CitizenWindowUtils.createHealthBar(citizen, findPaneOfTypeByID(WINDOW_ID_HEALTHBAR, View.class));
         CitizenWindowUtils.createSaturationBar(citizen, this);
-        CitizenWindowUtils.createHappinessBar(citizen, this);
+        // QD-109: no individual happiness bar.
+        final View happinessBar = findPaneOfTypeByID(WINDOW_ID_HAPPINESS_BAR, View.class);
+        if (happinessBar != null)
+        {
+            happinessBar.setVisible(false);
+        }
         CitizenWindowUtils.createSkillContent(citizen, this);
 
         //Tool of class:§rwith minimal level:§rWood or Gold§r and§rwith maximal level:§rWood or Gold§r

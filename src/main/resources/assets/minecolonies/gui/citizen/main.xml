@@ -8,7 +8,7 @@
         <text id="healthLabel" size="30 11" color="black" pos="135 10" text="44"/>
     </view>
     <view id="saturationBar" size="120 12" pos="55 53"/>
-    <view id="happinessBar" size="120 11" pos="55 63"/>
+    <view id="happinessBar" size="120 11" pos="55 63" visible="false"/>
 
     <scrollgroup pos="55 90" size="105 143">
         <view size="100% 13">

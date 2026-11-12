@@ -1,31 +1,22 @@
 package com.minecolonies.core.client.gui.citizen;
 
 import com.minecolonies.api.colony.ICitizenDataView;
-import com.minecolonies.api.util.constant.Constants;
-import net.minecraft.resources.ResourceLocation;
 
 /**
- * BOWindow for the citizen.
+ * Quidoms QD-109: happiness window removed. Opening this redirects to the main citizen page.
  */
 public class HappinessWindowCitizen extends AbstractWindowCitizen
 {
-    /**
-     * Constructor to initiate the citizen windows.
-     *
-     * @param citizen citizen to bind the window to.
-     */
     public HappinessWindowCitizen(final ICitizenDataView citizen)
     {
-        super(citizen, new ResourceLocation(Constants.MOD_ID, "gui/citizen/happiness.xml"));
+        super(citizen, new net.minecraft.resources.ResourceLocation(
+          com.minecolonies.api.util.constant.Constants.MOD_ID, "gui/citizen/main.xml"));
     }
 
-    /**
-     * Called when the gui is opened by an player.
-     */
     @Override
     public void onOpened()
     {
-        super.onOpened();
-        CitizenWindowUtils.updateHappiness(citizen, this);
+        // Redirect away from the deleted happiness UI.
+        new MainWindowCitizen(citizen).open();
     }
 }
