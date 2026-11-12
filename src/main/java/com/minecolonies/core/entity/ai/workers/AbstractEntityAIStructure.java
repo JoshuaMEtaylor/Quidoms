@@ -36,6 +36,7 @@ import com.minecolonies.core.entity.ai.workers.util.BuildingProgressStage;
 import com.minecolonies.core.entity.ai.workers.util.BuildingStructureHandler;
 import com.minecolonies.core.tileentities.TileEntityDecorationController;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
@@ -142,6 +143,12 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
      * Consecutive BUILDING_STEP ticks where walk/ready returned false (QD-101 walk harden).
      */
     protected int walkNotReadyStreak = 0;
+
+    /**
+     * Rate-limit in-game wall chat so RECALC/path spam does not flood (QD-102).
+     */
+    private long lastWallChatMs = 0L;
+    private String lastWallChatKey = "";
 
     /**
      * Different item check result possibilities.
@@ -433,6 +440,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                   workFrom,
                   worldPos,
                   blockToMine);
+                wallChat("path",
+                  Component.literal("can't reach the next build spot — repathing (streak " + walkNotReadyStreak + ")."));
             }
             // Soft recover: after sustained path failure, drop workFrom so walkToConstructionSite repaths
             // (or works in-place when already within reach — see EntityAIStructureBuilder).
@@ -441,6 +450,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 workFrom = null;
                 walkNotReadyStreak = 0;
                 Log.getLogger().info("[QuidomsBuilder] BUILDING_STEP walk recover: cleared workFrom");
+                wallChat("path-recover", Component.literal("path stuck — resetting work position."));
             }
             return getState();
         }
@@ -579,8 +589,11 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                     Log.getLogger().info(
                       "[QuidomsBuilder] MISSING_ITEMS hut-has stock person={} hut={} item={} → GATHER",
                       person, hut, need.getItem());
+                    wallChat("gather",
+                      Component.literal("picking up " + need.getHoverName().getString() + " from the hut."));
                     if (!worker.getInventoryCitizen().hasSpace())
                     {
+                        wallChat("inv-full", Component.literal("inventory full — dumping before pickup."));
                         return INVENTORY_FULL;
                     }
                     needsCurrently = new Tuple<>(match, Math.max(1, need.getCount()));
@@ -593,14 +606,25 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 }
             }
 
+            // QD-102: never LOAD_STRUCTURE on RECALC — that looped forever after QuidCraft provisioned
+            // (MISSING_ITEMS check=RECALC → LOAD_STRUCTURE → …). Stay on BUILDING_STEP / gather / retry.
             if (check == RECALC)
             {
-                building.getWorkOrder().setRequested(false);
-                Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS → LOAD_STRUCTURE (RECALC)");
-                return LOAD_STRUCTURE;
+                Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS RECALC → BUILDING_STEP retry (no LOAD_STRUCTURE)");
+                final String missingName = required.isEmpty() || ItemStackUtils.isEmpty(required.get(0))
+                                             ? "materials"
+                                             : required.get(0).getHoverName().getString();
+                wallChat("recalc",
+                  Component.literal("waiting on " + missingName + " — retrying (not reloading schematic)."));
+                setDelay(40);
+                return BUILDING_STEP;
             }
             // QD-101: async request already filed (if any) — stay on BUILDING_STEP and retry; do NOT park NEEDS_ITEM.
             Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS → BUILDING_STEP retry (no NEEDS_ITEM park)");
+            final String needName = required.isEmpty() || ItemStackUtils.isEmpty(required.get(0))
+                                      ? "materials"
+                                      : required.get(0).getHoverName().getString() + " x" + required.get(0).getCount();
+            wallChat("missing", Component.literal("need " + needName + " — requesting / waiting."));
             setDelay(20);
             return BUILDING_STEP;
         }
@@ -1304,11 +1328,12 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 continue;
             }
 
-            // Still missing on-person — if hut has stock we must gather, not RECALC forever.
-            if (countInHut(placer.building, match) <= 0)
-            {
-                return RECALC;
-            }
+            // Still missing on-person and hut — do NOT return RECALC (that ping-ponged LOAD_STRUCTURE
+            // forever after QuidCraft provision, QD-102). Leave in map → async request + FAIL retry.
+            // TEMP QD-102 debug
+            Log.getLogger().info(
+              "[QuidomsBuilder] hasList missing person+hut item={} → FAIL path (no RECALC)",
+              stack.getItemStack().getItem());
         }
         // TODO: Why predicate based search when we got our ItemStorages we look for already?
         final List<ItemStack> foundStacks = InventoryUtils.filterItemHandler(placer.getWorker().getInventoryCitizen(),
@@ -1418,6 +1443,29 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             return FAIL;
         }
         return SUCCESS;
+    }
+
+    /**
+     * Short rate-limited citizen chat so players see walls without grepping latest.log (QD-102).
+     */
+    protected void wallChat(@NotNull final String key, @NotNull final net.minecraft.network.chat.Component detail)
+    {
+        final long now = System.currentTimeMillis();
+        if (key.equals(lastWallChatKey) && now - lastWallChatMs < 8000L)
+        {
+            return;
+        }
+        lastWallChatKey = key;
+        lastWallChatMs = now;
+        try
+        {
+            MessageUtils.forCitizen(worker, detail)
+              .sendTo(worker.getCitizenColonyHandler().getColonyOrRegister().getMessagePlayerEntities());
+        }
+        catch (final Exception e)
+        {
+            Log.getLogger().debug("[QuidomsBuilder] wallChat failed: {}", e.toString());
+        }
     }
 
     /**
