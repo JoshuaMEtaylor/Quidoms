@@ -35,8 +35,8 @@ public class CommandColonyPrintStats implements IMCOPCommand
     private static final String COORDINATES_XYZ   = "x=%s y=%s z=%s";
     private static final String CITIZENS          = "Citizens: ";
     private static final String LAST_CONTACT_TEXT = "Last contact with Owner or Officer: %d hours ago!";
-    private static final String IS_DELETABLE      = "If true this colony cannot be deleted: ";
-    private static final String CANNOT_BE_RAIDED  = "This colony is unable to be raided";
+    private static final String IS_DELETABLE      = "If true this kingdom cannot be deleted: ";
+    private static final String CANNOT_BE_RAIDED  = "This kingdom is unable to be raided";
     private              String fullLog           = "";
 
     /**

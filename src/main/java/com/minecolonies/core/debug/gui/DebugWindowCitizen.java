@@ -37,7 +37,7 @@ public class DebugWindowCitizen extends AbstractWindowSkeleton
         }
 
         findPaneOfTypeByID("citizenid", Text.class).setText(Component.literal("Citizen ID:" + citizen.getId()));
-        findPaneOfTypeByID("colonyid", Text.class).setText(Component.literal("Colony ID:" + citizen.getColonyId()));
+        findPaneOfTypeByID("colonyid", Text.class).setText(Component.literal("Kingdom ID:" + citizen.getColonyId()));
         findPaneOfTypeByID("aihistory", Button.class).setHandler(b -> new QueryCitizenAIHistoryMessage(citizen).sendToServer());
         findPaneOfTypeByID("pathfinding", Button.class).setHandler(b -> {
             trackingDebug = !trackingDebug;
