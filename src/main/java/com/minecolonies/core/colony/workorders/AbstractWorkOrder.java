@@ -468,6 +468,13 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
             return;
         }
 
+        // Remap legacy pack names (Stone → Minecolonies Original) before queueing IO.
+        final String aliased = com.ldtteam.structurize.storage.StructurePacks.aliasPackName(getStructurePack());
+        if (aliased != null && !aliased.isBlank() && !aliased.equals(getStructurePack()))
+        {
+            updateStructurePackAndPath(aliased, getStructurePath());
+        }
+
         future = ColonyUtils.queueBlueprintLoad(world, getStructurePack(), getStructurePath(), loaded ->
             {
                 // Soft-fail / pack search already happened on the IO pool inside ColonyUtils.
@@ -477,6 +484,12 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
                 {
                     // Flat packs (Stone) store townhall1.blueprint at pack root — recover and rewrite WO path.
                     resolved = recoverBlueprint(world);
+                }
+                else
+                {
+                    // ColonyUtils/HutBlueprintResolver may have loaded from another pack without
+                    // rewriting WO pack/path — persist the real location so reloads don't soft-fail.
+                    persistResolvedPackPath();
                 }
                 if (resolved != null)
                 {
@@ -492,6 +505,48 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
                 }
                 afterLoad.accept(recovered);
             });
+    }
+
+    /**
+     * When soft-load succeeded via pack search, rewrite WO pack/path to a real on-disk schematic.
+     */
+    private void persistResolvedPackPath()
+    {
+        try
+        {
+            String hut = "builder";
+            final String structurePath = getStructurePath();
+            if (structurePath != null && !structurePath.isBlank())
+            {
+                final String file = structurePath.contains("/")
+                                      ? structurePath.substring(structurePath.lastIndexOf('/') + 1)
+                                      : structurePath;
+                String name = file.replace(".blueprint", "");
+                if (!name.isEmpty() && Character.isDigit(name.charAt(name.length() - 1)))
+                {
+                    name = name.substring(0, name.length() - 1);
+                }
+                if (name.startsWith("alt"))
+                {
+                    name = name.substring(3);
+                }
+                if (!name.isBlank())
+                {
+                    hut = name;
+                }
+            }
+            final int level = Math.max(1, getTargetLevel() <= 0 ? 1 : getTargetLevel());
+            final com.minecolonies.core.util.HutBlueprintResolver.Resolved hit =
+              com.minecolonies.core.util.HutBlueprintResolver.resolve(hut, getStructurePack(), getStructurePath(), level);
+            if (hit != null)
+            {
+                updateStructurePackAndPath(hit.pack(), hit.path());
+            }
+        }
+        catch (final Exception e)
+        {
+            Log.getLogger().debug("WO pack/path persist failed for {}/{}", getStructurePack(), getStructurePath(), e);
+        }
     }
 
     /**

@@ -574,7 +574,34 @@ public class TileEntityColonyBuilding extends AbstractTileEntityColonyBuilding i
     {
         if (rotationMirror == null)
         {
-            calcRotation(StructurePacks.getBlueprint(this.packMeta, this.path.replace("0.blueprint", "1.blueprint"), level.registryAccess()));
+            // Soft-fail + pack alias (Stone → Minecolonies Original). Never block/spam on missing legacy paths.
+            final String tryPath = this.path == null ? "" : this.path.replace("0.blueprint", "1.blueprint");
+            Blueprint bp = StructurePacks.getBlueprint(this.packMeta, tryPath, true, level.registryAccess());
+            if (bp == null && tryPath != null && !tryPath.isBlank())
+            {
+                String hut = "townhall";
+                int schematicLevel = 1;
+                try
+                {
+                    final String file = tryPath.contains("/") ? tryPath.substring(tryPath.lastIndexOf('/') + 1) : tryPath;
+                    String name = file.replace(".blueprint", "");
+                    if (!name.isEmpty() && Character.isDigit(name.charAt(name.length() - 1)))
+                    {
+                        schematicLevel = Character.getNumericValue(name.charAt(name.length() - 1));
+                        name = name.substring(0, name.length() - 1);
+                    }
+                    if (!name.isBlank())
+                    {
+                        hut = name;
+                    }
+                }
+                catch (final Exception ignored)
+                {
+                }
+                bp = com.minecolonies.core.util.HutBlueprintResolver.loadBlueprint(
+                  this.packMeta, tryPath, hut, Math.max(1, schematicLevel), level.registryAccess());
+            }
+            calcRotation(bp);
         }
         return rotationMirror;
     }

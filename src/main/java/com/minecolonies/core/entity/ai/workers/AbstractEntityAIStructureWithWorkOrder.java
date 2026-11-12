@@ -107,8 +107,22 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
     {
         if (loadingBlueprint)
         {
+            // Safety: never wait forever for an async blueprint callback (IO deadlock / soft-fail loop).
+            if (++blueprintLoadWaitTicks > 100)
+            {
+                Log.getLogger().warn("Builder blueprint load timed out for WO {} — resetting placer to retry",
+                  building.getWorkOrder() == null ? "?" : building.getWorkOrder().getID());
+                loadingBlueprint = false;
+                blueprintLoadWaitTicks = 0;
+                resetCurrentStructure();
+                if (building.getWorkOrder() != null)
+                {
+                    building.getWorkOrder().clearBlueprint();
+                }
+            }
             return getState();
         }
+        blueprintLoadWaitTicks = 0;
 
         if (building.getWorkOrder() == null || building.getWorkOrder().getBlueprint() == null || structurePlacer == null)
         {
@@ -121,6 +135,7 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
                     worker.getCitizenColonyHandler().getColonyOrRegister().getID(),
                     worker.getCitizenData().getId()), new Exception());
                 building.setWorkOrder(null);
+                buildStartAnnounced = false;
                 return IDLE;
             }
 
@@ -135,23 +150,18 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
                     return IDLE;
                 }
 
-                MessageUtils.forCitizen(worker, COM_MINECOLONIES_COREMOD_ENTITY_BUILDER_BUILD_START, this.building.getWorkOrder().getDisplayName())
-                  .sendTo(worker.getCitizenColonyHandler().getColonyOrRegister().getMessagePlayerEntities());
-
                 //Don't go through the CLEAR stage for repairs and upgrades
                 if (building.getBuildingLevel() > 0)
                 {
                     wo.setCleared(true);
                 }
             }
-            else if (!(wo instanceof WorkOrderMiner))
-            {
-                MessageUtils.forCitizen(worker, COM_MINECOLONIES_COREMOD_ENTITY_BUILDER_BUILD_START, building.getWorkOrder().getDisplayName())
-                  .sendTo(worker.getCitizenColonyHandler().getColonyOrRegister().getMessagePlayerEntities());
-                ;
-            }
+            // Defer BUILD_START until the placer is actually ready — announcing while structurePlacer
+            // is still null made the builder look "started" then freeze next to the hut.
             return getState();
         }
+
+        announceBuildStartIfNeeded();
 
         if (building.getWorkOrder().isRequested())
         {
@@ -161,6 +171,26 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         //We need to deal with materials
         requestMaterialsState();
         return getState();
+    }
+
+    /**
+     * Send BUILD_START once the placer+blueprint are ready (not mid-async load).
+     */
+    private void announceBuildStartIfNeeded()
+    {
+        if (buildStartAnnounced || building.getWorkOrder() == null)
+        {
+            return;
+        }
+        final IBuilderWorkOrder wo = building.getWorkOrder();
+        if (wo instanceof WorkOrderMiner)
+        {
+            buildStartAnnounced = true;
+            return;
+        }
+        MessageUtils.forCitizen(worker, COM_MINECOLONIES_COREMOD_ENTITY_BUILDER_BUILD_START, wo.getDisplayName())
+          .sendTo(worker.getCitizenColonyHandler().getColonyOrRegister().getMessagePlayerEntities());
+        buildStartAnnounced = true;
     }
 
     /**

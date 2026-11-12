@@ -519,6 +519,18 @@ public final class HutBlueprintResolver
                     names.add(base);
                 }
             }
+            // Stone/Wooden/Asian (any casing) → Minecolonies Original / Pagoda / …
+            final String mapped = BlueprintMapping.getStyleMapping(preferredPack.trim());
+            if (mapped != null && !mapped.isBlank() && names.stream().noneMatch(mapped::equalsIgnoreCase))
+            {
+                names.add(mapped);
+            }
+            final String structurizeAlias = StructurePacks.aliasPackName(preferredPack.trim());
+            if (structurizeAlias != null && !structurizeAlias.isBlank()
+                  && names.stream().noneMatch(structurizeAlias::equalsIgnoreCase))
+            {
+                names.add(structurizeAlias);
+            }
         }
         return names;
     }

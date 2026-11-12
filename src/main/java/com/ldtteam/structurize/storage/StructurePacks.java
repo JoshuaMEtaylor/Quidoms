@@ -138,7 +138,8 @@ public class StructurePacks
     }
 
     /**
-     * Strip trailing {@code Alternative} suffixes from profile/style pack names.
+     * Strip trailing {@code Alternative} suffixes from profile/style pack names,
+     * and remap legacy folder styles (Stone/Wooden/Asian) to real registered packs.
      */
     public static String aliasPackName(final String pack)
     {
@@ -155,7 +156,32 @@ public class StructurePacks
         {
             name = name.substring(0, name.length() - "Alternative".length()).trim();
         }
-        return name.isEmpty() ? pack : name;
+        if (name.isEmpty())
+        {
+            return pack;
+        }
+        // Legacy MineColonies style folder names still appear on colonies/TEs/WOs.
+        final String compact = name.toLowerCase(Locale.ROOT).replace(" ", "");
+        return switch (compact)
+        {
+            case "stone", "wooden", "wood", "stonealternative", "woodalternative" -> "Minecolonies Original";
+            case "asian", "asianalternative" -> "Pagoda";
+            case "sandstone" -> "Desert Oasis";
+            case "nordic" -> "Nordic Spruce";
+            case "warped" -> "Warped Netherlands";
+            case "lostcity" -> "Lost Mesa City";
+            case "truedwarven" -> "Stalactite Caves";
+            case "darkoak" -> "Dark Oak Treehouse";
+            case "birch" -> "Urban Birch";
+            case "jungle", "junglealternative" -> "Jungle Treehouse";
+            case "acacia" -> "Urban Savanna";
+            case "medievaloak", "medievalspruce", "medievaldarkoak", "medievalbirch", "caledonia", "fortress",
+                 "incan", "spacewars", "colonial", "cavern", "shire", "pagoda", "original" -> {
+                // Keep already-canonical / near-canonical names; Original folder registers as Minecolonies Original.
+                yield "original".equals(compact) ? "Minecolonies Original" : name;
+            }
+            default -> name;
+        };
     }
 
     /**

@@ -129,6 +129,16 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
     protected boolean loadingBlueprint = false;
 
     /**
+     * LOAD_STRUCTURE ticks spent with {@link #loadingBlueprint} true — reset if stuck.
+     */
+    protected int blueprintLoadWaitTicks = 0;
+
+    /**
+     * Whether the citizen already announced BUILD_START for the current WO claim.
+     */
+    protected boolean buildStartAnnounced = false;
+
+    /**
      * Different item check result possibilities.
      */
     public enum ItemCheckResult
@@ -491,7 +501,26 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         if (result.getBlockResult().getResult() == BlockPlacementResult.Result.MISSING_ITEMS)
         {
             actionQueue.clear();
-            if (hasListOfResInInvOrRequest(this, result.getBlockResult().getRequiredItems(), result.getBlockResult().getRequiredItems().size() > 1) == RECALC)
+            // QuidCraft may have already provisioned the hut — pull/buy before parking in NEEDS_ITEM.
+            final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
+            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
+              building, citizenName, worker.getCitizenData());
+            for (final ItemStack need : result.getBlockResult().getRequiredItems())
+            {
+                if (!ItemStackUtils.isEmpty(need))
+                {
+                    com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+                      building, need, Math.max(1, need.getCount()), false, citizenName, worker.getCitizenData());
+                }
+            }
+
+            final ItemCheckResult check =
+              hasListOfResInInvOrRequest(this, result.getBlockResult().getRequiredItems(), result.getBlockResult().getRequiredItems().size() > 1);
+            if (check == SUCCESS)
+            {
+                return BUILDING_STEP;
+            }
+            if (check == RECALC)
             {
                 building.getWorkOrder().setRequested(false);
                 return LOAD_STRUCTURE;
@@ -1164,7 +1193,42 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
 
         for (final ItemStorage stack : requestedMap.keySet())
         {
-            if (!InventoryUtils.hasItemInItemHandler(placer.getInventory(), stack1 -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), stack1))
+            if (InventoryUtils.hasItemInItemHandler(placer.getInventory(), stack1 -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), stack1))
+                  || placer.building.hasResourceInBucket(stack.getItemStack()))
+            {
+                continue;
+            }
+
+            // QuidCraft / hut storage may already hold the blocks — pull into the worker before RECALC.
+            final Predicate<ItemStack> match =
+              candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), candidate, true, false);
+            if (placer.building.getTileEntity() != null
+                  && InventoryUtils.hasBuildingEnoughElseCount(placer.building, match, 1) > 0)
+            {
+                InventoryUtils.transferXOfFirstSlotInProviderWithIntoNextFreeSlotInItemHandler(
+                  placer.building.getTileEntity(),
+                  match,
+                  Math.max(1, stack.getAmount()),
+                  placer.getInventory());
+            }
+
+            if (InventoryUtils.hasItemInItemHandler(placer.getInventory(), match))
+            {
+                continue;
+            }
+
+            // Last chance: market-provision into worker/hut, then continue if present.
+            final String citizenName = placer.getWorker().getCitizenData() == null ? "" : placer.getWorker().getCitizenData().getName();
+            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+              placer.building,
+              stack.getItemStack(),
+              Math.max(1, stack.getAmount()),
+              false,
+              citizenName,
+              placer.getWorker().getCitizenData());
+
+            if (!InventoryUtils.hasItemInItemHandler(placer.getInventory(), match)
+                  && InventoryUtils.hasBuildingEnoughElseCount(placer.building, match, 1) <= 0
                   && !placer.building.hasResourceInBucket(stack.getItemStack()))
             {
                 return RECALC;
@@ -1207,9 +1271,23 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         else
         {
             requestedMap.entrySet()
-              .removeIf(entry -> ItemStackUtils.isEmpty(entry.getKey().getItemStack()) || foundStacks.stream()
-                                                                                            .anyMatch(target -> ItemStackUtils.compareItemStacksIgnoreStackSize(target,
-                                                                                              entry.getKey().getItemStack())));
+              .removeIf(entry -> {
+                  final ItemStack need = entry.getKey().getItemStack();
+                  if (ItemStackUtils.isEmpty(need))
+                  {
+                      return true;
+                  }
+                  if (foundStacks.stream().anyMatch(target -> ItemStackUtils.compareItemStacksIgnoreStackSize(target, need)))
+                  {
+                      return true;
+                  }
+                  // Already in hut (QuidCraft deposit) — do not open a courier request that parks NEEDS_ITEM.
+                  return InventoryUtils.hasBuildingEnoughElseCount(
+                    placer.building,
+                    candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false),
+                    1) > 0
+                           || placer.building.hasResourceInBucket(need);
+              });
         }
 
         final ICitizenData citizenData = placer.getWorker().getCitizenData();
@@ -1441,6 +1519,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         structurePlacer = null;
         actionQueue.clear();
         blockToMine = null;
+        blueprintLoadWaitTicks = 0;
+        buildStartAnnounced = false;
         building.setProgressPos(null, null);
         worker.getCitizenData().setStatusPosition(null);
     }
