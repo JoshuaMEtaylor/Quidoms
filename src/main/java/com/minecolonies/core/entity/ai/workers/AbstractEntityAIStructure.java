@@ -139,6 +139,11 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
     protected boolean buildStartAnnounced = false;
 
     /**
+     * Consecutive BUILDING_STEP ticks where walk/ready returned false (QD-101 walk harden).
+     */
+    protected int walkNotReadyStreak = 0;
+
+    /**
      * Different item check result possibilities.
      */
     public enum ItemCheckResult
@@ -417,8 +422,29 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         // Quidoms: soft clears / in-reach hard breaks skip slow repath; otherwise approach site.
         if (!limitReached && !isReadyForStructureAction(worldPos, blockToMine))
         {
+            walkNotReadyStreak++;
+            // TEMP QD-101 debug
+            if (walkNotReadyStreak == 1 || walkNotReadyStreak % 40 == 0)
+            {
+                Log.getLogger().info(
+                  "[QuidomsBuilder] BUILDING_STEP not-ready streak={} citizen={} workFrom={} worldPos={} minePos={}",
+                  walkNotReadyStreak,
+                  worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName(),
+                  workFrom,
+                  worldPos,
+                  blockToMine);
+            }
+            // Soft recover: after sustained path failure, drop workFrom so walkToConstructionSite repaths
+            // (or works in-place when already within reach — see EntityAIStructureBuilder).
+            if (walkNotReadyStreak >= 60)
+            {
+                workFrom = null;
+                walkNotReadyStreak = 0;
+                Log.getLogger().info("[QuidomsBuilder] BUILDING_STEP walk recover: cleared workFrom");
+            }
             return getState();
         }
+        walkNotReadyStreak = 0;
 
         limitReached = false;
 
@@ -519,6 +545,14 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             }
 
             final ItemCheckResult check = hasListOfResInInvOrRequest(this, required, required.size() > 1);
+            // TEMP QD-101 debug
+            Log.getLogger().info(
+              "[QuidomsBuilder] MISSING_ITEMS citizen={} check={} required={} openSync={}",
+              worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName(),
+              check,
+              required.size(),
+              worker.getCitizenData() != null && building.hasOpenSyncRequest(worker.getCitizenData()));
+
             if (check == SUCCESS)
             {
                 return BUILDING_STEP;
@@ -533,19 +567,25 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 }
                 final Predicate<ItemStack> match =
                   candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
-                if (InventoryUtils.hasItemInItemHandler(getInventory(), match))
+                final int person = InventoryUtils.getItemCountInItemHandler(getInventory(), match);
+                final int hut = countInHut(building, match);
+                if (person > 0)
                 {
                     continue;
                 }
-                if (countInHut(building, match) > 0 || building.hasResourceInBucket(need))
+                if (hut > 0 || building.hasResourceInBucket(need))
                 {
+                    // TEMP QD-101 debug
+                    Log.getLogger().info(
+                      "[QuidomsBuilder] MISSING_ITEMS hut-has stock person={} hut={} item={} → GATHER",
+                      person, hut, need.getItem());
                     if (!worker.getInventoryCitizen().hasSpace())
                     {
                         return INVENTORY_FULL;
                     }
                     needsCurrently = new Tuple<>(match, Math.max(1, need.getCount()));
                     if (InventoryUtils.hasItemInProvider(building.getTileEntity(), match)
-                          || countInHut(building, match) > 0)
+                          || hut > 0)
                     {
                         return GATHERING_REQUIRED_MATERIALS;
                     }
@@ -556,9 +596,13 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             if (check == RECALC)
             {
                 building.getWorkOrder().setRequested(false);
+                Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS → LOAD_STRUCTURE (RECALC)");
                 return LOAD_STRUCTURE;
             }
-            return NEEDS_ITEM;
+            // QD-101: async request already filed (if any) — stay on BUILDING_STEP and retry; do NOT park NEEDS_ITEM.
+            Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS → BUILDING_STEP retry (no NEEDS_ITEM park)");
+            setDelay(20);
+            return BUILDING_STEP;
         }
 
         worker.swing(InteractionHand.MAIN_HAND);
@@ -1354,21 +1398,22 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             if (requests.isEmpty() && completedRequests.isEmpty())
             {
                 final Stack stackRequest = new Stack(stack, placer.getTotalAmount(stack).getCount(), 1);
-                placer.getWorker().getCitizenData().createRequest(stackRequest);
+                // QD-101: async — must not trip hasOpenSyncRequest / NEEDS_ITEM park after a place.
+                placer.getWorker().getCitizenData().createRequestAsync(stackRequest);
                 placer.registerBlockAsNeeded(stack);
+                // TEMP QD-101 debug
+                Log.getLogger().info("[QuidomsBuilder] createRequestAsync item={} count={} citizen={}",
+                  stack.getItem(), stackRequest.getCount(), citizenData.getName());
                 return FAIL;
             }
             else
             {
-                for (final IRequest<?> request : requests)
-                {
-                    placer.building.moveToSyncCitizen(citizenData, request);
-                }
-
-                for (final IRequest<?> request : completedRequests)
-                {
-                    placer.building.moveToSyncCitizen(citizenData, request);
-                }
+                // Do NOT moveToSyncCitizen — that re-parks builders in NEEDS_ITEM (QD-100).
+                // Completed deliveries can still be picked up via hasCitizenCompletedRequestsToPickup.
+                // TEMP QD-101 debug
+                Log.getLogger().info(
+                  "[QuidomsBuilder] hasList open={} completed={} item={} (left async, no sync promote)",
+                  requests.size(), completedRequests.size(), stack.getItem());
             }
             return FAIL;
         }
@@ -1598,6 +1643,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         blockToMine = null;
         blueprintLoadWaitTicks = 0;
         buildStartAnnounced = false;
+        walkNotReadyStreak = 0;
         building.setProgressPos(null, null);
         worker.getCitizenData().setStatusPosition(null);
     }

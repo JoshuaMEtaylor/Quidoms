@@ -258,6 +258,29 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
     @Override
     protected boolean checkIfNeedsItem()
     {
+        // Active structure work: never let leftover sync Stack requests AI_BLOCKING-park us in NEEDS_ITEM
+        // (QD-100/101). Still pick up completed deliveries so QuidCraft/courier stock reaches the worker.
+        if (building.hasWorkOrder()
+              && structurePlacer != null
+              && structurePlacer.getB().hasBluePrint())
+        {
+            if (building.hasCitizenCompletedRequestsToPickup(worker.getCitizenData()))
+            {
+                // TEMP QD-101 debug
+                Log.getLogger().info("[QuidomsBuilder] checkIfNeedsItem citizen={} → NEEDS_ITEM (completed pickup)",
+                  worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName());
+                return true;
+            }
+            if (building.hasOpenSyncRequest(worker.getCitizenData()))
+            {
+                // TEMP QD-101 debug
+                Log.getLogger().info("[QuidomsBuilder] checkIfNeedsItem citizen={} ignoring open sync park during BUILD (wo={})",
+                  worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName(),
+                  building.getWorkOrder().getID());
+            }
+            return false;
+        }
+
         if (building.hasWorkOrder() && building.getNeededResources().isEmpty() && !building.hasCitizenCompletedRequests(worker.getCitizenData()) && !recalculated && (structurePlacer == null || !structurePlacer.getB().hasBluePrint() || !building.getWorkOrder().isRequested()))
         {
             return false;
