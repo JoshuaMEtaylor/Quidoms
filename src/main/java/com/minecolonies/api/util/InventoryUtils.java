@@ -758,6 +758,18 @@ public class InventoryUtils
      */
     public static int hasBuildingEnoughElseCount(@NotNull final ICommonBuilding provider, @NotNull final ItemStorage stack, final int count)
     {
+        // Combined hut TE inventory + racks. Rack-only counting missed manual deposits into the hut
+        // and left builders frozen on MISSING_ITEMS while the resources UI showed stock (QD-98).
+        if (provider instanceof IBuilding building)
+        {
+            final IItemHandler handler = building.getItemHandlerCap();
+            if (handler != null)
+            {
+                return getItemCountInItemHandler(handler,
+                  candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), candidate, !stack.ignoreDamageValue(), !stack.ignoreNBT()));
+            }
+        }
+
         int totalCount = 0;
         final Level world = provider.getColony().getWorld();
 
@@ -790,6 +802,16 @@ public class InventoryUtils
      */
     public static int hasBuildingEnoughElseCount(@NotNull final ICommonBuilding provider, @NotNull final Predicate<ItemStack> stack, final int count)
     {
+        // Combined hut TE inventory + racks (not racks alone).
+        if (provider instanceof IBuilding building)
+        {
+            final IItemHandler handler = building.getItemHandlerCap();
+            if (handler != null)
+            {
+                return getItemCountInItemHandler(handler, stack);
+            }
+        }
+
         int totalCount = 0;
         final Level world = provider.getColony().getWorld();
 
@@ -841,6 +863,13 @@ public class InventoryUtils
      */
     public static int getCountFromBuilding(@NotNull final IBuilding provider, @NotNull final ItemStorage stack)
     {
+        final IItemHandler handler = provider.getItemHandlerCap();
+        if (handler != null)
+        {
+            return getItemCountInItemHandler(handler,
+              candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), candidate, !stack.ignoreDamageValue(), !stack.ignoreNBT()));
+        }
+
         int totalCount = 0;
         final Level world = provider.getColony().getWorld();
 
@@ -918,6 +947,12 @@ public class InventoryUtils
      */
     public static int getCountFromBuilding(@NotNull final IBuilding provider, @NotNull final Predicate<ItemStack> predicate)
     {
+        final IItemHandler handler = provider.getItemHandlerCap();
+        if (handler != null)
+        {
+            return getItemCountInItemHandler(handler, predicate);
+        }
+
         int totalCount = 0;
         final Level world = provider.getColony().getWorld();
 

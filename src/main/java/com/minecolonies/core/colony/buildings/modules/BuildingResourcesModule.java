@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_CURR_STAGE;
 import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_TOTAL_STAGES;
@@ -133,24 +134,28 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
 
                 resource.setAvailable(0);
 
+                // Dual inventory: on-person + hut TE/racks. Ignore NBT so manual deposits count as supplied.
+                final Predicate<ItemStack> match =
+                  stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, false);
+
                 if (structureBuilderInventory != null)
                 {
-                    resource.addAvailable(InventoryUtils.getItemCountInItemHandler(structureBuilderInventory,
-                      stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, true)));
+                    resource.addAvailable(InventoryUtils.getItemCountInItemHandler(structureBuilderInventory, match));
                 }
 
-                if (building.getTileEntity() != null)
+                if (building.getTileEntity() != null && building.getItemHandlerCap() != null)
                 {
-                    resource.addAvailable(InventoryUtils.getItemCountInItemHandler(building.getItemHandlerCap(),
-                      stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, true)));
+                    resource.addAvailable(InventoryUtils.getItemCountInItemHandler(building.getItemHandlerCap(), match));
                 }
 
                 if (data.getJob() instanceof final IJobWithExternalWorkStations jobExternalStations)
                 {
                     for (final IBuilding station : jobExternalStations.getWorkStations())
                     {
-                        resource.addAvailable(InventoryUtils.getItemCountInItemHandler(station.getItemHandlerCap(),
-                          stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, true)));
+                        if (station.getItemHandlerCap() != null)
+                        {
+                            resource.addAvailable(InventoryUtils.getItemCountInItemHandler(station.getItemHandlerCap(), match));
+                        }
                     }
                 }
             }

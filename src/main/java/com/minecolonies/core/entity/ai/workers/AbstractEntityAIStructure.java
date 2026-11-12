@@ -501,25 +501,58 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         if (result.getBlockResult().getResult() == BlockPlacementResult.Result.MISSING_ITEMS)
         {
             actionQueue.clear();
+            final List<ItemStack> required = result.getBlockResult().getRequiredItems();
             // QuidCraft may have already provisioned the hut — pull/buy before parking in NEEDS_ITEM.
             final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
               building, citizenName, worker.getCitizenData());
-            for (final ItemStack need : result.getBlockResult().getRequiredItems())
+            for (final ItemStack need : required)
             {
                 if (!ItemStackUtils.isEmpty(need))
                 {
                     com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
                       building, need, Math.max(1, need.getCount()), false, citizenName, worker.getCitizenData());
+                    final Predicate<ItemStack> match =
+                      candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
+                    pullFromHutIntoWorker(this, match, Math.max(1, need.getCount()));
                 }
             }
 
-            final ItemCheckResult check =
-              hasListOfResInInvOrRequest(this, result.getBlockResult().getRequiredItems(), result.getBlockResult().getRequiredItems().size() > 1);
+            final ItemCheckResult check = hasListOfResInInvOrRequest(this, required, required.size() > 1);
             if (check == SUCCESS)
             {
                 return BUILDING_STEP;
             }
+
+            // Hut holds the next place materials but worker couldn't take them yet — walk/gather, never freeze.
+            for (final ItemStack need : required)
+            {
+                if (ItemStackUtils.isEmpty(need))
+                {
+                    continue;
+                }
+                final Predicate<ItemStack> match =
+                  candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
+                if (InventoryUtils.hasItemInItemHandler(getInventory(), match))
+                {
+                    continue;
+                }
+                if (countInHut(building, match) > 0 || building.hasResourceInBucket(need))
+                {
+                    if (!worker.getInventoryCitizen().hasSpace())
+                    {
+                        return INVENTORY_FULL;
+                    }
+                    needsCurrently = new Tuple<>(match, Math.max(1, need.getCount()));
+                    if (InventoryUtils.hasItemInProvider(building.getTileEntity(), match)
+                          || countInHut(building, match) > 0)
+                    {
+                        return GATHERING_REQUIRED_MATERIALS;
+                    }
+                    return PICK_UP;
+                }
+            }
+
             if (check == RECALC)
             {
                 building.getWorkOrder().setRequested(false);
@@ -1193,31 +1226,24 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
 
         for (final ItemStorage stack : requestedMap.keySet())
         {
-            if (InventoryUtils.hasItemInItemHandler(placer.getInventory(), stack1 -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), stack1))
+            final Predicate<ItemStack> match =
+              candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), candidate, true, false);
+
+            if (InventoryUtils.hasItemInItemHandler(placer.getInventory(), match)
                   || placer.building.hasResourceInBucket(stack.getItemStack()))
             {
                 continue;
             }
 
-            // QuidCraft / hut storage may already hold the blocks — pull into the worker before RECALC.
-            final Predicate<ItemStack> match =
-              candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), candidate, true, false);
-            if (placer.building.getTileEntity() != null
-                  && InventoryUtils.hasBuildingEnoughElseCount(placer.building, match, 1) > 0)
-            {
-                InventoryUtils.transferXOfFirstSlotInProviderWithIntoNextFreeSlotInItemHandler(
-                  placer.building.getTileEntity(),
-                  match,
-                  Math.max(1, stack.getAmount()),
-                  placer.getInventory());
-            }
+            // Dual inventory: pull hut TE + racks into the on-person inventory before any RECALC/request.
+            pullFromHutIntoWorker(placer, match, Math.max(1, stack.getAmount()));
 
             if (InventoryUtils.hasItemInItemHandler(placer.getInventory(), match))
             {
                 continue;
             }
 
-            // Last chance: market-provision into worker/hut, then continue if present.
+            // Market-provision into worker/hut, then pull again.
             final String citizenName = placer.getWorker().getCitizenData() == null ? "" : placer.getWorker().getCitizenData().getName();
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
               placer.building,
@@ -1226,17 +1252,23 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
               false,
               citizenName,
               placer.getWorker().getCitizenData());
+            pullFromHutIntoWorker(placer, match, Math.max(1, stack.getAmount()));
 
-            if (!InventoryUtils.hasItemInItemHandler(placer.getInventory(), match)
-                  && InventoryUtils.hasBuildingEnoughElseCount(placer.building, match, 1) <= 0
-                  && !placer.building.hasResourceInBucket(stack.getItemStack()))
+            if (InventoryUtils.hasItemInItemHandler(placer.getInventory(), match)
+                  || placer.building.hasResourceInBucket(stack.getItemStack()))
+            {
+                continue;
+            }
+
+            // Still missing on-person — if hut has stock we must gather, not RECALC forever.
+            if (countInHut(placer.building, match) <= 0)
             {
                 return RECALC;
             }
         }
         // TODO: Why predicate based search when we got our ItemStorages we look for already?
         final List<ItemStack> foundStacks = InventoryUtils.filterItemHandler(placer.getWorker().getInventoryCitizen(),
-          itemStack -> requestedMap.keySet().stream().anyMatch(storage -> ItemStackUtils.compareItemStacksIgnoreStackSize(storage.getItemStack(), itemStack)));
+          itemStack -> requestedMap.keySet().stream().anyMatch(storage -> ItemStackUtils.compareItemStacksIgnoreStackSize(storage.getItemStack(), itemStack, true, false)));
 
         final Map<ItemStorage, Integer> localMap = new HashMap<>();
         for (final ItemStack stack : foundStacks)
@@ -1267,6 +1299,20 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                     }
                 }
             }
+            // Amounts still missing on-person but present in hut → pull once more, then leave for gather.
+            for (final Map.Entry<ItemStorage, Integer> pending : new HashMap<>(requestedMap).entrySet())
+            {
+                final Predicate<ItemStack> match =
+                  candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(pending.getKey().getItemStack(), candidate, true, false);
+                if (countInHut(placer.building, match) > 0)
+                {
+                    pullFromHutIntoWorker(placer, match, Math.max(1, pending.getValue()));
+                    if (InventoryUtils.getItemCountInItemHandler(placer.getInventory(), match) >= pending.getValue())
+                    {
+                        requestedMap.remove(pending.getKey());
+                    }
+                }
+            }
         }
         else
         {
@@ -1277,16 +1323,9 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                   {
                       return true;
                   }
-                  if (foundStacks.stream().anyMatch(target -> ItemStackUtils.compareItemStacksIgnoreStackSize(target, need)))
-                  {
-                      return true;
-                  }
-                  // Already in hut (QuidCraft deposit) — do not open a courier request that parks NEEDS_ITEM.
-                  return InventoryUtils.hasBuildingEnoughElseCount(
-                    placer.building,
-                    candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false),
-                    1) > 0
-                           || placer.building.hasResourceInBucket(need);
+                  // Placement consumes from the on-person inventory — only clear when the worker holds it.
+                  return foundStacks.stream()
+                           .anyMatch(target -> ItemStackUtils.compareItemStacksIgnoreStackSize(target, need, true, false));
               });
         }
 
@@ -1296,6 +1335,15 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         {
             final ItemStack stack = placedStack.getKey().getItemStack();
             if (ItemStackUtils.isEmpty(stack))
+            {
+                return FAIL;
+            }
+
+            final Predicate<ItemStack> match =
+              candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, candidate, true, false);
+
+            // Hut already has it (manual deposit / QuidCraft) — do not open a courier request that parks NEEDS_ITEM.
+            if (countInHut(placer.building, match) > 0 || placer.building.hasResourceInBucket(stack))
             {
                 return FAIL;
             }
@@ -1325,6 +1373,35 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             return FAIL;
         }
         return SUCCESS;
+    }
+
+    /**
+     * Count matching stacks in the hut TE inventory + registered racks (combined handler).
+     */
+    private static int countInHut(@NotNull final AbstractBuildingStructureBuilder building, @NotNull final Predicate<ItemStack> match)
+    {
+        return InventoryUtils.hasBuildingEnoughElseCount(building, match, 1);
+    }
+
+    /**
+     * Pull matching stacks from hut (TE + racks) into the worker's on-person inventory.
+     */
+    private static <J extends AbstractJobStructure<?, J>, B extends AbstractBuildingStructureBuilder> void pullFromHutIntoWorker(
+      @NotNull final AbstractEntityAIStructure<J, B> placer,
+      @NotNull final Predicate<ItemStack> match,
+      final int amount)
+    {
+        if (amount <= 0)
+        {
+            return;
+        }
+        final net.neoforged.neoforge.items.IItemHandler hut = placer.building.getItemHandlerCap();
+        if (hut == null)
+        {
+            return;
+        }
+        InventoryUtils.transferXOfFirstSlotInItemHandlerWithIntoNextFreeSlotInItemHandler(
+          hut, match, amount, placer.getInventory());
     }
 
     /**
