@@ -89,9 +89,10 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
     protected static final int BUILD_BLOCK_DELAY = 1;
 
     /**
-     * Soft leaves/grass/flowers cleared per structure tick (spam/cycle, not one-by-one walk).
+     * Soft leaves/grass/flowers cleared per structure tick.
+     * QD-108: keep small — 24 removeBlocks/tick hitch the server like a section clear.
      */
-    protected static final int SOFT_CLEAR_BATCH = 24;
+    protected static final int SOFT_CLEAR_BATCH = 2;
 
     /**
      * 2D reach for instant soft-obstruction clears without repathing.
@@ -991,7 +992,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             return continueQueuedBreaks();
         }
 
-        // Quidoms: soft leftovers clear instantly; keep draining the committed break queue.
+        // Quidoms: soft leftovers clear instantly; schedule next queue item for the following tick.
         if (isSoftObstruction(worldState) && isWithinSoftClearReach(blockToMine))
         {
             instantClearSoftObstruction(blockToMine);
@@ -1018,16 +1019,19 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         worker.decreaseSaturationForContinuousAction();
         blockToMine = null;
 
-        // Quidoms: drain predetermined break queue — no StructurePlacer reselection between mines.
+        // QD-108: arm next queued break for the *next* AI tick — never recurse doMining()
+        // (Eff5 netherite instamine would otherwise drain the whole queue in one hitch).
         return continueQueuedBreaks();
     }
 
     /**
-     * After a successful hard break, execute the next queued break immediately when still in reach.
+     * After a successful hard break, arm the next queued break for a subsequent AI tick.
+     * Soft leftovers may clear up to {@link #SOFT_CLEAR_BATCH} here; hard mines never recurse.
      */
     @NotNull
     private IAIState continueQueuedBreaks()
     {
+        int softCleared = 0;
         while (!actionQueue.isEmpty())
         {
             final QueuedBreakAction next = actionQueue.poll();
@@ -1041,23 +1045,22 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
 
             if (isSoftObstruction(state) && isWithinSoftClearReach(next.worldPos))
             {
+                if (softCleared >= SOFT_CLEAR_BATCH)
+                {
+                    actionQueue.addFirst(next);
+                    blockToMine = null;
+                    return MINE_BLOCK;
+                }
                 instantClearSoftObstruction(next.worldPos);
                 worker.swing(InteractionHand.MAIN_HAND);
+                softCleared++;
                 continue;
             }
 
-            if (!isWithinSoftClearReach(next.worldPos))
-            {
-                // Out of pocket — keep this break as the next target and walk via MINE_BLOCK.
-                blockToMine = next.worldPos;
-                worker.getCitizenData().setStatusPosition(blockToMine);
-                return MINE_BLOCK;
-            }
-
+            // Hard break — always defer to next AI tick (QD-108). Never call doMining() here.
             blockToMine = next.worldPos;
             worker.getCitizenData().setStatusPosition(blockToMine);
-            // Instantaneous handoff into the next mine cycle (tool delay still applies inside mineBlock).
-            return doMining();
+            return MINE_BLOCK;
         }
 
         return BUILDING_STEP;
@@ -1121,9 +1124,12 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             final boolean treatedAir = virtualAir.contains(worldPos.asLong());
             final BlockState effectiveState = treatedAir ? Blocks.AIR.defaultBlockState() : realState;
 
-            if (!treatedAir && isSoftObstruction(realState) && isWithinSoftClearReach(worldPos))
+            // QD-108: do not soft-clear during prefetch (piles removeBlocks onto the find-break tick).
+            // Enqueue softs so continueQueuedBreaks clears them under SOFT_CLEAR_BATCH.
+            if (!treatedAir && isSoftObstruction(realState))
             {
-                instantClearSoftObstruction(worldPos);
+                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), iterPos.immutable(), stage));
+                virtualAir.add(worldPos.asLong());
                 scanProgress = iterPos;
                 continue;
             }
@@ -1150,8 +1156,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                     continue;
                 }
 
-                // Resume progress stays at streak start (progressAfterFirst) so placer/clear continues in order.
-                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), progressAfterFirst.immutable(), stage));
+                // QD-108: store this cell's iterPos (not streak start) so progress advances one-by-one.
+                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), iterPos.immutable(), stage));
                 virtualAir.add(worldPos.asLong());
                 scanProgress = iterPos;
                 continue;
@@ -1166,7 +1172,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
 
             if (!(effectiveState.getBlock() instanceof AirBlock))
             {
-                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), progressAfterFirst.immutable(), stage));
+                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), iterPos.immutable(), stage));
                 virtualAir.add(worldPos.asLong());
                 // Treat as cleared+placed and continue so wood→wood→dirt can commit in one scan.
                 scanProgress = iterPos;
