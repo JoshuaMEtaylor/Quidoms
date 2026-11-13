@@ -630,22 +630,30 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 setDelay(40);
                 return BUILDING_STEP;
             }
-            // QD-101/118: stay on BUILDING_STEP; wait chat names raw BOM only (throttled via wait-raws key).
+            // QD-101/119: stay on BUILDING_STEP; chat shortages match Required Resources (or stay silent).
             Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS → BUILDING_STEP retry (no NEEDS_ITEM park)");
             final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
               building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
-            final String missingRaws = resModule == null ? "" : resModule.describeMissingRaws(worker.getCitizenData());
-            if (!missingRaws.isEmpty())
+            if (resModule != null)
             {
-                wallChat("wait-raws", Component.literal("waiting on raw deposits: " + missingRaws + "."));
-            }
-            else if (resModule != null && resModule.isFinishedConverted())
-            {
-                wallChat("wait-raws", Component.literal("granting finished placeables from deposits."));
-            }
-            else
-            {
-                wallChat("wait-raws", Component.literal("waiting on raw material deposits."));
+                // Menu complete → convert/grant; do not invent raw waits.
+                if (resModule.describeMissingRaws(worker.getCitizenData()).isEmpty())
+                {
+                    if (resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
+                    {
+                        wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
+                    }
+                    else if (resModule.isFinishedConverted())
+                    {
+                        wallChat("wait-raws", Component.literal("granting finished placeables from deposits."));
+                    }
+                    // else: menu empty / nothing missing — stay quiet (QD-119 sync)
+                }
+                else
+                {
+                    wallChat("wait-raws",
+                      Component.literal("waiting on raw deposits: " + resModule.describeMissingRaws(worker.getCitizenData()) + "."));
+                }
             }
             setDelay(20);
             return BUILDING_STEP;
@@ -1517,23 +1525,22 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                       requests.size(), completedRequests.size(), reqStack.getItem(), stack.getItem());
                 }
             }
-            // QD-118: wait chat names RAW BOM only — never the finished placeable (planks/stairs).
+            // QD-119: wait chat uses the same shortage list as Required Resources — silent if menu complete.
             final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
               placer.building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
             String missingRaws = resModule == null ? "" : resModule.describeMissingRaws(citizenData);
-            if (missingRaws.isEmpty())
+            if (missingRaws.isEmpty() && !rawNames.isEmpty())
             {
-                missingRaws = rawNames.isEmpty() ? "raw materials" : rawNames;
+                missingRaws = rawNames;
             }
-            if (filedAny)
+            if (!missingRaws.isEmpty())
             {
                 placer.wallChat("wait-raws",
-                  Component.literal("need raw deposits: " + missingRaws + "."));
+                  Component.literal((filedAny ? "need raw deposits: " : "waiting on raw deposits: ") + missingRaws + "."));
             }
-            else
+            else if (resModule != null && resModule.tryConvertRawsToFinishedCredit(citizenData))
             {
-                placer.wallChat("wait-raws",
-                  Component.literal("waiting on raw deposits: " + missingRaws + "."));
+                placer.wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
             }
             return FAIL;
         }

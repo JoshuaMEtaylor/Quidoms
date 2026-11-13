@@ -325,7 +325,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     }
 
     /**
-     * Combined person + hut TE+racks count for a predicate (QD-118).
+     * Same stock universe as Required Resources UI: person + hut TE+racks + workstations (QD-118/119).
      */
     private int countDualInv(@Nullable final ICitizenData worker, @NotNull final Predicate<ItemStack> match)
     {
@@ -335,15 +335,64 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         {
             count += InventoryUtils.getItemCountInItemHandler(hut, match);
         }
-        if (worker != null && worker.getInventory() != null)
+        if (worker != null)
         {
-            count += InventoryUtils.getItemCountInItemHandler(worker.getInventory(), match);
+            if (worker.getInventory() != null)
+            {
+                count += InventoryUtils.getItemCountInItemHandler(worker.getInventory(), match);
+            }
+            if (worker.getJob() instanceof final IJobWithExternalWorkStations jobExternalStations)
+            {
+                for (final IBuilding station : jobExternalStations.getWorkStations())
+                {
+                    if (station.getItemHandlerCap() != null)
+                    {
+                        count += InventoryUtils.getItemCountInItemHandler(station.getItemHandlerCap(), match);
+                    }
+                }
+            }
+        }
+        else
+        {
+            // No worker yet — still count assigned citizen like the UI does.
+            final Set<ICitizenData> set = building.getAllAssignedCitizen();
+            final ICitizenData data = set.isEmpty() ? null : set.iterator().next();
+            if (data != null)
+            {
+                return countDualInv(data, match);
+            }
         }
         return count;
     }
 
     /**
-     * Person + hut TE+racks together hold enough of every raw BOM entry (QD-118).
+     * Rebuild player-facing raw BOM from finished placeables with current recipe expansion (QD-119).
+     * Clears buckets and re-buckets raws; does not touch finishedConverted/credit.
+     */
+    public void rebuildNeededRawsFromFinishedPlaceables()
+    {
+        if (finishedConverted || finishedPlaceables.isEmpty())
+        {
+            return;
+        }
+        neededResources = new LinkedHashMap<>();
+        buckets.clear();
+        for (final BuildingBuilderResource placeable : finishedPlaceables.values())
+        {
+            final java.util.List<ItemStack> expanded = com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
+              building.getColony().getWorld(), placeable.getItemStack(), placeable.getAmount());
+            for (final ItemStack part : expanded)
+            {
+                addNeededResourceRaw(part, part.getCount());
+            }
+        }
+        this.markDirty();
+        Log.getLogger().info("[QuidomsBuilder] rebuilt raw BOM from {} finished kinds → {} raw kinds",
+          finishedPlaceables.size(), neededResources.size());
+    }
+
+    /**
+     * Person + hut TE+racks (+ workstations) hold enough of every raw BOM entry.
      */
     public boolean areRawsFullyDeposited()
     {
@@ -354,7 +403,18 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         if (neededResources.isEmpty())
         {
-            return finishedConverted;
+            if (finishedConverted)
+            {
+                return true;
+            }
+            if (!finishedPlaceables.isEmpty())
+            {
+                rebuildNeededRawsFromFinishedPlaceables();
+            }
+            if (neededResources.isEmpty())
+            {
+                return finishedConverted;
+            }
         }
         for (final BuildingBuilderResource resource : neededResources.values())
         {
@@ -369,14 +429,23 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     }
 
     /**
-     * Names of raw BOM entries still short in person+hut (for wait chat).
+     * Names of raw BOM entries still short — same accounting as Required Resources (QD-119).
+     * Empty string when nothing missing (menu complete) or already converted.
      */
     @NotNull
     public String describeMissingRaws(@Nullable final ICitizenData worker)
     {
+        if (finishedConverted)
+        {
+            return "";
+        }
+        if (neededResources.isEmpty() && !finishedPlaceables.isEmpty())
+        {
+            rebuildNeededRawsFromFinishedPlaceables();
+        }
         if (neededResources.isEmpty())
         {
-            return finishedConverted ? "" : "raw materials";
+            return "";
         }
         final StringBuilder sb = new StringBuilder();
         for (final BuildingBuilderResource resource : neededResources.values())
@@ -384,6 +453,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             final Predicate<ItemStack> match =
               stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, false);
             final int have = countDualInv(worker, match);
+            // Mirror UI "available" vs amount — only report true shortages.
             final int missing = resource.getAmount() - have;
             if (missing <= 0)
             {
