@@ -325,24 +325,42 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     }
 
     /**
-     * Hut TE+racks hold enough of every raw BOM entry.
+     * Combined person + hut TE+racks count for a predicate (QD-118).
+     */
+    private int countDualInv(@Nullable final ICitizenData worker, @NotNull final Predicate<ItemStack> match)
+    {
+        int count = 0;
+        final IItemHandler hut = building.getItemHandlerCap();
+        if (hut != null)
+        {
+            count += InventoryUtils.getItemCountInItemHandler(hut, match);
+        }
+        if (worker != null && worker.getInventory() != null)
+        {
+            count += InventoryUtils.getItemCountInItemHandler(worker.getInventory(), match);
+        }
+        return count;
+    }
+
+    /**
+     * Person + hut TE+racks together hold enough of every raw BOM entry (QD-118).
      */
     public boolean areRawsFullyDeposited()
+    {
+        return areRawsFullyDeposited(null);
+    }
+
+    public boolean areRawsFullyDeposited(@Nullable final ICitizenData worker)
     {
         if (neededResources.isEmpty())
         {
             return finishedConverted;
         }
-        final IItemHandler hut = building.getItemHandlerCap();
-        if (hut == null)
-        {
-            return false;
-        }
         for (final BuildingBuilderResource resource : neededResources.values())
         {
             final Predicate<ItemStack> match =
               stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, false);
-            if (InventoryUtils.getItemCountInItemHandler(hut, match) < resource.getAmount())
+            if (countDualInv(worker, match) < resource.getAmount())
             {
                 return false;
             }
@@ -351,11 +369,86 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     }
 
     /**
-     * QD-116: when hut raws cover the full BOM, consume them and open finished credit (no crafting).
+     * Names of raw BOM entries still short in person+hut (for wait chat).
+     */
+    @NotNull
+    public String describeMissingRaws(@Nullable final ICitizenData worker)
+    {
+        if (neededResources.isEmpty())
+        {
+            return finishedConverted ? "" : "raw materials";
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (final BuildingBuilderResource resource : neededResources.values())
+        {
+            final Predicate<ItemStack> match =
+              stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, false);
+            final int have = countDualInv(worker, match);
+            final int missing = resource.getAmount() - have;
+            if (missing <= 0)
+            {
+                continue;
+            }
+            if (sb.length() > 0)
+            {
+                sb.append(", ");
+            }
+            sb.append(resource.getItemStack().getHoverName().getString()).append(" x").append(missing);
+        }
+        return sb.length() == 0 ? "" : sb.toString();
+    }
+
+    /**
+     * Consume {@code amount} matching stacks from hut first, then person (QD-118).
+     */
+    private boolean consumeDualInv(
+      @Nullable final ICitizenData worker,
+      @NotNull final ItemStack template,
+      final int amount)
+    {
+        if (amount <= 0)
+        {
+            return true;
+        }
+        int left = amount;
+        final IItemHandler hut = building.getItemHandlerCap();
+        if (hut != null)
+        {
+            final int inHut = InventoryUtils.getItemCountInItemHandler(hut,
+              s -> ItemStackUtils.compareItemStacksIgnoreStackSize(s, template, true, false));
+            final int fromHut = Math.min(left, inHut);
+            if (fromHut > 0)
+            {
+                if (!InventoryUtils.attemptReduceStackInItemHandler(hut, template.copy(), fromHut, true, true))
+                {
+                    return false;
+                }
+                left -= fromHut;
+            }
+        }
+        if (left <= 0)
+        {
+            return true;
+        }
+        if (worker == null || worker.getInventory() == null)
+        {
+            return false;
+        }
+        return InventoryUtils.attemptReduceStackInItemHandler(worker.getInventory(), template.copy(), left, true, true);
+    }
+
+    /**
+     * QD-116/118: when person+hut raws cover the BOM, consume (hut first) and open finished credit.
+     * Finished stacks already present are not re-granted / do not consume raws for that line.
      *
      * @return true if already converted or conversion succeeded this call.
      */
     public boolean tryConvertRawsToFinishedCredit()
+    {
+        return tryConvertRawsToFinishedCredit(null);
+    }
+
+    public boolean tryConvertRawsToFinishedCredit(@Nullable final ICitizenData worker)
     {
         if (finishedConverted)
         {
@@ -365,42 +458,49 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         {
             return false;
         }
-        if (!areRawsFullyDeposited())
+        if (!areRawsFullyDeposited(worker))
         {
             return false;
         }
 
-        final IItemHandler hut = building.getItemHandlerCap();
-        if (hut == null)
-        {
-            return false;
-        }
-
-        // Consume exact raw quantities from hut TE+racks.
-        for (final BuildingBuilderResource resource : neededResources.values())
-        {
-            final ItemStack consume = resource.getItemStack().copy();
-            consume.setCount(resource.getAmount());
-            if (!InventoryUtils.attemptReduceStackInItemHandler(hut, consume, resource.getAmount(), true, true))
-            {
-                Log.getLogger().warn("[QuidomsBuilder] raw consume failed for {} x{} — abort convert",
-                  consume.getItem(), resource.getAmount());
-                return false;
-            }
-        }
-
+        // Credit only what is not already present as finished in person+hut.
         finishedCredit = new LinkedHashMap<>();
         for (final Map.Entry<String, BuildingBuilderResource> entry : finishedPlaceables.entrySet())
         {
-            finishedCredit.put(entry.getKey(),
-              new BuildingBuilderResource(entry.getValue().getItemStack().copyWithCount(1), entry.getValue().getAmount()));
+            final BuildingBuilderResource placeable = entry.getValue();
+            final Predicate<ItemStack> match =
+              stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, placeable.getItemStack(), true, false);
+            final int already = countDualInv(worker, match);
+            final int stillNeed = Math.max(0, placeable.getAmount() - already);
+            if (stillNeed > 0)
+            {
+                finishedCredit.put(entry.getKey(),
+                  new BuildingBuilderResource(placeable.getItemStack().copyWithCount(1), stillNeed));
+            }
         }
+
+        // Consume raws only when credit still needs finished injections.
+        // If every finished line is already present, skip raw consume.
+        if (!finishedCredit.isEmpty())
+        {
+            for (final BuildingBuilderResource resource : neededResources.values())
+            {
+                if (!consumeDualInv(worker, resource.getItemStack(), resource.getAmount()))
+                {
+                    Log.getLogger().warn("[QuidomsBuilder] raw consume failed for {} x{} — abort convert",
+                      resource.getItemStack().getItem(), resource.getAmount());
+                    finishedCredit = new LinkedHashMap<>();
+                    return false;
+                }
+            }
+        }
+
         finishedConverted = true;
-        // Player deposit list is satisfied — stop further raw requests / bucket chasing.
         neededResources = new LinkedHashMap<>();
         buckets.clear();
         this.markDirty();
-        Log.getLogger().info("[QuidomsBuilder] converted hut raws → finished credit ({} kinds)", finishedCredit.size());
+        Log.getLogger().info("[QuidomsBuilder] converted dual-inv raws → finished credit ({} kinds still to grant)",
+          finishedCredit.size());
         return true;
     }
 

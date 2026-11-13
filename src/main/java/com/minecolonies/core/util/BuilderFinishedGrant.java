@@ -15,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 /**
- * Quidoms QD-116: after the hut holds the full raw BOM, consume those raws and grant
- * finished placeables from a credit pool into the builder — no runtime crafting.
+ * Quidoms QD-116/118: after person+hut hold the raw BOM (or finished already present),
+ * convert/consume raws and grant finished placeables — no runtime crafting.
  */
 public final class BuilderFinishedGrant
 {
@@ -25,10 +25,8 @@ public final class BuilderFinishedGrant
     }
 
     /**
-     * If raws are fully deposited and not yet converted, consume hut raws and open the finished credit.
-     * Then inject any still-needed finished stacks for {@code need} into the builder's person inventory.
-     *
-     * @return true when the person inventory holds enough of {@code need} afterwards.
+     * Ensure the builder's person inventory holds enough of the finished {@code need}.
+     * Counts finished already in person/hut as satisfied; converts dual-inv raws when complete.
      */
     public static boolean ensureFinishedInPerson(
       @NotNull final AbstractBuildingStructureBuilder building,
@@ -56,7 +54,7 @@ public final class BuilderFinishedGrant
             return true;
         }
 
-        // Pull finished already sitting in the hut (post-grant overflow / prior inject).
+        // Pull finished already sitting in the hut.
         final IItemHandler hut = building.getItemHandlerCap();
         if (hut != null)
         {
@@ -73,7 +71,8 @@ public final class BuilderFinishedGrant
             return true;
         }
 
-        module.tryConvertRawsToFinishedCredit();
+        // QD-118: person + hut raws together; skip raw consume for finished already present.
+        module.tryConvertRawsToFinishedCredit(worker);
 
         if (!module.isFinishedConverted())
         {
@@ -89,6 +88,7 @@ public final class BuilderFinishedGrant
         final int taken = module.takeFinishedCredit(need, stillNeed);
         if (taken <= 0)
         {
+            // Converted but this finished line was already satisfied elsewhere — treat as ok if present.
             return InventoryUtils.getItemCountInItemHandler(person, match) >= want;
         }
 
@@ -96,7 +96,6 @@ public final class BuilderFinishedGrant
         grant.setCount(taken);
         if (!InventoryUtils.addItemStackToItemHandler(person, grant))
         {
-            // Person full — park finished in hut and pull what fits next tick.
             if (hut != null)
             {
                 InventoryUtils.addItemStackToItemHandler(hut, grant);
@@ -105,7 +104,6 @@ public final class BuilderFinishedGrant
             }
             else
             {
-                // Rollback credit if we cannot store the grant anywhere.
                 module.returnFinishedCredit(grant);
                 Log.getLogger().info("[QuidomsBuilder] grant blocked — no space for {}", need.getItem());
             }

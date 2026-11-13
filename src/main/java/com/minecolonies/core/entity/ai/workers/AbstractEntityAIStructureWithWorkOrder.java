@@ -243,7 +243,7 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
             // QD-116: as soon as hut raws cover the BOM, convert to finished credit.
             final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
               building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
-            if (resModule != null && resModule.tryConvertRawsToFinishedCredit())
+            if (resModule != null && resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
             {
                 wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
             }
@@ -258,7 +258,7 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
             building.getWorkOrder().setRequested(true);
             final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
               building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
-            if (resModule != null && resModule.tryConvertRawsToFinishedCredit())
+            if (resModule != null && resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
             {
                 wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
             }
