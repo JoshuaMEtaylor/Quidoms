@@ -253,6 +253,17 @@ public class BuildingStructureHandler<J extends AbstractJobStructure<?, J>, B ex
             itemList.add(stack);
         }
 
+        // QD-116: grant finished from raw-deposit credit before place (no runtime craft).
+        for (final ItemStack need : itemList)
+        {
+            if (com.minecolonies.api.util.ItemStackUtils.isEmpty(need))
+            {
+                continue;
+            }
+            com.minecolonies.core.util.BuilderFinishedGrant.ensureFinishedInPerson(
+              structureAI.building, structureAI.getWorker().getCitizenData(), need.copy());
+        }
+
         return AbstractEntityAIStructure.hasListOfResInInvOrRequest(structureAI, itemList, itemList.size() > 1) == AbstractEntityAIStructure.ItemCheckResult.SUCCESS;
     }
 

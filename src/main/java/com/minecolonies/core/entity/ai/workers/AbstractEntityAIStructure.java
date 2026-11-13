@@ -36,6 +36,7 @@ import com.minecolonies.core.entity.ai.workers.util.BuildingProgressStage;
 import com.minecolonies.core.entity.ai.workers.util.BuildingStructureHandler;
 import com.minecolonies.core.tileentities.TileEntityDecorationController;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
@@ -88,9 +89,10 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
     protected static final int BUILD_BLOCK_DELAY = 1;
 
     /**
-     * Soft leaves/grass/flowers cleared per structure tick (spam/cycle, not one-by-one walk).
+     * Soft leaves/grass/flowers cleared per structure tick.
+     * QD-108: keep small — 24 removeBlocks/tick hitch the server like a section clear.
      */
-    protected static final int SOFT_CLEAR_BATCH = 24;
+    protected static final int SOFT_CLEAR_BATCH = 2;
 
     /**
      * 2D reach for instant soft-obstruction clears without repathing.
@@ -127,6 +129,27 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
      * We're waiting for the blueprint to finish loading.
      */
     protected boolean loadingBlueprint = false;
+
+    /**
+     * LOAD_STRUCTURE ticks spent with {@link #loadingBlueprint} true — reset if stuck.
+     */
+    protected int blueprintLoadWaitTicks = 0;
+
+    /**
+     * Whether the citizen already announced BUILD_START for the current WO claim.
+     */
+    protected boolean buildStartAnnounced = false;
+
+    /**
+     * Consecutive BUILDING_STEP ticks where walk/ready returned false (QD-101 walk harden).
+     */
+    protected int walkNotReadyStreak = 0;
+
+    /**
+     * Rate-limit in-game wall chat so RECALC/path spam does not flood (QD-102).
+     */
+    private long lastWallChatMs = 0L;
+    private String lastWallChatKey = "";
 
     /**
      * Different item check result possibilities.
@@ -407,8 +430,32 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         // Quidoms: soft clears / in-reach hard breaks skip slow repath; otherwise approach site.
         if (!limitReached && !isReadyForStructureAction(worldPos, blockToMine))
         {
+            walkNotReadyStreak++;
+            // TEMP QD-101 debug
+            if (walkNotReadyStreak == 1 || walkNotReadyStreak % 40 == 0)
+            {
+                Log.getLogger().info(
+                  "[QuidomsBuilder] BUILDING_STEP not-ready streak={} citizen={} workFrom={} worldPos={} minePos={}",
+                  walkNotReadyStreak,
+                  worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName(),
+                  workFrom,
+                  worldPos,
+                  blockToMine);
+                wallChat("path",
+                  Component.literal("can't reach the next build spot — repathing (streak " + walkNotReadyStreak + ")."));
+            }
+            // Soft recover: after sustained path failure, drop workFrom so walkToConstructionSite repaths
+            // (or works in-place when already within reach — see EntityAIStructureBuilder).
+            if (walkNotReadyStreak >= 60)
+            {
+                workFrom = null;
+                walkNotReadyStreak = 0;
+                Log.getLogger().info("[QuidomsBuilder] BUILDING_STEP walk recover: cleared workFrom");
+                wallChat("path-recover", Component.literal("path stuck — resetting work position."));
+            }
             return getState();
         }
+        walkNotReadyStreak = 0;
 
         limitReached = false;
 
@@ -491,12 +538,122 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         if (result.getBlockResult().getResult() == BlockPlacementResult.Result.MISSING_ITEMS)
         {
             actionQueue.clear();
-            if (hasListOfResInInvOrRequest(this, result.getBlockResult().getRequiredItems(), result.getBlockResult().getRequiredItems().size() > 1) == RECALC)
+            final List<ItemStack> required = result.getBlockResult().getRequiredItems();
+            // QuidCraft may have already provisioned the hut — pull/buy before parking in NEEDS_ITEM.
+            final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
+            com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
+              building, citizenName, worker.getCitizenData());
+            // QD-116: provision/buy RAWS only; grant finished from credit after raw deposit — no craft.
+            for (final ItemStack need : required)
             {
-                building.getWorkOrder().setRequested(false);
-                return LOAD_STRUCTURE;
+                if (ItemStackUtils.isEmpty(need))
+                {
+                    continue;
+                }
+                final boolean convertible =
+                  com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(worker.level(), need);
+                if (convertible)
+                {
+                    for (final ItemStack raw : com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
+                      worker.level(), need, Math.max(1, need.getCount())))
+                    {
+                        com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+                          building, raw, Math.max(1, raw.getCount()), false, citizenName, worker.getCitizenData());
+                    }
+                }
+                else
+                {
+                    com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+                      building, need, Math.max(1, need.getCount()), false, citizenName, worker.getCitizenData());
+                }
+                com.minecolonies.core.util.BuilderFinishedGrant.ensureFinishedInPerson(
+                  building, worker.getCitizenData(), need.copy());
             }
-            return NEEDS_ITEM;
+
+            final ItemCheckResult check = hasListOfResInInvOrRequest(this, required, required.size() > 1);
+            // TEMP QD-101 debug
+            Log.getLogger().info(
+              "[QuidomsBuilder] MISSING_ITEMS citizen={} check={} required={} openSync={}",
+              worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName(),
+              check,
+              required.size(),
+              worker.getCitizenData() != null && building.hasOpenSyncRequest(worker.getCitizenData()));
+
+            if (check == SUCCESS)
+            {
+                return BUILDING_STEP;
+            }
+
+            // Hut holds finished placeables — gather. Raws wait for deposit completeness (QD-116), no craft.
+            for (final ItemStack need : required)
+            {
+                if (ItemStackUtils.isEmpty(need))
+                {
+                    continue;
+                }
+                final Predicate<ItemStack> match =
+                  candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
+                final int person = InventoryUtils.getItemCountInItemHandler(getInventory(), match);
+                final int hut = countInHut(building, match);
+                if (person > 0)
+                {
+                    continue;
+                }
+                if (hut > 0 || building.hasResourceInBucket(need))
+                {
+                    Log.getLogger().info(
+                      "[QuidomsBuilder] MISSING_ITEMS hut-has finished person={} hut={} item={} → GATHER",
+                      person, hut, need.getItem());
+                    wallChat("gather",
+                      Component.literal("picking up " + need.getHoverName().getString() + " from the hut."));
+                    if (!worker.getInventoryCitizen().hasSpace())
+                    {
+                        wallChat("inv-full", Component.literal("inventory full — dumping before pickup."));
+                        return INVENTORY_FULL;
+                    }
+                    needsCurrently = new Tuple<>(match, Math.max(1, need.getCount()));
+                    if (InventoryUtils.hasItemInProvider(building.getTileEntity(), match) || hut > 0)
+                    {
+                        return GATHERING_REQUIRED_MATERIALS;
+                    }
+                    return PICK_UP;
+                }
+            }
+
+            // QD-102: never LOAD_STRUCTURE on RECALC — that looped forever after QuidCraft provisioned
+            // (MISSING_ITEMS check=RECALC → LOAD_STRUCTURE → …). Stay on BUILDING_STEP / gather / retry.
+            if (check == RECALC)
+            {
+                Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS RECALC → BUILDING_STEP retry (no LOAD_STRUCTURE)");
+                wallChat("wait-raws",
+                  Component.literal("retrying material check (not reloading schematic)."));
+                setDelay(40);
+                return BUILDING_STEP;
+            }
+            // QD-101/119: stay on BUILDING_STEP; chat shortages match Required Resources (or stay silent).
+            Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS → BUILDING_STEP retry (no NEEDS_ITEM park)");
+            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
+              building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            if (resModule != null)
+            {
+                // Menu complete → convert once; already-granted stays quiet (QD-121).
+                if (resModule.describeMissingRaws(worker.getCitizenData()).isEmpty())
+                {
+                    if (!resModule.isFinishedConverted()
+                          && resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
+                    {
+                        wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
+                    }
+                    // else already converted / nothing to say — continue BUILDING_STEP
+                }
+                else
+                {
+                    wallChat("wait-raws",
+                      Component.literal("waiting on raw deposits: " + resModule.describeMissingRaws(worker.getCitizenData()) + "."));
+                }
+            }
+            setDelay(20);
+            return BUILDING_STEP;
         }
 
         worker.swing(InteractionHand.MAIN_HAND);
@@ -513,11 +670,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             blockToMine = firstBreak;
             worker.getCitizenData().setStatusPosition(blockToMine);
 
-            // Quidoms: if already in place-reach, mine now; otherwise move then break.
-            if (isWithinSoftClearReach(blockToMine))
-            {
-                return doMining();
-            }
+            // Hard blocks: always go through MINE_BLOCK so out-of-range walks closer, then tool-break.
+            // Soft clears already handled above; do not spam-insta hard solids.
             return MINE_BLOCK;
         }
         else
@@ -842,7 +996,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             return continueQueuedBreaks();
         }
 
-        // Quidoms: soft leftovers clear instantly; keep draining the committed break queue.
+        // Quidoms: soft leftovers clear instantly; schedule next queue item for the following tick.
         if (isSoftObstruction(worldState) && isWithinSoftClearReach(blockToMine))
         {
             instantClearSoftObstruction(blockToMine);
@@ -869,16 +1023,19 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         worker.decreaseSaturationForContinuousAction();
         blockToMine = null;
 
-        // Quidoms: drain predetermined break queue — no StructurePlacer reselection between mines.
+        // QD-108: arm next queued break for the *next* AI tick — never recurse doMining()
+        // (Eff5 netherite instamine would otherwise drain the whole queue in one hitch).
         return continueQueuedBreaks();
     }
 
     /**
-     * After a successful hard break, execute the next queued break immediately when still in reach.
+     * After a successful hard break, arm the next queued break for a subsequent AI tick.
+     * Soft leftovers may clear up to {@link #SOFT_CLEAR_BATCH} here; hard mines never recurse.
      */
     @NotNull
     private IAIState continueQueuedBreaks()
     {
+        int softCleared = 0;
         while (!actionQueue.isEmpty())
         {
             final QueuedBreakAction next = actionQueue.poll();
@@ -892,23 +1049,22 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
 
             if (isSoftObstruction(state) && isWithinSoftClearReach(next.worldPos))
             {
+                if (softCleared >= SOFT_CLEAR_BATCH)
+                {
+                    actionQueue.addFirst(next);
+                    blockToMine = null;
+                    return MINE_BLOCK;
+                }
                 instantClearSoftObstruction(next.worldPos);
                 worker.swing(InteractionHand.MAIN_HAND);
+                softCleared++;
                 continue;
             }
 
-            if (!isWithinSoftClearReach(next.worldPos))
-            {
-                // Out of pocket — keep this break as the next target and walk via MINE_BLOCK.
-                blockToMine = next.worldPos;
-                worker.getCitizenData().setStatusPosition(blockToMine);
-                return MINE_BLOCK;
-            }
-
+            // Hard break — always defer to next AI tick (QD-108). Never call doMining() here.
             blockToMine = next.worldPos;
             worker.getCitizenData().setStatusPosition(blockToMine);
-            // Instantaneous handoff into the next mine cycle (tool delay still applies inside mineBlock).
-            return doMining();
+            return MINE_BLOCK;
         }
 
         return BUILDING_STEP;
@@ -972,9 +1128,12 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             final boolean treatedAir = virtualAir.contains(worldPos.asLong());
             final BlockState effectiveState = treatedAir ? Blocks.AIR.defaultBlockState() : realState;
 
-            if (!treatedAir && isSoftObstruction(realState) && isWithinSoftClearReach(worldPos))
+            // QD-108: do not soft-clear during prefetch (piles removeBlocks onto the find-break tick).
+            // Enqueue softs so continueQueuedBreaks clears them under SOFT_CLEAR_BATCH.
+            if (!treatedAir && isSoftObstruction(realState))
             {
-                instantClearSoftObstruction(worldPos);
+                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), iterPos.immutable(), stage));
+                virtualAir.add(worldPos.asLong());
                 scanProgress = iterPos;
                 continue;
             }
@@ -1001,8 +1160,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                     continue;
                 }
 
-                // Resume progress stays at streak start (progressAfterFirst) so placer/clear continues in order.
-                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), progressAfterFirst.immutable(), stage));
+                // QD-108: store this cell's iterPos (not streak start) so progress advances one-by-one.
+                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), iterPos.immutable(), stage));
                 virtualAir.add(worldPos.asLong());
                 scanProgress = iterPos;
                 continue;
@@ -1017,7 +1176,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
 
             if (!(effectiveState.getBlock() instanceof AirBlock))
             {
-                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), progressAfterFirst.immutable(), stage));
+                actionQueue.addLast(new QueuedBreakAction(worldPos.immutable(), iterPos.immutable(), stage));
                 virtualAir.add(worldPos.asLong());
                 // Treat as cleared+placed and continue so wood→wood→dirt can commit in one scan.
                 scanProgress = iterPos;
@@ -1078,10 +1237,13 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         workOrder.loadBlueprint(world, (blueprint -> {
             if (blueprint == null)
             {
-                handleSpecificCancelActions();
+                // Keep the claim — in-flight/pack-not-ready misses used to cancel the WO (QD-94).
+                // Clear placer and let LOAD_STRUCTURE retry on a later tick.
                 Log.getLogger()
-                  .warn("Couldn't find structure with name: " + workOrder.getStructurePath() + " in: " + workOrder.getStructurePack() + ". Aborting loading procedure");
+                  .warn("Couldn't find structure with name: " + workOrder.getStructurePath() + " in: " + workOrder.getStructurePack()
+                          + ". Will retry; work order kept claimed.");
                 this.loadingBlueprint = false;
+                resetCurrentStructure();
                 return;
             }
 
@@ -1162,54 +1324,111 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             requestedMap.put(tempStorage, tempStorage.getAmount());
         }
 
-        for (final ItemStorage stack : requestedMap.keySet())
+        final net.minecraft.world.level.Level world = placer.getWorker().level();
+        for (final ItemStorage stack : new HashSet<>(requestedMap.keySet()))
         {
-            if (!InventoryUtils.hasItemInItemHandler(placer.getInventory(), stack1 -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack.getItemStack(), stack1))
-                  && !placer.building.hasResourceInBucket(stack.getItemStack()))
-            {
-                return RECALC;
-            }
-        }
-        // TODO: Why predicate based search when we got our ItemStorages we look for already?
-        final List<ItemStack> foundStacks = InventoryUtils.filterItemHandler(placer.getWorker().getInventoryCitizen(),
-          itemStack -> requestedMap.keySet().stream().anyMatch(storage -> ItemStackUtils.compareItemStacksIgnoreStackSize(storage.getItemStack(), itemStack)));
+            final ItemStack need = stack.getItemStack();
+            final int want = Math.max(1, stack.getAmount());
+            final Predicate<ItemStack> match =
+              candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
+            final boolean convertible =
+              com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(world, need);
+            final java.util.List<ItemStack> raws =
+              convertible
+                ? com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(world, need, want)
+                : java.util.List.of();
 
-        final Map<ItemStorage, Integer> localMap = new HashMap<>();
-        for (final ItemStack stack : foundStacks)
-        {
-            ItemStorage tempStorage = new ItemStorage(stack.copy());
-            if (localMap.containsKey(tempStorage))
+            // QD-112: cancel any open delivery requests for convertible finished products (oak planks, framed…).
+            if (convertible)
             {
-                final int oldSize = localMap.get(tempStorage);
-                tempStorage.setAmount(tempStorage.getAmount() + oldSize);
+                cancelFinishedConvertibleRequests(placer, need);
             }
-            localMap.put(tempStorage, tempStorage.getAmount());
-        }
 
-        if (force)
-        {
-            for (final Map.Entry<ItemStorage, Integer> local : localMap.entrySet())
+            // QD-118: finished already in person (exact count) → satisfied, do not wait on raws.
+            if (InventoryUtils.getItemCountInItemHandler(placer.getInventory(), match) >= want
+                  || (!convertible && placer.building.hasResourceInBucket(need)))
             {
-                int req = requestedMap.getOrDefault(local.getKey(), 0);
-                if (req != 0)
+                requestedMap.remove(stack);
+                continue;
+            }
+
+            // Dual inventory: pull finished product from hut TE + racks.
+            pullFromHutIntoWorker(placer, match, want);
+
+            if (InventoryUtils.getItemCountInItemHandler(placer.getInventory(), match) >= want)
+            {
+                requestedMap.remove(stack);
+                continue;
+            }
+
+            // QD-116/118: convert dual-inv raws → finished credit, inject into person (no runtime craft).
+            final String citizenName = placer.getWorker().getCitizenData() == null ? "" : placer.getWorker().getCitizenData().getName();
+            if (convertible)
+            {
+                for (final ItemStack raw : raws)
                 {
-                    if (local.getValue() >= req)
-                    {
-                        requestedMap.remove(local.getKey());
-                    }
-                    else
-                    {
-                        requestedMap.put(local.getKey(), req - local.getValue());
-                    }
+                    com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+                      placer.building,
+                      raw,
+                      Math.max(1, raw.getCount()),
+                      false,
+                      citizenName,
+                      placer.getWorker().getCitizenData());
                 }
             }
+            else
+            {
+                com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+                  placer.building,
+                  need,
+                  want,
+                  false,
+                  citizenName,
+                  placer.getWorker().getCitizenData());
+                pullFromHutIntoWorker(placer, match, want);
+            }
+
+            if (com.minecolonies.core.util.BuilderFinishedGrant.ensureFinishedInPerson(
+              placer.building, placer.getWorker().getCitizenData(), need.copyWithCount(want)))
+            {
+                Log.getLogger().info("[QuidomsBuilder] hasList granted/has finished {} x{}", need.getItem(), want);
+                requestedMap.remove(stack);
+                continue;
+            }
+
+            if (InventoryUtils.getItemCountInItemHandler(placer.getInventory(), match) >= want
+                  || (!convertible && placer.building.hasResourceInBucket(need)))
+            {
+                requestedMap.remove(stack);
+                continue;
+            }
+
+            // Still missing — do NOT return RECALC (QD-102). Leave in map → raw async request + FAIL.
+            Log.getLogger().info(
+              "[QuidomsBuilder] hasList missing person+hut item={} convertible={} → FAIL path (no RECALC)",
+              need.getItem(), convertible);
         }
-        else
+        // QD-118: clear satisfied finished by count compare (avoid ItemStorage key mismatches).
+        for (final Map.Entry<ItemStorage, Integer> pending : new HashMap<>(requestedMap).entrySet())
         {
-            requestedMap.entrySet()
-              .removeIf(entry -> ItemStackUtils.isEmpty(entry.getKey().getItemStack()) || foundStacks.stream()
-                                                                                            .anyMatch(target -> ItemStackUtils.compareItemStacksIgnoreStackSize(target,
-                                                                                              entry.getKey().getItemStack())));
+            final ItemStack need = pending.getKey().getItemStack();
+            final Predicate<ItemStack> match =
+              candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
+            final int want = Math.max(1, pending.getValue());
+            int personHave = InventoryUtils.getItemCountInItemHandler(placer.getInventory(), match);
+            if (personHave < want && countInHut(placer.building, match) > 0)
+            {
+                pullFromHutIntoWorker(placer, match, want - personHave);
+                personHave = InventoryUtils.getItemCountInItemHandler(placer.getInventory(), match);
+            }
+            if (personHave >= want)
+            {
+                requestedMap.remove(pending.getKey());
+            }
+            else if (force && personHave > 0)
+            {
+                requestedMap.put(pending.getKey(), want - personHave);
+            }
         }
 
         final ICitizenData citizenData = placer.getWorker().getCitizenData();
@@ -1222,31 +1441,199 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 return FAIL;
             }
 
-            final List<IRequest<?>> requests = placer.building.getOpenRequestsOfCitizenOrBuilding(citizenId, e -> e.getRequest() instanceof IDeliverable deliverable && deliverable.matches(stack));
-            final List<IRequest<?>> completedRequests = placer.building.getCompletedRequestsOfCitizenOrBuilding(citizenData, e -> e.getRequest() instanceof IDeliverable deliverable && deliverable.matches(stack));
+            final int want = Math.max(1, placedStack.getValue());
+            final Predicate<ItemStack> match =
+              candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, candidate, true, false);
 
-            if (requests.isEmpty() && completedRequests.isEmpty())
+            final boolean convertible =
+              com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(world, stack);
+
+            // QD-112: never open a delivery request for convertible finished products (oak planks / framed).
+            if (convertible)
             {
-                final Stack stackRequest = new Stack(stack, placer.getTotalAmount(stack).getCount(), 1);
-                placer.getWorker().getCitizenData().createRequest(stackRequest);
-                placer.registerBlockAsNeeded(stack);
+                cancelFinishedConvertibleRequests(placer, stack);
+            }
+
+            // Person already has finished — should have been cleared above; safety net.
+            if (InventoryUtils.getItemCountInItemHandler(placer.getInventory(), match) >= want)
+            {
+                continue;
+            }
+
+            // Hut already has finished product — gather, do not open a courier request.
+            if (countInHut(placer.building, match) > 0 || (!convertible && placer.building.hasResourceInBucket(stack)))
+            {
                 return FAIL;
             }
-            else
+
+            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
+              placer.building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            // QD-120/121: after one-shot grant, never open new raw requests / top-ups mid-build.
+            if (resModule != null && resModule.isFinishedConverted())
             {
-                for (final IRequest<?> request : requests)
+                return FAIL;
+            }
+
+            // Request RAW only (BOM). Person+hut already holding raws → no new request.
+            final java.util.List<ItemStack> toRequest = convertible
+              ? com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(world, stack, want)
+              : java.util.List.of(stack.copyWithCount(want));
+
+            boolean filedAny = false;
+            String rawNames = "";
+            for (final ItemStack reqStack : toRequest)
+            {
+                if (ItemStackUtils.isEmpty(reqStack))
                 {
-                    placer.building.moveToSyncCitizen(citizenData, request);
+                    continue;
+                }
+                if (convertible && ItemStackUtils.compareItemStacksIgnoreStackSize(reqStack, stack, true, false))
+                {
+                    Log.getLogger().info(
+                      "[QuidomsBuilder] skip finished request for convertible {} (no distinct raw BOM)",
+                      stack.getItem());
+                    continue;
+                }
+                final Predicate<ItemStack> rawMatch =
+                  candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(reqStack, candidate, true, false);
+                final int personRaw = InventoryUtils.getItemCountInItemHandler(placer.getInventory(), rawMatch);
+                final int hutRaw = countInHut(placer.building, rawMatch);
+                if (personRaw + hutRaw > 0 || placer.building.hasResourceInBucket(reqStack))
+                {
+                    continue;
                 }
 
-                for (final IRequest<?> request : completedRequests)
+                final List<IRequest<?>> requests = placer.building.getOpenRequestsOfCitizenOrBuilding(citizenId,
+                  e -> e.getRequest() instanceof IDeliverable deliverable && deliverable.matches(reqStack));
+                final List<IRequest<?>> completedRequests = placer.building.getCompletedRequestsOfCitizenOrBuilding(citizenData,
+                  e -> e.getRequest() instanceof IDeliverable deliverable && deliverable.matches(reqStack));
+
+                if (requests.isEmpty() && completedRequests.isEmpty())
                 {
-                    placer.building.moveToSyncCitizen(citizenData, request);
+                    final int count = convertible
+                      ? Math.max(1, reqStack.getCount())
+                      : placer.getTotalAmount(reqStack).getCount();
+                    final Stack stackRequest = new Stack(reqStack, count, 1);
+                    placer.getWorker().getCitizenData().createRequestAsync(stackRequest);
+                    placer.registerBlockAsNeeded(reqStack);
+                    filedAny = true;
+                    final String rawLabel = com.minecolonies.core.util.BuilderInventoryCraft.localizedDepositName(reqStack);
+                    rawNames = rawNames.isEmpty() ? rawLabel : rawNames + ", " + rawLabel;
+                    Log.getLogger().info(
+                      "[QuidomsBuilder] createRequestAsync raw={} count={} forFinished={} citizen={}",
+                      reqStack.getItem(), stackRequest.getCount(), stack.getItem(), citizenData.getName());
                 }
+                else
+                {
+                    Log.getLogger().info(
+                      "[QuidomsBuilder] hasList open={} completed={} raw={} forFinished={} (left async, no sync promote)",
+                      requests.size(), completedRequests.size(), reqStack.getItem(), stack.getItem());
+                }
+            }
+            // QD-119/121: wait chat matches Required Resources; grant chat only on fresh convert.
+            String missingRaws = resModule == null ? "" : resModule.describeMissingRaws(citizenData);
+            if (missingRaws.isEmpty() && !rawNames.isEmpty())
+            {
+                missingRaws = rawNames;
+            }
+            if (!missingRaws.isEmpty())
+            {
+                placer.wallChat("wait-raws",
+                  Component.literal((filedAny ? "need raw deposits: " : "waiting on raw deposits: ") + missingRaws + "."));
+            }
+            else if (resModule != null && resModule.tryConvertRawsToFinishedCredit(citizenData))
+            {
+                placer.wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
             }
             return FAIL;
         }
         return SUCCESS;
+    }
+
+    /**
+     * QD-112: cancel open/completed-async Stack requests for a convertible finished product
+     * (e.g. oak planks) so the clipboard never asks for craftables covered by the raw BOM.
+     */
+    private static <J extends AbstractJobStructure<?, J>, B extends AbstractBuildingStructureBuilder> void cancelFinishedConvertibleRequests(
+      @NotNull final AbstractEntityAIStructure<J, B> placer,
+      @NotNull final ItemStack finished)
+    {
+        final ICitizenData citizenData = placer.getWorker().getCitizenData();
+        if (citizenData == null || ItemStackUtils.isEmpty(finished))
+        {
+            return;
+        }
+        final int citizenId = citizenData.getId();
+        final List<IRequest<?>> open = new ArrayList<>(placer.building.getOpenRequestsOfCitizenOrBuilding(citizenId,
+          e -> e.getRequest() instanceof IDeliverable deliverable && deliverable.matches(finished)));
+        for (final IRequest<?> request : open)
+        {
+            try
+            {
+                placer.building.getColony().getRequestManager().updateRequestState(request.getId(),
+                  com.minecolonies.api.colony.requestsystem.request.RequestState.CANCELLED);
+                Log.getLogger().info("[QuidomsBuilder] cancelled spurious finished request item={} id={}",
+                  finished.getItem(), request.getId());
+            }
+            catch (final Exception ex)
+            {
+                Log.getLogger().debug("[QuidomsBuilder] cancel finished request failed: {}", ex.toString());
+            }
+        }
+    }
+
+    /**
+     * Short rate-limited citizen chat so players see walls without grepping latest.log (QD-102).
+     */
+    protected void wallChat(@NotNull final String key, @NotNull final net.minecraft.network.chat.Component detail)
+    {
+        final long now = System.currentTimeMillis();
+        // QD-118: throttle wait-raws harder (20s) so deposit waits do not spam chat.
+        final long throttleMs = "wait-raws".equals(key) ? 20000L : 8000L;
+        if (key.equals(lastWallChatKey) && now - lastWallChatMs < throttleMs)
+        {
+            return;
+        }
+        lastWallChatKey = key;
+        lastWallChatMs = now;
+        try
+        {
+            MessageUtils.forCitizen(worker, detail)
+              .sendTo(worker.getCitizenColonyHandler().getColonyOrRegister().getMessagePlayerEntities());
+        }
+        catch (final Exception e)
+        {
+            Log.getLogger().debug("[QuidomsBuilder] wallChat failed: {}", e.toString());
+        }
+    }
+
+    /**
+     * Count matching stacks in the hut TE inventory + registered racks (combined handler).
+     */
+    private static int countInHut(@NotNull final AbstractBuildingStructureBuilder building, @NotNull final Predicate<ItemStack> match)
+    {
+        return InventoryUtils.hasBuildingEnoughElseCount(building, match, 1);
+    }
+
+    /**
+     * Pull matching stacks from hut (TE + racks) into the worker's on-person inventory.
+     */
+    private static <J extends AbstractJobStructure<?, J>, B extends AbstractBuildingStructureBuilder> void pullFromHutIntoWorker(
+      @NotNull final AbstractEntityAIStructure<J, B> placer,
+      @NotNull final Predicate<ItemStack> match,
+      final int amount)
+    {
+        if (amount <= 0)
+        {
+            return;
+        }
+        final net.neoforged.neoforge.items.IItemHandler hut = placer.building.getItemHandlerCap();
+        if (hut == null)
+        {
+            return;
+        }
+        InventoryUtils.transferXOfFirstSlotInItemHandlerWithIntoNextFreeSlotInItemHandler(
+          hut, match, amount, placer.getInventory());
     }
 
     /**
@@ -1441,6 +1828,9 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         structurePlacer = null;
         actionQueue.clear();
         blockToMine = null;
+        blueprintLoadWaitTicks = 0;
+        buildStartAnnounced = false;
+        walkNotReadyStreak = 0;
         building.setProgressPos(null, null);
         worker.getCitizenData().setStatusPosition(null);
     }

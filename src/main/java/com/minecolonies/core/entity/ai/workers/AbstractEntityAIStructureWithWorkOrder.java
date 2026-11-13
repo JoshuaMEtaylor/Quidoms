@@ -31,6 +31,7 @@ import com.minecolonies.core.colony.workorders.WorkOrderMiner;
 import com.minecolonies.core.entity.ai.workers.util.BuildingProgressStage;
 import com.minecolonies.core.entity.ai.workers.util.WorkerLoadOnlyStructureHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
@@ -107,8 +108,22 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
     {
         if (loadingBlueprint)
         {
+            // Safety: never wait forever for an async blueprint callback (IO deadlock / soft-fail loop).
+            if (++blueprintLoadWaitTicks > 100)
+            {
+                Log.getLogger().warn("Builder blueprint load timed out for WO {} — resetting placer to retry",
+                  building.getWorkOrder() == null ? "?" : building.getWorkOrder().getID());
+                loadingBlueprint = false;
+                blueprintLoadWaitTicks = 0;
+                resetCurrentStructure();
+                if (building.getWorkOrder() != null)
+                {
+                    building.getWorkOrder().clearBlueprint();
+                }
+            }
             return getState();
         }
+        blueprintLoadWaitTicks = 0;
 
         if (building.getWorkOrder() == null || building.getWorkOrder().getBlueprint() == null || structurePlacer == null)
         {
@@ -121,6 +136,7 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
                     worker.getCitizenColonyHandler().getColonyOrRegister().getID(),
                     worker.getCitizenData().getId()), new Exception());
                 building.setWorkOrder(null);
+                buildStartAnnounced = false;
                 return IDLE;
             }
 
@@ -135,23 +151,18 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
                     return IDLE;
                 }
 
-                MessageUtils.forCitizen(worker, COM_MINECOLONIES_COREMOD_ENTITY_BUILDER_BUILD_START, this.building.getWorkOrder().getDisplayName())
-                  .sendTo(worker.getCitizenColonyHandler().getColonyOrRegister().getMessagePlayerEntities());
-
                 //Don't go through the CLEAR stage for repairs and upgrades
                 if (building.getBuildingLevel() > 0)
                 {
                     wo.setCleared(true);
                 }
             }
-            else if (!(wo instanceof WorkOrderMiner))
-            {
-                MessageUtils.forCitizen(worker, COM_MINECOLONIES_COREMOD_ENTITY_BUILDER_BUILD_START, building.getWorkOrder().getDisplayName())
-                  .sendTo(worker.getCitizenColonyHandler().getColonyOrRegister().getMessagePlayerEntities());
-                ;
-            }
+            // Defer BUILD_START until the placer is actually ready — announcing while structurePlacer
+            // is still null made the builder look "started" then freeze next to the hut.
             return getState();
         }
+
+        announceBuildStartIfNeeded();
 
         if (building.getWorkOrder().isRequested())
         {
@@ -161,6 +172,26 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         //We need to deal with materials
         requestMaterialsState();
         return getState();
+    }
+
+    /**
+     * Send BUILD_START once the placer+blueprint are ready (not mid-async load).
+     */
+    private void announceBuildStartIfNeeded()
+    {
+        if (buildStartAnnounced || building.getWorkOrder() == null)
+        {
+            return;
+        }
+        final IBuilderWorkOrder wo = building.getWorkOrder();
+        if (wo instanceof WorkOrderMiner)
+        {
+            buildStartAnnounced = true;
+            return;
+        }
+        MessageUtils.forCitizen(worker, COM_MINECOLONIES_COREMOD_ENTITY_BUILDER_BUILD_START, wo.getDisplayName())
+          .sendTo(worker.getCitizenColonyHandler().getColonyOrRegister().getMessagePlayerEntities());
+        buildStartAnnounced = true;
     }
 
     /**
@@ -209,15 +240,34 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         {
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
               building, citizenName, worker.getCitizenData());
+            // QD-116/121: convert once; do not re-chat when already granted.
+            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
+              building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            if (resModule != null && !resModule.isFinishedConverted()
+                  && resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
+            {
+                wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
+            }
             recalculated = true;
             return;
         }
 
         if (requestMaterials())
         {
+            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
+              building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            // QD-120: one-shot raw BOM from finished placeables, then lock.
+            if (resModule != null)
+            {
+                resModule.finalizeBomOnce();
+            }
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
               building, citizenName, worker.getCitizenData());
             building.getWorkOrder().setRequested(true);
+            if (resModule != null && resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
+            {
+                wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
+            }
         }
         int newQuantity = buildingWorker.getNeededResources().values().stream().mapToInt(ItemStorage::getAmount).sum();
         if (building.getWorkOrder().getAmountOfResources() == 0 || newQuantity > building.getWorkOrder().getAmountOfResources())
@@ -228,6 +278,29 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
     @Override
     protected boolean checkIfNeedsItem()
     {
+        // Active structure work: never let leftover sync Stack requests AI_BLOCKING-park us in NEEDS_ITEM
+        // (QD-100/101). Still pick up completed deliveries so QuidCraft/courier stock reaches the worker.
+        if (building.hasWorkOrder()
+              && structurePlacer != null
+              && structurePlacer.getB().hasBluePrint())
+        {
+            if (building.hasCitizenCompletedRequestsToPickup(worker.getCitizenData()))
+            {
+                // TEMP QD-101 debug
+                Log.getLogger().info("[QuidomsBuilder] checkIfNeedsItem citizen={} → NEEDS_ITEM (completed pickup)",
+                  worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName());
+                return true;
+            }
+            if (building.hasOpenSyncRequest(worker.getCitizenData()))
+            {
+                // TEMP QD-101 debug
+                Log.getLogger().info("[QuidomsBuilder] checkIfNeedsItem citizen={} ignoring open sync park during BUILD (wo={})",
+                  worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName(),
+                  building.getWorkOrder().getID());
+            }
+            return false;
+        }
+
         if (building.hasWorkOrder() && building.getNeededResources().isEmpty() && !building.hasCitizenCompletedRequests(worker.getCitizenData()) && !recalculated && (structurePlacer == null || !structurePlacer.getB().hasBluePrint() || !building.getWorkOrder().isRequested()))
         {
             return false;
@@ -490,13 +563,22 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
     @Override
     protected boolean checkIfCanceled()
     {
-        if ((building.getWorkOrder() == null && structurePlacer != null) || (structurePlacer != null && !structurePlacer.getB().hasBluePrint()))
+        // Placer lost its blueprint (async reload / flat-pack path miss) — do NOT destroy the claim.
+        // Clear placer so LOAD_STRUCTURE can recover; keep the work order assigned.
+        if (structurePlacer != null && !structurePlacer.getB().hasBluePrint())
         {
-            if (building.hasWorkOrder())
+            Log.getLogger().warn("Builder structure placer lost blueprint for WO {} — resetting placer to reload",
+              building.getWorkOrder() == null ? "?" : building.getWorkOrder().getID());
+            resetCurrentStructure();
+            if (building.getWorkOrder() != null)
             {
                 building.getWorkOrder().clearBlueprint();
-                building.getColony().getWorkManager().removeWorkOrder(building.getWorkOrder());
             }
+            return false;
+        }
+
+        if (building.getWorkOrder() == null && structurePlacer != null)
+        {
             building.setWorkOrder(null);
             resetCurrentStructure();
             building.cancelAllRequestsOfCitizenOrBuilding(worker.getCitizenData());

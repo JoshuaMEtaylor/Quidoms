@@ -132,14 +132,8 @@ public final class SoundUtils
         }
         else if (v <= 0.2)
         {
-            if (citizen.getCitizenHappinessHandler().getHappiness(citizen.getColony(), citizen) < 5)
-            {
-                playSoundAtCitizenWith(worldIn, pos, EventType.UNHAPPY, citizen);
-            }
-            else
-            {
-                playSoundAtCitizenWith(worldIn, pos, EventType.HAPPY, citizen);
-            }
+            // QD-109: no happiness meter — use general ambient instead of happy/unhappy.
+            playSoundAtCitizenWith(worldIn, pos, EventType.GENERAL, citizen);
         }
         else if (v <= 0.3)
         {

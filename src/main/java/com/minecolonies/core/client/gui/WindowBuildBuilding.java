@@ -427,6 +427,12 @@ public class WindowBuildBuilding extends AbstractWindowSkeleton
         if (derived != null)
         {
             addLeveledVariants(candidates, derived + ".blueprint");
+            // Flat legacy packs (Stone): hut file at pack root.
+            if (derived.contains("/"))
+            {
+                final String hutFile = derived.substring(derived.lastIndexOf('/') + 1);
+                addLeveledVariants(candidates, hutFile + ".blueprint");
+            }
         }
 
         final List<String> withAlts = new ArrayList<>(candidates);

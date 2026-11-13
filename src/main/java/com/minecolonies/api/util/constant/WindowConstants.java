@@ -606,6 +606,9 @@ public final class WindowConstants
     public static final String LABEL_CONSTRUCTION_NAME = "constructionName";
     public static final String LABEL_PROGRESS          = "progress";
     public static final String STEP_PROGRESS           = "stepprogress";
+    public static final String LABEL_BLOCKS_REMAINING  = "blocksremaining";
+    public static final String PROGRESS_BAR            = "progressbar";
+    public static final String PROGRESS_BAR_BG         = "progressbarbg";
     public static final String LABEL_WORKERNAME        = "workerName";
 
     public static final String LABEL_PAGE_NUMBER = "pageNum";

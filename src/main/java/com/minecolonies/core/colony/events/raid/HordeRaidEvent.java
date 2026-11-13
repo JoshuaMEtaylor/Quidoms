@@ -79,7 +79,7 @@ public abstract class HordeRaidEvent implements IColonyRaidEvent, IColonyCampFir
     /**
      * The raids visual raidbar
      */
-    protected final ServerBossEvent raidBar = new ServerBossEvent(Component.literal("Colony Raid"), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.NOTCHED_10);
+    protected final ServerBossEvent raidBar = new ServerBossEvent(Component.literal("Kingdom Raid"), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.NOTCHED_10);
 
     /**
      * The references to living raiders left

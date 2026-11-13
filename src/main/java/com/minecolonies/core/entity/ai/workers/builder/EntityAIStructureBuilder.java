@@ -238,14 +238,47 @@ public class EntityAIStructureBuilder extends AbstractEntityAIStructureWithWorkO
                 {
                     workFrom = gotoPath.getPath().getTarget();
                 }
+                else
+                {
+                    // QD-101: path failed — if already in reach, work from feet instead of false forever.
+                    if (BlockPosUtil.getDistance2D(worker.blockPosition(), currentBlock) <= BUILDER_WORK_REACH)
+                    {
+                        workFrom = worker.blockPosition();
+                        // TEMP QD-101 debug
+                        com.minecolonies.api.util.Log.getLogger().info(
+                          "[QuidomsBuilder] walk path-null → work-in-place at {} for {}",
+                          workFrom, currentBlock);
+                    }
+                    else
+                    {
+                        // TEMP QD-101 debug
+                        com.minecolonies.api.util.Log.getLogger().info(
+                          "[QuidomsBuilder] walk path-null fail citizen={} target={} dist2d={}",
+                          worker.getCitizenData() == null ? "?" : worker.getCitizenData().getName(),
+                          currentBlock,
+                          BlockPosUtil.getDistance2D(worker.blockPosition(), currentBlock));
+                    }
+                }
                 gotoPath = null;
             }
 
-            if (prevBlockPosition != null)
+            if (workFrom != null)
+            {
+                // Fall through to walk/reach checks below.
+            }
+            else if (prevBlockPosition != null)
             {
                 // This is good for building, and bad for mining, this is why mining should validate workFrom.
                 return BlockPosUtil.dist(prevBlockPosition, currentBlock) <= BUILDER_WORK_REACH + 6;
             }
+            else
+            {
+                return false;
+            }
+        }
+
+        if (workFrom == null)
+        {
             return false;
         }
 
@@ -254,6 +287,9 @@ public class EntityAIStructureBuilder extends AbstractEntityAIStructureWithWorkO
             // Something might have changed, new wall and we can't reach the position anymore. Reset workfrom if stuck.
             if (worker.getNavigation() instanceof MinecoloniesAdvancedPathNavigate pathNavigate && pathNavigate.isStuck())
             {
+                // TEMP QD-101 debug
+                com.minecolonies.api.util.Log.getLogger().info(
+                  "[QuidomsBuilder] walk stuck at workFrom={} → clear", workFrom);
                 workFrom = null;
             }
             return false;

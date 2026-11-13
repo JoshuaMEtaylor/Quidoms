@@ -1,7 +1,5 @@
 package com.minecolonies.core.colony.workorders;
 
-import com.ldtteam.structurize.blueprints.v1.Blueprint;
-import com.ldtteam.structurize.storage.StructurePacks;
 import com.minecolonies.api.advancements.AdvancementTriggers;
 import com.minecolonies.api.colony.ICitizenData;
 import com.minecolonies.api.colony.IColony;
@@ -332,10 +330,19 @@ public class WorkManager implements IWorkManager
 
         workOrders.put(order.getID(), order);
         order.onAdded(colony, readingFromNbt);
+
+        // Bind claim immediately so builder AI sees the WO without waiting a colony tick.
+        if (!readingFromNbt)
+        {
+            tryAssignWorkOrder(order, order::canBuild);
+        }
     }
 
     /**
      * Check if the workOrder is within a colony.
+     * <p>
+     * Must never call {@code StructurePacks.getBlueprint} — that blocks on
+     * {@code waitUntilFinishedLoading} and freezes Build/claim for minutes (QD-82/QD-94).
      *
      * @param order the workorder to check.
      * @return true if so.
@@ -343,12 +350,24 @@ public class WorkManager implements IWorkManager
     private boolean isWorkOrderWithinColony(final IWorkOrder order)
     {
         final Level world = colony.getWorld();
-        final Blueprint blueprint = StructurePacks.getBlueprint(order.getStructurePack(), order.getStructurePath(), world.registryAccess());
-        final Tuple<BlockPos, BlockPos> corners
-          = ColonyUtils.calculateCorners(order.getLocation(),
-          world,
-          blueprint,
-          order.getRotationMirror());
+        final BlockPos location = order.getLocation();
+
+        Tuple<BlockPos, BlockPos> corners = null;
+        final IBuilding building = colony.getServerBuildingManager().getBuilding(location);
+        if (building != null)
+        {
+            try
+            {
+                corners = building.getCorners();
+            }
+            catch (final Exception ignored)
+            {
+            }
+        }
+        if (corners == null || corners.getA() == null || corners.getB() == null)
+        {
+            corners = new Tuple<>(location, location);
+        }
 
         Set<ChunkPos> chunks = new HashSet<>();
         final int minX = Math.min(corners.getA().getX(), corners.getB().getX()) + 1;
@@ -356,6 +375,12 @@ public class WorkManager implements IWorkManager
 
         final int minZ = Math.min(corners.getA().getZ(), corners.getB().getZ()) + 1;
         final int maxZ = Math.max(corners.getA().getZ(), corners.getB().getZ());
+
+        // Degenerate footprint (pos,pos) or not-yet-synced corners: location chunk is enough.
+        if (minX >= maxX || minZ >= maxZ)
+        {
+            return ColonyUtils.getOwningColony(world.getChunk(location)) == colony.getID();
+        }
 
         for (int x = minX; x < maxX; x += 16)
         {
@@ -439,7 +464,12 @@ public class WorkManager implements IWorkManager
         {
             if (building instanceof AbstractBuildingStructureBuilder abstractBuildingStructureBuilder)
             {
-                final @Nullable ICitizenData citizen = building.getModule(WorkerBuildingModule.class).getFirstCitizen();
+                final WorkerBuildingModule module = building.getModule(WorkerBuildingModule.class);
+                if (module == null)
+                {
+                    continue;
+                }
+                final @Nullable ICitizenData citizen = module.getFirstCitizen();
                 if (citizen == null)
                 {
                     continue;
@@ -452,7 +482,8 @@ public class WorkManager implements IWorkManager
 
                 if (order.isClaimed())
                 {
-                    if (order.getClaimedBy().equals(building.getPosition()))
+                    final BlockPos claimedBy = order.getClaimedBy();
+                    if (claimedBy.equals(building.getPosition()) || claimedBy.equals(building.getID()))
                     {
                         abstractBuildingStructureBuilder.setWorkOrder(order);
                         order.setClaimedBy(building.getID());

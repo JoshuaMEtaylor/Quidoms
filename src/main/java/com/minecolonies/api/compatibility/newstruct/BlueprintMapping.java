@@ -3,6 +3,7 @@ package com.minecolonies.api.compatibility.newstruct;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -128,7 +129,18 @@ public class BlueprintMapping
      */
     public static String getStyleMapping(final String key)
     {
-        return styleMapping.getOrDefault(key, key);
+        if (key == null || key.isEmpty())
+        {
+            return key;
+        }
+        final String direct = styleMapping.get(key);
+        if (direct != null)
+        {
+            return direct;
+        }
+        // Colonies/TEs often persist display casing ("Stone") while keys are lowercase ("stone").
+        final String compact = key.toLowerCase(Locale.ROOT).replace(" ", "");
+        return styleMapping.getOrDefault(compact, key);
     }
 
     /**

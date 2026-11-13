@@ -9,14 +9,14 @@ version="${version}"
 displayName="Quidoms"
 displayURL="https://github.com/JoshuaMEtaylor/Quidoms"
 logoFile="minecolonies_logo.png"
-credits="Based on MineColonies by LDT Team (GPL-3.0). Quidoms fork changes: no raids, unbreakable any-tier colonist tools, ingredient BOM builds. Vendors Structurize/BlockUI/Domum/MultiPiston."
+credits="Based on MineColonies by LDT Team (GPL-3.0). Quidoms fork changes: no raids, unbreakable any-tier citizen tools, ingredient BOM builds. Vendors Structurize/BlockUI/Domum/MultiPiston."
 authors="JoshuaMEtaylor; LDT Team (upstream MineColonies)"
 description='''
-Quidoms is a colony simulator for NeoForge based on the full MineColonies codebase (LDT Team, GPL-3.0).
+Quidoms is a kingdom simulator for NeoForge based on the full MineColonies codebase (LDT Team, GPL-3.0).
 
 Quidoms product changes on top of upstream:
 - Raids removed (never scheduled).
-- Colonist tools are unbreakable and ignore hut/citizen tool-level gates (player-equivalent stats/enchants kept).
+- Citizen tools are unbreakable and ignore hut/citizen tool-level gates (player-equivalent stats/enchants kept).
 - Building material lists expand to recursive crafting ingredients where recipes allow.
 
 LDT libraries (Structurize, BlockUI, Domum Ornamentum, MultiPiston) are baked into this jar (compiled for NeoForge 1.21.10).

@@ -14,6 +14,7 @@ import com.minecolonies.api.crafting.ItemStorage;
 import com.minecolonies.api.inventory.InventoryCitizen;
 import com.minecolonies.api.util.InventoryUtils;
 import com.minecolonies.api.util.ItemStackUtils;
+import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.Utils;
 import com.minecolonies.core.colony.buildings.AbstractBuildingStructureBuilder;
 import com.minecolonies.core.colony.buildings.utils.BuilderBucket;
@@ -22,12 +23,16 @@ import com.minecolonies.core.colony.jobs.AbstractJobStructure;
 import com.minecolonies.core.entity.ai.workers.util.BuildingProgressStage;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_CURR_STAGE;
 import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_TOTAL_STAGES;
@@ -37,10 +42,45 @@ import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_TOTAL_STAGE
  */
 public class BuildingResourcesModule extends AbstractBuildingModule implements IPersistentModule
 {
+    private static final String TAG_FINISHED_CONVERTED = "quidFinishedConverted";
+    private static final String TAG_BOM_FINALIZED = "quidBomFinalized";
+    private static final String TAG_SCHEM_TOTAL = "quidSchemBlocksTotal";
+    private static final String TAG_SCHEM_REMAINING = "quidSchemBlocksRemaining";
+    private static final String TAG_FINISHED_PLACEABLES = "quidFinishedPlaceables";
+    private static final String TAG_FINISHED_CREDIT = "quidFinishedCredit";
+    private static final String TAG_STACK = "stack";
+    private static final String TAG_AMOUNT = "amount";
+
     /**
-     * Contains all resources needed for a certain build.
+     * Contains all resources needed for a certain build (player-facing raw BOM).
      */
     private Map<String, BuildingBuilderResource> neededResources = new LinkedHashMap<>();
+
+    /**
+     * Exact finished placeables scanned from the schematic (QD-116).
+     */
+    private Map<String, BuildingBuilderResource> finishedPlaceables = new LinkedHashMap<>();
+
+    /**
+     * Remaining finished stacks to inject after raws were consumed (QD-116).
+     */
+    private Map<String, BuildingBuilderResource> finishedCredit = new LinkedHashMap<>();
+
+    /**
+     * True after hut raws were consumed and finished credit opened.
+     */
+    private boolean finishedConverted = false;
+
+    /**
+     * QD-120: raw BOM computed once after schematic scan — no mid-build top-ups / rebuilds.
+     */
+    private boolean bomFinalized = false;
+
+    /**
+     * QD-121: schematic placeable block counts (finished items), locked at BOM finalize.
+     */
+    private int schematicBlocksTotal = 0;
+    private int schematicBlocksRemaining = 0;
 
     /**
      * The different possible buckets.
@@ -58,6 +98,12 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         currentStage = compound.getIntOr(TAG_CURR_STAGE, 0);
         totalStages = compound.getIntOr(TAG_TOTAL_STAGES, 0);
+        finishedConverted = compound.getBooleanOr(TAG_FINISHED_CONVERTED, false);
+        bomFinalized = compound.getBooleanOr(TAG_BOM_FINALIZED, false);
+        schematicBlocksTotal = compound.getIntOr(TAG_SCHEM_TOTAL, 0);
+        schematicBlocksRemaining = compound.getIntOr(TAG_SCHEM_REMAINING, schematicBlocksTotal);
+        finishedPlaceables = readResourceMap(provider, compound, TAG_FINISHED_PLACEABLES);
+        finishedCredit = readResourceMap(provider, compound, TAG_FINISHED_CREDIT);
     }
 
     @Override
@@ -65,6 +111,54 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         compound.putInt(TAG_TOTAL_STAGES, totalStages);
         compound.putInt(TAG_CURR_STAGE, currentStage);
+        compound.putBoolean(TAG_FINISHED_CONVERTED, finishedConverted);
+        compound.putBoolean(TAG_BOM_FINALIZED, bomFinalized);
+        compound.putInt(TAG_SCHEM_TOTAL, schematicBlocksTotal);
+        compound.putInt(TAG_SCHEM_REMAINING, schematicBlocksRemaining);
+        writeResourceMap(provider, compound, TAG_FINISHED_PLACEABLES, finishedPlaceables);
+        writeResourceMap(provider, compound, TAG_FINISHED_CREDIT, finishedCredit);
+    }
+
+    @NotNull
+    private static Map<String, BuildingBuilderResource> readResourceMap(
+      @NotNull final HolderLookup.Provider provider,
+      @NotNull final CompoundTag compound,
+      @NotNull final String key)
+    {
+        final Map<String, BuildingBuilderResource> map = new LinkedHashMap<>();
+        final ListTag list = compound.getListOrEmpty(key);
+        for (int i = 0; i < list.size(); i++)
+        {
+            final CompoundTag entry = list.getCompoundOrEmpty(i);
+            final ItemStack stack = ItemStackUtils.parseOptional(provider, entry.getCompoundOrEmpty(TAG_STACK));
+            final int amount = entry.getIntOr(TAG_AMOUNT, 0);
+            if (ItemStackUtils.isEmpty(stack) || amount <= 0)
+            {
+                continue;
+            }
+            final ItemStack keyStack = stack.copy();
+            keyStack.setCount(1);
+            final String mapKey = keyStack.getItem().getDescriptionId() + "-" + keyStack.getComponentsPatch().hashCode();
+            map.put(mapKey, new BuildingBuilderResource(keyStack, amount));
+        }
+        return map;
+    }
+
+    private static void writeResourceMap(
+      @NotNull final HolderLookup.Provider provider,
+      @NotNull final CompoundTag compound,
+      @NotNull final String key,
+      @NotNull final Map<String, BuildingBuilderResource> map)
+    {
+        final ListTag list = new ListTag();
+        for (final BuildingBuilderResource resource : map.values())
+        {
+            final CompoundTag entry = new CompoundTag();
+            entry.put(TAG_STACK, ItemStackUtils.saveOptional(resource.getItemStack().copyWithCount(1), provider));
+            entry.putInt(TAG_AMOUNT, resource.getAmount());
+            list.add(entry);
+        }
+        compound.put(key, list);
     }
 
     /**
@@ -77,13 +171,11 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         updateAvailableResources();
         buf.writeInt(neededResources.size());
-        double qty = 0;
         for (@NotNull final BuildingBuilderResource resource : neededResources.values())
         {
             Utils.serializeCodecMess(buf, resource.getItemStack());
             buf.writeInt(resource.getAvailable());
             buf.writeInt(resource.getAmount());
-            qty += resource.getAmount();
         }
 
         final Set<ICitizenData> set = building.getAllAssignedCitizen();
@@ -94,15 +186,22 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             if (workOrder != null)
             {
                 buf.writeInt(workOrder.getID());
-                buf.writeDouble(workOrder.getAmountOfResources() == 0 ? 0 : qty / workOrder.getAmountOfResources());
+                // QD-121: remaining/total schematic blocks (0 = complete / unknown).
+                final double remainFrac = schematicBlocksTotal <= 0 ? 0.0
+                  : Math.max(0.0, Math.min(1.0, (double) schematicBlocksRemaining / (double) schematicBlocksTotal));
+                buf.writeDouble(remainFrac);
                 buf.writeInt(totalStages);
                 buf.writeInt(currentStage);
+                buf.writeInt(schematicBlocksTotal);
+                buf.writeInt(schematicBlocksRemaining);
                 return;
             }
         }
 
         buf.writeInt(-1);
         buf.writeDouble(0.0);
+        buf.writeInt(0);
+        buf.writeInt(0);
         buf.writeInt(0);
         buf.writeInt(0);
     }
@@ -133,24 +232,28 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
 
                 resource.setAvailable(0);
 
+                // Dual inventory: on-person + hut TE/racks. Ignore NBT so manual deposits count as supplied.
+                final Predicate<ItemStack> match =
+                  stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, false);
+
                 if (structureBuilderInventory != null)
                 {
-                    resource.addAvailable(InventoryUtils.getItemCountInItemHandler(structureBuilderInventory,
-                      stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, true)));
+                    resource.addAvailable(InventoryUtils.getItemCountInItemHandler(structureBuilderInventory, match));
                 }
 
-                if (building.getTileEntity() != null)
+                if (building.getTileEntity() != null && building.getItemHandlerCap() != null)
                 {
-                    resource.addAvailable(InventoryUtils.getItemCountInItemHandler(building.getItemHandlerCap(),
-                      stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, true)));
+                    resource.addAvailable(InventoryUtils.getItemCountInItemHandler(building.getItemHandlerCap(), match));
                 }
 
                 if (data.getJob() instanceof final IJobWithExternalWorkStations jobExternalStations)
                 {
                     for (final IBuilding station : jobExternalStations.getWorkStations())
                     {
-                        resource.addAvailable(InventoryUtils.getItemCountInItemHandler(station.getItemHandlerCap(),
-                          stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, true)));
+                        if (station.getItemHandlerCap() != null)
+                        {
+                            resource.addAvailable(InventoryUtils.getItemCountInItemHandler(station.getItemHandlerCap(), match));
+                        }
                     }
                 }
             }
@@ -203,13 +306,385 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         {
             return;
         }
+        // QD-120: one-shot BOM — ignore mid-build registerBlockAsNeeded / top-ups.
+        if (bomFinalized)
+        {
+            return;
+        }
 
-        // Quidoms: request recursive crafting ingredients instead of exotic crafted blocks.
-        final java.util.List<ItemStack> expanded = com.minecolonies.api.util.IngredientBomExpand.expand(
+        // QD-116: keep exact finished placeables separately from the player-facing raw BOM.
+        addFinishedPlaceable(res, amount);
+
+        // Quidoms QD-103: Domum framed → texture components, then crafting BOM (planks→logs).
+        // Required list / QuidCraft / courier see raw only — never framed products.
+        final java.util.List<ItemStack> expanded = com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
             building.getColony().getWorld(), res, amount);
         for (final ItemStack part : expanded)
         {
             addNeededResourceRaw(part, part.getCount());
+        }
+    }
+
+    private void addFinishedPlaceable(@NotNull final ItemStack res, final int amount)
+    {
+        final ItemStack keyStack = res.copy();
+        keyStack.setCount(1);
+        final int hashCode = keyStack.getComponentsPatch().hashCode();
+        final String key = keyStack.getItem().getDescriptionId() + "-" + hashCode;
+        BuildingBuilderResource resource = this.finishedPlaceables.get(key);
+        if (resource == null)
+        {
+            resource = new BuildingBuilderResource(keyStack, amount);
+        }
+        else
+        {
+            resource.setAmount(resource.getAmount() + amount);
+        }
+        this.finishedPlaceables.put(key, resource);
+    }
+
+    public boolean isFinishedConverted()
+    {
+        return finishedConverted;
+    }
+
+    @NotNull
+    public Map<String, BuildingBuilderResource> getFinishedPlaceables()
+    {
+        return Collections.unmodifiableMap(finishedPlaceables);
+    }
+
+    /**
+     * Same stock universe as Required Resources UI: person + hut TE+racks + workstations (QD-118/119).
+     */
+    private int countDualInv(@Nullable final ICitizenData worker, @NotNull final Predicate<ItemStack> match)
+    {
+        int count = 0;
+        final IItemHandler hut = building.getItemHandlerCap();
+        if (hut != null)
+        {
+            count += InventoryUtils.getItemCountInItemHandler(hut, match);
+        }
+        if (worker != null)
+        {
+            if (worker.getInventory() != null)
+            {
+                count += InventoryUtils.getItemCountInItemHandler(worker.getInventory(), match);
+            }
+            if (worker.getJob() instanceof final IJobWithExternalWorkStations jobExternalStations)
+            {
+                for (final IBuilding station : jobExternalStations.getWorkStations())
+                {
+                    if (station.getItemHandlerCap() != null)
+                    {
+                        count += InventoryUtils.getItemCountInItemHandler(station.getItemHandlerCap(), match);
+                    }
+                }
+            }
+        }
+        else
+        {
+            // No worker yet — still count assigned citizen like the UI does.
+            final Set<ICitizenData> set = building.getAllAssignedCitizen();
+            final ICitizenData data = set.isEmpty() ? null : set.iterator().next();
+            if (data != null)
+            {
+                return countDualInv(data, match);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Rebuild player-facing raw BOM from finished placeables with current recipe expansion (QD-119).
+     * Clears buckets and re-buckets raws; does not touch finishedConverted/credit.
+     */
+    public boolean isBomFinalized()
+    {
+        return bomFinalized;
+    }
+
+    /**
+     * QD-120: compute raw BOM once from finished placeables, then lock — no mid-build escalation.
+     */
+    public void finalizeBomOnce()
+    {
+        if (bomFinalized)
+        {
+            return;
+        }
+        rebuildNeededRawsFromFinishedPlaceables();
+        int total = 0;
+        for (final BuildingBuilderResource placeable : finishedPlaceables.values())
+        {
+            total += Math.max(0, placeable.getAmount());
+        }
+        schematicBlocksTotal = total;
+        schematicBlocksRemaining = total;
+        bomFinalized = true;
+        this.markDirty();
+        Log.getLogger().info("[QuidomsBuilder] BOM finalized: {} finished kinds → {} raw kinds, {} blocks (locked)",
+          finishedPlaceables.size(), neededResources.size(), schematicBlocksTotal);
+    }
+
+    public int getSchematicBlocksTotal()
+    {
+        return schematicBlocksTotal;
+    }
+
+    public int getSchematicBlocksRemaining()
+    {
+        return schematicBlocksRemaining;
+    }
+
+    public void rebuildNeededRawsFromFinishedPlaceables()
+    {
+        if (finishedConverted || finishedPlaceables.isEmpty())
+        {
+            return;
+        }
+        // Allow rebuild only before lock, or during finalizeBomOnce (caller clears lock timing).
+        neededResources = new LinkedHashMap<>();
+        buckets.clear();
+        for (final BuildingBuilderResource placeable : finishedPlaceables.values())
+        {
+            final java.util.List<ItemStack> expanded = com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
+              building.getColony().getWorld(), placeable.getItemStack(), placeable.getAmount());
+            for (final ItemStack part : expanded)
+            {
+                addNeededResourceRaw(part, part.getCount());
+            }
+        }
+        this.markDirty();
+        Log.getLogger().info("[QuidomsBuilder] rebuilt raw BOM from {} finished kinds → {} raw kinds",
+          finishedPlaceables.size(), neededResources.size());
+    }
+
+    /**
+     * Person + hut TE+racks (+ workstations) hold enough of every raw BOM entry.
+     */
+    public boolean areRawsFullyDeposited()
+    {
+        return areRawsFullyDeposited(null);
+    }
+
+    public boolean areRawsFullyDeposited(@Nullable final ICitizenData worker)
+    {
+        if (neededResources.isEmpty())
+        {
+            if (finishedConverted)
+            {
+                return true;
+            }
+            // QD-120: do not rebuild mid-build (escalates shortages). Only use locked BOM.
+            return false;
+        }
+        for (final BuildingBuilderResource resource : neededResources.values())
+        {
+            final Predicate<ItemStack> match =
+              stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, false);
+            if (countDualInv(worker, match) < resource.getAmount())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Names of raw BOM entries still short — same accounting as Required Resources (QD-119).
+     * Empty string when nothing missing (menu complete) or already converted.
+     */
+    @NotNull
+    public String describeMissingRaws(@Nullable final ICitizenData worker)
+    {
+        if (finishedConverted)
+        {
+            return "";
+        }
+        if (neededResources.isEmpty())
+        {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (final BuildingBuilderResource resource : neededResources.values())
+        {
+            final Predicate<ItemStack> match =
+              stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, false);
+            final int have = countDualInv(worker, match);
+            // Mirror UI "available" vs amount — only report true shortages.
+            final int missing = resource.getAmount() - have;
+            if (missing <= 0)
+            {
+                continue;
+            }
+            if (sb.length() > 0)
+            {
+                sb.append(", ");
+            }
+            // QD-122: localized names (no Domum format-key leftovers in chat).
+            sb.append(com.minecolonies.core.util.BuilderInventoryCraft.localizedDepositName(resource.getItemStack()))
+              .append(" x").append(missing);
+        }
+        return sb.length() == 0 ? "" : sb.toString();
+    }
+
+    /**
+     * Consume {@code amount} matching stacks from hut first, then person (QD-118).
+     */
+    private boolean consumeDualInv(
+      @Nullable final ICitizenData worker,
+      @NotNull final ItemStack template,
+      final int amount)
+    {
+        if (amount <= 0)
+        {
+            return true;
+        }
+        int left = amount;
+        final IItemHandler hut = building.getItemHandlerCap();
+        if (hut != null)
+        {
+            final int inHut = InventoryUtils.getItemCountInItemHandler(hut,
+              s -> ItemStackUtils.compareItemStacksIgnoreStackSize(s, template, true, false));
+            final int fromHut = Math.min(left, inHut);
+            if (fromHut > 0)
+            {
+                if (!InventoryUtils.attemptReduceStackInItemHandler(hut, template.copy(), fromHut, true, true))
+                {
+                    return false;
+                }
+                left -= fromHut;
+            }
+        }
+        if (left <= 0)
+        {
+            return true;
+        }
+        if (worker == null || worker.getInventory() == null)
+        {
+            return false;
+        }
+        return InventoryUtils.attemptReduceStackInItemHandler(worker.getInventory(), template.copy(), left, true, true);
+    }
+
+    /**
+     * QD-116/118/121: when person+hut raws cover the BOM, consume (hut first) and open finished credit.
+     * Credits the <em>full</em> finished placeable amounts (already-held finished stay in inv and are
+     * used first; leftover credit is unused). Returns true only when conversion happens <em>this</em>
+     * call — already converted returns false so callers do not re-chat / re-grant.
+     */
+    public boolean tryConvertRawsToFinishedCredit()
+    {
+        return tryConvertRawsToFinishedCredit(null);
+    }
+
+    public boolean tryConvertRawsToFinishedCredit(@Nullable final ICitizenData worker)
+    {
+        if (finishedConverted)
+        {
+            return false;
+        }
+        if (finishedPlaceables.isEmpty())
+        {
+            return false;
+        }
+        if (!areRawsFullyDeposited(worker))
+        {
+            return false;
+        }
+
+        // QD-121: full finished credit — avoid under-grant when "already" counts were fragile.
+        finishedCredit = new LinkedHashMap<>();
+        for (final Map.Entry<String, BuildingBuilderResource> entry : finishedPlaceables.entrySet())
+        {
+            final BuildingBuilderResource placeable = entry.getValue();
+            finishedCredit.put(entry.getKey(),
+              new BuildingBuilderResource(placeable.getItemStack().copyWithCount(1), placeable.getAmount()));
+        }
+
+        for (final BuildingBuilderResource resource : neededResources.values())
+        {
+            if (!consumeDualInv(worker, resource.getItemStack(), resource.getAmount()))
+            {
+                Log.getLogger().warn("[QuidomsBuilder] raw consume failed for {} x{} — abort convert",
+                  resource.getItemStack().getItem(), resource.getAmount());
+                finishedCredit = new LinkedHashMap<>();
+                return false;
+            }
+        }
+
+        finishedConverted = true;
+        neededResources = new LinkedHashMap<>();
+        buckets.clear();
+        this.markDirty();
+        Log.getLogger().info("[QuidomsBuilder] converted dual-inv raws → finished credit ({} kinds, full amounts)",
+          finishedCredit.size());
+        return true;
+    }
+
+    /**
+     * Take up to {@code amount} matching finished stacks from the credit pool.
+     *
+     * @return count actually taken.
+     */
+    public int takeFinishedCredit(@NotNull final ItemStack need, final int amount)
+    {
+        if (!finishedConverted || amount <= 0 || ItemStackUtils.isEmpty(need))
+        {
+            return 0;
+        }
+        final ItemStack keyStack = need.copyWithCount(1);
+        final String key = keyStack.getItem().getDescriptionId() + "-" + keyStack.getComponentsPatch().hashCode();
+        BuildingBuilderResource resource = finishedCredit.get(key);
+        if (resource == null)
+        {
+            // Ignore NBT mismatches for vanilla stairs/planks — match by item only.
+            for (final Map.Entry<String, BuildingBuilderResource> entry : finishedCredit.entrySet())
+            {
+                if (ItemStackUtils.compareItemStacksIgnoreStackSize(entry.getValue().getItemStack(), need, true, false))
+                {
+                    resource = entry.getValue();
+                    break;
+                }
+            }
+        }
+        if (resource == null || resource.getAmount() <= 0)
+        {
+            return 0;
+        }
+        final int take = Math.min(amount, resource.getAmount());
+        resource.setAmount(resource.getAmount() - take);
+        finishedCredit.entrySet().removeIf(e -> e.getValue().getAmount() <= 0);
+        this.markDirty();
+        return take;
+    }
+
+    public void returnFinishedCredit(@NotNull final ItemStack stack)
+    {
+        if (ItemStackUtils.isEmpty(stack) || !finishedConverted)
+        {
+            return;
+        }
+        addToMap(finishedCredit, stack, stack.getCount());
+        this.markDirty();
+    }
+
+    private static void addToMap(
+      @NotNull final Map<String, BuildingBuilderResource> map,
+      @NotNull final ItemStack res,
+      final int amount)
+    {
+        final ItemStack keyStack = res.copyWithCount(1);
+        final String key = keyStack.getItem().getDescriptionId() + "-" + keyStack.getComponentsPatch().hashCode();
+        BuildingBuilderResource resource = map.get(key);
+        if (resource == null)
+        {
+            map.put(key, new BuildingBuilderResource(keyStack, amount));
+        }
+        else
+        {
+            resource.setAmount(resource.getAmount() + amount);
         }
     }
 
@@ -271,6 +746,37 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
      */
     public void reduceNeededResource(final ItemStack res, final int amount)
     {
+        if (ItemStackUtils.isEmpty(res) || amount <= 0)
+        {
+            return;
+        }
+
+        // QD-121: track schematic place progress regardless of raw BOM / grant state.
+        if (schematicBlocksTotal > 0 && schematicBlocksRemaining > 0)
+        {
+            schematicBlocksRemaining = Math.max(0, schematicBlocksRemaining - amount);
+        }
+
+        // QD-103: Domum framed places 1:1 with texture components on the needed map — reduce those.
+        // Vanilla convertibles (planks→logs) keep ceil-BOM on add; per-place log reduce would
+        // over-decrement (1 plank ≠ 1 log), so leave crafting BOM accounting as before.
+        if (com.minecolonies.core.util.DomumOrnamentumUtils.getBlock(res) != null
+              && !com.ldtteam.domumornamentum.client.model.data.MaterialTextureData.readFromItemStack(res).isEmpty())
+        {
+            final java.util.List<ItemStack> parts = com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
+                building.getColony().getWorld(), res, amount);
+            for (final ItemStack part : parts)
+            {
+                reduceNeededResourceRaw(part, part.getCount());
+            }
+            return;
+        }
+
+        reduceNeededResourceRaw(res, amount);
+    }
+
+    private void reduceNeededResourceRaw(final ItemStack res, final int amount)
+    {
         final int hashCode = res.getComponentsPatch().hashCode();
         final String name = res.getItem().getDescriptionId() + "-" + hashCode;
 
@@ -322,6 +828,12 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         neededResources = new HashMap<>();
         buckets.clear();
+        finishedPlaceables = new LinkedHashMap<>();
+        finishedCredit = new LinkedHashMap<>();
+        finishedConverted = false;
+        bomFinalized = false;
+        schematicBlocksTotal = 0;
+        schematicBlocksRemaining = 0;
         this.markDirty();
     }
 
@@ -347,6 +859,11 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     public void checkOrRequestBucket(@Nullable final BuilderBucket requiredResources, final ICitizenData worker)
     {
         if (requiredResources == null)
+        {
+            return;
+        }
+        // QD-120: after grant, never open new raw courier requests mid-build.
+        if (finishedConverted)
         {
             return;
         }

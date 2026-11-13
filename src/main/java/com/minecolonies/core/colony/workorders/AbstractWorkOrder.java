@@ -424,30 +424,180 @@ public abstract class AbstractWorkOrder implements IBuilderWorkOrder
         return packName;
     }
 
+    /**
+     * Update pack+path after a soft-fail resolve so later loads hit the real schematic.
+     */
+    public void updateStructurePackAndPath(@Nullable final String pack, @Nullable final String structurePath)
+    {
+        if (pack != null && !pack.isBlank())
+        {
+            this.packName = pack;
+        }
+        if (structurePath != null && !structurePath.isBlank())
+        {
+            this.path = structurePath;
+        }
+        changed = true;
+    }
+
     @Override
     public void loadBlueprint(final Level world, final Consumer<Blueprint> afterLoad)
     {
         if (blueprint != null)
         {
             afterLoad.accept(blueprint);
+            return;
         }
-        else if (future == null || future.isDone())
+
+        // In-flight load from requestWorkOrder / onAdded — NEVER treat as failure.
+        // Returning null here made the builder AI cancel a freshly claimed WO (QD-94).
+        if (future != null && !future.isDone())
         {
-            future = ColonyUtils.queueBlueprintLoad(world, getStructurePack(), getStructurePath(), blueprint ->
-                {
-                    // Soft-fail / pack search already happened on the IO pool inside ColonyUtils.
-                    // Do not sync-load again on the server tick callback.
-                    if (blueprint != null)
+            final CompletableFuture<Blueprint> inFlight = future;
+            com.ldtteam.structurize.storage.ServerFutureProcessor.queueBlueprint(
+              new com.ldtteam.structurize.storage.ServerFutureProcessor.BlueprintProcessingData(
+                inFlight,
+                world,
+                loaded -> {
+                    if (loaded != null)
                     {
-                        setBlueprint(blueprint, world);
+                        setBlueprint(loaded, world);
                     }
-                    afterLoad.accept(blueprint);
-                },
-                e -> afterLoad.accept(null));
+                    afterLoad.accept(blueprint != null ? blueprint : loaded);
+                }));
+            return;
         }
-        else
+
+        // Remap legacy pack names (Stone → Minecolonies Original) before queueing IO.
+        final String aliased = com.ldtteam.structurize.storage.StructurePacks.aliasPackName(getStructurePack());
+        if (aliased != null && !aliased.isBlank() && !aliased.equals(getStructurePack()))
         {
-            afterLoad.accept(null);
+            updateStructurePackAndPath(aliased, getStructurePath());
+        }
+
+        future = ColonyUtils.queueBlueprintLoad(world, getStructurePack(), getStructurePath(), loaded ->
+            {
+                // Soft-fail / pack search already happened on the IO pool inside ColonyUtils.
+                // Do not sync-load again on the server tick callback.
+                Blueprint resolved = loaded;
+                if (resolved == null)
+                {
+                    // Flat packs (Stone) store townhall1.blueprint at pack root — recover and rewrite WO path.
+                    resolved = recoverBlueprint(world);
+                }
+                else
+                {
+                    // ColonyUtils/HutBlueprintResolver may have loaded from another pack without
+                    // rewriting WO pack/path — persist the real location so reloads don't soft-fail.
+                    persistResolvedPackPath();
+                }
+                if (resolved != null)
+                {
+                    setBlueprint(resolved, world);
+                }
+                afterLoad.accept(resolved);
+            },
+            e -> {
+                final Blueprint recovered = recoverBlueprint(world);
+                if (recovered != null)
+                {
+                    setBlueprint(recovered, world);
+                }
+                afterLoad.accept(recovered);
+            });
+    }
+
+    /**
+     * When soft-load succeeded via pack search, rewrite WO pack/path to a real on-disk schematic.
+     */
+    private void persistResolvedPackPath()
+    {
+        try
+        {
+            String hut = "builder";
+            final String structurePath = getStructurePath();
+            if (structurePath != null && !structurePath.isBlank())
+            {
+                final String file = structurePath.contains("/")
+                                      ? structurePath.substring(structurePath.lastIndexOf('/') + 1)
+                                      : structurePath;
+                String name = file.replace(".blueprint", "");
+                if (!name.isEmpty() && Character.isDigit(name.charAt(name.length() - 1)))
+                {
+                    name = name.substring(0, name.length() - 1);
+                }
+                if (name.startsWith("alt"))
+                {
+                    name = name.substring(3);
+                }
+                if (!name.isBlank())
+                {
+                    hut = name;
+                }
+            }
+            final int level = Math.max(1, getTargetLevel() <= 0 ? 1 : getTargetLevel());
+            final com.minecolonies.core.util.HutBlueprintResolver.Resolved hit =
+              com.minecolonies.core.util.HutBlueprintResolver.resolve(hut, getStructurePack(), getStructurePath(), level);
+            if (hit != null)
+            {
+                updateStructurePackAndPath(hit.pack(), hit.path());
+            }
+        }
+        catch (final Exception e)
+        {
+            Log.getLogger().debug("WO pack/path persist failed for {}/{}", getStructurePack(), getStructurePath(), e);
+        }
+    }
+
+    /**
+     * Recover a missing pack/path (e.g. Stone + fundamentals/…) via HutBlueprintResolver and rewrite WO.
+     * Runs only from IO-pool / ServerFutureProcessor callbacks — never on the raw server tick.
+     */
+    @Nullable
+    private Blueprint recoverBlueprint(final Level world)
+    {
+        try
+        {
+            String hut = "builder";
+            final String structurePath = getStructurePath();
+            if (structurePath != null && !structurePath.isBlank())
+            {
+                final String file = structurePath.contains("/")
+                                      ? structurePath.substring(structurePath.lastIndexOf('/') + 1)
+                                      : structurePath;
+                String name = file.replace(".blueprint", "");
+                if (!name.isEmpty() && Character.isDigit(name.charAt(name.length() - 1)))
+                {
+                    name = name.substring(0, name.length() - 1);
+                }
+                if (name.startsWith("alt"))
+                {
+                    name = name.substring(3);
+                }
+                if (!name.isBlank())
+                {
+                    hut = name;
+                }
+            }
+            final int level = Math.max(1, getTargetLevel() <= 0 ? 1 : getTargetLevel());
+            final com.minecolonies.core.util.HutBlueprintResolver.Resolved hit =
+              com.minecolonies.core.util.HutBlueprintResolver.resolve(hut, getStructurePack(), getStructurePath(), level);
+            if (hit == null)
+            {
+                return null;
+            }
+            final Blueprint bp = com.ldtteam.structurize.storage.StructurePacks.getBlueprint(
+              hit.pack(), hit.path(), true, world.registryAccess());
+            if (bp != null)
+            {
+                updateStructurePackAndPath(hit.pack(), hit.path());
+            }
+            return bp;
+        }
+        catch (final Exception e)
+        {
+            Log.getLogger().debug("WO blueprint recover failed for {}/{}", getStructurePack(), getStructurePath(), e);
+            return null;
         }
     }
 
