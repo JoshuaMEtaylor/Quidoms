@@ -555,6 +555,49 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 }
             }
 
+            // QD-114: craft convertibles from hut+person raws BEFORE gather/request/place retry.
+            boolean craftedAny = false;
+            final net.neoforged.neoforge.items.IItemHandler hutCap = building.getItemHandlerCap();
+            for (final ItemStack need : required)
+            {
+                if (ItemStackUtils.isEmpty(need))
+                {
+                    continue;
+                }
+                if (!com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(worker.level(), need))
+                {
+                    continue;
+                }
+                final Predicate<ItemStack> already =
+                  candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
+                if (InventoryUtils.getItemCountInItemHandler(getInventory(), already) >= Math.max(1, need.getCount()))
+                {
+                    continue;
+                }
+                wallChat("craft-try",
+                  Component.literal("crafting " + need.getHoverName().getString() + " from hut/person raws."));
+                if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftForBuilder(
+                  worker.level(), getInventory(), hutCap, need.copy()))
+                {
+                    craftedAny = true;
+                    Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS crafted {} before place", need.getItem());
+                }
+                else
+                {
+                    wallChat("craft-miss",
+                      Component.literal("still missing raws for " + need.getHoverName().getString() + " after craft attempt."));
+                }
+            }
+            if (craftedAny)
+            {
+                final ItemCheckResult afterCraft = hasListOfResInInvOrRequest(this, required, required.size() > 1);
+                if (afterCraft == SUCCESS)
+                {
+                    wallChat("craft-ok", Component.literal("crafted materials — placing."));
+                    return BUILDING_STEP;
+                }
+            }
+
             final ItemCheckResult check = hasListOfResInInvOrRequest(this, required, required.size() > 1);
             // TEMP QD-101 debug
             Log.getLogger().info(
@@ -1369,18 +1412,17 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 continue;
             }
 
-            // QD-103/112: pull raw ingredients (logs / Domum components), craft in builder inv.
-            for (final ItemStack raw : raws)
+            // QD-114: craft-before-place — pull raws from hut+person, craft finished into person inv.
+            final net.neoforged.neoforge.items.IItemHandler hutCap = placer.building.getItemHandlerCap();
+            if (convertible)
             {
-                final Predicate<ItemStack> rawMatch =
-                  candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(raw, candidate, true, false);
-                // Pull enough for craft yield (e.g. 1 log → 4 planks covers want=1).
-                pullFromHutIntoWorker(placer, rawMatch, Math.max(1, raw.getCount()));
+                placer.wallChat("craft-try",
+                  Component.literal("crafting " + need.getHoverName().getString() + " from raws before place."));
             }
-            if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftInInventory(
-              world, placer.getInventory(), need.copyWithCount(want)))
+            if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftForBuilder(
+              world, placer.getInventory(), hutCap, need.copyWithCount(want)))
             {
-                Log.getLogger().info("[QuidomsBuilder] hasList crafted {} x{} in-inv", need.getItem(), want);
+                Log.getLogger().info("[QuidomsBuilder] hasList crafted {} x{} before place", need.getItem(), want);
                 requestedMap.remove(stack);
                 continue;
             }
@@ -1398,9 +1440,6 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                       false,
                       citizenName,
                       placer.getWorker().getCitizenData());
-                    final Predicate<ItemStack> rawMatch =
-                      candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(raw, candidate, true, false);
-                    pullFromHutIntoWorker(placer, rawMatch, Math.max(1, raw.getCount()));
                 }
             }
             else
@@ -1415,8 +1454,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 pullFromHutIntoWorker(placer, match, want);
             }
 
-            if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftInInventory(
-              world, placer.getInventory(), need.copyWithCount(want)))
+            if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftForBuilder(
+              world, placer.getInventory(), hutCap, need.copyWithCount(want)))
             {
                 Log.getLogger().info("[QuidomsBuilder] hasList crafted after provision {} x{}", need.getItem(), want);
                 requestedMap.remove(stack);

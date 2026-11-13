@@ -10,8 +10,9 @@ import com.minecolonies.api.util.ItemStackUtils;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.RecipeCompat;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,14 +29,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
- * Quidoms QD-103: builders request raw materials only and craft/convert finished
- * products (vanilla crafting + Domum framed) inside their own inventory.
+ * Quidoms QD-103/114: builders request raw materials only and craft/convert finished
+ * products (vanilla crafting + Domum framed) inside their own inventory before place.
  */
 public final class BuilderInventoryCraft
 {
@@ -87,8 +88,11 @@ public final class BuilderInventoryCraft
         {
             return false;
         }
-        // Domum framed / textured blocks are always converted from components in-inv (QD-103/112).
         if (DomumOrnamentumUtils.getBlock(stack) != null)
+        {
+            return true;
+        }
+        if (plankFallback(stack.getItem()) != null)
         {
             return true;
         }
@@ -124,30 +128,64 @@ public final class BuilderInventoryCraft
       @NotNull final IItemHandler inv,
       @NotNull final ItemStack need)
     {
+        return tryCraftForBuilder(level, inv, null, need);
+    }
+
+    /**
+     * QD-114: pull ingredients from hut (TE+racks) into the worker, craft finished product
+     * into the worker inventory (where place/consume expects it).
+     *
+     * @return true when person inventory holds enough of {@code need} after.
+     */
+    public static boolean tryCraftForBuilder(
+      @Nullable final Level level,
+      @NotNull final IItemHandler personInv,
+      @Nullable final IItemHandler hutInv,
+      @NotNull final ItemStack need)
+    {
         if (ItemStackUtils.isEmpty(need))
         {
             return true;
         }
         final int want = Math.max(1, need.getCount());
-        final java.util.function.Predicate<ItemStack> match =
-          candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, true);
+        final Predicate<ItemStack> match =
+          candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
 
-        if (InventoryUtils.getItemCountInItemHandler(inv, match) >= want)
+        if (InventoryUtils.getItemCountInItemHandler(personInv, match) >= want)
         {
             return true;
         }
 
-        if (tryAssembleDomum(inv, need, want))
+        // Prefer Domum assemble when the need is a textured Domum block.
+        if (DomumOrnamentumUtils.getBlock(need) != null)
         {
-            return InventoryUtils.getItemCountInItemHandler(inv, match) >= want;
+            pullIngredientsForDomum(personInv, hutInv, need, want);
+            if (tryAssembleDomum(personInv, need, want)
+                  && InventoryUtils.getItemCountInItemHandler(personInv, match) >= want)
+            {
+                return true;
+            }
         }
 
-        if (level instanceof ServerLevel serverLevel)
+        final CraftRecipe recipe = resolveCraftRecipe(level, need.getItem());
+        if (recipe != null)
         {
-            tryCraftVanilla(serverLevel, inv, need, want);
+            pullIngredientsForRecipe(personInv, hutInv, recipe, want);
+            tryCraftWithRecipe(personInv, need, want, recipe);
         }
 
-        return InventoryUtils.getItemCountInItemHandler(inv, match) >= want;
+        final boolean ok = InventoryUtils.getItemCountInItemHandler(personInv, match) >= want;
+        if (!ok)
+        {
+            Log.getLogger().info(
+              "[QuidomsBuilder] craft-before-place FAILED need={} want={} recipe={} personHas={} hutPresent={}",
+              need.getItem(),
+              want,
+              recipe == null ? "none" : recipe.describe(),
+              InventoryUtils.getItemCountInItemHandler(personInv, match),
+              hutInv != null);
+        }
+        return ok;
     }
 
     /**
@@ -164,7 +202,6 @@ public final class BuilderInventoryCraft
         }
         final MaterialTextureData data = MaterialTextureData.readFromItemStack(stack);
 
-        // Prefer texture data; fall back to component defaults so Framed White never stays as a request id (QD-112).
         boolean any = false;
         for (final IMateriallyTexturedBlockComponent component : doBlock.getComponents())
         {
@@ -197,15 +234,59 @@ public final class BuilderInventoryCraft
         return out;
     }
 
+    private static void pullIngredientsForDomum(
+      @NotNull final IItemHandler personInv,
+      @Nullable final IItemHandler hutInv,
+      @NotNull final ItemStack need,
+      final int want)
+    {
+        if (hutInv == null)
+        {
+            return;
+        }
+        final List<ItemStack> components = expandDomumComponents(need, want);
+        for (final ItemStack comp : components)
+        {
+            final Predicate<ItemStack> match =
+              s -> ItemStackUtils.compareItemStacksIgnoreStackSize(comp, s, true, false);
+            final int have = InventoryUtils.getItemCountInItemHandler(personInv, match);
+            final int missing = Math.max(0, comp.getCount() - have);
+            if (missing > 0)
+            {
+                InventoryUtils.transferXOfFirstSlotInItemHandlerWithIntoNextFreeSlotInItemHandler(
+                  hutInv, match, missing, personInv);
+            }
+        }
+    }
+
+    private static void pullIngredientsForRecipe(
+      @NotNull final IItemHandler personInv,
+      @Nullable final IItemHandler hutInv,
+      @NotNull final CraftRecipe recipe,
+      final int want)
+    {
+        if (hutInv == null)
+        {
+            return;
+        }
+        final int craftsNeeded = (want + recipe.resultCount - 1) / recipe.resultCount;
+        for (final IngredientSlot slot : recipe.inputs)
+        {
+            final int needCount = slot.count * craftsNeeded;
+            final int have = InventoryUtils.getItemCountInItemHandler(personInv, slot::matches);
+            final int missing = Math.max(0, needCount - have);
+            if (missing > 0)
+            {
+                InventoryUtils.transferXOfFirstSlotInItemHandlerWithIntoNextFreeSlotInItemHandler(
+                  hutInv, slot::matches, missing, personInv);
+            }
+        }
+    }
+
     private static boolean tryAssembleDomum(@NotNull final IItemHandler inv, @NotNull final ItemStack need, final int want)
     {
         final IMateriallyTexturedBlock doBlock = DomumOrnamentumUtils.getBlock(need);
         if (doBlock == null)
-        {
-            return false;
-        }
-        final MaterialTextureData data = MaterialTextureData.readFromItemStack(need);
-        if (data.isEmpty())
         {
             return false;
         }
@@ -219,17 +300,19 @@ public final class BuilderInventoryCraft
         int made = 0;
         while (made < want)
         {
-            // Verify all components present for one assemble.
             for (final ItemStack comp : components)
             {
                 final int have = InventoryUtils.getItemCountInItemHandler(inv,
                   s -> ItemStackUtils.compareItemStacksIgnoreStackSize(comp, s, true, false));
                 if (have < 1)
                 {
+                    if (made > 0)
+                    {
+                        Log.getLogger().info("[QuidomsBuilder] crafted Domum {} x{} in builder inv", need.getItem(), made);
+                    }
                     return made > 0;
                 }
             }
-            // Consume one of each, insert one framed product.
             for (final ItemStack comp : components)
             {
                 if (!InventoryUtils.attemptReduceStackInItemHandler(inv, comp, 1, true, true))
@@ -242,11 +325,11 @@ public final class BuilderInventoryCraft
             product.setCount(1);
             if (!InventoryUtils.addItemStackToItemHandler(inv, product))
             {
-                // Roll back components if we cannot insert the product.
                 for (final ItemStack comp : components)
                 {
                     InventoryUtils.addItemStackToItemHandler(inv, comp.copy());
                 }
+                Log.getLogger().info("[QuidomsBuilder] Domum craft blocked — no free slot for {}", need.getItem());
                 return made > 0;
             }
             made++;
@@ -258,29 +341,20 @@ public final class BuilderInventoryCraft
         return made > 0;
     }
 
-    private static void tryCraftVanilla(
-      @NotNull final ServerLevel level,
+    private static void tryCraftWithRecipe(
       @NotNull final IItemHandler inv,
       @NotNull final ItemStack need,
-      final int want)
+      final int want,
+      @NotNull final CraftRecipe recipe)
     {
-        final CraftRecipe recipe = findCraftingRecipe(level, need.getItem());
-        if (recipe == null)
-        {
-            return;
-        }
-
         int have = InventoryUtils.getItemCountInItemHandler(inv,
           s -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, s, true, false));
         int made = 0;
         while (have < want)
         {
-            // Enough of each input?
-            for (final Map.Entry<Item, Integer> in : recipe.inputs.entrySet())
+            for (final IngredientSlot slot : recipe.inputs)
             {
-                final int needIn = in.getValue();
-                final int haveIn = InventoryUtils.getItemCountInItemHandler(inv, s -> s.getItem() == in.getKey());
-                if (haveIn < needIn)
+                if (InventoryUtils.getItemCountInItemHandler(inv, slot::matches) < slot.count)
                 {
                     if (made > 0)
                     {
@@ -289,23 +363,36 @@ public final class BuilderInventoryCraft
                     return;
                 }
             }
-            for (final Map.Entry<Item, Integer> in : recipe.inputs.entrySet())
+
+            final List<ItemStack> consumed = new ArrayList<>();
+            boolean ok = true;
+            for (final IngredientSlot slot : recipe.inputs)
             {
-                final ItemStack consume = new ItemStack(in.getKey(), in.getValue());
-                if (!InventoryUtils.attemptReduceStackInItemHandler(inv, consume, in.getValue(), true, true))
+                final ItemStack taken = extractMatching(inv, slot, slot.count);
+                if (taken.isEmpty())
                 {
-                    return;
+                    ok = false;
+                    break;
                 }
+                consumed.add(taken);
             }
+            if (!ok)
+            {
+                for (final ItemStack back : consumed)
+                {
+                    InventoryUtils.addItemStackToItemHandler(inv, back);
+                }
+                return;
+            }
+
             final ItemStack product = new ItemStack(need.getItem(), recipe.resultCount);
-            // Preserve need components only when identical item (vanilla planks: empty components).
             if (!InventoryUtils.addItemStackToItemHandler(inv, product))
             {
-                // Rollback inputs
-                for (final Map.Entry<Item, Integer> in : recipe.inputs.entrySet())
+                for (final ItemStack back : consumed)
                 {
-                    InventoryUtils.addItemStackToItemHandler(inv, new ItemStack(in.getKey(), in.getValue()));
+                    InventoryUtils.addItemStackToItemHandler(inv, back);
                 }
+                Log.getLogger().info("[QuidomsBuilder] craft blocked — no free slot for {}", need.getItem());
                 return;
             }
             made += recipe.resultCount;
@@ -313,8 +400,62 @@ public final class BuilderInventoryCraft
         }
         if (made > 0)
         {
-            Log.getLogger().info("[QuidomsBuilder] crafted {} x{} in builder inv", need.getItem(), made);
+            Log.getLogger().info("[QuidomsBuilder] crafted {} x{} in builder inv (before place)", need.getItem(), made);
         }
+    }
+
+    @NotNull
+    private static ItemStack extractMatching(
+      @NotNull final IItemHandler inv,
+      @NotNull final IngredientSlot slot,
+      final int quantity)
+    {
+        int left = quantity;
+        ItemStack collected = ItemStack.EMPTY;
+        for (int i = 0; i < inv.getSlots() && left > 0; i++)
+        {
+            final ItemStack stack = inv.getStackInSlot(i);
+            if (stack.isEmpty() || !slot.matches(stack))
+            {
+                continue;
+            }
+            final ItemStack extracted = inv.extractItem(i, left, false);
+            if (extracted.isEmpty())
+            {
+                continue;
+            }
+            if (collected.isEmpty())
+            {
+                collected = extracted.copy();
+            }
+            else
+            {
+                collected.grow(extracted.getCount());
+            }
+            left -= extracted.getCount();
+        }
+        return left > 0 ? ItemStack.EMPTY : collected;
+    }
+
+    @Nullable
+    private static CraftRecipe resolveCraftRecipe(@Nullable final Level level, @NotNull final Item resultItem)
+    {
+        CraftRecipe best = null;
+        if (level instanceof ServerLevel serverLevel)
+        {
+            best = findCraftingRecipe(serverLevel, resultItem);
+        }
+        final CraftRecipe fallback = plankFallback(resultItem);
+        if (fallback == null)
+        {
+            return best;
+        }
+        if (best == null)
+        {
+            return fallback;
+        }
+        // Prefer the fewer-input recipe (log→planks) over multi-ingredient datapack crafts.
+        return fallback.inputUnits() <= best.inputUnits() ? fallback : best;
     }
 
     @Nullable
@@ -331,22 +472,26 @@ public final class BuilderInventoryCraft
             {
                 continue;
             }
-            final Map<Item, Integer> inputs = new LinkedHashMap<>();
+            final List<IngredientSlot> inputs = new ArrayList<>();
             for (final Ingredient ingredient : RecipeCompat.getIngredients(crafting))
             {
-                final ItemStack[] stacks = IngredientCompat.getItems(ingredient);
-                if (stacks.length == 0 || stacks[0].isEmpty() || stacks[0].getItem() == Items.AIR)
+                if (ingredient.isEmpty())
                 {
                     continue;
                 }
-                inputs.merge(stacks[0].getItem(), 1, Integer::sum);
+                final ItemStack[] stacks = IngredientCompat.getItems(ingredient);
+                if (stacks.length == 0)
+                {
+                    continue;
+                }
+                // QD-114: keep the full ingredient (tag-aware), not only stacks[0].
+                inputs.add(IngredientSlot.ofIngredient(ingredient, 1));
             }
             if (inputs.isEmpty())
             {
                 continue;
             }
-            // Prefer fewest inputs then highest output (log→4 planks beats multi-ingredient crafts).
-            final int score = inputs.values().stream().mapToInt(Integer::intValue).sum() * 100 - Math.max(1, result.getCount());
+            final int score = inputs.stream().mapToInt(s -> s.count).sum() * 100 - Math.max(1, result.getCount());
             if (score < bestScore)
             {
                 bestScore = score;
@@ -354,6 +499,70 @@ public final class BuilderInventoryCraft
             }
         }
         return best;
+    }
+
+    /**
+     * Hardcoded log→planks so craft works even when RecipeCompat/placementInfo misses vanilla recipes.
+     */
+    @Nullable
+    private static CraftRecipe plankFallback(@NotNull final Item planks)
+    {
+        final TagKey<Item> logTag = plankLogTag(planks);
+        if (logTag == null)
+        {
+            return null;
+        }
+        return new CraftRecipe(4, List.of(IngredientSlot.ofTag(logTag, 1)));
+    }
+
+    @Nullable
+    private static TagKey<Item> plankLogTag(@NotNull final Item planks)
+    {
+        if (planks == Items.OAK_PLANKS)
+        {
+            return ItemTags.OAK_LOGS;
+        }
+        if (planks == Items.SPRUCE_PLANKS)
+        {
+            return ItemTags.SPRUCE_LOGS;
+        }
+        if (planks == Items.BIRCH_PLANKS)
+        {
+            return ItemTags.BIRCH_LOGS;
+        }
+        if (planks == Items.JUNGLE_PLANKS)
+        {
+            return ItemTags.JUNGLE_LOGS;
+        }
+        if (planks == Items.ACACIA_PLANKS)
+        {
+            return ItemTags.ACACIA_LOGS;
+        }
+        if (planks == Items.DARK_OAK_PLANKS)
+        {
+            return ItemTags.DARK_OAK_LOGS;
+        }
+        if (planks == Items.MANGROVE_PLANKS)
+        {
+            return ItemTags.MANGROVE_LOGS;
+        }
+        if (planks == Items.CHERRY_PLANKS)
+        {
+            return ItemTags.CHERRY_LOGS;
+        }
+        if (planks == Items.BAMBOO_PLANKS)
+        {
+            return ItemTags.BAMBOO_BLOCKS;
+        }
+        if (planks == Items.CRIMSON_PLANKS)
+        {
+            return ItemTags.CRIMSON_STEMS;
+        }
+        if (planks == Items.WARPED_PLANKS)
+        {
+            return ItemTags.WARPED_STEMS;
+        }
+        return null;
     }
 
     @NotNull
@@ -388,7 +597,46 @@ public final class BuilderInventoryCraft
         return copy;
     }
 
-    private record CraftRecipe(int resultCount, Map<Item, Integer> inputs)
+    private record IngredientSlot(int count, @Nullable Ingredient ingredient, @Nullable TagKey<Item> tag, @Nullable Item exact)
     {
+        static IngredientSlot ofIngredient(@NotNull final Ingredient ingredient, final int count)
+        {
+            return new IngredientSlot(count, ingredient, null, null);
+        }
+
+        static IngredientSlot ofTag(@NotNull final TagKey<Item> tag, final int count)
+        {
+            return new IngredientSlot(count, null, tag, null);
+        }
+
+        boolean matches(@NotNull final ItemStack stack)
+        {
+            if (stack.isEmpty())
+            {
+                return false;
+            }
+            if (ingredient != null)
+            {
+                return ingredient.test(stack);
+            }
+            if (tag != null)
+            {
+                return stack.is(tag);
+            }
+            return exact != null && stack.getItem() == exact;
+        }
+    }
+
+    private record CraftRecipe(int resultCount, List<IngredientSlot> inputs)
+    {
+        int inputUnits()
+        {
+            return inputs.stream().mapToInt(s -> s.count).sum();
+        }
+
+        String describe()
+        {
+            return "out=" + resultCount + " in=" + inputUnits();
+        }
     }
 }

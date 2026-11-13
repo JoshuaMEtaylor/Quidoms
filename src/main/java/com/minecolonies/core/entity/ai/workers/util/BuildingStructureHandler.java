@@ -253,6 +253,26 @@ public class BuildingStructureHandler<J extends AbstractJobStructure<?, J>, B ex
             itemList.add(stack);
         }
 
+        // QD-114: craft convertibles from hut+person raws before the place check succeeds.
+        final net.neoforged.neoforge.items.IItemHandler hutCap = structureAI.building.getItemHandlerCap();
+        for (final ItemStack need : itemList)
+        {
+            if (com.minecolonies.api.util.ItemStackUtils.isEmpty(need))
+            {
+                continue;
+            }
+            if (!com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(
+              structureAI.getWorker().level(), need))
+            {
+                continue;
+            }
+            com.minecolonies.core.util.BuilderInventoryCraft.tryCraftForBuilder(
+              structureAI.getWorker().level(),
+              this.getInventory(),
+              hutCap,
+              need.copy());
+        }
+
         return AbstractEntityAIStructure.hasListOfResInInvOrRequest(structureAI, itemList, itemList.size() > 1) == AbstractEntityAIStructure.ItemCheckResult.SUCCESS;
     }
 
