@@ -201,27 +201,22 @@ public final class BuilderInventoryCraft
             return out;
         }
         final MaterialTextureData data = MaterialTextureData.readFromItemStack(stack);
-
-        boolean any = false;
+        // QD-120: never invent component.getDefault() (TimberFrame center defaults to WHITE_TERRACOTTA
+        // → dye reverse-expand → Bone Meal phantoms on wood huts). Only schematic texture data.
+        if (data.isEmpty())
+        {
+            return out;
+        }
         for (final IMateriallyTexturedBlockComponent component : doBlock.getComponents())
         {
-            Block block = data.isEmpty() ? null : data.getTexturedComponents().get(component.getId());
+            final Block block = data.getTexturedComponents().get(component.getId());
             if (block == null || block == Blocks.AIR)
-            {
-                block = component.getDefault();
-            }
-            if (block == null || block == Blocks.AIR)
-            {
-                continue;
-            }
-            if (component.isOptional() && (data.isEmpty() || !data.getTexturedComponents().containsKey(component.getId())))
             {
                 continue;
             }
             out.add(new ItemStack(block, amount));
-            any = true;
         }
-        if (!any && !data.isEmpty())
+        if (out.isEmpty())
         {
             for (final Block block : data.getTexturedComponents().values())
             {

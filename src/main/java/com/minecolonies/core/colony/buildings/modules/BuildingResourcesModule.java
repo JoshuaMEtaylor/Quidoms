@@ -43,6 +43,9 @@ import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_TOTAL_STAGE
 public class BuildingResourcesModule extends AbstractBuildingModule implements IPersistentModule
 {
     private static final String TAG_FINISHED_CONVERTED = "quidFinishedConverted";
+    private static final String TAG_BOM_FINALIZED = "quidBomFinalized";
+    private static final String TAG_SCHEM_TOTAL = "quidSchemBlocksTotal";
+    private static final String TAG_SCHEM_REMAINING = "quidSchemBlocksRemaining";
     private static final String TAG_FINISHED_PLACEABLES = "quidFinishedPlaceables";
     private static final String TAG_FINISHED_CREDIT = "quidFinishedCredit";
     private static final String TAG_STACK = "stack";
@@ -69,6 +72,17 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     private boolean finishedConverted = false;
 
     /**
+     * QD-120: raw BOM computed once after schematic scan — no mid-build top-ups / rebuilds.
+     */
+    private boolean bomFinalized = false;
+
+    /**
+     * QD-121: schematic placeable block counts (finished items), locked at BOM finalize.
+     */
+    private int schematicBlocksTotal = 0;
+    private int schematicBlocksRemaining = 0;
+
+    /**
      * The different possible buckets.
      */
     private Deque<BuilderBucket> buckets = new ArrayDeque<>();
@@ -85,6 +99,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         currentStage = compound.getIntOr(TAG_CURR_STAGE, 0);
         totalStages = compound.getIntOr(TAG_TOTAL_STAGES, 0);
         finishedConverted = compound.getBooleanOr(TAG_FINISHED_CONVERTED, false);
+        bomFinalized = compound.getBooleanOr(TAG_BOM_FINALIZED, false);
+        schematicBlocksTotal = compound.getIntOr(TAG_SCHEM_TOTAL, 0);
+        schematicBlocksRemaining = compound.getIntOr(TAG_SCHEM_REMAINING, schematicBlocksTotal);
         finishedPlaceables = readResourceMap(provider, compound, TAG_FINISHED_PLACEABLES);
         finishedCredit = readResourceMap(provider, compound, TAG_FINISHED_CREDIT);
     }
@@ -95,6 +112,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         compound.putInt(TAG_TOTAL_STAGES, totalStages);
         compound.putInt(TAG_CURR_STAGE, currentStage);
         compound.putBoolean(TAG_FINISHED_CONVERTED, finishedConverted);
+        compound.putBoolean(TAG_BOM_FINALIZED, bomFinalized);
+        compound.putInt(TAG_SCHEM_TOTAL, schematicBlocksTotal);
+        compound.putInt(TAG_SCHEM_REMAINING, schematicBlocksRemaining);
         writeResourceMap(provider, compound, TAG_FINISHED_PLACEABLES, finishedPlaceables);
         writeResourceMap(provider, compound, TAG_FINISHED_CREDIT, finishedCredit);
     }
@@ -151,13 +171,11 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         updateAvailableResources();
         buf.writeInt(neededResources.size());
-        double qty = 0;
         for (@NotNull final BuildingBuilderResource resource : neededResources.values())
         {
             Utils.serializeCodecMess(buf, resource.getItemStack());
             buf.writeInt(resource.getAvailable());
             buf.writeInt(resource.getAmount());
-            qty += resource.getAmount();
         }
 
         final Set<ICitizenData> set = building.getAllAssignedCitizen();
@@ -168,15 +186,22 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             if (workOrder != null)
             {
                 buf.writeInt(workOrder.getID());
-                buf.writeDouble(workOrder.getAmountOfResources() == 0 ? 0 : qty / workOrder.getAmountOfResources());
+                // QD-121: remaining/total schematic blocks (0 = complete / unknown).
+                final double remainFrac = schematicBlocksTotal <= 0 ? 0.0
+                  : Math.max(0.0, Math.min(1.0, (double) schematicBlocksRemaining / (double) schematicBlocksTotal));
+                buf.writeDouble(remainFrac);
                 buf.writeInt(totalStages);
                 buf.writeInt(currentStage);
+                buf.writeInt(schematicBlocksTotal);
+                buf.writeInt(schematicBlocksRemaining);
                 return;
             }
         }
 
         buf.writeInt(-1);
         buf.writeDouble(0.0);
+        buf.writeInt(0);
+        buf.writeInt(0);
         buf.writeInt(0);
         buf.writeInt(0);
     }
@@ -281,6 +306,11 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         {
             return;
         }
+        // QD-120: one-shot BOM — ignore mid-build registerBlockAsNeeded / top-ups.
+        if (bomFinalized)
+        {
+            return;
+        }
 
         // QD-116: keep exact finished placeables separately from the player-facing raw BOM.
         addFinishedPlaceable(res, amount);
@@ -369,12 +399,51 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
      * Rebuild player-facing raw BOM from finished placeables with current recipe expansion (QD-119).
      * Clears buckets and re-buckets raws; does not touch finishedConverted/credit.
      */
+    public boolean isBomFinalized()
+    {
+        return bomFinalized;
+    }
+
+    /**
+     * QD-120: compute raw BOM once from finished placeables, then lock — no mid-build escalation.
+     */
+    public void finalizeBomOnce()
+    {
+        if (bomFinalized)
+        {
+            return;
+        }
+        rebuildNeededRawsFromFinishedPlaceables();
+        int total = 0;
+        for (final BuildingBuilderResource placeable : finishedPlaceables.values())
+        {
+            total += Math.max(0, placeable.getAmount());
+        }
+        schematicBlocksTotal = total;
+        schematicBlocksRemaining = total;
+        bomFinalized = true;
+        this.markDirty();
+        Log.getLogger().info("[QuidomsBuilder] BOM finalized: {} finished kinds → {} raw kinds, {} blocks (locked)",
+          finishedPlaceables.size(), neededResources.size(), schematicBlocksTotal);
+    }
+
+    public int getSchematicBlocksTotal()
+    {
+        return schematicBlocksTotal;
+    }
+
+    public int getSchematicBlocksRemaining()
+    {
+        return schematicBlocksRemaining;
+    }
+
     public void rebuildNeededRawsFromFinishedPlaceables()
     {
         if (finishedConverted || finishedPlaceables.isEmpty())
         {
             return;
         }
+        // Allow rebuild only before lock, or during finalizeBomOnce (caller clears lock timing).
         neededResources = new LinkedHashMap<>();
         buckets.clear();
         for (final BuildingBuilderResource placeable : finishedPlaceables.values())
@@ -407,14 +476,8 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             {
                 return true;
             }
-            if (!finishedPlaceables.isEmpty())
-            {
-                rebuildNeededRawsFromFinishedPlaceables();
-            }
-            if (neededResources.isEmpty())
-            {
-                return finishedConverted;
-            }
+            // QD-120: do not rebuild mid-build (escalates shortages). Only use locked BOM.
+            return false;
         }
         for (final BuildingBuilderResource resource : neededResources.values())
         {
@@ -438,10 +501,6 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         if (finishedConverted)
         {
             return "";
-        }
-        if (neededResources.isEmpty() && !finishedPlaceables.isEmpty())
-        {
-            rebuildNeededRawsFromFinishedPlaceables();
         }
         if (neededResources.isEmpty())
         {
@@ -508,10 +567,10 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     }
 
     /**
-     * QD-116/118: when person+hut raws cover the BOM, consume (hut first) and open finished credit.
-     * Finished stacks already present are not re-granted / do not consume raws for that line.
-     *
-     * @return true if already converted or conversion succeeded this call.
+     * QD-116/118/121: when person+hut raws cover the BOM, consume (hut first) and open finished credit.
+     * Credits the <em>full</em> finished placeable amounts (already-held finished stay in inv and are
+     * used first; leftover credit is unused). Returns true only when conversion happens <em>this</em>
+     * call — already converted returns false so callers do not re-chat / re-grant.
      */
     public boolean tryConvertRawsToFinishedCredit()
     {
@@ -522,7 +581,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         if (finishedConverted)
         {
-            return true;
+            return false;
         }
         if (finishedPlaceables.isEmpty())
         {
@@ -533,35 +592,23 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             return false;
         }
 
-        // Credit only what is not already present as finished in person+hut.
+        // QD-121: full finished credit — avoid under-grant when "already" counts were fragile.
         finishedCredit = new LinkedHashMap<>();
         for (final Map.Entry<String, BuildingBuilderResource> entry : finishedPlaceables.entrySet())
         {
             final BuildingBuilderResource placeable = entry.getValue();
-            final Predicate<ItemStack> match =
-              stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, placeable.getItemStack(), true, false);
-            final int already = countDualInv(worker, match);
-            final int stillNeed = Math.max(0, placeable.getAmount() - already);
-            if (stillNeed > 0)
-            {
-                finishedCredit.put(entry.getKey(),
-                  new BuildingBuilderResource(placeable.getItemStack().copyWithCount(1), stillNeed));
-            }
+            finishedCredit.put(entry.getKey(),
+              new BuildingBuilderResource(placeable.getItemStack().copyWithCount(1), placeable.getAmount()));
         }
 
-        // Consume raws only when credit still needs finished injections.
-        // If every finished line is already present, skip raw consume.
-        if (!finishedCredit.isEmpty())
+        for (final BuildingBuilderResource resource : neededResources.values())
         {
-            for (final BuildingBuilderResource resource : neededResources.values())
+            if (!consumeDualInv(worker, resource.getItemStack(), resource.getAmount()))
             {
-                if (!consumeDualInv(worker, resource.getItemStack(), resource.getAmount()))
-                {
-                    Log.getLogger().warn("[QuidomsBuilder] raw consume failed for {} x{} — abort convert",
-                      resource.getItemStack().getItem(), resource.getAmount());
-                    finishedCredit = new LinkedHashMap<>();
-                    return false;
-                }
+                Log.getLogger().warn("[QuidomsBuilder] raw consume failed for {} x{} — abort convert",
+                  resource.getItemStack().getItem(), resource.getAmount());
+                finishedCredit = new LinkedHashMap<>();
+                return false;
             }
         }
 
@@ -569,7 +616,7 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         neededResources = new LinkedHashMap<>();
         buckets.clear();
         this.markDirty();
-        Log.getLogger().info("[QuidomsBuilder] converted dual-inv raws → finished credit ({} kinds still to grant)",
+        Log.getLogger().info("[QuidomsBuilder] converted dual-inv raws → finished credit ({} kinds, full amounts)",
           finishedCredit.size());
         return true;
     }
@@ -702,6 +749,12 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             return;
         }
 
+        // QD-121: track schematic place progress regardless of raw BOM / grant state.
+        if (schematicBlocksTotal > 0 && schematicBlocksRemaining > 0)
+        {
+            schematicBlocksRemaining = Math.max(0, schematicBlocksRemaining - amount);
+        }
+
         // QD-103: Domum framed places 1:1 with texture components on the needed map — reduce those.
         // Vanilla convertibles (planks→logs) keep ceil-BOM on add; per-place log reduce would
         // over-decrement (1 plank ≠ 1 log), so leave crafting BOM accounting as before.
@@ -776,6 +829,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         finishedPlaceables = new LinkedHashMap<>();
         finishedCredit = new LinkedHashMap<>();
         finishedConverted = false;
+        bomFinalized = false;
+        schematicBlocksTotal = 0;
+        schematicBlocksRemaining = 0;
         this.markDirty();
     }
 
@@ -801,6 +857,11 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     public void checkOrRequestBucket(@Nullable final BuilderBucket requiredResources, final ICitizenData worker)
     {
         if (requiredResources == null)
+        {
+            return;
+        }
+        // QD-120: after grant, never open new raw courier requests mid-build.
+        if (finishedConverted)
         {
             return;
         }

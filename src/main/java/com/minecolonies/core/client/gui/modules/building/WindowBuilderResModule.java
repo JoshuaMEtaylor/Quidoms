@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.minecolonies.api.util.constant.WindowConstants.*;
 
+
 /**
  * BOWindow for the builder hut.
  */
@@ -99,12 +100,66 @@ public class WindowBuilderResModule extends AbstractModuleWindow<BuildingResourc
             total += resource.getAmount();
         }
 
-        if (total > 0)
-        {
-            findPaneOfTypeByID(LABEL_PROGRESS, Text.class).setText(Component.translatableEscape("com.minecolonies.coremod.gui.progress.res", (int) ((supplied / total) * 100) + "%", moduleView.getProgress() + "%"));
-        }
+        updateSchematicProgressLabels(supplied, total);
 
         resources.sort(new BuildingBuilderResource.ResourceComparator());
+    }
+
+    /**
+     * QD-121: schematic blocks remaining + percent complete + progress bar width.
+     */
+    private void updateSchematicProgressLabels(final double supplied, final double total)
+    {
+        final int blocksTotal = moduleView.getSchematicBlocksTotal();
+        final int blocksRemaining = moduleView.getSchematicBlocksRemaining();
+        final int blocksPlaced = moduleView.getSchematicBlocksPlaced();
+        final int pct = moduleView.getProgress();
+
+        final Text blocksLabel = findPaneOfTypeByID(LABEL_BLOCKS_REMAINING, Text.class);
+        if (blocksLabel != null)
+        {
+            if (blocksTotal > 0)
+            {
+                blocksLabel.setText(Component.translatableEscape(
+                  "com.minecolonies.coremod.gui.progress.blocks", blocksPlaced, blocksTotal, blocksRemaining));
+            }
+            else
+            {
+                blocksLabel.setText(Component.translatableEscape(
+                  "com.minecolonies.coremod.gui.progress.step", moduleView.getCurrentStage(), moduleView.getTotalStages()));
+            }
+        }
+
+        final Text progressLabel = findPaneOfTypeByID(LABEL_PROGRESS, Text.class);
+        if (progressLabel != null)
+        {
+            if (blocksTotal > 0)
+            {
+                progressLabel.setText(Component.translatableEscape(
+                  "com.minecolonies.coremod.gui.progress.complete", pct));
+            }
+            else if (total > 0)
+            {
+                progressLabel.setText(Component.translatableEscape(
+                  "com.minecolonies.coremod.gui.progress.res",
+                  (int) ((supplied / total) * 100) + "%",
+                  pct + "%"));
+            }
+            else
+            {
+                progressLabel.setText(Component.translatableEscape(
+                  "com.minecolonies.coremod.gui.progress.complete", pct));
+            }
+        }
+
+        final Pane bar = findPaneByID(PROGRESS_BAR);
+        final Pane barBg = findPaneByID(PROGRESS_BAR_BG);
+        if (bar != null && barBg != null)
+        {
+            final int maxW = Math.max(1, barBg.getWidth());
+            final int fill = Math.max(0, Math.min(maxW, (int) Math.round(maxW * (pct / 100.0))));
+            bar.setSize(fill, barBg.getHeight());
+        }
     }
 
     @Override
@@ -143,7 +198,9 @@ public class WindowBuilderResModule extends AbstractModuleWindow<BuildingResourc
                 PaneBuilders.tooltipBuilder().hoverPane(pane).build().setText(text);
             }
         }
-        findPaneOfTypeByID(STEP_PROGRESS, Text.class).setText(Component.translatable("com.minecolonies.coremod.gui.progress.step", moduleView.getCurrentStage(), moduleView.getTotalStages()));
+        findPaneOfTypeByID(STEP_PROGRESS, Text.class).setText(Component.translatable(
+          "com.minecolonies.coremod.gui.progress.step", moduleView.getCurrentStage(), moduleView.getTotalStages()));
+        updateSchematicProgressLabels(0, 0);
     }
 
     /**

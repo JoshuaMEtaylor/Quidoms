@@ -1959,6 +1959,8 @@
   "com.minecolonies.coremod.gui.blocks.distance": "%d blocks",
   "com.minecolonies.coremod.gui.progress.step": "Step %d/%d",
   "com.minecolonies.coremod.gui.progress.res": "Supplied %s / Used %s",
+  "com.minecolonies.coremod.gui.progress.blocks": "Blocks %d/%d (%d left)",
+  "com.minecolonies.coremod.gui.progress.complete": "Build %d%% complete",
   "com.minecolonies.core.guard.setting.follow.tight": "Tight Grouping",
   "com.minecolonies.core.guard.setting.follow.loose": "Loose Grouping",
   "com.minecolonies.core.guard.setting.patrol.auto": "Automatic",

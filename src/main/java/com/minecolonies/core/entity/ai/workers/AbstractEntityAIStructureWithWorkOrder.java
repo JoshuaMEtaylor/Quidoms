@@ -240,10 +240,11 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         {
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
               building, citizenName, worker.getCitizenData());
-            // QD-116: as soon as hut raws cover the BOM, convert to finished credit.
+            // QD-116/121: convert once; do not re-chat when already granted.
             final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
               building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
-            if (resModule != null && resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
+            if (resModule != null && !resModule.isFinishedConverted()
+                  && resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
             {
                 wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
             }
@@ -255,10 +256,10 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         {
             final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
               building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
-            // QD-119: rebuild raw BOM with recipe-accurate yields once the schematic scan finishes.
+            // QD-120: one-shot raw BOM from finished placeables, then lock.
             if (resModule != null)
             {
-                resModule.rebuildNeededRawsFromFinishedPlaceables();
+                resModule.finalizeBomOnce();
             }
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
               building, citizenName, worker.getCitizenData());

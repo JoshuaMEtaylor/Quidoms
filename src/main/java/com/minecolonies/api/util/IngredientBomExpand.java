@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -23,6 +25,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.Tags;
 
 /**
  * Quidoms: expand schematic finished items into recursive crafting ingredients (raw BOM).
@@ -253,8 +256,16 @@ public final class IngredientBomExpand
             out.merge(itemId, amount, Integer::sum);
             return;
         }
+        // QD-120: dyes / bone meal / dyeing recipes are terminal — do not reverse-expand
+        // white terracotta → white dye → bone meal phantoms.
+        if (isTerminalBuildingRaw(itemId))
+        {
+            out.merge(itemId, amount, Integer::sum);
+            stack.remove(itemId);
+            return;
+        }
         final RecipeInputs recipe = recipes.get(itemId);
-        if (recipe == null || recipe.inputs().isEmpty() || recipe.resultCount() <= 0)
+        if (recipe == null || recipe.inputs().isEmpty() || recipe.resultCount() <= 0 || recipeHasDyeOrBoneMeal(recipe))
         {
             out.merge(itemId, amount, Integer::sum);
             stack.remove(itemId);
@@ -267,5 +278,39 @@ public final class IngredientBomExpand
             expandOne(input.getKey(), input.getValue() * batches, recipes, out, stack);
         }
         stack.remove(itemId);
+    }
+
+    private static boolean isTerminalBuildingRaw(@NotNull final String itemId)
+    {
+        final Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(itemId));
+        if (item == null || item == Items.AIR)
+        {
+            return true;
+        }
+        if (item == Items.BONE_MEAL || item instanceof DyeItem)
+        {
+            return true;
+        }
+        final ItemStack stack = new ItemStack(item);
+        return stack.is(Tags.Items.DYES) || stack.is(ItemTags.WOOL) || stack.is(ItemTags.TERRACOTTA);
+    }
+
+    private static boolean recipeHasDyeOrBoneMeal(@NotNull final RecipeInputs recipe)
+    {
+        for (final Map.Entry<String, Integer> input : recipe.inputs())
+        {
+            // Only treat dye/bone-meal inputs as blocking reverse-expand; wool/terracotta as
+            // *inputs* of a recipe are fine to refuse expansion of the *result*.
+            final Item item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(input.getKey()));
+            if (item == null || item == Items.AIR)
+            {
+                continue;
+            }
+            if (item == Items.BONE_MEAL || item instanceof DyeItem || new ItemStack(item).is(Tags.Items.DYES))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

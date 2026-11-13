@@ -636,18 +636,15 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
               building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
             if (resModule != null)
             {
-                // Menu complete → convert/grant; do not invent raw waits.
+                // Menu complete → convert once; already-granted stays quiet (QD-121).
                 if (resModule.describeMissingRaws(worker.getCitizenData()).isEmpty())
                 {
-                    if (resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
+                    if (!resModule.isFinishedConverted()
+                          && resModule.tryConvertRawsToFinishedCredit(worker.getCitizenData()))
                     {
                         wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
                     }
-                    else if (resModule.isFinishedConverted())
-                    {
-                        wallChat("wait-raws", Component.literal("granting finished placeables from deposits."));
-                    }
-                    // else: menu empty / nothing missing — stay quiet (QD-119 sync)
+                    // else already converted / nothing to say — continue BUILDING_STEP
                 }
                 else
                 {
@@ -1469,6 +1466,14 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 return FAIL;
             }
 
+            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
+              placer.building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            // QD-120/121: after one-shot grant, never open new raw requests / top-ups mid-build.
+            if (resModule != null && resModule.isFinishedConverted())
+            {
+                return FAIL;
+            }
+
             // Request RAW only (BOM). Person+hut already holding raws → no new request.
             final java.util.List<ItemStack> toRequest = convertible
               ? com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(world, stack, want)
@@ -1525,9 +1530,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                       requests.size(), completedRequests.size(), reqStack.getItem(), stack.getItem());
                 }
             }
-            // QD-119: wait chat uses the same shortage list as Required Resources — silent if menu complete.
-            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
-              placer.building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            // QD-119/121: wait chat matches Required Resources; grant chat only on fresh convert.
             String missingRaws = resModule == null ? "" : resModule.describeMissingRaws(citizenData);
             if (missingRaws.isEmpty() && !rawNames.isEmpty())
             {

@@ -31,7 +31,7 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
     private int workOrderId;
 
     /**
-     * Building progress.
+     * Fraction of schematic blocks remaining (0 = done / unknown).
      */
     private double progress;
 
@@ -40,6 +40,12 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
      */
     private int finishedStages = 0;
     private int totalStages    = 1;
+
+    /**
+     * QD-121: schematic placeable counters.
+     */
+    private int schematicBlocksTotal = 0;
+    private int schematicBlocksRemaining = 0;
 
     @Override
     public void deserialize(@NotNull final RegistryFriendlyByteBuf buf)
@@ -62,6 +68,8 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
         progress = buf.readDouble();
         totalStages = buf.readInt();
         finishedStages = buf.readInt();
+        schematicBlocksTotal = buf.readInt();
+        schematicBlocksRemaining = buf.readInt();
     }
 
     /**
@@ -86,12 +94,17 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
     }
 
     /**
-     * Get the building progress (relative to items used)
+     * Get the building progress percent (0–100) from schematic blocks placed.
      *
      * @return the progress.
      */
     public int getProgress()
     {
+        if (schematicBlocksTotal > 0)
+        {
+            final int placed = Math.max(0, schematicBlocksTotal - schematicBlocksRemaining);
+            return Math.min(100, (int) Math.round(100.0 * placed / (double) schematicBlocksTotal));
+        }
         int localProgress = Math.max(100 - (int) (progress * 100), 0);
         if (finishedStages == 0)
         {
@@ -119,6 +132,21 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
     public int getTotalStages()
     {
         return totalStages;
+    }
+
+    public int getSchematicBlocksTotal()
+    {
+        return schematicBlocksTotal;
+    }
+
+    public int getSchematicBlocksRemaining()
+    {
+        return schematicBlocksRemaining;
+    }
+
+    public int getSchematicBlocksPlaced()
+    {
+        return Math.max(0, schematicBlocksTotal - schematicBlocksRemaining);
     }
 
     @OnlyIn(Dist.CLIENT)
