@@ -647,7 +647,22 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             final String needName = required.isEmpty() || ItemStackUtils.isEmpty(required.get(0))
                                       ? "materials"
                                       : required.get(0).getHoverName().getString() + " x" + required.get(0).getCount();
-            wallChat("missing", Component.literal("need " + needName + " — requesting / crafting."));
+            // QD-112: name raw BOM when convertible so chat matches Required Resources (not oak planks).
+            String chatNeed = needName;
+            if (!required.isEmpty() && !ItemStackUtils.isEmpty(required.get(0)))
+            {
+                final ItemStack first = required.get(0);
+                if (com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(worker.level(), first))
+                {
+                    final java.util.List<ItemStack> raws =
+                      com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(worker.level(), first, Math.max(1, first.getCount()));
+                    if (!raws.isEmpty() && !ItemStackUtils.compareItemStacksIgnoreStackSize(raws.get(0), first, true, false))
+                    {
+                        chatNeed = raws.get(0).getHoverName().getString() + " (craft " + first.getHoverName().getString() + ")";
+                    }
+                }
+            }
+            wallChat("missing", Component.literal("need " + chatNeed + " — crafting in inventory."));
             setDelay(20);
             return BUILDING_STEP;
         }
@@ -1321,15 +1336,27 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
         }
 
         final net.minecraft.world.level.Level world = placer.getWorker().level();
-        for (final ItemStorage stack : requestedMap.keySet())
+        for (final ItemStorage stack : new HashSet<>(requestedMap.keySet()))
         {
             final ItemStack need = stack.getItemStack();
             final int want = Math.max(1, stack.getAmount());
             final Predicate<ItemStack> match =
               candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
+            final boolean convertible =
+              com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(world, need);
+            final java.util.List<ItemStack> raws =
+              convertible
+                ? com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(world, need, want)
+                : java.util.List.of();
+
+            // QD-112: cancel any open delivery requests for convertible finished products (oak planks, framed…).
+            if (convertible)
+            {
+                cancelFinishedConvertibleRequests(placer, need);
+            }
 
             if (InventoryUtils.hasItemInItemHandler(placer.getInventory(), match)
-                  || placer.building.hasResourceInBucket(need))
+                  || (!convertible && placer.building.hasResourceInBucket(need)))
             {
                 continue;
             }
@@ -1342,21 +1369,19 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 continue;
             }
 
-            // QD-103: pull raw ingredients (logs / Domum components), craft in builder inv.
-            final java.util.List<ItemStack> raws =
-              com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(world, need, want);
-            final boolean convertible =
-              com.minecolonies.core.util.BuilderInventoryCraft.isConvertible(world, need);
+            // QD-103/112: pull raw ingredients (logs / Domum components), craft in builder inv.
             for (final ItemStack raw : raws)
             {
                 final Predicate<ItemStack> rawMatch =
                   candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(raw, candidate, true, false);
+                // Pull enough for craft yield (e.g. 1 log → 4 planks covers want=1).
                 pullFromHutIntoWorker(placer, rawMatch, Math.max(1, raw.getCount()));
             }
             if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftInInventory(
               world, placer.getInventory(), need.copyWithCount(want)))
             {
                 Log.getLogger().info("[QuidomsBuilder] hasList crafted {} x{} in-inv", need.getItem(), want);
+                requestedMap.remove(stack);
                 continue;
             }
 
@@ -1394,11 +1419,12 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
               world, placer.getInventory(), need.copyWithCount(want)))
             {
                 Log.getLogger().info("[QuidomsBuilder] hasList crafted after provision {} x{}", need.getItem(), want);
+                requestedMap.remove(stack);
                 continue;
             }
 
             if (InventoryUtils.hasItemInItemHandler(placer.getInventory(), match)
-                  || placer.building.hasResourceInBucket(need))
+                  || (!convertible && placer.building.hasResourceInBucket(need)))
             {
                 continue;
             }
@@ -1485,25 +1511,41 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             final Predicate<ItemStack> match =
               candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, candidate, true, false);
 
+            final boolean convertible =
+              com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(world, stack);
+
+            // QD-112: never open a delivery request for convertible finished products (oak planks / framed).
+            if (convertible)
+            {
+                cancelFinishedConvertibleRequests(placer, stack);
+            }
+
             // Hut already has finished product — gather, do not open a courier request.
-            if (countInHut(placer.building, match) > 0 || placer.building.hasResourceInBucket(stack))
+            if (countInHut(placer.building, match) > 0 || (!convertible && placer.building.hasResourceInBucket(stack)))
             {
                 return FAIL;
             }
 
-            // QD-103: request RAW ingredients only when the finished stack is convertible
-            // (oak planks → logs, Domum framed → texture components). Never request framed products.
-            final boolean convertible =
-              com.minecolonies.core.util.BuilderInventoryCraft.isConvertible(world, stack);
+            // Request RAW only (BOM). If hut/bucket already holds raws, gather/craft — no new request.
             final java.util.List<ItemStack> toRequest = convertible
               ? com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(world, stack, want)
               : java.util.List.of(stack.copyWithCount(want));
 
+            // If expansion somehow returned the finished id, still refuse to request it when convertible.
             boolean filedAny = false;
+            String rawNames = "";
             for (final ItemStack reqStack : toRequest)
             {
                 if (ItemStackUtils.isEmpty(reqStack))
                 {
+                    continue;
+                }
+                if (convertible && ItemStackUtils.compareItemStacksIgnoreStackSize(reqStack, stack, true, false))
+                {
+                    // Expansion failed to produce distinct raws — do not request the finished product.
+                    Log.getLogger().info(
+                      "[QuidomsBuilder] skip finished request for convertible {} (no distinct raw BOM)",
+                      stack.getItem());
                     continue;
                 }
                 final Predicate<ItemStack> rawMatch =
@@ -1529,6 +1571,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                     placer.getWorker().getCitizenData().createRequestAsync(stackRequest);
                     placer.registerBlockAsNeeded(reqStack);
                     filedAny = true;
+                    rawNames = rawNames.isEmpty() ? reqStack.getHoverName().getString()
+                                 : rawNames + ", " + reqStack.getHoverName().getString();
                     Log.getLogger().info(
                       "[QuidomsBuilder] createRequestAsync raw={} count={} forFinished={} citizen={}",
                       reqStack.getItem(), stackRequest.getCount(), stack.getItem(), citizenData.getName());
@@ -1541,14 +1585,54 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                       requests.size(), completedRequests.size(), reqStack.getItem(), stack.getItem());
                 }
             }
-            if (filedAny && convertible)
+            if (convertible)
             {
-                placer.wallChat("craft-raw",
-                  Component.literal("need raw for " + stack.getHoverName().getString() + " — requesting / crafting in inventory."));
+                if (filedAny)
+                {
+                    placer.wallChat("craft-raw",
+                      Component.literal("need " + rawNames + " to craft " + stack.getHoverName().getString() + " in inventory."));
+                }
+                else
+                {
+                    placer.wallChat("craft-inv",
+                      Component.literal("crafting " + stack.getHoverName().getString() + " from hut stock."));
+                }
             }
             return FAIL;
         }
         return SUCCESS;
+    }
+
+    /**
+     * QD-112: cancel open/completed-async Stack requests for a convertible finished product
+     * (e.g. oak planks) so the clipboard never asks for craftables covered by the raw BOM.
+     */
+    private static <J extends AbstractJobStructure<?, J>, B extends AbstractBuildingStructureBuilder> void cancelFinishedConvertibleRequests(
+      @NotNull final AbstractEntityAIStructure<J, B> placer,
+      @NotNull final ItemStack finished)
+    {
+        final ICitizenData citizenData = placer.getWorker().getCitizenData();
+        if (citizenData == null || ItemStackUtils.isEmpty(finished))
+        {
+            return;
+        }
+        final int citizenId = citizenData.getId();
+        final List<IRequest<?>> open = new ArrayList<>(placer.building.getOpenRequestsOfCitizenOrBuilding(citizenId,
+          e -> e.getRequest() instanceof IDeliverable deliverable && deliverable.matches(finished)));
+        for (final IRequest<?> request : open)
+        {
+            try
+            {
+                placer.building.getColony().getRequestManager().updateRequestState(request.getId(),
+                  com.minecolonies.api.colony.requestsystem.request.RequestState.CANCELLED);
+                Log.getLogger().info("[QuidomsBuilder] cancelled spurious finished request item={} id={}",
+                  finished.getItem(), request.getId());
+            }
+            catch (final Exception ex)
+            {
+                Log.getLogger().debug("[QuidomsBuilder] cancel finished request failed: {}", ex.toString());
+            }
+        }
     }
 
     /**

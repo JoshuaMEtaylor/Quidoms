@@ -399,61 +399,7 @@ public class CitizenWindowUtils
      */
     public static void updateHappiness(final ICitizenDataView citizen, final AbstractWindowSkeleton window)
     {
-        window.findPaneOfTypeByID("happinessModifier", Text.class).setText(Component.translatableEscape(LABEL_HAPPINESS_MODIFIER));
-        int yPos = 62;
-        for (final String name : citizen.getHappinessHandler().getModifiers())
-        {
-            final double value = citizen.getHappinessHandler().getModifier(name).getFactor(null);
-            if (value == 1.0)
-                continue;
-            final Image image = new Image();
-            image.setSize(11, 11);
-            image.setPosition(45, yPos);
-            window.addChild(image);
-
-            final Text label = new Text();
-            label.setSize(136, 11);
-            label.setPosition(70, yPos);
-            label.setColors(BLACK);
-            label.setText(Component.translatableEscape(PARTIAL_HAPPINESS_MODIFIER_NAME + name));
-            window.addChild(label);
-            PaneBuilders.tooltipBuilder().hoverPane(label).append(Component.translatableEscape(PARTIAL_HAPPINESS_MODIFIER_DESCRIPTION + name)).build();
-
-            if (value > 1.0)
-            {
-                image.setImage(ResourceLocation.parse(HAPPY_ICON), false);
-                PaneBuilders.tooltipBuilder()
-                    .append(Component.translatableEscape(LABEL_HAPPINESS_POSITIVE))
-                    .hoverPane(image)
-                    .build();
-            }
-            else if (value == 1)
-            {
-                image.setImage(ResourceLocation.parse(SATISFIED_ICON), false);
-                PaneBuilders.tooltipBuilder()
-                    .append(Component.translatableEscape(LABEL_HAPPINESS_NEUTRAL))
-                    .hoverPane(image)
-                    .build();
-            }
-            else if (value > 0.75)
-            {
-                image.setImage(ResourceLocation.parse(UNSATISFIED_ICON), false);
-                PaneBuilders.tooltipBuilder()
-                    .append(Component.translatableEscape(LABEL_HAPPINESS_SLIGHTLY_NEGATIVE))
-                    .hoverPane(image)
-                    .build();
-            }
-            else
-            {
-                image.setImage(ResourceLocation.parse(UNHAPPY_ICON), false);
-                PaneBuilders.tooltipBuilder()
-                    .append(Component.translatableEscape(LABEL_HAPPINESS_NEGATIVE))
-                    .hoverPane(image)
-                    .build();
-            }
-
-            yPos += 12;
-        }
+        // QD-113: happiness modifiers UI removed — no-op.
     }
 
     /**

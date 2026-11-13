@@ -87,11 +87,16 @@ public final class BuilderInventoryCraft
         {
             return false;
         }
-        if (DomumOrnamentumUtils.getBlock(stack) != null && !MaterialTextureData.readFromItemStack(stack).isEmpty())
+        // Domum framed / textured blocks are always converted from components in-inv (QD-103/112).
+        if (DomumOrnamentumUtils.getBlock(stack) != null)
         {
             return true;
         }
         final List<ItemStack> raw = expandToRaw(level, stack, Math.max(1, stack.getCount()));
+        if (raw.isEmpty())
+        {
+            return false;
+        }
         if (raw.size() != 1)
         {
             return true;
@@ -100,6 +105,14 @@ public final class BuilderInventoryCraft
         return only.getItem() != stack.getItem()
                  || only.getCount() != Math.max(1, stack.getCount())
                  || !ItemStack.isSameItemSameComponents(only, copyWithCount(stack, only.getCount()));
+    }
+
+    /**
+     * True when this finished stack must never be courier/QuidCraft-requested — only its raw BOM.
+     */
+    public static boolean mustNotRequestFinished(@Nullable final Level level, @NotNull final ItemStack stack)
+    {
+        return isConvertible(level, stack);
     }
 
     /**
@@ -150,28 +163,28 @@ public final class BuilderInventoryCraft
             return out;
         }
         final MaterialTextureData data = MaterialTextureData.readFromItemStack(stack);
-        if (data.isEmpty())
-        {
-            return out;
-        }
 
-        // Prefer declared component order; fall back to texture map values.
+        // Prefer texture data; fall back to component defaults so Framed White never stays as a request id (QD-112).
         boolean any = false;
         for (final IMateriallyTexturedBlockComponent component : doBlock.getComponents())
         {
-            final Block block = data.getTexturedComponents().get(component.getId());
+            Block block = data.isEmpty() ? null : data.getTexturedComponents().get(component.getId());
             if (block == null || block == Blocks.AIR)
             {
-                if (component.isOptional())
-                {
-                    continue;
-                }
+                block = component.getDefault();
+            }
+            if (block == null || block == Blocks.AIR)
+            {
+                continue;
+            }
+            if (component.isOptional() && (data.isEmpty() || !data.getTexturedComponents().containsKey(component.getId())))
+            {
                 continue;
             }
             out.add(new ItemStack(block, amount));
             any = true;
         }
-        if (!any)
+        if (!any && !data.isEmpty())
         {
             for (final Block block : data.getTexturedComponents().values())
             {
@@ -308,11 +321,8 @@ public final class BuilderInventoryCraft
     private static CraftRecipe findCraftingRecipe(@NotNull final ServerLevel level, @NotNull final Item resultItem)
     {
         final RecipeManager recipes = level.getServer().getRecipeManager();
-        final ResourceLocation wantId = BuiltInRegistries.ITEM.getKey(resultItem);
-        if (wantId == null)
-        {
-            return null;
-        }
+        CraftRecipe best = null;
+        int bestScore = Integer.MAX_VALUE;
         for (final RecipeHolder<CraftingRecipe> holder : RecipeCompat.getAllRecipesFor(recipes, RecipeType.CRAFTING))
         {
             final CraftingRecipe crafting = holder.value();
@@ -335,10 +345,15 @@ public final class BuilderInventoryCraft
             {
                 continue;
             }
-            // Prefer single-ingredient recipes (log→planks) over multi-ingredient.
-            return new CraftRecipe(Math.max(1, result.getCount()), inputs);
+            // Prefer fewest inputs then highest output (log→4 planks beats multi-ingredient crafts).
+            final int score = inputs.values().stream().mapToInt(Integer::intValue).sum() * 100 - Math.max(1, result.getCount());
+            if (score < bestScore)
+            {
+                bestScore = score;
+                best = new CraftRecipe(Math.max(1, result.getCount()), inputs);
+            }
         }
-        return null;
+        return best;
     }
 
     @NotNull
