@@ -1,0 +1,185 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="GPL-3.0-or-later"
+issueTrackerURL="https://github.com/JoshuaMEtaylor/Quidoms/issues"
+
+[[mods]]
+modId="minecolonies"
+version="0.0.31-1.21.10"
+displayName="Quidoms"
+displayURL="https://github.com/JoshuaMEtaylor/Quidoms"
+logoFile="minecolonies_logo.png"
+credits="Based on MineColonies by LDT Team (GPL-3.0). Quidoms fork changes: no raids, unbreakable any-tier citizen tools, ingredient BOM builds. Vendors Structurize/BlockUI/Domum/MultiPiston."
+authors="JoshuaMEtaylor; LDT Team (upstream MineColonies)"
+description='''
+Quidoms is a kingdom simulator for NeoForge based on the full MineColonies codebase (LDT Team, GPL-3.0).
+
+Quidoms product changes on top of upstream:
+- Raids removed (never scheduled).
+- Citizen tools are unbreakable and ignore hut/citizen tool-level gates (player-equivalent stats/enchants kept).
+- Building material lists expand to recursive crafting ingredients where recipes allow.
+
+LDT libraries (Structurize, BlockUI, Domum Ornamentum, MultiPiston) are baked into this jar (compiled for NeoForge 1.21.10).
+'''
+
+[[mods]]
+modId="blockui"
+version="1.0.212-1.21.10"
+displayName="BlockUI"
+authors="LDT Team"
+description="BlockUI library (vendored into Quidoms for 1.21.10)."
+
+[[mods]]
+modId="structurize"
+version="1.0.832-1.21.10"
+displayName="Structurize"
+authors="LDT Team"
+description="Structurize library (vendored into Quidoms for 1.21.10)."
+
+[[mods]]
+modId="domum_ornamentum"
+version="1.21.10-1.0.193"
+displayName="Domum Ornamentum"
+authors="LDT Team"
+description="Domum Ornamentum library (vendored into Quidoms for 1.21.10)."
+
+[[mods]]
+modId="multipiston"
+version="1.2.58-1.21.10"
+displayName="Multi-Piston"
+authors="LDT Team"
+description="Multi-Piston library (vendored into Quidoms for 1.21.10)."
+
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
+[[dependencies.minecolonies]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.10.0, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.10,1.22)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="structurize"
+    type="required"
+    versionRange="[1.0.832-1.21.10, )"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="blockui"
+    type="required"
+    versionRange="[1.0.212-1.21.10, )"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="domum_ornamentum"
+    type="required"
+    versionRange="[1.21.10-1.0.193, )"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="multipiston"
+    type="required"
+    versionRange="[1.2.58-1.21.10, )"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="jei"
+    type="optional"
+    versionRange="[19.19.6.235,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="journeymap"
+    type="optional"
+    versionRange="[1.21.1-6.0.0-beta.29,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="dynamictrees"
+    type="optional"
+    versionRange="[1.5.0-BETA07,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.minecolonies]]
+    modId="quidcraft"
+    type="optional"
+    versionRange="[1.0.9,1.1.0)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.structurize]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.10.0, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.structurize]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.10,1.22)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.structurize]]
+    modId="blockui"
+    type="required"
+    versionRange="[1.0.212-1.21.10, )"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.structurize]]
+    modId="domum_ornamentum"
+    type="required"
+    versionRange="[1.21.10-1.0.193, )"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.blockui]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.10.0, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.blockui]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.10,1.22)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.domum_ornamentum]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.10.0, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.domum_ornamentum]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.10,1.22)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.multipiston]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.10.0, )"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.multipiston]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.10,1.22)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.multipiston]]
+    modId="blockui"
+    type="required"
+    versionRange="[1.0.212-1.21.10, )"
+    ordering="AFTER"
+    side="BOTH"
