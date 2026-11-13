@@ -31,6 +31,7 @@ import com.minecolonies.core.colony.workorders.WorkOrderMiner;
 import com.minecolonies.core.entity.ai.workers.util.BuildingProgressStage;
 import com.minecolonies.core.entity.ai.workers.util.WorkerLoadOnlyStructureHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
@@ -239,6 +240,13 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         {
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
               building, citizenName, worker.getCitizenData());
+            // QD-116: as soon as hut raws cover the BOM, convert to finished credit.
+            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
+              building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            if (resModule != null && resModule.tryConvertRawsToFinishedCredit())
+            {
+                wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
+            }
             recalculated = true;
             return;
         }
@@ -248,6 +256,12 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
               building, citizenName, worker.getCitizenData());
             building.getWorkOrder().setRequested(true);
+            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
+              building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            if (resModule != null && resModule.tryConvertRawsToFinishedCredit())
+            {
+                wallChat("grant", Component.literal("raw deposits complete — granting finished placeables."));
+            }
         }
         int newQuantity = buildingWorker.getNeededResources().values().stream().mapToInt(ItemStorage::getAmount).sum();
         if (building.getWorkOrder().getAmountOfResources() == 0 || newQuantity > building.getWorkOrder().getAmountOfResources())

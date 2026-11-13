@@ -253,24 +253,15 @@ public class BuildingStructureHandler<J extends AbstractJobStructure<?, J>, B ex
             itemList.add(stack);
         }
 
-        // QD-114: craft convertibles from hut+person raws before the place check succeeds.
-        final net.neoforged.neoforge.items.IItemHandler hutCap = structureAI.building.getItemHandlerCap();
+        // QD-116: grant finished from raw-deposit credit before place (no runtime craft).
         for (final ItemStack need : itemList)
         {
             if (com.minecolonies.api.util.ItemStackUtils.isEmpty(need))
             {
                 continue;
             }
-            if (!com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(
-              structureAI.getWorker().level(), need))
-            {
-                continue;
-            }
-            com.minecolonies.core.util.BuilderInventoryCraft.tryCraftForBuilder(
-              structureAI.getWorker().level(),
-              this.getInventory(),
-              hutCap,
-              need.copy());
+            com.minecolonies.core.util.BuilderFinishedGrant.ensureFinishedInPerson(
+              structureAI.building, structureAI.getWorker().getCitizenData(), need.copy());
         }
 
         return AbstractEntityAIStructure.hasListOfResInInvOrRequest(structureAI, itemList, itemList.size() > 1) == AbstractEntityAIStructure.ItemCheckResult.SUCCESS;

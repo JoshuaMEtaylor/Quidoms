@@ -543,59 +543,31 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             final String citizenName = worker.getCitizenData() == null ? "" : worker.getCitizenData().getName();
             com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryProvisionNeededResources(
               building, citizenName, worker.getCitizenData());
-            for (final ItemStack need : required)
-            {
-                if (!ItemStackUtils.isEmpty(need))
-                {
-                    com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
-                      building, need, Math.max(1, need.getCount()), false, citizenName, worker.getCitizenData());
-                    final Predicate<ItemStack> match =
-                      candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
-                    pullFromHutIntoWorker(this, match, Math.max(1, need.getCount()));
-                }
-            }
-
-            // QD-114: craft convertibles from hut+person raws BEFORE gather/request/place retry.
-            boolean craftedAny = false;
-            final net.neoforged.neoforge.items.IItemHandler hutCap = building.getItemHandlerCap();
+            // QD-116: provision/buy RAWS only; grant finished from credit after raw deposit — no craft.
             for (final ItemStack need : required)
             {
                 if (ItemStackUtils.isEmpty(need))
                 {
                     continue;
                 }
-                if (!com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(worker.level(), need))
+                final boolean convertible =
+                  com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(worker.level(), need);
+                if (convertible)
                 {
-                    continue;
-                }
-                final Predicate<ItemStack> already =
-                  candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(need, candidate, true, false);
-                if (InventoryUtils.getItemCountInItemHandler(getInventory(), already) >= Math.max(1, need.getCount()))
-                {
-                    continue;
-                }
-                wallChat("craft-try",
-                  Component.literal("crafting " + need.getHoverName().getString() + " from hut/person raws."));
-                if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftForBuilder(
-                  worker.level(), getInventory(), hutCap, need.copy()))
-                {
-                    craftedAny = true;
-                    Log.getLogger().info("[QuidomsBuilder] MISSING_ITEMS crafted {} before place", need.getItem());
+                    for (final ItemStack raw : com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
+                      worker.level(), need, Math.max(1, need.getCount())))
+                    {
+                        com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+                          building, raw, Math.max(1, raw.getCount()), false, citizenName, worker.getCitizenData());
+                    }
                 }
                 else
                 {
-                    wallChat("craft-miss",
-                      Component.literal("still missing raws for " + need.getHoverName().getString() + " after craft attempt."));
+                    com.minecolonies.core.compatibility.quidcraft.QuidCraftMarketBridge.tryBuyForBuilding(
+                      building, need, Math.max(1, need.getCount()), false, citizenName, worker.getCitizenData());
                 }
-            }
-            if (craftedAny)
-            {
-                final ItemCheckResult afterCraft = hasListOfResInInvOrRequest(this, required, required.size() > 1);
-                if (afterCraft == SUCCESS)
-                {
-                    wallChat("craft-ok", Component.literal("crafted materials — placing."));
-                    return BUILDING_STEP;
-                }
+                com.minecolonies.core.util.BuilderFinishedGrant.ensureFinishedInPerson(
+                  building, worker.getCitizenData(), need.copy());
             }
 
             final ItemCheckResult check = hasListOfResInInvOrRequest(this, required, required.size() > 1);
@@ -612,7 +584,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 return BUILDING_STEP;
             }
 
-            // Hut holds finished OR raw ingredients for in-inv craft — walk/gather, never freeze.
+            // Hut holds finished placeables — gather. Raws wait for deposit completeness (QD-116), no craft.
             for (final ItemStack need : required)
             {
                 if (ItemStackUtils.isEmpty(need))
@@ -627,49 +599,33 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 {
                     continue;
                 }
-                ItemStack gatherStack = need;
-                Predicate<ItemStack> gatherMatch = match;
-                int gatherHut = hut;
-                if (gatherHut <= 0 && !building.hasResourceInBucket(need))
-                {
-                    // QD-103: look for raw BOM parts (logs / Domum components) to craft in-inv.
-                    for (final ItemStack raw : com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
-                      worker.level(), need, Math.max(1, need.getCount())))
-                    {
-                        final Predicate<ItemStack> rawMatch =
-                          candidate -> ItemStackUtils.compareItemStacksIgnoreStackSize(raw, candidate, true, false);
-                        final int rawHut = countInHut(building, rawMatch);
-                        if (rawHut > 0 || building.hasResourceInBucket(raw))
-                        {
-                            gatherStack = raw;
-                            gatherMatch = rawMatch;
-                            gatherHut = Math.max(rawHut, 1);
-                            break;
-                        }
-                    }
-                }
-                if (gatherHut > 0 || building.hasResourceInBucket(gatherStack))
+                if (hut > 0 || building.hasResourceInBucket(need))
                 {
                     Log.getLogger().info(
-                      "[QuidomsBuilder] MISSING_ITEMS hut-has stock person={} hut={} item={} (for {}) → GATHER",
-                      person, gatherHut, gatherStack.getItem(), need.getItem());
+                      "[QuidomsBuilder] MISSING_ITEMS hut-has finished person={} hut={} item={} → GATHER",
+                      person, hut, need.getItem());
                     wallChat("gather",
-                      Component.literal("picking up " + gatherStack.getHoverName().getString()
-                        + (gatherStack.getItem() == need.getItem() ? "" : " to craft " + need.getHoverName().getString())
-                        + " from the hut."));
+                      Component.literal("picking up " + need.getHoverName().getString() + " from the hut."));
                     if (!worker.getInventoryCitizen().hasSpace())
                     {
                         wallChat("inv-full", Component.literal("inventory full — dumping before pickup."));
                         return INVENTORY_FULL;
                     }
-                    needsCurrently = new Tuple<>(gatherMatch, Math.max(1, gatherStack.getCount()));
-                    if (InventoryUtils.hasItemInProvider(building.getTileEntity(), gatherMatch)
-                          || gatherHut > 0)
+                    needsCurrently = new Tuple<>(match, Math.max(1, need.getCount()));
+                    if (InventoryUtils.hasItemInProvider(building.getTileEntity(), match) || hut > 0)
                     {
                         return GATHERING_REQUIRED_MATERIALS;
                     }
                     return PICK_UP;
                 }
+            }
+
+            final com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule resModule =
+              building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class);
+            if (resModule != null && !resModule.isFinishedConverted())
+            {
+                wallChat("wait-raws",
+                  Component.literal("waiting for raw material deposits — will convert to placeables when complete."));
             }
 
             // QD-102: never LOAD_STRUCTURE on RECALC — that looped forever after QuidCraft provisioned
@@ -690,22 +646,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             final String needName = required.isEmpty() || ItemStackUtils.isEmpty(required.get(0))
                                       ? "materials"
                                       : required.get(0).getHoverName().getString() + " x" + required.get(0).getCount();
-            // QD-112: name raw BOM when convertible so chat matches Required Resources (not oak planks).
-            String chatNeed = needName;
-            if (!required.isEmpty() && !ItemStackUtils.isEmpty(required.get(0)))
-            {
-                final ItemStack first = required.get(0);
-                if (com.minecolonies.core.util.BuilderInventoryCraft.mustNotRequestFinished(worker.level(), first))
-                {
-                    final java.util.List<ItemStack> raws =
-                      com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(worker.level(), first, Math.max(1, first.getCount()));
-                    if (!raws.isEmpty() && !ItemStackUtils.compareItemStacksIgnoreStackSize(raws.get(0), first, true, false))
-                    {
-                        chatNeed = raws.get(0).getHoverName().getString() + " (craft " + first.getHoverName().getString() + ")";
-                    }
-                }
-            }
-            wallChat("missing", Component.literal("need " + chatNeed + " — crafting in inventory."));
+            wallChat("missing", Component.literal("need " + needName + " — waiting for raw deposits / grant."));
             setDelay(20);
             return BUILDING_STEP;
         }
@@ -1412,22 +1353,7 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 continue;
             }
 
-            // QD-114: craft-before-place — pull raws from hut+person, craft finished into person inv.
-            final net.neoforged.neoforge.items.IItemHandler hutCap = placer.building.getItemHandlerCap();
-            if (convertible)
-            {
-                placer.wallChat("craft-try",
-                  Component.literal("crafting " + need.getHoverName().getString() + " from raws before place."));
-            }
-            if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftForBuilder(
-              world, placer.getInventory(), hutCap, need.copyWithCount(want)))
-            {
-                Log.getLogger().info("[QuidomsBuilder] hasList crafted {} x{} before place", need.getItem(), want);
-                requestedMap.remove(stack);
-                continue;
-            }
-
-            // Market-provision RAW (never framed / convertible finished), then craft again.
+            // QD-116: convert raw deposits → finished credit, inject into person (no runtime craft).
             final String citizenName = placer.getWorker().getCitizenData() == null ? "" : placer.getWorker().getCitizenData().getName();
             if (convertible)
             {
@@ -1454,10 +1380,10 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                 pullFromHutIntoWorker(placer, match, want);
             }
 
-            if (com.minecolonies.core.util.BuilderInventoryCraft.tryCraftForBuilder(
-              world, placer.getInventory(), hutCap, need.copyWithCount(want)))
+            if (com.minecolonies.core.util.BuilderFinishedGrant.ensureFinishedInPerson(
+              placer.building, placer.getWorker().getCitizenData(), need.copyWithCount(want)))
             {
-                Log.getLogger().info("[QuidomsBuilder] hasList crafted after provision {} x{}", need.getItem(), want);
+                Log.getLogger().info("[QuidomsBuilder] hasList granted finished {} x{}", need.getItem(), want);
                 requestedMap.remove(stack);
                 continue;
             }
@@ -1628,13 +1554,13 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
             {
                 if (filedAny)
                 {
-                    placer.wallChat("craft-raw",
-                      Component.literal("need " + rawNames + " to craft " + stack.getHoverName().getString() + " in inventory."));
+                    placer.wallChat("need-raw",
+                      Component.literal("need " + rawNames + " deposited (for " + stack.getHoverName().getString() + ")."));
                 }
                 else
                 {
-                    placer.wallChat("craft-inv",
-                      Component.literal("crafting " + stack.getHoverName().getString() + " from hut stock."));
+                    placer.wallChat("wait-raws",
+                      Component.literal("waiting for raw deposits before granting " + stack.getHoverName().getString() + "."));
                 }
             }
             return FAIL;

@@ -14,6 +14,7 @@ import com.minecolonies.api.crafting.ItemStorage;
 import com.minecolonies.api.inventory.InventoryCitizen;
 import com.minecolonies.api.util.InventoryUtils;
 import com.minecolonies.api.util.ItemStackUtils;
+import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.Utils;
 import com.minecolonies.core.colony.buildings.AbstractBuildingStructureBuilder;
 import com.minecolonies.core.colony.buildings.utils.BuilderBucket;
@@ -22,8 +23,11 @@ import com.minecolonies.core.colony.jobs.AbstractJobStructure;
 import com.minecolonies.core.entity.ai.workers.util.BuildingProgressStage;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,10 +42,31 @@ import static com.minecolonies.api.util.constant.NbtTagConstants.TAG_TOTAL_STAGE
  */
 public class BuildingResourcesModule extends AbstractBuildingModule implements IPersistentModule
 {
+    private static final String TAG_FINISHED_CONVERTED = "quidFinishedConverted";
+    private static final String TAG_FINISHED_PLACEABLES = "quidFinishedPlaceables";
+    private static final String TAG_FINISHED_CREDIT = "quidFinishedCredit";
+    private static final String TAG_STACK = "stack";
+    private static final String TAG_AMOUNT = "amount";
+
     /**
-     * Contains all resources needed for a certain build.
+     * Contains all resources needed for a certain build (player-facing raw BOM).
      */
     private Map<String, BuildingBuilderResource> neededResources = new LinkedHashMap<>();
+
+    /**
+     * Exact finished placeables scanned from the schematic (QD-116).
+     */
+    private Map<String, BuildingBuilderResource> finishedPlaceables = new LinkedHashMap<>();
+
+    /**
+     * Remaining finished stacks to inject after raws were consumed (QD-116).
+     */
+    private Map<String, BuildingBuilderResource> finishedCredit = new LinkedHashMap<>();
+
+    /**
+     * True after hut raws were consumed and finished credit opened.
+     */
+    private boolean finishedConverted = false;
 
     /**
      * The different possible buckets.
@@ -59,6 +84,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         currentStage = compound.getIntOr(TAG_CURR_STAGE, 0);
         totalStages = compound.getIntOr(TAG_TOTAL_STAGES, 0);
+        finishedConverted = compound.getBooleanOr(TAG_FINISHED_CONVERTED, false);
+        finishedPlaceables = readResourceMap(provider, compound, TAG_FINISHED_PLACEABLES);
+        finishedCredit = readResourceMap(provider, compound, TAG_FINISHED_CREDIT);
     }
 
     @Override
@@ -66,6 +94,51 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         compound.putInt(TAG_TOTAL_STAGES, totalStages);
         compound.putInt(TAG_CURR_STAGE, currentStage);
+        compound.putBoolean(TAG_FINISHED_CONVERTED, finishedConverted);
+        writeResourceMap(provider, compound, TAG_FINISHED_PLACEABLES, finishedPlaceables);
+        writeResourceMap(provider, compound, TAG_FINISHED_CREDIT, finishedCredit);
+    }
+
+    @NotNull
+    private static Map<String, BuildingBuilderResource> readResourceMap(
+      @NotNull final HolderLookup.Provider provider,
+      @NotNull final CompoundTag compound,
+      @NotNull final String key)
+    {
+        final Map<String, BuildingBuilderResource> map = new LinkedHashMap<>();
+        final ListTag list = compound.getListOrEmpty(key);
+        for (int i = 0; i < list.size(); i++)
+        {
+            final CompoundTag entry = list.getCompoundOrEmpty(i);
+            final ItemStack stack = ItemStackUtils.parseOptional(provider, entry.getCompoundOrEmpty(TAG_STACK));
+            final int amount = entry.getIntOr(TAG_AMOUNT, 0);
+            if (ItemStackUtils.isEmpty(stack) || amount <= 0)
+            {
+                continue;
+            }
+            final ItemStack keyStack = stack.copy();
+            keyStack.setCount(1);
+            final String mapKey = keyStack.getItem().getDescriptionId() + "-" + keyStack.getComponentsPatch().hashCode();
+            map.put(mapKey, new BuildingBuilderResource(keyStack, amount));
+        }
+        return map;
+    }
+
+    private static void writeResourceMap(
+      @NotNull final HolderLookup.Provider provider,
+      @NotNull final CompoundTag compound,
+      @NotNull final String key,
+      @NotNull final Map<String, BuildingBuilderResource> map)
+    {
+        final ListTag list = new ListTag();
+        for (final BuildingBuilderResource resource : map.values())
+        {
+            final CompoundTag entry = new CompoundTag();
+            entry.put(TAG_STACK, ItemStackUtils.saveOptional(resource.getItemStack().copyWithCount(1), provider));
+            entry.putInt(TAG_AMOUNT, resource.getAmount());
+            list.add(entry);
+        }
+        compound.put(key, list);
     }
 
     /**
@@ -209,6 +282,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             return;
         }
 
+        // QD-116: keep exact finished placeables separately from the player-facing raw BOM.
+        addFinishedPlaceable(res, amount);
+
         // Quidoms QD-103: Domum framed → texture components, then crafting BOM (planks→logs).
         // Required list / QuidCraft / courier see raw only — never framed products.
         final java.util.List<ItemStack> expanded = com.minecolonies.core.util.BuilderInventoryCraft.expandToRaw(
@@ -216,6 +292,180 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
         for (final ItemStack part : expanded)
         {
             addNeededResourceRaw(part, part.getCount());
+        }
+    }
+
+    private void addFinishedPlaceable(@NotNull final ItemStack res, final int amount)
+    {
+        final ItemStack keyStack = res.copy();
+        keyStack.setCount(1);
+        final int hashCode = keyStack.getComponentsPatch().hashCode();
+        final String key = keyStack.getItem().getDescriptionId() + "-" + hashCode;
+        BuildingBuilderResource resource = this.finishedPlaceables.get(key);
+        if (resource == null)
+        {
+            resource = new BuildingBuilderResource(keyStack, amount);
+        }
+        else
+        {
+            resource.setAmount(resource.getAmount() + amount);
+        }
+        this.finishedPlaceables.put(key, resource);
+    }
+
+    public boolean isFinishedConverted()
+    {
+        return finishedConverted;
+    }
+
+    @NotNull
+    public Map<String, BuildingBuilderResource> getFinishedPlaceables()
+    {
+        return Collections.unmodifiableMap(finishedPlaceables);
+    }
+
+    /**
+     * Hut TE+racks hold enough of every raw BOM entry.
+     */
+    public boolean areRawsFullyDeposited()
+    {
+        if (neededResources.isEmpty())
+        {
+            return finishedConverted;
+        }
+        final IItemHandler hut = building.getItemHandlerCap();
+        if (hut == null)
+        {
+            return false;
+        }
+        for (final BuildingBuilderResource resource : neededResources.values())
+        {
+            final Predicate<ItemStack> match =
+              stack -> ItemStackUtils.compareItemStacksIgnoreStackSize(stack, resource.getItemStack(), true, false);
+            if (InventoryUtils.getItemCountInItemHandler(hut, match) < resource.getAmount())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * QD-116: when hut raws cover the full BOM, consume them and open finished credit (no crafting).
+     *
+     * @return true if already converted or conversion succeeded this call.
+     */
+    public boolean tryConvertRawsToFinishedCredit()
+    {
+        if (finishedConverted)
+        {
+            return true;
+        }
+        if (finishedPlaceables.isEmpty())
+        {
+            return false;
+        }
+        if (!areRawsFullyDeposited())
+        {
+            return false;
+        }
+
+        final IItemHandler hut = building.getItemHandlerCap();
+        if (hut == null)
+        {
+            return false;
+        }
+
+        // Consume exact raw quantities from hut TE+racks.
+        for (final BuildingBuilderResource resource : neededResources.values())
+        {
+            final ItemStack consume = resource.getItemStack().copy();
+            consume.setCount(resource.getAmount());
+            if (!InventoryUtils.attemptReduceStackInItemHandler(hut, consume, resource.getAmount(), true, true))
+            {
+                Log.getLogger().warn("[QuidomsBuilder] raw consume failed for {} x{} — abort convert",
+                  consume.getItem(), resource.getAmount());
+                return false;
+            }
+        }
+
+        finishedCredit = new LinkedHashMap<>();
+        for (final Map.Entry<String, BuildingBuilderResource> entry : finishedPlaceables.entrySet())
+        {
+            finishedCredit.put(entry.getKey(),
+              new BuildingBuilderResource(entry.getValue().getItemStack().copyWithCount(1), entry.getValue().getAmount()));
+        }
+        finishedConverted = true;
+        // Player deposit list is satisfied — stop further raw requests / bucket chasing.
+        neededResources = new LinkedHashMap<>();
+        buckets.clear();
+        this.markDirty();
+        Log.getLogger().info("[QuidomsBuilder] converted hut raws → finished credit ({} kinds)", finishedCredit.size());
+        return true;
+    }
+
+    /**
+     * Take up to {@code amount} matching finished stacks from the credit pool.
+     *
+     * @return count actually taken.
+     */
+    public int takeFinishedCredit(@NotNull final ItemStack need, final int amount)
+    {
+        if (!finishedConverted || amount <= 0 || ItemStackUtils.isEmpty(need))
+        {
+            return 0;
+        }
+        final ItemStack keyStack = need.copyWithCount(1);
+        final String key = keyStack.getItem().getDescriptionId() + "-" + keyStack.getComponentsPatch().hashCode();
+        BuildingBuilderResource resource = finishedCredit.get(key);
+        if (resource == null)
+        {
+            // Ignore NBT mismatches for vanilla stairs/planks — match by item only.
+            for (final Map.Entry<String, BuildingBuilderResource> entry : finishedCredit.entrySet())
+            {
+                if (ItemStackUtils.compareItemStacksIgnoreStackSize(entry.getValue().getItemStack(), need, true, false))
+                {
+                    resource = entry.getValue();
+                    break;
+                }
+            }
+        }
+        if (resource == null || resource.getAmount() <= 0)
+        {
+            return 0;
+        }
+        final int take = Math.min(amount, resource.getAmount());
+        resource.setAmount(resource.getAmount() - take);
+        finishedCredit.entrySet().removeIf(e -> e.getValue().getAmount() <= 0);
+        this.markDirty();
+        return take;
+    }
+
+    public void returnFinishedCredit(@NotNull final ItemStack stack)
+    {
+        if (ItemStackUtils.isEmpty(stack) || !finishedConverted)
+        {
+            return;
+        }
+        addToMap(finishedCredit, stack, stack.getCount());
+        this.markDirty();
+    }
+
+    private static void addToMap(
+      @NotNull final Map<String, BuildingBuilderResource> map,
+      @NotNull final ItemStack res,
+      final int amount)
+    {
+        final ItemStack keyStack = res.copyWithCount(1);
+        final String key = keyStack.getItem().getDescriptionId() + "-" + keyStack.getComponentsPatch().hashCode();
+        BuildingBuilderResource resource = map.get(key);
+        if (resource == null)
+        {
+            map.put(key, new BuildingBuilderResource(keyStack, amount));
+        }
+        else
+        {
+            resource.setAmount(resource.getAmount() + amount);
         }
     }
 
@@ -353,6 +603,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         neededResources = new HashMap<>();
         buckets.clear();
+        finishedPlaceables = new LinkedHashMap<>();
+        finishedCredit = new LinkedHashMap<>();
+        finishedConverted = false;
         this.markDirty();
     }
 
