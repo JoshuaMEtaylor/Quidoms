@@ -2,7 +2,10 @@ package com.minecolonies.core.util;
 
 import com.ldtteam.domumornamentum.block.IMateriallyTexturedBlock;
 import com.ldtteam.domumornamentum.block.IMateriallyTexturedBlockComponent;
+import com.ldtteam.domumornamentum.block.decorative.ExtraBlock;
 import com.ldtteam.domumornamentum.client.model.data.MaterialTextureData;
+import com.ldtteam.domumornamentum.recipe.ModRecipeTypes;
+import com.ldtteam.domumornamentum.recipe.architectscutter.ArchitectsCutterRecipe;
 import com.minecolonies.api.util.IngredientBomExpand;
 import com.minecolonies.api.util.IngredientCompat;
 import com.minecolonies.api.util.InventoryUtils;
@@ -10,6 +13,8 @@ import com.minecolonies.api.util.ItemStackUtils;
 import com.minecolonies.api.util.Log;
 import com.minecolonies.api.util.RecipeCompat;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -24,6 +29,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,8 +51,8 @@ public final class BuilderInventoryCraft
     }
 
     /**
-     * Expand a finished schematic stack into raw requestable stacks (Domum components
-     * then recursive crafting BOM). Identity when nothing expands.
+     * Expand a finished schematic stack into raw requestable stacks (Domum architect-cutter
+     * components / ExtraBlock materials, then recursive crafting BOM). Identity when nothing expands.
      */
     @NotNull
     public static List<ItemStack> expandToRaw(@Nullable final Level level, @NotNull final ItemStack stack, final int amount)
@@ -57,7 +63,12 @@ public final class BuilderInventoryCraft
             return out;
         }
 
-        final List<ItemStack> seeds = expandDomumComponents(stack, amount);
+        final List<ItemStack> seeds = new ArrayList<>();
+        if (DomumOrnamentumUtils.getBlock(stack) != null)
+        {
+            // QD-122: architect-cutter components (textures / safe defaults) — never keep finished Domum.
+            seeds.addAll(expandDomumComponents(level, stack, amount));
+        }
         if (seeds.isEmpty())
         {
             seeds.add(copyWithCount(stack, amount));
@@ -66,13 +77,42 @@ public final class BuilderInventoryCraft
         for (final ItemStack seed : seeds)
         {
             final List<ItemStack> bom = IngredientBomExpand.expand(level, seed, seed.getCount());
-            if (bom.isEmpty())
+            final List<ItemStack> parts = bom.isEmpty() ? List.of(seed) : bom;
+            for (final ItemStack part : parts)
             {
-                out.add(seed);
-            }
-            else
-            {
-                out.addAll(bom);
+                if (isExtraBlock(part))
+                {
+                    // Crafting expand may have left ExtraBlock terminal — force material raws.
+                    final List<ItemStack> materials = expandExtraBlockMaterials(part, part.getCount());
+                    if (!materials.isEmpty())
+                    {
+                        for (final ItemStack mat : materials)
+                        {
+                            out.addAll(IngredientBomExpand.expand(level, mat, mat.getCount()));
+                        }
+                        continue;
+                    }
+                }
+                if (!isDomumFinishedOrExtra(part))
+                {
+                    out.add(part);
+                }
+                else if (DomumOrnamentumUtils.getBlock(part) != null)
+                {
+                    // Nested Domum (shouldn't loop forever — components are usually vanilla/Extra).
+                    final List<ItemStack> nested = expandDomumComponents(level, part, part.getCount());
+                    for (final ItemStack n : nested)
+                    {
+                        if (isExtraBlock(n))
+                        {
+                            out.addAll(expandExtraBlockMaterials(n, n.getCount()));
+                        }
+                        else if (!isDomumFinishedOrExtra(n))
+                        {
+                            out.addAll(IngredientBomExpand.expand(level, n, n.getCount()));
+                        }
+                    }
+                }
             }
         }
         return mergeStacks(out);
@@ -88,7 +128,7 @@ public final class BuilderInventoryCraft
         {
             return false;
         }
-        if (DomumOrnamentumUtils.getBlock(stack) != null)
+        if (DomumOrnamentumUtils.getBlock(stack) != null || isExtraBlock(stack))
         {
             return true;
         }
@@ -109,6 +149,93 @@ public final class BuilderInventoryCraft
         return only.getItem() != stack.getItem()
                  || only.getCount() != Math.max(1, stack.getCount())
                  || !ItemStack.isSameItemSameComponents(only, copyWithCount(stack, only.getCount()));
+    }
+
+    /**
+     * Server-safe localized name for wait-chat (avoids Domum format-key leftovers).
+     */
+    @NotNull
+    public static String localizedDepositName(@NotNull final ItemStack stack)
+    {
+        if (ItemStackUtils.isEmpty(stack))
+        {
+            return "?";
+        }
+        final Language lang = Language.getInstance();
+        final String descId = stack.getItem().getDescriptionId();
+        if (lang.has(descId))
+        {
+            return lang.getOrDefault(descId);
+        }
+        // Domum shingles etc.: build "%s Shingles" from registry id + cover material.
+        final IMateriallyTexturedBlock doBlock = DomumOrnamentumUtils.getBlock(stack);
+        if (doBlock != null)
+        {
+            final ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(stack.getItem() instanceof net.minecraft.world.item.BlockItem bi
+              ? bi.getBlock() : Blocks.AIR);
+            if (blockId != null && blockId.getNamespace().equals("domum_ornamentum"))
+            {
+                final MaterialTextureData data = MaterialTextureData.readFromItemStack(stack);
+                String material = "";
+                final List<IMateriallyTexturedBlockComponent> comps = new ArrayList<>(doBlock.getComponents());
+                if (!comps.isEmpty())
+                {
+                    final IMateriallyTexturedBlockComponent cover = comps.get(0);
+                    Block mat = data.getTexturedComponents().get(cover.getId());
+                    if (mat == null || mat == Blocks.AIR)
+                    {
+                        mat = cover.getDefault();
+                    }
+                    if (mat != null && mat != Blocks.AIR)
+                    {
+                        final String matId = mat.asItem().getDescriptionId();
+                        material = lang.has(matId) ? lang.getOrDefault(matId) : mat.getName().getString();
+                    }
+                }
+                // Domum keys: domum_ornamentum.shingle.name.format.block.domum_ornamentum.shingle
+                final String doFormat = "domum_ornamentum.shingle.name.format.block." + blockId.getNamespace() + "." + blockId.getPath();
+                if (lang.has(doFormat))
+                {
+                    return lang.getOrDefault(doFormat).replace("%s", material.isEmpty() ? "Wood" : material);
+                }
+                if (!material.isEmpty())
+                {
+                    return material + " " + (lang.has(descId) ? lang.getOrDefault(descId) : blockId.getPath().replace('_', ' '));
+                }
+            }
+        }
+        final String hover = stack.getHoverName().getString();
+        // Reject unresolved translation keys leaking into chat.
+        if (hover.contains("domum_ornamentum.") && hover.contains(".format."))
+        {
+            return blockPathFallback(stack);
+        }
+        return hover;
+    }
+
+    @NotNull
+    private static String blockPathFallback(@NotNull final ItemStack stack)
+    {
+        final ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        if (id == null)
+        {
+            return stack.getItem().toString();
+        }
+        final String[] parts = id.getPath().split("_");
+        final StringBuilder sb = new StringBuilder();
+        for (final String part : parts)
+        {
+            if (part.isEmpty())
+            {
+                continue;
+            }
+            if (sb.length() > 0)
+            {
+                sb.append(' ');
+            }
+            sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
+        }
+        return sb.toString();
     }
 
     /**
@@ -189,10 +316,66 @@ public final class BuilderInventoryCraft
     }
 
     /**
-     * Domum framed → one of each textured component × amount.
+     * QD-122: Domum ExtraBlock (brick_extra / slate / thatch…) → type.getMaterial() raws.
+     * Crafting recipe is typically 5 material → 4 extra (brick_extra.json).
      */
     @NotNull
+    private static List<ItemStack> expandExtraBlockMaterials(@NotNull final ItemStack stack, final int amount)
+    {
+        final List<ItemStack> out = new ArrayList<>();
+        if (!(stack.getItem() instanceof net.minecraft.world.item.BlockItem blockItem)
+              || !(blockItem.getBlock() instanceof ExtraBlock extra))
+        {
+            return out;
+        }
+        final Item material = extra.getType().getMaterial();
+        if (material == null || material == Items.AIR)
+        {
+            return out;
+        }
+        final int batches = (amount + 3) / 4;
+        out.add(new ItemStack(material, batches * 5));
+        return out;
+    }
+
+    private static boolean isExtraBlock(@NotNull final ItemStack stack)
+    {
+        return stack.getItem() instanceof net.minecraft.world.item.BlockItem bi
+                 && bi.getBlock() instanceof ExtraBlock;
+    }
+
+    private static boolean isDomumFinishedOrExtra(@NotNull final ItemStack stack)
+    {
+        return DomumOrnamentumUtils.getBlock(stack) != null || isExtraBlock(stack);
+    }
+
+    /**
+     * Domum framed/shingle → architect-cutter component materials (schematic textures, else safe defaults).
+     * QD-120: never invent terracotta/wool/dye phantoms when texture data omitted them.
+     * QD-122: empty texture still expands via safe defaults (shingle cover/support) so finished Domum
+     * never stays on the deposit list when a cutter path exists.
+     */
+    @NotNull
+    private static List<ItemStack> expandDomumComponents(
+      @Nullable final Level level,
+      @NotNull final ItemStack stack,
+      final int amount)
+    {
+        return expandDomumComponents(level, stack, amount, true);
+    }
+
+    @NotNull
     private static List<ItemStack> expandDomumComponents(@NotNull final ItemStack stack, final int amount)
+    {
+        return expandDomumComponents(null, stack, amount, true);
+    }
+
+    @NotNull
+    private static List<ItemStack> expandDomumComponents(
+      @Nullable final Level level,
+      @NotNull final ItemStack stack,
+      final int amount,
+      final boolean applyCutterYield)
     {
         final List<ItemStack> out = new ArrayList<>();
         final IMateriallyTexturedBlock doBlock = DomumOrnamentumUtils.getBlock(stack);
@@ -201,32 +384,86 @@ public final class BuilderInventoryCraft
             return out;
         }
         final MaterialTextureData data = MaterialTextureData.readFromItemStack(stack);
-        // QD-120: never invent component.getDefault() (TimberFrame center defaults to WHITE_TERRACOTTA
-        // → dye reverse-expand → Bone Meal phantoms on wood huts). Only schematic texture data.
-        if (data.isEmpty())
-        {
-            return out;
-        }
+        final int perCraft = applyCutterYield ? Math.max(1, architectsCutterResultCount(level, stack)) : 1;
+        final int batches = (amount + perCraft - 1) / perCraft;
+
         for (final IMateriallyTexturedBlockComponent component : doBlock.getComponents())
         {
-            final Block block = data.getTexturedComponents().get(component.getId());
+            Block block = data.getTexturedComponents().get(component.getId());
             if (block == null || block == Blocks.AIR)
             {
-                continue;
+                // Missing from schematic texture: use Domum default unless it is a known phantom fill
+                // (TimberFrame center → WHITE_TERRACOTTA). Explicit texture always wins.
+                if (component.isOptional() && !data.isEmpty())
+                {
+                    continue;
+                }
+                block = component.getDefault();
+                if (block == null || block == Blocks.AIR || isPhantomDomumDefault(block))
+                {
+                    continue;
+                }
             }
-            out.add(new ItemStack(block, amount));
+            out.add(new ItemStack(block, batches));
         }
-        if (out.isEmpty())
+        if (out.isEmpty() && !data.isEmpty())
         {
             for (final Block block : data.getTexturedComponents().values())
             {
-                if (block != null && block != Blocks.AIR)
+                if (block != null && block != Blocks.AIR && !isPhantomDomumDefault(block))
                 {
-                    out.add(new ItemStack(block, amount));
+                    out.add(new ItemStack(block, batches));
                 }
             }
         }
         return out;
+    }
+
+    /**
+     * Architects-cutter craft yield for this Domum block (shingles usually 4). Default 1.
+     */
+    private static int architectsCutterResultCount(@Nullable final Level level, @NotNull final ItemStack stack)
+    {
+        if (!(level instanceof ServerLevel serverLevel))
+        {
+            return 1;
+        }
+        final Block block = stack.getItem() instanceof net.minecraft.world.item.BlockItem bi ? bi.getBlock() : null;
+        if (block == null)
+        {
+            return 1;
+        }
+        final ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
+        if (blockId == null)
+        {
+            return 1;
+        }
+        try
+        {
+            for (final RecipeHolder<ArchitectsCutterRecipe> holder :
+              RecipeCompat.getAllRecipesFor(serverLevel.getServer().getRecipeManager(), ModRecipeTypes.ARCHITECTS_CUTTER.get()))
+            {
+                if (blockId.equals(holder.value().getBlockName()))
+                {
+                    return Math.max(1, holder.value().getCount());
+                }
+            }
+        }
+        catch (final Exception ex)
+        {
+            Log.getLogger().debug("[QuidomsBuilder] architects cutter lookup failed: {}", ex.toString());
+        }
+        return 1;
+    }
+
+    /**
+     * Defaults that QD-120 must not invent when schematic texture omitted them.
+     */
+    private static boolean isPhantomDomumDefault(@NotNull final Block block)
+    {
+        final ItemStack stack = new ItemStack(block);
+        return stack.is(ItemTags.TERRACOTTA) || stack.is(ItemTags.WOOL) || stack.is(Tags.Items.DYES)
+                 || block.asItem() == Items.BONE_MEAL || block == Blocks.WHITE_TERRACOTTA;
     }
 
     private static void pullIngredientsForDomum(
@@ -286,7 +523,7 @@ public final class BuilderInventoryCraft
             return false;
         }
 
-        final List<ItemStack> components = expandDomumComponents(need, 1);
+        final List<ItemStack> components = expandDomumComponents(null, need, 1, false);
         if (components.isEmpty())
         {
             return false;

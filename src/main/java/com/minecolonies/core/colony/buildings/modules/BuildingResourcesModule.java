@@ -522,7 +522,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             {
                 sb.append(", ");
             }
-            sb.append(resource.getItemStack().getHoverName().getString()).append(" x").append(missing);
+            // QD-122: localized names (no Domum format-key leftovers in chat).
+            sb.append(com.minecolonies.core.util.BuilderInventoryCraft.localizedDepositName(resource.getItemStack()))
+              .append(" x").append(missing);
         }
         return sb.length() == 0 ? "" : sb.toString();
     }

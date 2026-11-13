@@ -1517,8 +1517,8 @@ public abstract class AbstractEntityAIStructure<J extends AbstractJobStructure<?
                     placer.getWorker().getCitizenData().createRequestAsync(stackRequest);
                     placer.registerBlockAsNeeded(reqStack);
                     filedAny = true;
-                    rawNames = rawNames.isEmpty() ? reqStack.getHoverName().getString()
-                                 : rawNames + ", " + reqStack.getHoverName().getString();
+                    final String rawLabel = com.minecolonies.core.util.BuilderInventoryCraft.localizedDepositName(reqStack);
+                    rawNames = rawNames.isEmpty() ? rawLabel : rawNames + ", " + rawLabel;
                     Log.getLogger().info(
                       "[QuidomsBuilder] createRequestAsync raw={} count={} forFinished={} citizen={}",
                       reqStack.getItem(), stackRequest.getCount(), stack.getItem(), citizenData.getName());
