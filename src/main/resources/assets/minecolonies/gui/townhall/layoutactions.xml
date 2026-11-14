@@ -50,12 +50,7 @@
                  source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
                  disabled="minecolonies:textures/gui/builderhut/builder_button_medium_disabled.png"
                  color="#F4F1EA"/>
-
-    <button id="patreon" size="120 19" pos="288 133" source="minecolonies:textures/gui/patreonwidget.png"
-                 label="$(com.minecolonies.coremod.gui.townhall.patreon)" tooltip="$(com.minecolonies.coremod.gui.townhall.patreon.hover)" />
-
-
-    <text label="$(com.minecolonies.coremod.gui.townhall.picktexturestyle)" pos="269 168" size="148 11" color="#F4F1EA"/>
+<text label="$(com.minecolonies.coremod.gui.townhall.picktexturestyle)" pos="269 168" size="148 11" color="#F4F1EA"/>
     <dropdown id="textureStylePicker"
               size="86 17"
               pos="337 165"

@@ -1,8 +1,6 @@
 package com.minecolonies.core.client.gui.townhall;
 
 import com.ldtteam.blockui.Pane;
-import com.ldtteam.blockui.PaneBuilders;
-import com.ldtteam.blockui.controls.AbstractTextBuilder;
 import com.ldtteam.blockui.controls.Button;
 import com.ldtteam.blockui.controls.ButtonImage;
 import com.ldtteam.blockui.controls.Text;
@@ -17,9 +15,7 @@ import com.minecolonies.core.network.messages.server.colony.ColonyStructureStyle
 import com.minecolonies.core.network.messages.server.colony.ColonyTextureStyleMessage;
 import com.minecolonies.core.network.messages.server.colony.TeamColonyColorChangeMessage;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -96,7 +92,6 @@ public class WindowMainPage extends AbstractWindowTownHall
         registerButton(BUTTON_RENAME, this::renameClicked);
         registerButton(BUTTON_MERCENARY, this::mercenaryClicked);
         registerButton(BUTTON_TOWNHALLMAP, this::mapButtonClicked);
-        registerButton(BUTTON_PATREON, this::patreonClicked);
 
         registerButton(BUTTON_COLONY_SWITCH_STYLE, this::switchPack);
 
@@ -256,17 +251,22 @@ public class WindowMainPage extends AbstractWindowTownHall
         final Pane namePane = findPaneByID(DROPDOWN_NAME_ID);
         final Pane resetButton = findPaneByID(BUTTON_RESET_TEXTURE);
         final boolean isOwner = buildingView.getColony().getPermissions().getOwner().equals(Minecraft.getInstance().player.getUUID());
-        if (isFeatureUnlocked.get() && isOwner)
+        // Quidoms: Patreon UI removed — unlock texture/name controls for colony owner only.
+        final Pane patreonBtn = findPaneByID(BUTTON_PATREON);
+        if (patreonBtn != null)
         {
-            findPaneByID(BUTTON_PATREON).hide();
+            patreonBtn.hide();
+        }
+        if (isOwner)
+        {
             textPane.enable();
             namePane.enable();
             textPane.show();
             resetButton.hide();
+            isFeatureUnlocked.set(true);
         }
         else
         {
-            findPaneByID(BUTTON_PATREON).show();
             textPane.disable();
             namePane.disable();
 
@@ -279,28 +279,6 @@ public class WindowMainPage extends AbstractWindowTownHall
             {
                 textPane.show();
             }
-
-            final AbstractTextBuilder.TooltipBuilder textPaneToolTipBuilder = PaneBuilders.tooltipBuilder().hoverPane(textPane).append(Component.translatable("com.minecolonies.core.townhall.patreon.textures"))
-                    .paragraphBreak()
-                    .appendNL(Component.empty())
-                    .appendNL(Component.translatable("com.minecolonies.core.townhall.patreon"))
-                    .paragraphBreak();
-
-
-            final AbstractTextBuilder.TooltipBuilder namePaneToolTipBuilder = PaneBuilders.tooltipBuilder().hoverPane(namePane)
-                    .append(Component.translatable("com.minecolonies.core.townhall.patreon.names")).paragraphBreak()
-                    .appendNL(Component.empty())
-                    .appendNL(Component.translatable("com.minecolonies.core.townhall.patreon")).paragraphBreak();
-
-            if (isFeatureUnlocked.get() && !isOwner)
-            {
-                textPaneToolTipBuilder.appendNL(Component.empty());
-                namePaneToolTipBuilder.appendNL(Component.empty());
-                textPaneToolTipBuilder.appendNL(Component.translatable("com.minecolonies.core.townhall.patreon.needs_owner"));
-                namePaneToolTipBuilder.appendNL(Component.translatable("com.minecolonies.core.townhall.patreon.needs_owner"));
-            }
-            textPaneToolTipBuilder.build();
-            namePaneToolTipBuilder.build();
         }
     }
 
@@ -351,14 +329,7 @@ public class WindowMainPage extends AbstractWindowTownHall
      */
     private void patreonClicked()
     {
-        Minecraft.getInstance().setScreen(new ConfirmLinkScreen((check) -> {
-            if (check)
-            {
-                Util.getPlatform().openUri("https://www.patreon.com/Minecolonies");
-            }
-
-            Minecraft.getInstance().setScreen(this.screen);
-        }, "https://www.patreon.com/Minecolonies", true));
+        // Quidoms: Patreon link removed.
     }
 
     @Override
