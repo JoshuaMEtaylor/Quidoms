@@ -109,7 +109,7 @@ public final class QuidCraftMarketBridge {
             Level level = iColony.getWorld();
             BlockPos blockPos = iBuilding.getPosition();
             String string5 = level.dimension().location().toString();
-            long infraBudget = QuidCraftMarketBridge.infraBudgetRemaining((String) object);
+            long infraBudget = QuidCraftMarketBridge.infraBudgetRemaining(object);
             if (infraBudget <= 0L) {
                 COOLDOWNS.put(string3, l + 2000L);
                 QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), object, uUID3, string4, string, string2, n, false, 0L, "infra-budget", l);
@@ -127,7 +127,7 @@ public final class QuidCraftMarketBridge {
             }
             long cost = quidCraftProvisionOutcome.notionalCostMinor();
             int n2 = QuidCraftMarketBridge.deposit(iBuilding, iCitizenData, itemStack, quidCraftProvisionOutcome.filled(), bl);
-            if (n2 > 0 && cost > 0L && !QuidCraftMarketBridge.chargeInfra((String) object, cost, uUID3, l)) {
+            if (n2 > 0 && cost > 0L && !QuidCraftMarketBridge.chargeInfra(object, cost, uUID3, l)) {
                 // Delivered materials but treasury/allotment could not cover — record soft failure for ops.
                 QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), object, uUID3, string4, string, string2, n, true, cost, "delivered-unpaid", l);
                 Log.getLogger().warn("Infrastructure budget charge failed after delivering {} x{} to {}", (Object)string2, (Object)n2, object);
