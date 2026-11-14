@@ -112,7 +112,7 @@ public final class QuidCraftMarketBridge {
             long infraBudget = QuidCraftMarketBridge.infraBudgetRemaining((String) object);
             if (infraBudget <= 0L) {
                 COOLDOWNS.put(string3, l + 2000L);
-                QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), (String)object, uUID3, string4, string, string2, n, false, 0L, "infra-budget", l);
+                QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), object, uUID3, string4, string, string2, n, false, 0L, "infra-budget", l);
                 return false;
             }
             QuidCraftProvisionOutcome quidCraftProvisionOutcome = QuidCraftMarketBridge.invokeProvision(string2, n, string5, blockPos.getX(), blockPos.getZ(), l, infraBudget);
@@ -122,14 +122,14 @@ public final class QuidCraftMarketBridge {
             }
             COOLDOWNS.put(string3, l + 3000L);
             if (quidCraftProvisionOutcome.filled() <= 0) {
-                QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), (String)object, uUID3, string4, string, string2, n, false, 0L, quidCraftProvisionOutcome.detail().isEmpty() ? "no-fill" : quidCraftProvisionOutcome.detail(), l);
+                QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), object, uUID3, string4, string, string2, n, false, 0L, quidCraftProvisionOutcome.detail().isEmpty() ? "no-fill" : quidCraftProvisionOutcome.detail(), l);
                 return false;
             }
             long cost = quidCraftProvisionOutcome.notionalCostMinor();
             int n2 = QuidCraftMarketBridge.deposit(iBuilding, iCitizenData, itemStack, quidCraftProvisionOutcome.filled(), bl);
             if (n2 > 0 && cost > 0L && !QuidCraftMarketBridge.chargeInfra((String) object, cost, uUID3, l)) {
                 // Delivered materials but treasury/allotment could not cover — record soft failure for ops.
-                QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), (String)object, uUID3, string4, string, string2, n, true, cost, "delivered-unpaid", l);
+                QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), object, uUID3, string4, string, string2, n, true, cost, "delivered-unpaid", l);
                 Log.getLogger().warn("Infrastructure budget charge failed after delivering {} x{} to {}", (Object)string2, (Object)n2, object);
             }
             int n3 = InventoryUtils.hasBuildingEnoughElseCount((ICommonBuilding)iBuilding, (ItemStorage)new ItemStorage(itemStack, true, bl), (int)n);
@@ -139,7 +139,7 @@ public final class QuidCraftMarketBridge {
             }
             boolean bl2 = n3 + n4 >= n;
             String string6 = (quidCraftProvisionOutcome.detail().isEmpty() ? "provision" : quidCraftProvisionOutcome.detail()) + ";delivered=" + n2 + (bl2 ? ";ok" : ";partial");
-            QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), (String)object, uUID3, string4, string, string2, n, bl2 || n2 > 0, quidCraftProvisionOutcome.notionalCostMinor(), string6, l);
+            QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), object, uUID3, string4, string, string2, n, bl2 || n2 > 0, quidCraftProvisionOutcome.notionalCostMinor(), string6, l);
             if (n2 > 0) {
                 Log.getLogger().info("QuidCraft provisioned {} x{} for colony {} (delivered={}, enough={})", (Object)string2, (Object)quidCraftProvisionOutcome.filled(), object, (Object)n2, (Object)bl2);
             }
@@ -163,7 +163,7 @@ public final class QuidCraftMarketBridge {
         }
         catch (Throwable throwable) {
             COOLDOWNS.put(string3, l + 3000L);
-            QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), (String)object, uUID3, string4, string, string2, n, false, 0L, throwable.toString(), l);
+            QuidCraftMarketBridge.recordOrder(uUID, iColony.getID(), object, uUID3, string4, string, string2, n, false, 0L, throwable.toString(), l);
             Log.getLogger().warn("QuidCraft provision buy failed for {}: {}", (Object)string2, (Object)throwable.toString());
             return false;
         }
