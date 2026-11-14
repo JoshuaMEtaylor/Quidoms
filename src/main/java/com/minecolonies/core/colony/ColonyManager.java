@@ -106,7 +106,7 @@ public final class ColonyManager implements IColonyManager
     @Nullable
     private IServerColonySaveData getColonySaveData(final ServerLevel w)
     {
-       return IServerColonySaveData.getOrComputeSaveData(w);
+        return IServerColonySaveData.getOrComputeSaveData(w);
     }
 
     @Override

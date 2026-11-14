@@ -177,7 +177,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
             }
 
             IMinecoloniesAPI.getInstance().getEventBus().post(new ColonyCreatedModEvent(createdColony));
-            new OpenBuildingUIMessage(building).sendToPlayer(sender);;
+            new OpenBuildingUIMessage(building).sendToPlayer(sender);
 
             return;
         }
