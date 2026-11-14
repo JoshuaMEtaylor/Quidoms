@@ -87,10 +87,13 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
             ex.printStackTrace();
             try
             {
-                sender.displayClientMessage(Component.literal("Founding failed: " + ex.getClass().getSimpleName() + " — see server log."), false);
-                MessageUtils.format(WARNING_COLONY_FOUNDING_FAILED)
-                  .withPriority(MessagePriority.DANGER)
-                  .sendTo(sender);
+                // Never send WARNING_COLONY_FOUNDING_FAILED / “already got a kingdom” on unexpected errors —
+                // that message is only for the ownedColony != null path below.
+                final String detail = ex.getClass().getSimpleName()
+                  + (ex.getMessage() != null && !ex.getMessage().isEmpty() ? ": " + ex.getMessage() : "");
+                final Component real = Component.literal("Founding failed: " + detail);
+                sender.sendSystemMessage(real);
+                sender.displayClientMessage(real, true);
             }
             catch (final Throwable ignored)
             {
