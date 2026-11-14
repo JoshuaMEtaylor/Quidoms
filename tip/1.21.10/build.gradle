@@ -133,11 +133,15 @@ tasks.register('prepareTipClasspath') {
         new File(stubSrc, 'net/neoforged/fml').mkdirs()
         new File(stubSrc, 'net/neoforged/neoforge/network/handling/IPayloadContext.java').text =
             'package net.neoforged.neoforge.network.handling;\npublic interface IPayloadContext {}\n'
+        // Match NeoForge 21.10.64: IntValue extends ConfigValue<Integer> + IntSupplier.getAsInt().
         new File(stubSrc, 'net/neoforged/neoforge/common/ModConfigSpec.java').text = '''
 package net.neoforged.neoforge.common;
 public class ModConfigSpec {
-  public static class IntValue {
-    public Integer get() { return 0; }
+  public static class ConfigValue<T> implements java.util.function.Supplier<T> {
+    public T get() { return null; }
+  }
+  public static class IntValue extends ConfigValue<Integer> implements java.util.function.IntSupplier {
+    public int getAsInt() { return 0; }
   }
 }
 '''

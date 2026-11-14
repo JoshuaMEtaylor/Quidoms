@@ -140,19 +140,23 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         hut.setBlueprintPath(pathName);
 
         final double spawnDistance = Math.sqrt(BlockPosUtil.getDistanceSquared2D(townHall, world.getRespawnData().pos()));
-        if (spawnDistance < MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.get())
+        // NeoForge 21.10: IntValue exposes getAsInt() (IntSupplier). Do not call get():Integer —
+        // tip-javac against a flat stub emitted that and caused NoSuchMethodError at runtime.
+        final int minSpawnDist = MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.getAsInt();
+        final int maxSpawnDist = MineColonies.getConfig().getServer().maxDistanceFromWorldSpawn.getAsInt();
+        if (spawnDistance < minSpawnDist)
         {
             if (!world.isClientSide())
             {
-                MessageUtils.format(CANT_PLACE_COLONY_TOO_CLOSE_TO_SPAWN, MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.get() - spawnDistance).sendTo(sender);
+                MessageUtils.format(CANT_PLACE_COLONY_TOO_CLOSE_TO_SPAWN, minSpawnDist - spawnDistance).sendTo(sender);
             }
             return;
         }
-        else if (spawnDistance > MineColonies.getConfig().getServer().maxDistanceFromWorldSpawn.get())
+        else if (spawnDistance > maxSpawnDist)
         {
             if (!world.isClientSide())
             {
-                MessageUtils.format(CANT_PLACE_COLONY_TOO_FAR_FROM_SPAWN, spawnDistance - MineColonies.getConfig().getServer().maxDistanceFromWorldSpawn.get()).sendTo(sender);
+                MessageUtils.format(CANT_PLACE_COLONY_TOO_FAR_FROM_SPAWN, spawnDistance - maxSpawnDist).sendTo(sender);
             }
             return;
         }
