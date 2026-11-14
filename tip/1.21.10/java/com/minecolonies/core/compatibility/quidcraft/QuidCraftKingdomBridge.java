@@ -12,7 +12,7 @@ import net.neoforged.fml.ModList;
 
 /**
  * Tip bridge for QuidCraft kingdom founding.
- * Afford failures use QuidCraft HUD toast ({@code toastFunds}) — never chat spam.
+ * All player feedback uses QuidCraft HUD toast only — never chat / action-bar.
  */
 public final class QuidCraftKingdomBridge
 {
@@ -62,7 +62,7 @@ public final class QuidCraftKingdomBridge
             final String name = colonyName == null ? "" : colonyName.trim();
             if (name.isEmpty())
             {
-                notifyNeedQuid(player, access);
+                toastFunds(player);
                 return false;
             }
 
@@ -75,7 +75,7 @@ public final class QuidCraftKingdomBridge
             final long available = account == null ? 0L : account.available();
             if (available < FOUNDING_COST_MINOR)
             {
-                notifyNeedQuid(player, access);
+                toastFunds(player);
                 return false;
             }
 
@@ -91,7 +91,7 @@ public final class QuidCraftKingdomBridge
               requestId, playerId, kingdomId, FOUNDING_COST_MINOR, "Kingdom founding", playerId, now);
             if (result == null || !result.ok())
             {
-                notifyNeedQuid(player, access);
+                toastFunds(player);
                 return false;
             }
             return true;
@@ -105,8 +105,7 @@ public final class QuidCraftKingdomBridge
         {
             System.err.println("QuidCraft kingdom founding bridge failed: " + ex);
             ex.printStackTrace();
-            // Hard API failure — still toast, never chat.
-            notifyNeedQuid(player, null);
+            toast(player, "quidcraft.toast.founding_failed");
             return false;
         }
     }
@@ -136,30 +135,46 @@ public final class QuidCraftKingdomBridge
         return "£" + (FOUNDING_COST_MINOR / 100L) + "." + String.format("%02d", FOUNDING_COST_MINOR % 100L);
     }
 
-    /**
-     * Afford / charge failure: QuidCraft HUD toast only (“Not enough quid”). No chat, no action bar.
-     */
-    private static void notifyNeedQuid(final ServerPlayer player, final QuidAccess access)
+    /** Afford fail: “Not enough quid”. No chat / action-bar. */
+    public static void toastFunds(final ServerPlayer player)
     {
+        toast(player, "quidcraft.toast.funds");
+    }
+
+    /**
+     * Server → client QuidCraft HUD toast. Never chat, never action-bar.
+     * Soft no-op when QuidCraft is absent.
+     */
+    public static void toast(final ServerPlayer player, final String messageKey)
+    {
+        if (player == null || messageKey == null || messageKey.isBlank())
+        {
+            return;
+        }
         try
         {
-            final QuidAccess toastAccess = access != null ? access : (QuidApi.ready() ? QuidApi.get() : null);
-            if (toastAccess != null)
+            if (!isPresent() || !QuidApi.ready())
             {
-                toastAccess.toastFunds(player.getUUID());
                 return;
             }
-        }
-        catch (final NoSuchMethodError | AbstractMethodError missing)
-        {
-            // Older QuidCraft without toast API — fall through to reflective no-op.
-            System.err.println("QuidCraft toastFunds missing; update QuidCraft tip: " + missing);
+            final QuidAccess access = QuidApi.get();
+            if (access == null)
+            {
+                return;
+            }
+            if ("quidcraft.toast.funds".equals(messageKey) || "quidcraft.fail.funds".equals(messageKey))
+            {
+                access.toastFunds(player.getUUID());
+            }
+            else
+            {
+                access.toast(player.getUUID(), messageKey);
+            }
         }
         catch (final Throwable ex)
         {
             System.err.println("QuidCraft toast failed: " + ex);
         }
-        // Last resort: still never spam chat. Soft-fail silent if toast unavailable.
     }
 
     public static long infraBudgetRemaining(final String kingdomName)

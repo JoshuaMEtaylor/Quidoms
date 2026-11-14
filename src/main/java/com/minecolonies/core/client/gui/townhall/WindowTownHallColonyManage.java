@@ -4,11 +4,11 @@ import com.ldtteam.blockui.controls.Text;
 import com.ldtteam.blockui.controls.TextField;
 import com.ldtteam.structurize.storage.StructurePacks;
 import com.minecolonies.api.util.constant.Constants;
-import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import com.minecolonies.core.client.gui.AbstractWindowSkeleton;
 import com.minecolonies.core.compatibility.quidcraft.QuidCraftKingdomBridge;
-import com.minecolonies.core.network.messages.server.CreateColonyMessage;
 import com.minecolonies.core.network.messages.client.VanillaParticleMessage;
+import com.minecolonies.core.network.messages.server.CreateColonyMessage;
+import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -25,25 +25,19 @@ import static com.minecolonies.api.util.constant.TranslationConstants.*;
 import static com.minecolonies.api.util.constant.WindowConstants.*;
 
 /**
- * UI to found a new colony.
+ * Tip UI to found a new colony — founding fee shown in-pane.
+ * Client feedback uses QuidCraft HUD toast only (never displayClientMessage / action-bar).
  */
 public class WindowTownHallColonyManage extends AbstractWindowSkeleton
 {
     private static final String BUTTON_CREATE = "create";
 
-    /**
-     * Townhall position
-     */
     private final BlockPos pos;
-
-    /**
-     * If it is a reactivated colony.
-     */
     private final boolean reactivate;
 
     public WindowTownHallColonyManage(final BlockPos pos, final String closestName, final int closestDistance, final String preName, final boolean reactivate)
     {
-        super(new ResourceLocation(Constants.MOD_ID, "gui/townhall/windowcolonymanagement.xml"));
+        super(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "gui/townhall/windowcolonymanagement.xml"));
         this.pos = pos;
         this.reactivate = reactivate;
         mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BOOK_PAGE_TURN, 1.0F));
@@ -55,7 +49,7 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
         this.findPaneOfTypeByID("text1", Text.class).setText(Component.translatable("com.minecolonies.core.settlementcovenant1", Math.max(13, Minecraft.getInstance().level.getGameTime() / TICKS_SECOND / 60 / 100)));
         if (closestDistance < 1000)
         {
-            this.findPaneOfTypeByID("text3", Text.class).setText(Component.translatable("com.minecolonies.core.settlementcovenant3.hasclose", Component.literal(closestName).withStyle(ChatFormatting.RED) , Component.literal(String.valueOf(closestDistance)).withStyle(ChatFormatting.RED)));
+            this.findPaneOfTypeByID("text3", Text.class).setText(Component.translatable("com.minecolonies.core.settlementcovenant3.hasclose", Component.literal(closestName).withStyle(ChatFormatting.RED), Component.literal(String.valueOf(closestDistance)).withStyle(ChatFormatting.RED)));
         }
         else
         {
@@ -71,9 +65,6 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
         }
     }
 
-    /**
-     * On create button
-     */
     public void onCreate()
     {
         try
@@ -81,7 +72,7 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
             final String colonyName = this.findPaneOfTypeByID("colonyname", TextField.class).getText();
             if (colonyName == null || colonyName.trim().isEmpty())
             {
-                mc.player.displayClientMessage(Component.literal("Enter a kingdom name before founding."), true);
+                clientToastKey("quidcraft.toast.need_name");
                 return;
             }
 
@@ -98,7 +89,7 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
             final BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(pos);
             if (!(entity instanceof final TileEntityColonyBuilding hut))
             {
-                mc.player.displayClientMessage(Component.literal("Town hall block is missing — cannot found here."), true);
+                clientToastKey("quidcraft.toast.missing_hut");
                 return;
             }
 
@@ -118,18 +109,28 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
                 pathName = "";
             }
 
-            // No optimistic action-bar / chat. Server shows QuidCraft toast on afford fail,
-            // or success feedback on CreateColonyMessage when founding completes.
             new CreateColonyMessage(pos, reactivate, colonyName.trim(), packName, pathName).sendToServer();
             close();
         }
         catch (final Throwable ex)
         {
             System.err.println("Founding create click failed: " + ex);
-            if (mc.player != null)
-            {
-                mc.player.displayClientMessage(Component.literal("Could not send founding request: " + ex.getClass().getSimpleName()), false);
-            }
+            ex.printStackTrace();
+            clientToastKey("quidcraft.toast.founding_failed");
+        }
+    }
+
+    /** Soft-call QuidCraft TransferToast — never vanilla action-bar. */
+    private static void clientToastKey(final String key)
+    {
+        try
+        {
+            final Class<?> toast = Class.forName("com.quidcraft.client.TransferToast");
+            toast.getMethod("showKey", String.class).invoke(null, key);
+        }
+        catch (final Throwable ignored)
+        {
+            // QuidCraft absent — stay silent rather than spam action-bar.
         }
     }
 }

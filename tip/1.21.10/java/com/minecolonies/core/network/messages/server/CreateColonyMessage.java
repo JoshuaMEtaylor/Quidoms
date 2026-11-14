@@ -9,29 +9,24 @@ import com.minecolonies.api.colony.IColonyManager;
 import com.minecolonies.api.colony.buildings.IBuilding;
 import com.minecolonies.api.eventbus.events.colony.ColonyCreatedModEvent;
 import com.minecolonies.api.util.BlockPosUtil;
-import com.minecolonies.api.util.MessageUtils;
-import com.minecolonies.api.util.MessageUtils.MessagePriority;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.MineColonies;
 import com.minecolonies.core.compatibility.quidcraft.QuidCraftKingdomBridge;
 import com.minecolonies.core.network.messages.client.colony.OpenBuildingUIMessage;
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import java.util.ArrayList;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import static com.minecolonies.api.util.constant.BuildingConstants.DEACTIVATED;
-import static com.minecolonies.api.util.constant.TranslationConstants.*;
 
 /**
  * Tip 1.21.10 CreateColonyMessage — {@code ServerPlayer.level()} + {@code getRespawnData()}.
- * Always sends player feedback on success or failure (including founding fee).
+ * Founding feedback: QuidCraft HUD toast only — never chat / action-bar / MessageUtils.
  */
 public class CreateColonyMessage extends AbstractServerPlayMessage
 {
@@ -84,25 +79,12 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         {
             System.err.println("CreateColonyMessage failed: " + ex);
             ex.printStackTrace();
-            try
-            {
-                // Never send WARNING_COLONY_FOUNDING_FAILED / “already got a kingdom” on unexpected errors —
-                // that message is only for the ownedColony != null path below.
-                final String detail = ex.getClass().getSimpleName()
-                  + (ex.getMessage() != null && !ex.getMessage().isEmpty() ? ": " + ex.getMessage() : "");
-                final Component real = Component.literal("Founding failed: " + detail);
-                sender.sendSystemMessage(real);
-                sender.displayClientMessage(real, true);
-            }
-            catch (final Throwable ignored)
-            {
-            }
+            QuidCraftKingdomBridge.toast(sender, "quidcraft.toast.founding_failed");
         }
     }
 
     private void onExecuteSafe(final ServerPlayer sender)
     {
-        // Tip 1.21.10: ServerPlayer.level() returns ServerLevel (serverLevel() does not exist).
         final ServerLevel world = sender.level();
 
         final IColony colony = IColonyManager.getInstance().getClosestColony(world, townHall);
@@ -112,14 +94,10 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
 
         if (!(tileEntity instanceof final TileEntityColonyBuilding hut))
         {
-            MessageUtils.format(WARNING_TOWN_HALL_NO_TILE_ENTITY)
-              .withPriority(MessagePriority.DANGER)
-              .sendTo(sender);
-            sender.displayClientMessage(Component.literal("Founding failed: town hall has no tile entity."), true);
+            QuidCraftKingdomBridge.toast(sender, "quidcraft.toast.missing_hut");
             return;
         }
 
-        // Prefer hut pack whenever present — client selectedPack is often unset after supply placement.
         if (hut.getStructurePack() != null && (claim || pack.isEmpty()))
         {
             pack = hut.getStructurePack().getName();
@@ -139,30 +117,17 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         hut.setBlueprintPath(pathName);
 
         final double spawnDistance = Math.sqrt(BlockPosUtil.getDistanceSquared2D(townHall, world.getRespawnData().pos()));
-        // NeoForge 21.10: IntValue exposes getAsInt() (IntSupplier). Do not call get():Integer —
-        // tip-javac against a flat stub emitted that and caused NoSuchMethodError at runtime.
         final int minSpawnDist = MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.getAsInt();
         final int maxSpawnDist = MineColonies.getConfig().getServer().maxDistanceFromWorldSpawn.getAsInt();
-        if (spawnDistance < minSpawnDist)
+        if (spawnDistance < minSpawnDist || spawnDistance > maxSpawnDist)
         {
-            if (!world.isClientSide())
-            {
-                MessageUtils.format(CANT_PLACE_COLONY_TOO_CLOSE_TO_SPAWN, minSpawnDist - spawnDistance).sendTo(sender);
-            }
-            return;
-        }
-        else if (spawnDistance > maxSpawnDist)
-        {
-            if (!world.isClientSide())
-            {
-                MessageUtils.format(CANT_PLACE_COLONY_TOO_FAR_FROM_SPAWN, spawnDistance - maxSpawnDist).sendTo(sender);
-            }
+            QuidCraftKingdomBridge.toast(sender, "quidcraft.toast.founding_failed");
             return;
         }
 
         if (colony != null && !IColonyManager.getInstance().isFarEnoughFromColonies(world, townHall))
         {
-            MessageUtils.format(MESSAGE_COLONY_CREATE_DENIED_TOO_CLOSE, colony.getName()).sendTo(sender);
+            QuidCraftKingdomBridge.toast(sender, "quidcraft.toast.founding_failed");
             return;
         }
 
@@ -172,29 +137,14 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         {
             if (!QuidCraftKingdomBridge.tryFundKingdomFounding(sender, colonyName))
             {
-                // Afford failure: QuidCraft HUD toast only (bridge). No chat / action-bar spam.
+                // Afford / charge fail already toasted by the bridge.
                 return;
             }
 
             final IColony createdColony = IColonyManager.getInstance().createColony(world, townHall, sender, colonyName, pack);
             final IBuilding building = createdColony.getServerBuildingManager().addNewBuilding((TileEntityColonyBuilding) tileEntity, world);
 
-            if (reactivate)
-            {
-                MessageUtils.format(MESSAGE_COLONY_REACTIVATED, colonyName)
-                  .withPriority(MessagePriority.IMPORTANT)
-                  .sendTo(sender);
-            }
-            else
-            {
-                MessageUtils.format(MESSAGE_COLONY_FOUNDED)
-                  .withPriority(MessagePriority.IMPORTANT)
-                  .sendTo(sender);
-                sender.displayClientMessage(Component.translatable(MESSAGE_COLONY_FOUNDED).withStyle(ChatFormatting.GREEN), true);
-                sender.displayClientMessage(Component.literal(
-                  "Treasury funded with " + QuidCraftKingdomBridge.formatFoundingCostPretty() + "."), false);
-            }
-
+            QuidCraftKingdomBridge.toast(sender, "quidcraft.toast.founded");
             IMinecoloniesAPI.getInstance().getEventBus().post(new ColonyCreatedModEvent(createdColony));
             new OpenBuildingUIMessage(building).sendToPlayer(sender);
             return;
@@ -202,9 +152,6 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
 
         ownedColony.getPackageManager().sendColonyViewPackets();
         ownedColony.getPackageManager().sendPermissionsPackets();
-        MessageUtils.format(WARNING_COLONY_FOUNDING_FAILED)
-          .withPriority(MessagePriority.DANGER)
-          .sendTo(sender);
-        sender.displayClientMessage(Component.translatable(WARNING_COLONY_FOUNDING_FAILED), true);
+        QuidCraftKingdomBridge.toast(sender, "quidcraft.toast.already_kingdom");
     }
 }

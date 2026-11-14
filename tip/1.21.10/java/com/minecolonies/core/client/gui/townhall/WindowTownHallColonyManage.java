@@ -25,7 +25,8 @@ import static com.minecolonies.api.util.constant.TranslationConstants.*;
 import static com.minecolonies.api.util.constant.WindowConstants.*;
 
 /**
- * Tip UI to found a new colony — shows founding price and always reports send errors.
+ * Tip UI to found a new colony — founding fee shown in-pane.
+ * Client feedback uses QuidCraft HUD toast only (never displayClientMessage / action-bar).
  */
 public class WindowTownHallColonyManage extends AbstractWindowSkeleton
 {
@@ -71,30 +72,27 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
             final String colonyName = this.findPaneOfTypeByID("colonyname", TextField.class).getText();
             if (colonyName == null || colonyName.trim().isEmpty())
             {
-                mc.player.displayClientMessage(Component.literal("Enter a kingdom name before founding."), true);
+                clientToastKey("quidcraft.toast.need_name");
                 return;
             }
 
             try
             {
-                // Tip 1.21.10 uses FLAME (DRAGON_BREATH is no longer SimpleParticleType).
                 new VanillaParticleMessage(pos.getX(), pos.getY(), pos.getZ(), ParticleTypes.FLAME).onExecute(null, mc.player);
                 Minecraft.getInstance().level.playSound(Minecraft.getInstance().player, Minecraft.getInstance().player.blockPosition(),
                   SoundEvents.CAMPFIRE_CRACKLE, SoundSource.AMBIENT, 2.5f, 0.8f);
             }
             catch (final Throwable ignored)
             {
-                // Cosmetics must never block founding.
             }
 
             final BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(pos);
             if (!(entity instanceof final TileEntityColonyBuilding hut))
             {
-                mc.player.displayClientMessage(Component.literal("Town hall block is missing — cannot found here."), true);
+                clientToastKey("quidcraft.toast.missing_hut");
                 return;
             }
 
-            // Prefer hut pack; selectedPack is often null after supply-camp placement and NPEs the click.
             String packName = "";
             if (hut.getStructurePack() != null)
             {
@@ -111,8 +109,6 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
                 pathName = "";
             }
 
-            // No optimistic action-bar / chat. Server shows QuidCraft toast on afford fail,
-            // or success feedback on CreateColonyMessage when founding completes.
             new CreateColonyMessage(pos, reactivate, colonyName.trim(), packName, pathName).sendToServer();
             close();
         }
@@ -120,10 +116,21 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
         {
             System.err.println("Founding create click failed: " + ex);
             ex.printStackTrace();
-            if (mc.player != null)
-            {
-                mc.player.displayClientMessage(Component.literal("Could not send founding request: " + ex.getClass().getSimpleName()), false);
-            }
+            clientToastKey("quidcraft.toast.founding_failed");
+        }
+    }
+
+    /** Soft-call QuidCraft TransferToast — never vanilla action-bar. */
+    private static void clientToastKey(final String key)
+    {
+        try
+        {
+            final Class<?> toast = Class.forName("com.quidcraft.client.TransferToast");
+            toast.getMethod("showKey", String.class).invoke(null, key);
+        }
+        catch (final Throwable ignored)
+        {
+            // QuidCraft absent — stay silent rather than spam action-bar.
         }
     }
 }
