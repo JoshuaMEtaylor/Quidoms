@@ -4,8 +4,8 @@
 
     <button id="cancel" size="86 17" pos="60 120"
             source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
-            label="$(gui.yes)" color="black"/>
+            label="$(gui.yes)" color="#F4F1EA"/>
     <button id="confirm" size="86 17" pos="160 120"
             source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
-            label="$(gui.cancel)" color="black"/>
+            label="$(gui.cancel)" color="#F4F1EA"/>
 </window>

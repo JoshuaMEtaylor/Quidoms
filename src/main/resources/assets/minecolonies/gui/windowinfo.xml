@@ -10,5 +10,5 @@
     <button id="exit" size="18 10" pos="13 13" source="minecolonies:textures/gui/builderhut/turn_page_left.png"/>
     <button id="prevPage" size="18 10" pos="13 13" source="minecolonies:textures/gui/builderhut/turn_page_left.png"/>
     <button id="nextPage" size="18 10" pos="159 13" source="minecolonies:textures/gui/builderhut/turn_page_right.png"/>
-    <text id="pageNum" size="20 11" pos="158 222" textalign="MIDDLE" label="" color="black"/>
+    <text id="pageNum" size="20 11" pos="158 222" textalign="MIDDLE" label="" color="#F4F1EA"/>
 </window>

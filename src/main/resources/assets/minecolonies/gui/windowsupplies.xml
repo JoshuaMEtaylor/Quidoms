@@ -3,5 +3,5 @@
 
     <layout source="structurize:gui/layoutmanipulation.xml"/>
 
-    <button id="switch" source="structurize:textures/gui/buildtool/button_medium.png" label="$(structurize.gui.buildtool.switchpack)" size="86 17" pos="5 5" textcolor="black" texthovercolor="gray"/>
+    <button id="switch" source="structurize:textures/gui/buildtool/button_medium.png" label="$(structurize.gui.buildtool.switchpack)" size="86 17" pos="5 5" textcolor="#F4F1EA" texthovercolor="gray"/>
 </window>

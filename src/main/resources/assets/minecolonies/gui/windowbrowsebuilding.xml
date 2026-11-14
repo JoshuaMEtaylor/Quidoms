@@ -14,10 +14,10 @@
 
     <list id="buildings" size="162 80%" pos="15 30" visible="false">
         <box size="100% 32" linewidth="1">
-            <text id="packName" size="158 10" pos="2 2" color="black"/>
-            <text id="buildingName" size="158 10" pos="2 11" color="black" textscale="0.5" wrap="true"/>
-            <text id="buildingSize" size="69% 10" pos="2 21" color="black"/>
-            <text id="buildingLevel" align="TOP_RIGHT" textalign="TOP_RIGHT" size="29% 10" pos="2 21" color="black"/>
+            <text id="packName" size="158 10" pos="2 2" color="#F4F1EA"/>
+            <text id="buildingName" size="158 10" pos="2 11" color="#F4F1EA" textscale="0.5" wrap="true"/>
+            <text id="buildingSize" size="69% 10" pos="2 21" color="#F4F1EA"/>
+            <text id="buildingLevel" align="TOP_RIGHT" textalign="TOP_RIGHT" size="29% 10" pos="2 21" color="#F4F1EA"/>
         </box>
     </list>
 </window>
