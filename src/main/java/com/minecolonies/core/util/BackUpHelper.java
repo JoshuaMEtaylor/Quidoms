@@ -448,7 +448,8 @@ public final class BackUpHelper
             loadedColony.setDimensionId(dimension);
             IColonyManager.getInstance().addColonyDirect(loadedColony, (ServerLevel) colonyWorld);
 
-            if (claimChunks)
+            // Do not reclaim while save-data is still being constructed — claim lookups re-enter load.
+            if (claimChunks && !com.minecolonies.api.colony.savedata.ColonySaveDataLoadGuard.isLoading())
             {
                 final LevelChunk chunk = ((LevelChunk) colonyWorld.getChunk(loadedColony.getCenter()));
                 if (ColonyUtils.getOwningColony(chunk) != colonyId)
