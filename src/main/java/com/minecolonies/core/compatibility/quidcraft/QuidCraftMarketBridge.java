@@ -89,7 +89,7 @@ public final class QuidCraftMarketBridge {
             return false;
         }
         IColony iColony = iBuilding.getColony();
-        String string2 = BuiltInRegistries.ITEM.getKey((Object)itemStack.getItem()).toString();
+        String string2 = BuiltInRegistries.ITEM.getKey(itemStack.getItem()).toString();
         String string3 = iColony.getID() + "|" + string2;
         long l = System.currentTimeMillis();
         Long l2 = COOLDOWNS.get(string3);
@@ -99,7 +99,7 @@ public final class QuidCraftMarketBridge {
         UUID uUID = UUID.randomUUID();
         UUID uUID2 = iColony.getPermissions().getOwner();
         String string4 = iColony.getPermissions().getOwnerName() == null ? "colony-owner" : iColony.getPermissions().getOwnerName();
-        Object object = iColony.getName() == null ? "colony-" + iColony.getID() : iColony.getName();
+        String object = iColony.getName() == null ? "colony-" + iColony.getID() : iColony.getName();
         UUID uUID3 = uUID2 == null ? new UUID(0L, 0L) : uUID2;
         try {
             if (!QuidCraftMarketBridge.quidReady()) {
@@ -179,7 +179,7 @@ public final class QuidCraftMarketBridge {
         }
         AbstractBuildingStructureBuilder abstractBuildingStructureBuilder = (AbstractBuildingStructureBuilder)iBuilding;
         try {
-            Map map = abstractBuildingStructureBuilder.getNeededResources();
+            Map<String, BuildingBuilderResource> map = abstractBuildingStructureBuilder.getNeededResources();
             if (map == null || map.isEmpty()) {
                 return;
             }
