@@ -645,12 +645,20 @@ public final class ColonyManager implements IColonyManager
     @Override
     public void onClientTick(@NotNull final ClientTickEvent.Pre event)
     {
-        if (Minecraft.getInstance().level == null && !colonyViews.isEmpty())
+        onClientTick(Minecraft.getInstance().level != null);
+    }
+
+    /**
+     * Client tick for the 1.21.10 tip {@link IColonyManager} surface ({@code boolean hasWorld}).
+     * {@code hasWorld} is true when the client level is loaded.
+     */
+    public void onClientTick(final boolean hasWorld)
+    {
+        if (!hasWorld && !colonyViews.isEmpty())
         {
-            //  Player has left the game, clear the Colony View cache
+            // Player has left the game, clear the Colony View cache
             colonyViews.clear();
         }
-
 
         if (clientSoundManager == null)
         {
