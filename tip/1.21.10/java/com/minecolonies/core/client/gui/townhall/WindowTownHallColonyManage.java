@@ -111,10 +111,8 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
                 pathName = "";
             }
 
-            mc.player.displayClientMessage(
-              Component.literal("Founding \"" + colonyName.trim() + "\" (fee " + QuidCraftKingdomBridge.formatFoundingCostPretty() + ")…"),
-              true);
-
+            // No optimistic action-bar / chat. Server shows QuidCraft toast on afford fail,
+            // or success feedback on CreateColonyMessage when founding completes.
             new CreateColonyMessage(pos, reactivate, colonyName.trim(), packName, pathName).sendToServer();
             close();
         }
