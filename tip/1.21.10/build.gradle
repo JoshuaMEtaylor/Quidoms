@@ -1,0 +1,143 @@
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+def tipBase = (findProperty('tipBaseJar') ?: System.getenv('TIP_BASE_JAR') ?: '') as String
+def nfMerged = (findProperty('neoforgeMergedJar') ?: System.getenv('NEOFORGE_MERGED_JAR') ?: '') as String
+def outDirProp = (findProperty('outDir') ?: 'build/classes') as String
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['java']
+        }
+        // Tip compile is classes-only; no resources.
+        resources {
+            srcDirs = []
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.neoforged.net/releases' }
+    maven { url = 'https://libraries.minecraft.net' }
+}
+
+// Prefer local Gradle-cache jars when present (offline-friendly tip compile).
+def cacheJar = { String glob ->
+    def matches = fileTree(dir: "${System.getProperty('user.home')}/.gradle/caches", include: glob).files
+    matches ? matches.sort { -it.lastModified() }.first() : null
+}
+def dfuJar = cacheJar('**/datafixerupper-8.0.16.jar')
+def guavaJar = cacheJar('**/guava-32.1.2-jre.jar')
+def log4jJar = cacheJar('**/log4j-api-2.22.1.jar')
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:24.1.0'
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    if (guavaJar != null) {
+        compileOnly files(guavaJar)
+    } else {
+        compileOnly 'com.google.guava:guava:32.1.2-jre'
+    }
+    if (dfuJar != null) {
+        compileOnly files(dfuJar)
+    } else {
+        compileOnly 'com.mojang:datafixerupper:8.0.16'
+    }
+    if (log4jJar != null) {
+        compileOnly files(log4jJar)
+    } else {
+        compileOnly 'org.apache.logging.log4j:log4j-api:2.22.1'
+    }
+}
+
+/**
+ * Builds a tip-safe compile classpath:
+ * tip fat jar + minecraft-only slice of NeoForge merged (no net.neoforged)
+ * + minimal NeoForge extension stubs so Level/SavedData typecheck without
+ * pulling the full NeoForge dependency tree into javac.
+ */
+tasks.register('prepareTipClasspath') {
+    group = 'tip'
+    description = 'Extract MC-only + min NeoForge stubs for tip SavedData javac'
+    def work = layout.buildDirectory.dir('tip-cp')
+    outputs.dir(work)
+    doLast {
+        if (!tipBase || !file(tipBase).exists()) {
+            throw new GradleException('Set -PtipBaseJar= to quidoms tip fat jar (e.g. 0.0.31)')
+        }
+        if (!nfMerged || !file(nfMerged).exists()) {
+            throw new GradleException('Set -PneoforgeMergedJar= to neoforge-*-merged.jar for 21.10')
+        }
+        def workDir = work.get().asFile
+        delete workDir
+        def mcDir = new File(workDir, 'mc-only')
+        def stubSrc = new File(workDir, 'stub-src')
+        def stubOut = new File(workDir, 'stub-classes')
+        mcDir.mkdirs()
+        stubSrc.mkdirs()
+        stubOut.mkdirs()
+
+        ant.unzip(src: nfMerged, dest: mcDir) {
+            patternset {
+                include(name: 'net/minecraft/**')
+                include(name: 'com/mojang/**')
+            }
+        }
+        ant.jar(destfile: new File(workDir, 'mc-only.jar'), basedir: mcDir)
+
+        def stubPkgs = [
+            'net/neoforged/neoforge/common/extensions',
+            'net/neoforged/neoforge/attachment'
+        ]
+        stubPkgs.each { new File(stubSrc, it).mkdirs() }
+        new File(stubSrc, 'net/neoforged/neoforge/common/extensions/IBlockGetterExtension.java').text =
+            'package net.neoforged.neoforge.common.extensions;\npublic interface IBlockGetterExtension {}\n'
+        new File(stubSrc, 'net/neoforged/neoforge/common/extensions/IBlockAndTintGetterExtension.java').text =
+            'package net.neoforged.neoforge.common.extensions;\npublic interface IBlockAndTintGetterExtension extends IBlockGetterExtension {}\n'
+        new File(stubSrc, 'net/neoforged/neoforge/common/extensions/ILevelReaderExtension.java').text =
+            'package net.neoforged.neoforge.common.extensions;\npublic interface ILevelReaderExtension extends IBlockAndTintGetterExtension {}\n'
+        new File(stubSrc, 'net/neoforged/neoforge/common/extensions/ILevelExtension.java').text =
+            'package net.neoforged.neoforge.common.extensions;\npublic interface ILevelExtension extends ILevelReaderExtension {}\n'
+        new File(stubSrc, 'net/neoforged/neoforge/attachment/AttachmentHolder.java').text =
+            'package net.neoforged.neoforge.attachment;\npublic abstract class AttachmentHolder {}\n'
+
+        ant.javac(
+            srcdir: stubSrc.absolutePath,
+            destdir: stubOut.absolutePath,
+            includeantruntime: false,
+            source: '21',
+            target: '21',
+            encoding: 'UTF-8'
+        )
+        ant.jar(destfile: new File(workDir, 'nf-minstubs.jar'), basedir: stubOut)
+    }
+}
+
+tasks.named('compileJava', JavaCompile).configure {
+    dependsOn 'prepareTipClasspath'
+    options.encoding = 'UTF-8'
+    options.release = 21
+    doFirst {
+        def workDir = layout.buildDirectory.dir('tip-cp').get().asFile
+        def tipJar = file(tipBase)
+        def mcOnly = new File(workDir, 'mc-only.jar')
+        def stubs = new File(workDir, 'nf-minstubs.jar')
+        classpath = files(tipJar, mcOnly, stubs) + configurations.compileClasspath
+        destinationDirectory.set(file(outDirProp))
+    }
+}
+
+tasks.register('compileTipSavedata') {
+    group = 'tip'
+    description = 'Gradle javac of tip 1.21.10 SavedDataType + load-guard sources'
+    dependsOn 'compileJava'
+}

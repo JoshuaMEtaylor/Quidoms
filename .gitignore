@@ -22,6 +22,8 @@
 # gradle
 /build
 /.gradle
+/tip/1.21.10/build
+/tip/1.21.10/.gradle
 
 # other
 /.vscode
