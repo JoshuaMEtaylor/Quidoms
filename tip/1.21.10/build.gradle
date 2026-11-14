@@ -38,6 +38,9 @@ def cacheJar = { String glob ->
 def dfuJar = cacheJar('**/datafixerupper-8.0.16.jar')
 def guavaJar = cacheJar('**/guava-32.1.2-jre.jar')
 def log4jJar = cacheJar('**/log4j-api-2.22.1.jar')
+def nettyJar = cacheJar('**/netty-buffer-4.1.*.jar')
+def nettyCommonJar = cacheJar('**/netty-common-4.1.*.jar')
+def brigadierJar = cacheJar('**/brigadier-1.3.10.jar')
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:24.1.0'
@@ -56,6 +59,15 @@ dependencies {
         compileOnly files(log4jJar)
     } else {
         compileOnly 'org.apache.logging.log4j:log4j-api:2.22.1'
+    }
+    if (nettyJar != null) {
+        compileOnly files(nettyJar)
+    }
+    if (nettyCommonJar != null) {
+        compileOnly files(nettyCommonJar)
+    }
+    if (brigadierJar != null) {
+        compileOnly files(brigadierJar)
     }
 }
 
@@ -110,6 +122,43 @@ tasks.register('prepareTipClasspath') {
         new File(stubSrc, 'net/neoforged/neoforge/attachment/AttachmentHolder.java').text =
             'package net.neoforged.neoforge.attachment;\npublic abstract class AttachmentHolder {}\n'
 
+        // Network / config / FML stubs for tip CreateColonyMessage + QuidCraft bridge compile
+        new File(stubSrc, 'net/neoforged/neoforge/network/handling').mkdirs()
+        new File(stubSrc, 'net/neoforged/neoforge/common').mkdirs()
+        new File(stubSrc, 'net/neoforged/fml').mkdirs()
+        new File(stubSrc, 'net/neoforged/neoforge/network/handling/IPayloadContext.java').text =
+            'package net.neoforged.neoforge.network.handling;\npublic interface IPayloadContext {}\n'
+        new File(stubSrc, 'net/neoforged/neoforge/common/ModConfigSpec.java').text = '''
+package net.neoforged.neoforge.common;
+public class ModConfigSpec {
+  public static class IntValue {
+    public Integer get() { return 0; }
+  }
+}
+'''
+        new File(stubSrc, 'net/neoforged/fml/ModList.java').text = '''
+package net.neoforged.fml;
+public class ModList {
+  public static ModList get() { return new ModList(); }
+  public boolean isLoaded(String id) { return false; }
+}
+'''
+        // Empty extension interfaces referenced by MC 1.21.10 class signatures
+        def extIfaces = [
+            'IPlayerExtension', 'IEntityExtension', 'ILivingEntityExtension',
+            'IBlockEntityExtension', 'IFriendlyByteBufExtension', 'IMenuProviderExtension'
+        ]
+        extIfaces.each { name ->
+            new File(stubSrc, "net/neoforged/neoforge/common/extensions/${name}.java").text =
+                "package net.neoforged.neoforge.common.extensions;\npublic interface ${name} {}\n"
+        }
+        new File(stubSrc, 'net/neoforged/neoforge/client/extensions').mkdirs()
+        new File(stubSrc, 'net/neoforged/neoforge/client/extensions/IMinecraftExtension.java').text =
+            'package net.neoforged.neoforge.client.extensions;\npublic interface IMinecraftExtension {}\n'
+        new File(stubSrc, 'net/neoforged/neoforge/resource').mkdirs()
+        new File(stubSrc, 'net/neoforged/neoforge/resource/ContextAwareReloadListener.java').text =
+            'package net.neoforged.neoforge.resource;\npublic abstract class ContextAwareReloadListener {}\n'
+
         ant.javac(
             srcdir: stubSrc.absolutePath,
             destdir: stubOut.absolutePath,
@@ -138,6 +187,12 @@ tasks.named('compileJava', JavaCompile).configure {
 
 tasks.register('compileTipSavedata') {
     group = 'tip'
-    description = 'Gradle javac of tip 1.21.10 SavedDataType + load-guard sources'
+    description = 'Gradle javac of tip 1.21.10 sources (SavedData, CreateColonyMessage, founding UI)'
     dependsOn 'compileJava'
+}
+
+tasks.register('compileTipClasses') {
+    group = 'tip'
+    description = 'Alias for compileTipSavedata — tip 1.21.10 gradle javac'
+    dependsOn 'compileTipSavedata'
 }

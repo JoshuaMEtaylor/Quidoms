@@ -2552,5 +2552,6 @@
   "com.minecolonies.core.gui.build.confirm.title": "Are you sure you want to upgrade the building?",
   "com.minecolonies.core.gui.teleport.confirm.title": "Are you sure you want to teleport now?",
   "com.minecolonies.core.menu.ingredients": "Ingredients",
-  "com.minecolonies.core.founding.needquid": "Founding a kingdom costs %s. Deposit more Quid into your personal account, then try again."
+  "com.minecolonies.core.founding.needquid": "Founding a kingdom costs %s. Deposit more Quid into your personal account, then try again.",
+  "com.minecolonies.core.founding.cost": "Founding fee: %s — paid from your personal Quid into the new kingdom treasury."
 }

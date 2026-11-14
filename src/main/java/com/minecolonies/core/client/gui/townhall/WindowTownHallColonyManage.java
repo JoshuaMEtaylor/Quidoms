@@ -6,6 +6,7 @@ import com.ldtteam.structurize.storage.StructurePacks;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import com.minecolonies.core.client.gui.AbstractWindowSkeleton;
+import com.minecolonies.core.compatibility.quidcraft.QuidCraftKingdomBridge;
 import com.minecolonies.core.network.messages.server.CreateColonyMessage;
 import com.minecolonies.core.network.messages.client.VanillaParticleMessage;
 import net.minecraft.ChatFormatting;
@@ -59,6 +60,14 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
         else
         {
             this.findPaneOfTypeByID("text3", Text.class).setText(Component.translatable("com.minecolonies.core.settlementcovenant3.noclose"));
+        }
+
+        final Text costPane = this.findPaneOfTypeByID("foundingcost", Text.class);
+        if (costPane != null)
+        {
+            costPane.setText(Component.translatable(
+              FOUNDING_COST_LABEL,
+              QuidCraftKingdomBridge.formatFoundingCostPretty()).withStyle(ChatFormatting.DARK_GREEN));
         }
     }
 

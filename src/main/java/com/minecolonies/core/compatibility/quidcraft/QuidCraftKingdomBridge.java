@@ -103,25 +103,48 @@ public final class QuidCraftKingdomBridge
         return UUID.nameUUIDFromBytes(("kingdom:" + colonyName.trim()).getBytes(StandardCharsets.UTF_8));
     }
 
-    private static void notifyNeedQuid(final ServerPlayer player, final Object access)
+    /** Pretty founding fee for UI / messages (defaults to £1000.00 when QuidCraft absent). */
+    public static String formatFoundingCostPretty()
     {
         try
         {
-            final String pretty = formatAmount(access, FOUNDING_COST_MINOR);
+            if (isPresent() && quidReady())
+            {
+                final Object access = quidAccess();
+                if (access != null)
+                {
+                    return formatAmount(access, FOUNDING_COST_MINOR);
+                }
+            }
+        }
+        catch (final Throwable ignored)
+        {
+        }
+        return formatAmount(null, FOUNDING_COST_MINOR);
+    }
+
+    private static void notifyNeedQuid(final ServerPlayer player, final Object access)
+    {
+        final String pretty = formatAmount(access, FOUNDING_COST_MINOR);
+        try
+        {
             final Class<?> component = Class.forName("net.minecraft.network.chat.Component");
             final Object msg = component.getMethod("translatable", String.class, Object[].class)
               .invoke(null, "com.minecolonies.core.founding.needquid", new Object[] {pretty});
             player.getClass().getMethod("sendSystemMessage", Class.forName("net.minecraft.network.chat.Component"))
               .invoke(player, msg);
+            // Also surface as action-bar toast so closing the covenant is not silent.
+            player.getClass().getMethod("displayClientMessage", Class.forName("net.minecraft.network.chat.Component"), boolean.class)
+              .invoke(player, msg, true);
         }
         catch (final Throwable ignored)
         {
             try
             {
-                final String pretty = formatAmount(access, FOUNDING_COST_MINOR);
+                final Object lit = Class.forName("net.minecraft.network.chat.Component").getMethod("literal", String.class)
+                  .invoke(null, "Founding a kingdom costs " + pretty + ". Deposit more Quid, then try again.");
                 player.getClass().getMethod("displayClientMessage", Class.forName("net.minecraft.network.chat.Component"), boolean.class)
-                  .invoke(player, Class.forName("net.minecraft.network.chat.Component").getMethod("literal", String.class)
-                    .invoke(null, "Founding a kingdom costs " + pretty + "."), false);
+                  .invoke(player, lit, false);
             }
             catch (final Throwable ignored2)
             {
