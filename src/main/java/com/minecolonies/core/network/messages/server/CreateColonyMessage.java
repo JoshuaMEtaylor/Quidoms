@@ -11,15 +11,11 @@ import com.minecolonies.api.eventbus.events.colony.ColonyCreatedModEvent;
 import com.minecolonies.core.network.messages.client.colony.OpenBuildingUIMessage;
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import com.minecolonies.api.util.BlockPosUtil;
-import com.minecolonies.api.util.MessageUtils;
-import com.minecolonies.api.util.MessageUtils.MessagePriority;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.MineColonies;
 import com.minecolonies.core.compatibility.quidcraft.QuidCraftKingdomBridge;
-import com.minecolonies.core.network.messages.client.OpenCantFoundColonyWarningMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,7 +24,6 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import java.util.ArrayList;
 
 import static com.minecolonies.api.util.constant.BuildingConstants.DEACTIVATED;
-import static com.minecolonies.api.util.constant.TranslationConstants.*;
 
 /**
  * Message for trying to create a new colony.
