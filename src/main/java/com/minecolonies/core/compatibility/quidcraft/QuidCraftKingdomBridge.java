@@ -125,32 +125,38 @@ public final class QuidCraftKingdomBridge
         return formatAmount(null, FOUNDING_COST_MINOR);
     }
 
+    /**
+     * Afford / charge failure: QuidCraft HUD toast only (“Not enough quid”). No chat, no action bar.
+     */
     private static void notifyNeedQuid(final ServerPlayer player, final Object access)
     {
-        final String pretty = formatAmount(access, FOUNDING_COST_MINOR);
         try
         {
-            final Class<?> component = Class.forName("net.minecraft.network.chat.Component");
-            final Object msg = component.getMethod("translatable", String.class, Object[].class)
-              .invoke(null, "com.minecolonies.core.founding.needquid", new Object[] {pretty});
-            player.getClass().getMethod("sendSystemMessage", Class.forName("net.minecraft.network.chat.Component"))
-              .invoke(player, msg);
-            // Also surface as action-bar toast so closing the covenant is not silent.
-            player.getClass().getMethod("displayClientMessage", Class.forName("net.minecraft.network.chat.Component"), boolean.class)
-              .invoke(player, msg, true);
-        }
-        catch (final Throwable ignored)
-        {
+            Object toastAccess = access;
+            if (toastAccess == null && quidReady())
+            {
+                toastAccess = quidAccess();
+            }
+            if (toastAccess == null)
+            {
+                return;
+            }
+            final UUID playerId = (UUID) player.getClass().getMethod("getUUID").invoke(player);
             try
             {
-                final Object lit = Class.forName("net.minecraft.network.chat.Component").getMethod("literal", String.class)
-                  .invoke(null, "Founding a kingdom costs " + pretty + ". Deposit more Quid, then try again.");
-                player.getClass().getMethod("displayClientMessage", Class.forName("net.minecraft.network.chat.Component"), boolean.class)
-                  .invoke(player, lit, false);
+                toastAccess.getClass().getMethod("toastFunds", UUID.class).invoke(toastAccess, playerId);
+                return;
             }
-            catch (final Throwable ignored2)
+            catch (final NoSuchMethodException ignored)
             {
+                toastAccess.getClass().getMethod("toast", UUID.class, String.class)
+                  .invoke(toastAccess, playerId, "quidcraft.toast.funds");
             }
+        }
+        catch (final Throwable ex)
+        {
+            System.err.println("QuidCraft toast failed: " + ex);
+            // Never fall back to chat spam.
         }
     }
 

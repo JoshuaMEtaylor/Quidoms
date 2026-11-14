@@ -7,13 +7,12 @@ import com.quidcraft.api.AccountRef;
 import com.quidcraft.api.QuidAccess;
 import com.quidcraft.api.QuidApi;
 import com.quidcraft.api.QuidResult;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
 
 /**
- * Tip bridge for QuidCraft 1.0.59 kingdom founding.
- * Compiled against quidcraft-1.0.59 ({@link QuidApi}/{@link QuidAccess}); soft-skips when QuidCraft is absent.
+ * Tip bridge for QuidCraft kingdom founding.
+ * Afford failures use QuidCraft HUD toast ({@code toastFunds}) — never chat spam.
  */
 public final class QuidCraftKingdomBridge
 {
@@ -99,7 +98,6 @@ public final class QuidCraftKingdomBridge
         }
         catch (final NoClassDefFoundError | ExceptionInInitializerError missing)
         {
-            // QuidCraft API absent at runtime despite mod id — treat as optional.
             System.err.println("QuidCraft founding API missing: " + missing);
             return true;
         }
@@ -107,15 +105,8 @@ public final class QuidCraftKingdomBridge
         {
             System.err.println("QuidCraft kingdom founding bridge failed: " + ex);
             ex.printStackTrace();
-            // Do NOT silently allow free founding after a hard failure — tell the player.
-            try
-            {
-                player.displayClientMessage(Component.literal(
-                  "Could not charge the founding fee (" + formatFoundingCostPretty() + "). Check QuidCraft and try again."), false);
-            }
-            catch (final Throwable ignored)
-            {
-            }
+            // Hard API failure — still toast, never chat.
+            notifyNeedQuid(player, null);
             return false;
         }
     }
@@ -145,12 +136,30 @@ public final class QuidCraftKingdomBridge
         return "£" + (FOUNDING_COST_MINOR / 100L) + "." + String.format("%02d", FOUNDING_COST_MINOR % 100L);
     }
 
+    /**
+     * Afford / charge failure: QuidCraft HUD toast only (“Not enough quid”). No chat, no action bar.
+     */
     private static void notifyNeedQuid(final ServerPlayer player, final QuidAccess access)
     {
-        final String pretty = access != null ? access.format(FOUNDING_COST_MINOR) : formatFoundingCostPretty();
-        final Component msg = Component.translatable("com.minecolonies.core.founding.needquid", pretty);
-        player.sendSystemMessage(msg);
-        player.displayClientMessage(msg, true);
+        try
+        {
+            final QuidAccess toastAccess = access != null ? access : (QuidApi.ready() ? QuidApi.get() : null);
+            if (toastAccess != null)
+            {
+                toastAccess.toastFunds(player.getUUID());
+                return;
+            }
+        }
+        catch (final NoSuchMethodError | AbstractMethodError missing)
+        {
+            // Older QuidCraft without toast API — fall through to reflective no-op.
+            System.err.println("QuidCraft toastFunds missing; update QuidCraft tip: " + missing);
+        }
+        catch (final Throwable ex)
+        {
+            System.err.println("QuidCraft toast failed: " + ex);
+        }
+        // Last resort: still never spam chat. Soft-fail silent if toast unavailable.
     }
 
     public static long infraBudgetRemaining(final String kingdomName)

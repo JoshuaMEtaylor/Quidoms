@@ -14,7 +14,6 @@ import com.minecolonies.api.util.MessageUtils.MessagePriority;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.MineColonies;
 import com.minecolonies.core.compatibility.quidcraft.QuidCraftKingdomBridge;
-import com.minecolonies.core.network.messages.client.OpenCantFoundColonyWarningMessage;
 import com.minecolonies.core.network.messages.client.colony.OpenBuildingUIMessage;
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import java.util.ArrayList;
@@ -173,14 +172,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         {
             if (!QuidCraftKingdomBridge.tryFundKingdomFounding(sender, colonyName))
             {
-                final Component need = Component.translatable(
-                  FOUNDING_NEED_QUID,
-                  QuidCraftKingdomBridge.formatFoundingCostPretty());
-                MessageUtils.format(FOUNDING_NEED_QUID, QuidCraftKingdomBridge.formatFoundingCostPretty())
-                  .withPriority(MessagePriority.DANGER)
-                  .sendTo(sender);
-                sender.displayClientMessage(need, true);
-                new OpenCantFoundColonyWarningMessage(need, townHall, false).sendToPlayer(sender);
+                // Afford failure: QuidCraft HUD toast only (bridge). No chat / action-bar spam.
                 return;
             }
 

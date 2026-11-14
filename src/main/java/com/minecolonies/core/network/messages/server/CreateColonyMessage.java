@@ -184,13 +184,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
             // QuidCraft: founding costs 1000 Quid into the new kingdom treasury (soft optional).
             if (!QuidCraftKingdomBridge.tryFundKingdomFounding(sender, colonyName))
             {
-                final Component need = Component.translatable(
-                  FOUNDING_NEED_QUID,
-                  QuidCraftKingdomBridge.formatFoundingCostPretty());
-                MessageUtils.format(FOUNDING_NEED_QUID, QuidCraftKingdomBridge.formatFoundingCostPretty())
-                  .withPriority(MessagePriority.DANGER)
-                  .sendTo(sender);
-                new OpenCantFoundColonyWarningMessage(need, townHall, false).sendToPlayer(sender);
+                // Afford failure: QuidCraft HUD toast only (bridge). No chat spam.
                 return;
             }
 
