@@ -92,9 +92,11 @@ public final class QuidCraftKingdomBridge
         }
         catch (final Throwable ex)
         {
-            reflectFailed = true;
             System.err.println("QuidCraft kingdom founding bridge failed: " + ex);
-            return true;
+            ex.printStackTrace();
+            // Do not silently allow free founding after a hard API failure.
+            notifyNeedQuid(player, null);
+            return false;
         }
     }
 

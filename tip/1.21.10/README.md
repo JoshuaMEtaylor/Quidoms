@@ -18,8 +18,10 @@ From repo root:
 ./gradlew -p tip/1.21.10 compileTipClasses \
   -PtipBaseJar=/path/to/quidoms-0.0.31-1.21.10.jar \
   -PneoforgeMergedJar=/path/to/neoforge-21.10.64-merged.jar \
+  -PquidcraftJar=/path/to/quidcraft-1.0.59.jar \
   -PoutDir=/tmp/tip-classes \
   --no-configuration-cache
 ```
+
 
 Do **not** ASM-patch tip classes. Install only gradle-javac output into the tip jar.

@@ -25,7 +25,7 @@ import static com.minecolonies.api.util.constant.TranslationConstants.*;
 import static com.minecolonies.api.util.constant.WindowConstants.*;
 
 /**
- * Tip UI to found a new colony — shows founding price (1000 Quid).
+ * Tip UI to found a new colony — shows founding price and always reports send errors.
  */
 public class WindowTownHallColonyManage extends AbstractWindowSkeleton
 {
@@ -66,21 +66,66 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
 
     public void onCreate()
     {
-        final String colonyName = this.findPaneOfTypeByID("colonyname", TextField.class).getText();
+        try
+        {
+            final String colonyName = this.findPaneOfTypeByID("colonyname", TextField.class).getText();
+            if (colonyName == null || colonyName.trim().isEmpty())
+            {
+                mc.player.displayClientMessage(Component.literal("Enter a kingdom name before founding."), true);
+                return;
+            }
 
-        // Tip 1.21.10: DRAGON_BREATH is no longer SimpleParticleType.
-        new VanillaParticleMessage(pos.getX(), pos.getY(), pos.getZ(), ParticleTypes.HAPPY_VILLAGER).onExecute(null, mc.player);
-        Minecraft.getInstance().level.playSound(Minecraft.getInstance().player, Minecraft.getInstance().player.blockPosition(),
-          SoundEvents.CAMPFIRE_CRACKLE, SoundSource.AMBIENT, 2.5f, 0.8f);
-        final BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(pos);
+            try
+            {
+                // Tip 1.21.10 uses FLAME (DRAGON_BREATH is no longer SimpleParticleType).
+                new VanillaParticleMessage(pos.getX(), pos.getY(), pos.getZ(), ParticleTypes.FLAME).onExecute(null, mc.player);
+                Minecraft.getInstance().level.playSound(Minecraft.getInstance().player, Minecraft.getInstance().player.blockPosition(),
+                  SoundEvents.CAMPFIRE_CRACKLE, SoundSource.AMBIENT, 2.5f, 0.8f);
+            }
+            catch (final Throwable ignored)
+            {
+                // Cosmetics must never block founding.
+            }
 
-        new CreateColonyMessage(pos,
-          reactivate,
-          colonyName,
-          reactivate ? "" : StructurePacks.selectedPack.getName(),
-          ((TileEntityColonyBuilding) entity).getBlueprintPath()).sendToServer();
+            final BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(pos);
+            if (!(entity instanceof final TileEntityColonyBuilding hut))
+            {
+                mc.player.displayClientMessage(Component.literal("Town hall block is missing — cannot found here."), true);
+                return;
+            }
 
-        // Close the covenant; server opens building UI on success or cant-create warning on fund failure.
-        close();
+            // Prefer hut pack; selectedPack is often null after supply-camp placement and NPEs the click.
+            String packName = "";
+            if (hut.getStructurePack() != null)
+            {
+                packName = hut.getStructurePack().getName();
+            }
+            else if (!reactivate && StructurePacks.selectedPack != null)
+            {
+                packName = StructurePacks.selectedPack.getName();
+            }
+
+            String pathName = hut.getBlueprintPath();
+            if (pathName == null)
+            {
+                pathName = "";
+            }
+
+            mc.player.displayClientMessage(
+              Component.literal("Founding \"" + colonyName.trim() + "\" (fee " + QuidCraftKingdomBridge.formatFoundingCostPretty() + ")…"),
+              true);
+
+            new CreateColonyMessage(pos, reactivate, colonyName.trim(), packName, pathName).sendToServer();
+            close();
+        }
+        catch (final Throwable ex)
+        {
+            System.err.println("Founding create click failed: " + ex);
+            ex.printStackTrace();
+            if (mc.player != null)
+            {
+                mc.player.displayClientMessage(Component.literal("Could not send founding request: " + ex.getClass().getSimpleName()), false);
+            }
+        }
     }
 }

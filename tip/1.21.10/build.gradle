@@ -10,6 +10,7 @@ java {
 
 def tipBase = (findProperty('tipBaseJar') ?: System.getenv('TIP_BASE_JAR') ?: '') as String
 def nfMerged = (findProperty('neoforgeMergedJar') ?: System.getenv('NEOFORGE_MERGED_JAR') ?: '') as String
+def quidcraftJarProp = (findProperty('quidcraftJar') ?: System.getenv('QUIDCRAFT_JAR') ?: '') as String
 def outDirProp = (findProperty('outDir') ?: 'build/classes') as String
 
 sourceSets {
@@ -68,6 +69,10 @@ dependencies {
     }
     if (brigadierJar != null) {
         compileOnly files(brigadierJar)
+    }
+    // QuidCraft 1.0.59 API for typed founding bridge (soft-optional at runtime).
+    if (quidcraftJarProp && file(quidcraftJarProp).exists()) {
+        compileOnly files(quidcraftJarProp)
     }
 }
 

@@ -18,6 +18,7 @@ import com.minecolonies.core.network.messages.client.OpenCantFoundColonyWarningM
 import com.minecolonies.core.network.messages.client.colony.OpenBuildingUIMessage;
 import com.minecolonies.core.tileentities.TileEntityColonyBuilding;
 import java.util.ArrayList;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -30,8 +31,8 @@ import static com.minecolonies.api.util.constant.BuildingConstants.DEACTIVATED;
 import static com.minecolonies.api.util.constant.TranslationConstants.*;
 
 /**
- * Tip 1.21.10 CreateColonyMessage — uses ServerPlayer.level() and ServerLevel.getRespawnData().
- * Do not compile the 1.21.1 serverLevel()/getSharedSpawnPos() variant into the tip jar.
+ * Tip 1.21.10 CreateColonyMessage — {@code ServerPlayer.level()} + {@code getRespawnData()}.
+ * Always sends player feedback on success or failure (including founding fee).
  */
 public class CreateColonyMessage extends AbstractServerPlayMessage
 {
@@ -76,12 +77,35 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
     @Override
     protected void onExecute(final IPayloadContext ctxIn, final ServerPlayer sender)
     {
+        try
+        {
+            onExecuteSafe(sender);
+        }
+        catch (final Throwable ex)
+        {
+            System.err.println("CreateColonyMessage failed: " + ex);
+            ex.printStackTrace();
+            try
+            {
+                sender.displayClientMessage(Component.literal("Founding failed: " + ex.getClass().getSimpleName() + " — see server log."), false);
+                MessageUtils.format(WARNING_COLONY_FOUNDING_FAILED)
+                  .withPriority(MessagePriority.DANGER)
+                  .sendTo(sender);
+            }
+            catch (final Throwable ignored)
+            {
+            }
+        }
+    }
+
+    private void onExecuteSafe(final ServerPlayer sender)
+    {
         // Tip 1.21.10: ServerPlayer.level() returns ServerLevel (serverLevel() does not exist).
         final ServerLevel world = sender.level();
 
         final IColony colony = IColonyManager.getInstance().getClosestColony(world, townHall);
 
-        String pack = packName;
+        String pack = packName == null ? "" : packName;
         final BlockEntity tileEntity = world.getBlockEntity(townHall);
 
         if (!(tileEntity instanceof final TileEntityColonyBuilding hut))
@@ -89,10 +113,12 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
             MessageUtils.format(WARNING_TOWN_HALL_NO_TILE_ENTITY)
               .withPriority(MessagePriority.DANGER)
               .sendTo(sender);
+            sender.displayClientMessage(Component.literal("Founding failed: town hall has no tile entity."), true);
             return;
         }
 
-        if (hut.getStructurePack() != null && claim)
+        // Prefer hut pack whenever present — client selectedPack is often unset after supply placement.
+        if (hut.getStructurePack() != null && (claim || pack.isEmpty()))
         {
             pack = hut.getStructurePack().getName();
         }
@@ -110,7 +136,6 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         hut.setStructurePack(StructurePacks.getStructurePack(pack));
         hut.setBlueprintPath(pathName);
 
-        // Tip 1.21.10 spawn pos API
         final double spawnDistance = Math.sqrt(BlockPosUtil.getDistanceSquared2D(townHall, world.getRespawnData().pos()));
         if (spawnDistance < MineColonies.getConfig().getServer().minDistanceFromWorldSpawn.get())
         {
@@ -147,6 +172,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
                 MessageUtils.format(FOUNDING_NEED_QUID, QuidCraftKingdomBridge.formatFoundingCostPretty())
                   .withPriority(MessagePriority.DANGER)
                   .sendTo(sender);
+                sender.displayClientMessage(need, true);
                 new OpenCantFoundColonyWarningMessage(need, townHall, false).sendToPlayer(sender);
                 return;
             }
@@ -165,11 +191,13 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
                 MessageUtils.format(MESSAGE_COLONY_FOUNDED)
                   .withPriority(MessagePriority.IMPORTANT)
                   .sendTo(sender);
+                sender.displayClientMessage(Component.translatable(MESSAGE_COLONY_FOUNDED).withStyle(ChatFormatting.GREEN), true);
+                sender.displayClientMessage(Component.literal(
+                  "Treasury funded with " + QuidCraftKingdomBridge.formatFoundingCostPretty() + "."), false);
             }
 
             IMinecoloniesAPI.getInstance().getEventBus().post(new ColonyCreatedModEvent(createdColony));
             new OpenBuildingUIMessage(building).sendToPlayer(sender);
-
             return;
         }
 
@@ -178,5 +206,6 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         MessageUtils.format(WARNING_COLONY_FOUNDING_FAILED)
           .withPriority(MessagePriority.DANGER)
           .sendTo(sender);
+        sender.displayClientMessage(Component.translatable(WARNING_COLONY_FOUNDING_FAILED), true);
     }
 }

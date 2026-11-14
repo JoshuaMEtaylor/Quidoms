@@ -95,11 +95,34 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
     @Override
     protected void onExecute(final IPayloadContext ctxIn, final ServerPlayer sender)
     {
+        try
+        {
+            onExecuteSafe(sender);
+        }
+        catch (final Throwable ex)
+        {
+            System.err.println("CreateColonyMessage failed: " + ex);
+            ex.printStackTrace();
+            try
+            {
+                sender.displayClientMessage(Component.literal("Founding failed: " + ex.getClass().getSimpleName()), false);
+                MessageUtils.format(WARNING_COLONY_FOUNDING_FAILED)
+                  .withPriority(MessagePriority.DANGER)
+                  .sendTo(sender);
+            }
+            catch (final Throwable ignored)
+            {
+            }
+        }
+    }
+
+    private void onExecuteSafe(final ServerPlayer sender)
+    {
         final ServerLevel world = sender.serverLevel();
 
         final IColony colony = IColonyManager.getInstance().getClosestColony(world, townHall);
 
-        String pack = packName;
+        String pack = packName == null ? "" : packName;
         final BlockEntity tileEntity = world.getBlockEntity(townHall);
 
         if (!(tileEntity instanceof final TileEntityColonyBuilding hut))
@@ -110,7 +133,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
             return;
         }
 
-        if (hut.getStructurePack() != null && claim)
+        if (hut.getStructurePack() != null && (claim || pack.isEmpty()))
         {
             pack = hut.getStructurePack().getName();
         }
@@ -187,7 +210,7 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
 
             IMinecoloniesAPI.getInstance().getEventBus().post(new ColonyCreatedModEvent(createdColony));
             new OpenBuildingUIMessage(building).sendToPlayer(sender);
-
+            sender.displayClientMessage(Component.translatable(MESSAGE_COLONY_FOUNDED), true);
             return;
         }
 
@@ -196,5 +219,6 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
         MessageUtils.format(WARNING_COLONY_FOUNDING_FAILED)
           .withPriority(MessagePriority.DANGER)
           .sendTo(sender);
+        sender.displayClientMessage(Component.translatable(WARNING_COLONY_FOUNDING_FAILED), true);
     }
 }

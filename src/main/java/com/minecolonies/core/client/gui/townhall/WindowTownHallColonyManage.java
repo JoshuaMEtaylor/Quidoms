@@ -76,19 +76,62 @@ public class WindowTownHallColonyManage extends AbstractWindowSkeleton
      */
     public void onCreate()
     {
-        final String colonyName = this.findPaneOfTypeByID("colonyname", TextField.class).getText();
+        try
+        {
+            final String colonyName = this.findPaneOfTypeByID("colonyname", TextField.class).getText();
+            if (colonyName == null || colonyName.trim().isEmpty())
+            {
+                mc.player.displayClientMessage(Component.literal("Enter a kingdom name before founding."), true);
+                return;
+            }
 
-        new VanillaParticleMessage(pos.getX(), pos.getY(), pos.getZ(), ParticleTypes.DRAGON_BREATH).onExecute(null, mc.player);
-        Minecraft.getInstance().level.playSound(Minecraft.getInstance().player, Minecraft.getInstance().player.blockPosition(),
-          SoundEvents.CAMPFIRE_CRACKLE, SoundSource.AMBIENT, 2.5f, 0.8f);
-        final BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(pos);
+            try
+            {
+                new VanillaParticleMessage(pos.getX(), pos.getY(), pos.getZ(), ParticleTypes.FLAME).onExecute(null, mc.player);
+                Minecraft.getInstance().level.playSound(Minecraft.getInstance().player, Minecraft.getInstance().player.blockPosition(),
+                  SoundEvents.CAMPFIRE_CRACKLE, SoundSource.AMBIENT, 2.5f, 0.8f);
+            }
+            catch (final Throwable ignored)
+            {
+            }
 
-        new CreateColonyMessage(pos,
-                reactivate,
-                colonyName,
-                reactivate ? "" : StructurePacks.selectedPack.getName(),
-                ((TileEntityColonyBuilding) entity).getBlueprintPath()).sendToServer();
+            final BlockEntity entity = Minecraft.getInstance().level.getBlockEntity(pos);
+            if (!(entity instanceof final TileEntityColonyBuilding hut))
+            {
+                mc.player.displayClientMessage(Component.literal("Town hall block is missing — cannot found here."), true);
+                return;
+            }
 
-        close();
+            String packName = "";
+            if (hut.getStructurePack() != null)
+            {
+                packName = hut.getStructurePack().getName();
+            }
+            else if (!reactivate && StructurePacks.selectedPack != null)
+            {
+                packName = StructurePacks.selectedPack.getName();
+            }
+
+            String pathName = hut.getBlueprintPath();
+            if (pathName == null)
+            {
+                pathName = "";
+            }
+
+            mc.player.displayClientMessage(
+              Component.literal("Founding \"" + colonyName.trim() + "\" (fee " + QuidCraftKingdomBridge.formatFoundingCostPretty() + ")…"),
+              true);
+
+            new CreateColonyMessage(pos, reactivate, colonyName.trim(), packName, pathName).sendToServer();
+            close();
+        }
+        catch (final Throwable ex)
+        {
+            System.err.println("Founding create click failed: " + ex);
+            if (mc.player != null)
+            {
+                mc.player.displayClientMessage(Component.literal("Could not send founding request: " + ex.getClass().getSimpleName()), false);
+            }
+        }
     }
 }
