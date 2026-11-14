@@ -15,6 +15,7 @@ import com.minecolonies.api.util.MessageUtils;
 import com.minecolonies.api.util.MessageUtils.MessagePriority;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.MineColonies;
+import com.minecolonies.core.compatibility.quidcraft.QuidCraftKingdomBridge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -153,6 +154,12 @@ public class CreateColonyMessage extends AbstractServerPlayMessage
 
         if (ownedColony == null)
         {
+            // QuidCraft: founding costs 1000 Quid into the new kingdom treasury (soft optional).
+            if (!QuidCraftKingdomBridge.tryFundKingdomFounding(sender, colonyName))
+            {
+                return;
+            }
+
             final IColony createdColony = IColonyManager.getInstance().createColony(world, townHall, sender, colonyName, pack);
             final IBuilding building = createdColony.getServerBuildingManager().addNewBuilding((TileEntityColonyBuilding) tileEntity, world);
 
