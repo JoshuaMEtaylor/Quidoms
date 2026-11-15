@@ -1,95 +1,64 @@
 <window size="520 280">
-
     <layout source="minecolonies:gui/townhall/windowtownhall.xml"/>
-    <text size="148 11" color="green" pos="100 24"
-           label="$(com.minecolonies.coremod.gui.townhall.currtownhallname)"/>
-    <text size="148 11" id="name" color="#F4F1EA" pos="120 35"/>
 
-    <button id="rename" size="15 15" pos="100 32" source="minecolonies:textures/gui/builderhut/edit.png"
+    <!-- Content well starts ~112,40 -->
+    <text size="160 11" color="#8FD9B6" pos="120 42"
+           label="$(com.minecolonies.coremod.gui.townhall.currtownhallname)"/>
+    <text size="180 11" id="name" color="#ECE8E0" pos="140 56"/>
+    <button id="rename" size="15 15" pos="120 54" source="minecolonies:textures/gui/builderhut/edit.png"
                  tooltip="$(com.minecolonies.gui.edit)"/>
 
-    <!-- Body left side-->
-
-    <!-- todo search for "current pack" -->
-
-    <button id="build" size="129 17" pos="110 97"  color="#F4F1EA"
-            label="🔨🔨🔨🔨$(com.minecolonies.coremod.gui.townhall.build)" source="minecolonies:textures/gui/builderhut/builder_button_medium_large_build.png"/>
-
-    <button id="cancelBuild" size="129 17" pos="110 116" color="#F4F1EA" visible="false"
+    <button id="build" size="129 17" pos="120 88" color="#ECE8E0" textcolor="#ECE8E0"
+            label="$(com.minecolonies.coremod.gui.townhall.build)"
+            source="minecolonies:textures/gui/quidcraft/btn_129x17.png"/>
+    <button id="cancelBuild" size="129 17" pos="120 110" color="#ECE8E0" textcolor="#ECE8E0" visible="false"
             label="$(com.minecolonies.coremod.gui.workerhuts.cancelbuild)"
-            source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"/>
+            source="minecolonies:textures/gui/quidcraft/btn_129x17.png"/>
+    <button id="map" size="129 17" pos="120 132" color="#ECE8E0" textcolor="#ECE8E0"
+                 label="$(com.minecolonies.coremod.gui.townHall.map)"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"/>
+    <button id="mercenaries" size="129 17" pos="120 154" color="#ECE8E0" textcolor="#ECE8E0"
+                 label="$(com.minecolonies.coremod.gui.townhall.mercenary)"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"/>
 
-    <button id="map" size="129 17" pos="110 135"  color="#F4F1EA"
-                 label="$(com.minecolonies.coremod.gui.townHall.map)" source="minecolonies:textures/gui/builderhut/builder_button_medium_large_map.png"/>
+    <text label="$(com.minecolonies.coremod.gui.townhall.visual)" textalign="MIDDLE_LEFT" pos="310 42" size="160 11" color="#ECE8E0"/>
+    <button id="bannerPicker" label="$(com.minecolonies.coremod.gui.townhall.edit_flag)" pos="310 58" size="129 17"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <button id="mercenaries" size="129 17" pos="110 155"  color="#F4F1EA"
-                 label="$(com.minecolonies.coremod.gui.townhall.mercenary)" source="minecolonies:textures/gui/builderhut/builder_button_medium_large_merc.png"/>
-
-    <!-- Visual Changes, Right Side -->
-
-    <text label="$(com.minecolonies.coremod.gui.townhall.visual)" textalign="MIDDLE" pos="280 35" size="129 11" color="#F4F1EA"/>
-
-    <button id="bannerPicker" label="$(com.minecolonies.coremod.gui.townhall.edit_flag)" pos="280 57" size="129 17"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large_banner.png"  color="#F4F1EA"/>
-
-    <text id="pickColor" label="$(com.minecolonies.coremod.gui.townhall.pickteamcolor)" pos="269 83" size="148 11" color="#F4F1EA"/>
-    <dropdown id="colorPicker"
-              size="86 17"
-              pos="337 80"
-              maxContentHeight="75"
-              dropDownSize="86 75"
-              source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
-              color="#F4F1EA"
-              scrollbarOffset="9 0"
-              dropPosx="75">
+    <text id="pickColor" label="$(com.minecolonies.coremod.gui.townhall.pickteamcolor)" pos="310 84" size="160 11" color="#B7B1A8"/>
+    <dropdown id="colorPicker" size="129 17" pos="310 98" maxContentHeight="75" dropDownSize="129 75"
+              source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"
+              scrollbarOffset="9 0" dropPosx="0">
         <view size="100% 15">
-            <button id="button" size="86 17" pos="0 0" source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="#F4F1EA"/>
+            <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </dropdown>
 
-    <text label="$(com.minecolonies.coremod.gui.townhall.pickcolonystyle)" pos="269 108" size="148 11"  color="#F4F1EA"/>
-    <button id="colonyStylePicker"
-                 size="86 17"
-                 pos="337 105"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
+    <text label="$(com.minecolonies.coremod.gui.townhall.pickcolonystyle)" pos="310 122" size="160 11" color="#B7B1A8"/>
+    <button id="colonyStylePicker" size="129 17" pos="310 136"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
                  disabled="minecolonies:textures/gui/builderhut/builder_button_medium_disabled.png"
-                 color="#F4F1EA"/>
+                 color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <!-- Quidoms: Patreon button removed; texture/name styles unlocked. -->
-
-    <text label="$(com.minecolonies.coremod.gui.townhall.picktexturestyle)" pos="269 148" size="148 11" color="#F4F1EA"/>
-    <dropdown id="textureStylePicker"
-              size="86 17"
-              pos="337 145"
-              maxContentHeight="75"
-              dropDownSize="86 55"
-              source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
+    <text label="$(com.minecolonies.coremod.gui.townhall.picktexturestyle)" pos="310 160" size="160 11" color="#B7B1A8"/>
+    <dropdown id="textureStylePicker" size="129 17" pos="310 174" maxContentHeight="75" dropDownSize="129 55"
+              source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
               disabled="minecolonies:textures/gui/builderhut/builder_button_medium_disabled.png"
-              color="#F4F1EA"
-              scrollbarOffset="9 0"
-              dropPosx="75"
-              enabled="true">
+              color="#ECE8E0" textcolor="#ECE8E0" scrollbarOffset="9 0" dropPosx="0" enabled="true">
         <view size="100% 15">
-            <button id="button" size="86 17" pos="0 0" source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="#F4F1EA"/>
+            <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </dropdown>
-    <button id="resettexture" size="86 17" pos="337 145" source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
-                 visible="false" color="#F4F1EA" text="$(com.minecolonies.gui.reset)"/>
+    <button id="resettexture" size="129 17" pos="310 174" source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
+                 visible="false" color="#ECE8E0" textcolor="#ECE8E0" text="$(com.minecolonies.gui.reset)"/>
 
-    <text label="$(com.minecolonies.coremod.gui.townhall.picknamestyle)" pos="269 173" size="148 11" color="#F4F1EA"/>
-    <dropdown id="nameStylePicker"
-              size="86 17"
-              pos="337 170"
-              maxContentHeight="30"
-              dropDownSize="86 30"
-              source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
+    <text label="$(com.minecolonies.coremod.gui.townhall.picknamestyle)" pos="310 198" size="160 11" color="#B7B1A8"/>
+    <dropdown id="nameStylePicker" size="129 17" pos="310 212" maxContentHeight="75" dropDownSize="129 55"
+              source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
               disabled="minecolonies:textures/gui/builderhut/builder_button_medium_disabled.png"
-              color="#F4F1EA"
-              scrollbarOffset="9 0"
-              dropPosx="30"
-              enabled="true">
+              color="#ECE8E0" textcolor="#ECE8E0" scrollbarOffset="9 0" dropPosx="0" enabled="true">
         <view size="100% 15">
-            <button id="button" size="86 17" pos="0 0" source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="#F4F1EA"/>
+            <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </dropdown>
 </window>

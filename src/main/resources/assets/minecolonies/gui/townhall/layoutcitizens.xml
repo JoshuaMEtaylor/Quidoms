@@ -1,37 +1,35 @@
 <window size="520 280">
-
     <layout source="minecolonies:gui/townhall/windowtownhall.xml"/>
-    <!-- QD-109: happiness aggregate UI removed -->
-    <text id="happinessTitle" size="120 11" color="#F4F1EA" pos="100 61" textalign="MIDDLE" visible="false"/>
-    <list id="happinessList" size="148 136" pos="100 83" visible="false">
+
+    <text id="happinessTitle" size="120 11" color="#ECE8E0" pos="120 42" textalign="MIDDLE" visible="false"/>
+    <list id="happinessList" size="148 136" pos="120 58" visible="false">
         <view size="100% 11">
             <image id="icon" pos="0 0" size="11 11"/>
-            <text id="name" pos="15 0" size="120 11" color="#F4F1EA"/>
+            <text id="name" pos="15 0" size="120 11" color="#ECE8E0"/>
         </view>
     </list>
 
-    <text id="job" size="120 11" color="#F4F1EA" pos="276 28" textalign="MIDDLE"/>
-    <image id="gender" size="11 11" pos="396 28" source="minecolonies:textures/gui/citizen/colonist_wax_male_smaller.png"/>
+    <text id="job" size="160 11" color="#ECE8E0" pos="300 42" textalign="MIDDLE_LEFT"/>
+    <image id="gender" size="11 11" pos="470 42" source="minecolonies:textures/gui/citizen/colonist_wax_male_smaller.png"/>
 
-    <text id="health" size="35 8" color="#F4F1EA" pos="271 47" textalign="MIDDLE_RIGHT" textscale="0.7"/>
-    <text id="happinessLevel" size="25 8" color="#F4F1EA" pos="316 47" textalign="MIDDLE_RIGHT" textscale="0.7" visible="false"/>
-    <text id="saturation" size="25 8" color="#F4F1EA" pos="351 47" textalign="MIDDLE_RIGHT" textscale="0.7"/>
+    <text id="health" size="40 10" color="#ECE8E0" pos="300 60" textalign="MIDDLE_RIGHT" textscale="0.8"/>
+    <image source="minecolonies:textures/gui/hud/heart/full.png" size="9 9" pos="344 60"/>
+    <text id="happinessLevel" size="30 10" color="#ECE8E0" pos="360 60" textalign="MIDDLE_RIGHT" textscale="0.8" visible="false"/>
+    <image source="minecolonies:textures/gui/citizen/smiley_full.png" size="9 9" pos="394 60" visible="false"/>
+    <text id="saturation" size="30 10" color="#ECE8E0" pos="410 60" textalign="MIDDLE_RIGHT" textscale="0.8"/>
+    <image source="minecolonies:textures/gui/hud/food_full.png" size="9 9" pos="444 60"/>
 
-    <image source="minecolonies:textures/gui/hud/heart/full.png" size="9 9" pos="306 46"/>
-    <image source="minecolonies:textures/gui/citizen/smiley_full.png" size="9 9" pos="341 46" visible="false"/>
-    <image source="minecolonies:textures/gui/hud/food_full.png" size="9 9" pos="376 46"/>
+    <entityicon id="entity" size="25 50" pos="470 58" visible="false"/>
 
-    <entityicon id="entity" size="25 50" pos="396 38" visible="false" />
+    <button label="$(com.minecolonies.coremod.gui.townhall.recallone)" id="recallone" pos="300 80" size="129 17"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <button label="$(com.minecolonies.coremod.gui.townhall.recallone)" id="recallone" pos="306 70" size="86 17"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="#F4F1EA"/>
-
-    <input id="search" size="129 17" pos="285 90" maxlength="32" color="white"
+    <input id="search" size="160 17" pos="300 104" maxlength="32" color="#ECE8E0"
            tooltip="$(com.minecolonies.core.townhall.citizen.filter)"/>
-    <list id="citizenList" size="148 106" pos="276 110">
+    <list id="citizenList" size="180 120" pos="300 128">
         <view size="100% 17">
-            <button id="name" pos="9 0" size="129 17" color="#F4F1EA"
-                         source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+            <button id="name" pos="0 0" size="160 17" color="#ECE8E0" textcolor="#ECE8E0"
+                         source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
                          disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png"/>
         </view>
     </list>
