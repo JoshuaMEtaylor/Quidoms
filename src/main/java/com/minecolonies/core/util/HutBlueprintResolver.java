@@ -493,11 +493,7 @@ public final class HutBlueprintResolver
         {
             out.add(style);
         }
-        final String alias = StructurePacks.aliasPackName(packName.trim());
-        if (alias != null && !alias.isBlank() && out.stream().noneMatch(alias::equalsIgnoreCase))
-        {
-            out.add(alias);
-        }
+        // Note: StructurePacks has no aliasPackName API on current Structurize — style mapping only.
         return out;
     }
 
