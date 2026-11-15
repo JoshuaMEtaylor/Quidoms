@@ -1,27 +1,22 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper_wide2.png" size="400 244"/>
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
 
-    <button id="cancel" size="14 15" pos="375 10" source="minecolonies:textures/gui/button_x.png" color="black"/>
+    <button id="cancel" size="14 15" pos="374 10" source="minecolonies:textures/gui/button_x.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <text id="title" size="200 15" color="black" pos="130 15" label="$(com.minecolonies.core.settlementcovenant.title)" textscale="1.4"/>
-    <image size="128 16" pos="135 28" source="minecolonies:textures/gui/citizen/colonist_text_decor_down_wide.png"/>
+    <text id="title" size="340 15" color="#ECE8E0" pos="30 10" label="$(com.minecolonies.core.settlementcovenant.title)" textscale="1.2" textalign="MIDDLE" textcolor="#ECE8E0"/>
 
-    <text id="text1" size="300 30" color="black" pos="60 40"/>
+    <text id="text1" size="360 28" color="#ECE8E0" pos="20 40" textcolor="#ECE8E0"/>
+    <input id="colonyname" size="240 18" pos="80 72" maxlength="32" color="#ECE8E0"/>
+    <text id="text2" size="360 28" color="#ECE8E0" pos="20 96" label="$(com.minecolonies.core.settlementcovenant2)" textcolor="#ECE8E0"/>
+    <text id="text3" size="360 28" color="#ECE8E0" pos="20 128" textcolor="#ECE8E0"/>
+    <text id="text4" size="360 22" color="#B7B1A8" pos="20 160" label="$(com.minecolonies.core.settlementcovenant4)" textcolor="#ECE8E0"/>
+    <text id="foundingcost" size="360 14" color="#ECE8E0" pos="20 188" textcolor="#ECE8E0"/>
 
-    <input id="colonyname" size="200 18" pos="100 70" maxlength="32"/>
-
-    <text id="text2" size="300 30" color="black" pos="60 90" label="$(com.minecolonies.core.settlementcovenant2)"/>
-
-    <text id="text3" size="300 30" color="black" pos="60 130"/>
-
-    <text id="text4" size="300 30" color="black" pos="60 170" label="$(com.minecolonies.core.settlementcovenant4)"/>
-
-    <image size="25 49" pos="355 200" source="minecolonies:textures/gui/citizen/colonist_decor_up_ribbon_smaller.png"/>
-    <image  size="45 45" pos="345 185" source="minecolonies:textures/gui/citizen/colonist_wax_indetermined.png"/>
-
-    <button id="create" size="169 17" pos="115 210" color="black"
-                 source="minecolonies:textures/gui/builderhut/builder_button_large.png"
+    <button id="create" size="200 17" pos="100 214" color="#ECE8E0" textcolor="#ECE8E0"
+                 source="minecolonies:textures/gui/quidcraft/btn_200x17.png"
                  disabled="minecolonies:textures/gui/builderhut/builder_button_large_disabled.png"
                  label="$(com.minecolonies.coremod.gui.colony.create)"/>
 </window>

@@ -37,10 +37,18 @@ public class ServerColonySaveData extends SavedData implements IServerColonySave
     /**
      * Worldsavedata factory.
      */
-    public static final SavedData.Factory<ServerColonySaveData> FACTORY = new SavedData.Factory<>(ServerColonySaveData::new, (d,a) -> {
-        final ServerColonySaveData colonyManagerData = new ServerColonySaveData();
-        colonyManagerData.readNBT(a, d);
-        return colonyManagerData;
+    public static final SavedData.Factory<ServerColonySaveData> FACTORY = new SavedData.Factory<>(ServerColonySaveData::new, (d, a) -> {
+        ColonySaveDataLoadGuard.enter();
+        try
+        {
+            final ServerColonySaveData colonyManagerData = new ServerColonySaveData();
+            colonyManagerData.readNBT(a, d);
+            return colonyManagerData;
+        }
+        finally
+        {
+            ColonySaveDataLoadGuard.exit();
+        }
     });
 
     /**

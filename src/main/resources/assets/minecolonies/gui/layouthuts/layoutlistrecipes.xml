@@ -1,11 +1,13 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-    size="190 244">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
-    <text size="130 11" pos="30 14" textalign="MIDDLE" color="black"
-           label="$(com.minecolonies.coremod.gui.workerhuts.listrecipes)"/>
+    size="420 260">
+    <!-- qd148:quidcraft-restyle -->
+    <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
 
-    <text size="100% 11" pos="70 30"  color="black" id="recipestatus" />
-    <list id="recipes" size="85% 150" pos="20 40">
+    <text size="260 11" pos="118 12" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"
+           label="$(com.minecolonies.coremod.gui.workerhuts.listrecipes)"/>
+    <text size="270 11" pos="118 48" color="#ECE8E0" textcolor="#ECE8E0" id="recipestatus"/>
+
+    <list id="recipes" size="270 150" pos="118 64">
         <view size="100% 50">
             <gradient id="gradient" size="100% 100%" pos="0 0" visible="false" gradientstart="rgb(160,160,160)" gradientend="rgb(160,160,160)"/>
             <itemicon id="output" size="16 16" pos="80 17"/>
@@ -13,25 +15,22 @@
                 <itemicon id="res1" size="16 16" pos="20 1"/>
                 <itemicon id="res2" size="16 16" pos="34 1"/>
                 <itemicon id="res3" size="16 16" pos="48 1"/>
-
                 <itemicon id="res4" size="16 16" pos="20 15"/>
                 <itemicon id="res5" size="16 16" pos="34 15"/>
                 <itemicon id="res6" size="16 16" pos="48 15"/>
-
                 <itemicon id="res7" size="16 16" pos="20 29"/>
                 <itemicon id="res8" size="16 16" pos="34 29"/>
                 <itemicon id="res9" size="16 16" pos="48 29"/>
             </box>
-            <button id="up" size="15 15" label="↥" pos="0 0"/>
-            <button id="down" size="15 15" label="↧" pos="0 15"/>
-            <button id="remove" size="45 15" pos="105 3" label="$(com.minecolonies.coremod.gui.recipe.remove)"/>
-            <button id="toggle" size="45 15" pos="105 18" label="$(com.minecolonies.coremod.gui.recipe.disable)"/>
-            <text id="intermediate" size="45 15" pos="105 33" textalign="MIDDLE" color="black" />
+            <button id="up" size="15 15" label="↥" pos="0 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="down" size="15 15" label="↧" pos="0 15" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="remove" size="55 15" pos="200 3" label="$(com.minecolonies.coremod.gui.recipe.remove)" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="toggle" size="55 15" pos="200 18" label="$(com.minecolonies.coremod.gui.recipe.disable)" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="intermediate" size="55 15" pos="200 33" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </list>
 
-
-    <button id="crafting" size="129 17" pos="30 200" color="black"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+    <button id="crafting" size="129 17" pos="118 222" color="#ECE8E0" textcolor="#ECE8E0"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
                  label="$(com.minecolonies.coremod.gui.workerhuts.crafting)"/>
 </window>

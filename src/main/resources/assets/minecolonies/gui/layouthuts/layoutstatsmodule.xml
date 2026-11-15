@@ -1,26 +1,36 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-    size="190 244">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
-    <text size="130 11" pos="30 14" textalign="MIDDLE" color="black"
+    size="420 260">
+    <!-- qd148:quidcraft-restyle -->
+    <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
+
+    <text size="260 11" pos="118 12" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"
            label="$(com.minecolonies.core.gui.modules.stats)"/>
-    <view size="200 243" pos="0 0">
-        <dropdown id="intervals"
-                  size="129 17"
-                  pos="30 30"
-                  maxContentHeight="75"
-                  dropDownSize="140 75"
-                  source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                  color="black">
-            <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" color="black"
+
+    <!-- Content well only — never overlay sidebar (0–96) -->
+    <dropdown id="intervals"
+              size="200 17"
+              pos="118 48"
+              maxContentHeight="75"
+              dropDownSize="200 75"
+              source="minecolonies:textures/gui/quidcraft/btn_200x17.png"
+              color="#ECE8E0" textcolor="#ECE8E0">
+        <view size="100% 15">
+            <button id="button" size="200 17" pos="0 0"
+                         source="minecolonies:textures/gui/quidcraft/btn_200x17.png"
+                         color="#ECE8E0" textcolor="#ECE8E0"
                          label="$(com.minecolonies.coremod.gui.interval.yesterday)"/>
-        </dropdown>
-        <list id="stats" size="160 160" pos="20 55" emptytext="$(com.minecolonies.core.gui.modules.stats.empty)" emptycolor="black">
-            <text id="desc" size="160 13" pos="0 0" color="black" wrap="true"/>
-        </list>
-        <text size="105 11" pos="20 220" textalign="MIDDLE_RIGHT" color="black"
-            label="$(com.minecolonies.core.gui.modules.stats.hidezerolabel)"/>
-        <button id="hidezero" pos="127 218" size="14 15"
-                        source="minecolonies:textures/gui/builderhut/builder_button_mini_check.png"
-                        disabled="minecolonies:textures/gui/builderhut/builder_button_mini_disabled.png"/>
-    </view>
+        </view>
+    </dropdown>
+
+    <list id="stats" size="270 140" pos="118 72"
+          emptytext="$(com.minecolonies.core.gui.modules.stats.empty)" emptycolor="#ECE8E0">
+        <text id="desc" size="270 13" pos="0 0" color="#ECE8E0" textcolor="#ECE8E0" wrap="true"/>
+    </list>
+
+    <text size="200 11" pos="118 220" textalign="MIDDLE_RIGHT" color="#ECE8E0" textcolor="#ECE8E0"
+          label="$(com.minecolonies.core.gui.modules.stats.hidezerolabel)"/>
+    <button id="hidezero" pos="324 218" size="14 15"
+            source="minecolonies:textures/gui/builderhut/builder_button_mini_check.png"
+            disabled="minecolonies:textures/gui/builderhut/builder_button_mini_disabled.png"
+            color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

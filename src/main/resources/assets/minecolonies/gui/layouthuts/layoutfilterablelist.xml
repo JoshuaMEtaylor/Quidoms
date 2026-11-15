@@ -1,17 +1,20 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-    size="190 244">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
-    <text id="desc" size="130 11" pos="30 14" color="black" textalign="MIDDLE"/>
-    <input id="input" size="150 18" pos="20 30" maxlength="25"/>
+    size="420 260">
+    <!-- qd148:quidcraft-restyle -->
+    <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
 
-    <list id="resources" size="164 136" pos="13 50">
+    <text id="desc" size="260 11" pos="118 12" color="#ECE8E0" textcolor="#ECE8E0" textalign="MIDDLE"/>
+    <input id="input" size="200 18" pos="118 48" maxlength="25" color="#ECE8E0"/>
+
+    <list id="resources" size="270 140" pos="118 72">
         <box size="100% 17" linewidth="1">
             <itemicon id="resourceIcon" size="16 16" pos="0 0"/>
-            <text id="resourceName" size="100 12" pos="20 1" color="white"/>
-            <button label="$(com.minecolonies.coremod.gui.workerhuts.retrieveOn)" id="switch" pos="120 1" size="29 15"
-                         source="minecolonies:textures/gui/builderhut/builder_button_very_small.png" color="black"/>
+            <text id="resourceName" size="180 12" pos="20 1" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button label="$(com.minecolonies.coremod.gui.workerhuts.retrieveOn)" id="switch" pos="210 1" size="50 15"
+                         source="minecolonies:textures/gui/builderhut/builder_button_very_small.png"
+                         color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
-    <button label ="$(com.minecolonies.coremod.gui.workerhuts.resetdefault)" id="resetDefault" size="86 17" pos="50 194"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="black"/>
+    <button label="$(com.minecolonies.coremod.gui.workerhuts.resetdefault)" id="resetDefault" size="129 17" pos="118 220"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

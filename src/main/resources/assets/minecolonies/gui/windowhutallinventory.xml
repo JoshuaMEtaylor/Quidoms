@@ -1,23 +1,22 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        size="190 244"
+        size="420 260"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
-    <text id="desc" size="130 11" pos="30 14" color="black" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.allinventory)"/>
-    <input id="names" size="132 18" pos="15 30" maxlength="25"/>
-    <button id="sortStorageFilter" size="14 15" pos="158 31" color="black"
-                 source="minecolonies:textures/gui/builderhut/builder_button_mini.png"
-                 label="v^"/>
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
+    <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
+    <image id="qcContent" source="minecolonies:textures/gui/quidcraft/content_288x200.png" pos="104 36" size="288 200"/>
+
+    <text id="desc" size="130 11" pos="30 14" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.allinventory)" textcolor="#ECE8E0"/>
+    <input id="names" size="132 18" pos="15 30" maxlength="25" color="#ECE8E0"/>
+    <button id="sortStorageFilter" size="14 15" pos="158 31" color="#ECE8E0" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" label="v^" textcolor="#ECE8E0"/>
     <list id="allinventorylist" size="165 156" pos="15 55">
         <box size="100% 18" linewidth="1">
             <itemicon id="resourceIcon" size="17 17" pos="0 0"/>
-            <text id="ressourceStackName" size="100 12" pos="20 3" color="black"/>
-            <text id="quantities" size="25 18" pos="117 1" color="black"/>
-            <button id="locate" size="14 15" pos="141 1" color="black"
-                         source="minecolonies:textures/gui/builderhut/builder_button_mini.png"
-                         label="?"/>
+            <text id="ressourceStackName" size="100 12" pos="20 3" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="quantities" size="25 18" pos="117 1" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="locate" size="14 15" pos="141 1" color="#ECE8E0" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" label="?" textcolor="#ECE8E0"/>
         </box>
     </list>
-    <button id="back" size="86 17" pos="50 215" color="black"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
-                 label="$(com.minecolonies.coremod.gui.back)"/>
+    <button id="back" size="86 17" pos="50 215" color="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" label="$(com.minecolonies.coremod.gui.back)" textcolor="#ECE8E0"/>
 </window>

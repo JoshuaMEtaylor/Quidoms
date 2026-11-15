@@ -1,0 +1,44 @@
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
+        size="420 240" pause="false" type="OVERSIZED_VANILLA" lightbox="false">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="structurize:textures/gui/quidcraft/window_420x240.png" pos="0 0" size="420 240"/>
+    <image id="qcHeader" source="structurize:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="404 24"/>
+
+    <button id="switch" source="structurize:textures/gui/quidcraft/btn_86x17.png" label="$(structurize.gui.buildtool.switchpack)" size="86 17" pos="5 5" textcolor="#ECE8E0" texthovercolor="gray"/>
+
+    <text id="tree" size="300 12" pos="100 5" color="#ECE8E0"  textcolor="#ECE8E0"/>
+
+    <layout source="structurize:gui/layoutmanipulation.xml"/>
+
+    <list size="100 120" pos="5 50" id="alternatives" visible="false">
+        <box size="100% 17" linewidth="0">
+            <button id="alternative" source="structurize:textures/gui/quidcraft/btn_86x17.png" size="86 17" pos="0 0" textcolor="#ECE8E0" texthovercolor="gray"/>
+            <text size="0 0" pos="0 0" id="id" visible="false" color="#ECE8E0" textcolor="#ECE8E0"/>
+        </box>
+    </list>
+
+    <list size="100 120" pos="5 50" id="levels" visible="false">
+        <box size="100% 17" linewidth="0">
+            <button id="level" source="structurize:textures/gui/quidcraft/btn_86x17.png" size="86 17" pos="0 0" textcolor="#ECE8E0" texthovercolor="gray"/>
+            <text size="0 0" pos="0 0" id="id" visible="false" color="#ECE8E0" textcolor="#ECE8E0"/>
+        </box>
+    </list>
+
+    <list size="270 40" pos="100 160" id="subcategories" visible="false">
+        <box size="100% 20" linewidth="0">
+            <button id="1" source="structurize:textures/gui/quidcraft/btn_86x17.png" size="86 17" pos="0 0" textcolor="#ECE8E0" texthovercolor="gray" visible="false"/>
+            <button id="2" source="structurize:textures/gui/quidcraft/btn_86x17.png" size="86 17" pos="87 0" textcolor="#ECE8E0" texthovercolor="gray" visible="false"/>
+            <button id="3" source="structurize:textures/gui/quidcraft/btn_86x17.png" size="86 17" pos="174 0" textcolor="#ECE8E0" texthovercolor="gray" visible="false"/>
+        </box>
+    </list>
+    <list size="270 40" pos="100 160" id="blueprints" visible="false">
+        <box size="100% 20" linewidth="0">
+            <button id="1" source="structurize:textures/gui/buildtool/blueprint_medium.png" size="86 17" pos="0 0" textcolor="#ECE8E0" texthovercolor="gray" visible="false"/>
+            <button id="2" source="structurize:textures/gui/buildtool/blueprint_medium.png" size="86 17" pos="87 0" textcolor="#ECE8E0" texthovercolor="gray" visible="false"/>
+            <button id="3" source="structurize:textures/gui/buildtool/blueprint_medium.png" size="86 17" pos="174 0" textcolor="#ECE8E0" texthovercolor="gray" visible="false"/>
+        </box>
+    </list>
+    <view size="180 20" pos="120 200" id="categories">
+
+    </view>
+</window>

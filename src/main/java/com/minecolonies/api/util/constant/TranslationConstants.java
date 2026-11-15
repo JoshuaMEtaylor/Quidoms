@@ -218,6 +218,10 @@ public final class TranslationConstants
     public static final String CANT_PLACE_COLONY_TOO_FAR_FROM_SPAWN                                 = "com.minecolonies.core.founding.toofarfromspawn";
     @NonNls
     public static final String CANT_PLACE_COLONY_TOO_CLOSE_TO_OTHER_COLONY                          = "com.minecolonies.core.founding.tooclosetocolony";
+    /** Quidoms: founding a kingdom requires transferring Quid into the kingdom treasury. */
+    public static final String FOUNDING_NEED_QUID                                                  = "com.minecolonies.core.founding.needquid";
+    /** Quidoms: settlement covenant label showing the founding fee. */
+    public static final String FOUNDING_COST_LABEL                                                 = "com.minecolonies.core.founding.cost";
     @NonNls
     public static final String COM_MINECOLONIES_COREMOD_GUI_TOWNHALL_POPULATION_TOTALCITIZENS_COUNT = "com.minecolonies.coremod.gui.townhall.population.totalcitizens.count";
     @NonNls

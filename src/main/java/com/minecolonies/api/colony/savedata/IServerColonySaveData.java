@@ -75,6 +75,17 @@ public interface IServerColonySaveData
      */
     static IServerColonySaveData getOrComputeSaveData(final ServerLevel level)
     {
+        // Prefer already-present data. Never re-enter computeIfAbsent while FACTORY.load is running —
+        // reclaim/claim during Colony.onWorldLoad would otherwise StackOverflow.
+        final IServerColonySaveData existing = getSaveData(level);
+        if (existing != null)
+        {
+            return existing.setOverworld(level.dimension() == Level.OVERWORLD);
+        }
+        if (ColonySaveDataLoadGuard.isLoading())
+        {
+            return null;
+        }
         return level.getDataStorage().computeIfAbsent(ServerColonySaveData.FACTORY, ServerColonySaveData.NAME).setOverworld(level.dimension() == Level.OVERWORLD);
     }
 

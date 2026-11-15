@@ -1,36 +1,42 @@
-<window size="524 243">
-
+<window size="520 280">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/townhall/windowtownhall.xml"/>
-    <text id="happinessTitle" size="120 11" color="black" pos="100 61" textalign="MIDDLE"/>
-    <list id="happinessList" size="148 136" pos="100 83">
-        <view size="100% 11">
-            <image id="icon" pos="0 0" size="11 11"/>
-            <text id="name" pos="15 0" size="120 11" color="black"/>
-        </view>
-    </list>
 
-    <text id="job" size="120 11" color="black" pos="276 28" textalign="MIDDLE"/>
-    <image id="gender" size="11 11" pos="396 28" source="minecolonies:textures/gui/citizen/colonist_wax_male_smaller.png"/>
+    <!-- Content well starts ~112,40 — two columns, no orphan icons, no empty left well -->
 
-    <text id="health" size="35 8" color="black" pos="271 47" textalign="MIDDLE_RIGHT" textscale="0.7"/>
-    <text id="happinessLevel" size="25 8" color="black" pos="316 47" textalign="MIDDLE_RIGHT" textscale="0.7"/>
-    <text id="saturation" size="25 8" color="black" pos="351 47" textalign="MIDDLE_RIGHT" textscale="0.7"/>
-
-    <image source="minecraft:hud/heart/full" size="9 9" pos="306 46"/>
-    <image source="minecolonies:citizen/smiley/full" size="9 9" pos="341 46"/>
-    <image source="minecraft:hud/food_full" size="9 9" pos="376 46"/>
-
-    <entityicon id="entity" size="25 50" pos="396 38" visible="false" />
-
-    <button label="$(com.minecolonies.coremod.gui.townhall.recallone)" id="recallone" pos="306 70" size="86 17"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="black"/>
-
-    <input id="search" size="129 17" pos="285 90" maxlength="32" tooltip="$(com.minecolonies.core.townhall.citizen.filter)"/>
-    <list id="citizenList" size="148 106" pos="276 110">
+    <!-- Left: search + citizen roster -->
+    <input id="search" size="180 17" pos="118 44" maxlength="32" color="#ECE8E0"
+           tooltip="$(com.minecolonies.core.townhall.citizen.filter)"/>
+    <list id="citizenList" size="180 196" pos="118 66">
         <view size="100% 17">
-            <button id="name" pos="9 0" size="129 17" color="black"
-                         source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+            <button id="name" pos="0 0" size="170 17" color="#ECE8E0" textcolor="#ECE8E0"
+                         source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
                          disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png"/>
         </view>
     </list>
+
+    <!-- Right: selected citizen detail (icons/text gated by Java when none selected) -->
+    <text id="job" size="170 11" color="#ECE8E0" textcolor="#ECE8E0" pos="310 44" textalign="MIDDLE_LEFT"/>
+    <image id="gender" size="11 11" pos="486 44" source="minecolonies:textures/gui/citizen/colonist_wax_male_smaller.png" visible="false"/>
+
+    <text id="health" size="48 10" color="#ECE8E0" textcolor="#ECE8E0" pos="310 62" textalign="MIDDLE_RIGHT" textscale="0.8" visible="false"/>
+    <image id="healthIcon" source="minecolonies:textures/gui/hud/heart/full.png" size="9 9" pos="360 62" visible="false"/>
+    <text id="saturation" size="40 10" color="#ECE8E0" textcolor="#ECE8E0" pos="380 62" textalign="MIDDLE_RIGHT" textscale="0.8" visible="false"/>
+    <image id="foodIcon" source="minecolonies:textures/gui/hud/food_full.png" size="9 9" pos="422 62" visible="false"/>
+
+    <!-- Kept for WindowCitizenPage API; hidden (happiness tab removed from Quidoms nav) -->
+    <text id="happinessLevel" size="30 10" color="#ECE8E0" pos="360 62" textalign="MIDDLE_RIGHT" textscale="0.8" visible="false" textcolor="#ECE8E0"/>
+    <image source="minecolonies:textures/gui/citizen/smiley_full.png" size="9 9" pos="394 62" visible="false"/>
+    <text id="happinessTitle" size="170 11" color="#ECE8E0" pos="310 180" textalign="MIDDLE" visible="false" textcolor="#ECE8E0"/>
+    <list id="happinessList" size="170 60" pos="310 196" visible="false">
+        <view size="100% 11">
+            <image id="icon" pos="0 0" size="11 11"/>
+            <text id="name" pos="15 0" size="150 11" color="#ECE8E0" textcolor="#ECE8E0"/>
+        </view>
+    </list>
+
+    <entityicon id="entity" size="40 70" pos="450 80" visible="false"/>
+
+    <button label="$(com.minecolonies.coremod.gui.townhall.recallone)" id="recallone" pos="310 90" size="129 17"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

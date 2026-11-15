@@ -1,17 +1,15 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper_wide2.png" size="400 244"/>
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
 
-    <button id="cancel" size="14 15" pos="375 10" source="minecolonies:textures/gui/button_x.png" textcolor="black"/>
 
-    <text id="text" size="340 195" color="black" pos="40 15" textscale="0.8" textalign="MIDDLE"/>
+    <button id="cancel" size="14 15" pos="375 10" source="minecolonies:textures/gui/button_x.png" textcolor="#ECE8E0"/>
 
-    <button id="colonyStylePicker" size="129 17" pos="60 215" textcolor="black"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                 disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png"
-                 label="$(com.minecolonies.core.gui.supplies.selectstyle)"/>
+    <text id="text" size="340 195" color="#ECE8E0" pos="40 15" textscale="0.8" textalign="MIDDLE" textcolor="#ECE8E0"/>
 
-    <button id="place" size="129 17" pos="220 215" textcolor="black"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                 disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png"/>
+    <button id="colonyStylePicker" size="129 17" pos="60 215" textcolor="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png" label="$(com.minecolonies.core.gui.supplies.selectstyle)"/>
+
+    <button id="place" size="129 17" pos="220 215" textcolor="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png"/>
 </window>

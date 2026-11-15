@@ -1,0 +1,30 @@
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="block_ui.xsd" size="640 480" type="FIXED_VANILLA" pause="true" lightbox="true">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="640 480"/>
+    <list id="list1" size="160 240">
+        <text size="152 20" color="#ECE8E0" textcolor="#ECE8E0"/>
+    </list>
+    <list id="list2" size="160 240" pos="160 0">
+        <text size="152 20" color="#ECE8E0" textcolor="#ECE8E0"/>
+    </list>
+    <list id="list3" size="160 240" pos="320 0">
+        <view size="152 20">
+            <text size="100 20" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <checkbox pos="120 3"
+                size="14 15"
+                id="checkbox"
+                source="blockui:button_mini"
+                disabled="blockui:button_mini_disabled"
+                checkmark="blockui:overlay_mini_check"/>
+        </view>
+    </list>
+    <list id="list4" size="160 200" pos="480 0" emptytext="This list is empty" emptyscale="0.8" emptycolor="white">
+        <text size="152 20" color="#ECE8E0" textcolor="#ECE8E0"/>
+    </list>
+    <button id="list4add" pos="480 200" size="160 20" label="Add item" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="list4remove" pos="480 220" size="160 20" label="Remove item" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <list id="list5" size="160 200" pos="0 240" emptytext="This list is empty" emptyscale="0.8" emptycolor="white">
+        <text size="152 20" color="#ECE8E0" textcolor="#ECE8E0"/>
+    </list>
+    <button id="list5update" pos="0 440" size="160 20" label="Update list" color="#ECE8E0" textcolor="#ECE8E0"/>
+</window>

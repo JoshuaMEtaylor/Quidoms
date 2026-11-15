@@ -1,27 +1,23 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-    size="190 244">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
-    <text size="130 11" pos="30 14" color="black" textalign="MIDDLE"
+    size="420 260">
+    <!-- qd148:quidcraft-restyle -->
+    <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
+    <text size="130 11" pos="128 42" color="#ECE8E0" textalign="MIDDLE"
            label="$(com.minecolonies.coremod.gui.workerhuts.fields)"/>
-    <text id="AssignmentModeLabel" size="164 11" pos="13 29" color="black" textalign="MIDDLE"
+    <text id="AssignmentModeLabel" size="164 11" pos="118 57" color="#ECE8E0" textalign="MIDDLE"
            label="$(com.minecolonies.coremod.gui.workerhuts.fields.assignmentmode)"/>
-    <button id="assignmentMode" size="86 17" pos="52 42" color="black"
-                 label="$(com.minecolonies.coremod.gui.hiring.off)"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
-                 disabled="minecolonies:textures/gui/builderhut/builder_button_medium_disabled.png"/>
-    <text id="fieldCount" size="164 11" pos="13 69" color="black" textalign="MIDDLE"
+    <button id="assignmentMode" size="86 17" pos="150 70" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.hiring.off)" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" disabled="minecolonies:textures/gui/builderhut/builder_button_medium_disabled.png" textcolor="#ECE8E0"/>
+    <text id="fieldCount" size="164 11" pos="118 69" color="#ECE8E0" textalign="MIDDLE"
            label="$(com.minecolonies.coremod.gui.workerhuts.fields.fieldcount)"/>
-    <text id="plantCount" size="164 11" pos="13 82" color="black" textalign="MIDDLE"
+    <text id="plantCount" size="164 11" pos="118 82" color="#ECE8E0" textalign="MIDDLE"
            label="$(com.minecolonies.coremod.gui.workerhuts.fields.plantcount)"/>
 
-    <list id="fields" size="164 130" pos="13 95">
+    <list id="fields" size="164 130" pos="118 95">
         <box size="100% 24" linewidth="1">
             <itemicon id="icon" size="16 16" pos="4 4"/>
-            <text id="dist" color="black" pos="25 8" size="108 9"/>
+            <text id="dist" color="#ECE8E0" pos="25 8" size="108 9" textcolor="#ECE8E0"/>
 
-            <button id="assign" pos="137 4" size="14 15"
-                         source="minecolonies:textures/gui/builderhut/builder_button_mini.png"
-                         disabled="minecolonies:textures/gui/builderhut/builder_button_mini_disabled.png"/>
+            <button id="assign" pos="137 4" size="14 15" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" disabled="minecolonies:textures/gui/builderhut/builder_button_mini_disabled.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
 </window>

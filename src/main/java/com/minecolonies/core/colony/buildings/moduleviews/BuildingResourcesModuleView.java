@@ -41,6 +41,10 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
     private int finishedStages = 0;
     private int totalStages    = 1;
 
+    /** Quidoms: schematic shortage counters from server. */
+    private int schematicBlocksTotal = 0;
+    private int schematicBlocksRemaining = 0;
+
     @Override
     public void deserialize(@NotNull final RegistryFriendlyByteBuf buf)
     {
@@ -62,6 +66,8 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
         progress = buf.readDouble();
         totalStages = buf.readInt();
         finishedStages = buf.readInt();
+        schematicBlocksTotal = buf.readInt();
+        schematicBlocksRemaining = buf.readInt();
     }
 
     /**
@@ -86,21 +92,38 @@ public class BuildingResourcesModuleView extends AbstractBuildingModuleView
     }
 
     /**
-     * Get the building progress (relative to items used)
+     * Build progress as placed/total required shortage for the current work.
      *
-     * @return the progress.
+     * @return 0–100 percent complete.
      */
     public int getProgress()
     {
-        int localProgress = Math.max(100 - (int) (progress * 100), 0);
-        if (finishedStages == 0)
+        if (schematicBlocksTotal > 0)
         {
-            if (totalStages == finishedStages)
-            {
-                return 0;
-            }
+            final int placed = Math.max(0, schematicBlocksTotal - schematicBlocksRemaining);
+            return Math.min(100, (int) Math.round(100.0 * placed / (double) schematicBlocksTotal));
         }
-        return localProgress;
+        // Quidoms: unknown/empty shortage must not read as 100% (legacy amountOfResources==0 bug).
+        if (workOrderId > 0)
+        {
+            return 0;
+        }
+        return 0;
+    }
+
+    public int getSchematicBlocksTotal()
+    {
+        return schematicBlocksTotal;
+    }
+
+    public int getSchematicBlocksRemaining()
+    {
+        return schematicBlocksRemaining;
+    }
+
+    public int getSchematicBlocksPlaced()
+    {
+        return Math.max(0, schematicBlocksTotal - schematicBlocksRemaining);
     }
 
     /**

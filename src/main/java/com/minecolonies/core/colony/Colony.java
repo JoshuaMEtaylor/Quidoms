@@ -1067,11 +1067,16 @@ public class Colony implements IColony
                 questManager.onWorldLoad();
                 NeoForge.EVENT_BUS.register(eventHandler);
 
-                // Recovery for missing static colony claims
-                final IChunkClaimData data = claimData.get(ChunkPos.asLong(getCenter()));
-                if (data == null || !data.getStaticClaimColonies().contains(getID()))
+                // Recovery for missing static colony claims.
+                // Skip while colony save-data is mid-load — reclaim → claim → getColonyByDimension
+                // would re-enter SavedData.computeIfAbsent and StackOverflow.
+                if (!com.minecolonies.api.colony.savedata.ColonySaveDataLoadGuard.isLoading())
                 {
-                    BackUpHelper.reclaimChunks(this);
+                    final IChunkClaimData data = claimData.get(ChunkPos.asLong(getCenter()));
+                    if (data == null || !data.getStaticClaimColonies().contains(getID()))
+                    {
+                        BackUpHelper.reclaimChunks(this);
+                    }
                 }
             }
             setColonyColor(this.colonyTeamColor);

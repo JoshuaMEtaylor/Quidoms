@@ -1,5 +1,6 @@
 package com.minecolonies.core.client.gui.citizen;
 
+import com.ldtteam.blockui.Pane;
 import com.ldtteam.blockui.PaneBuilders;
 import com.minecolonies.api.colony.ICitizenDataView;
 import com.minecolonies.api.colony.IColonyView;
@@ -39,23 +40,30 @@ public abstract class AbstractWindowCitizen extends AbstractWindowSkeleton
 
         registerButton("mainTab", () -> new MainWindowCitizen(citizen).open());
         registerButton("mainIcon", () -> new MainWindowCitizen(citizen).open());
-        PaneBuilders.tooltipBuilder().hoverPane(findPaneByID("mainIcon")).build().setText(Component.translatableEscape("com.minecolonies.coremod.gui.citizen.main"));
+        tipTooltip("mainIcon", "com.minecolonies.coremod.gui.citizen.main");
 
         registerButton("requestTab", () -> new RequestWindowCitizen(citizen).open());
         registerButton("requestIcon", () -> new RequestWindowCitizen(citizen).open());
-        PaneBuilders.tooltipBuilder().hoverPane(findPaneByID("requestIcon")).build().setText(Component.translatableEscape("com.minecolonies.coremod.gui.citizen.requests"));
+        tipTooltip("requestIcon", "com.minecolonies.coremod.gui.citizen.requests");
 
         registerButton("inventoryTab", () -> new OpenInventoryMessage(citizen.getColony(), citizen.getName(), citizen.getEntityId()).sendToServer());
         registerButton("inventoryIcon", () -> new OpenInventoryMessage(citizen.getColony(), citizen.getName(), citizen.getEntityId()).sendToServer());
-        PaneBuilders.tooltipBuilder().hoverPane(findPaneByID("inventoryIcon")).build().setText(Component.translatableEscape("com.minecolonies.coremod.gui.citizen.inventory"));
+        tipTooltip("inventoryIcon", "com.minecolonies.coremod.gui.citizen.inventory");
 
-        registerButton("happinessTab", () -> new HappinessWindowCitizen(citizen).open());
-        registerButton("happinessIcon", () -> new HappinessWindowCitizen(citizen).open());
-        PaneBuilders.tooltipBuilder().hoverPane(findPaneByID("happinessIcon")).build().setText(Component.translatableEscape("com.minecolonies.coremod.gui.citizen.happiness"));
+        // Quidoms: happiness tab removed from nav — keep handlers null-safe if panes absent.
+        if (findPaneByID("happinessTab") != null)
+        {
+            registerButton("happinessTab", () -> new HappinessWindowCitizen(citizen).open());
+        }
+        if (findPaneByID("happinessIcon") != null)
+        {
+            registerButton("happinessIcon", () -> new HappinessWindowCitizen(citizen).open());
+            tipTooltip("happinessIcon", "com.minecolonies.coremod.gui.citizen.happiness");
+        }
 
         registerButton("familyTab", () -> new FamilyWindowCitizen(citizen).open());
         registerButton("familyIcon", () -> new FamilyWindowCitizen(citizen).open());
-        PaneBuilders.tooltipBuilder().hoverPane(findPaneByID("familyIcon")).build().setText(Component.translatableEscape("com.minecolonies.coremod.gui.citizen.family"));
+        tipTooltip("familyIcon", "com.minecolonies.coremod.gui.citizen.family");
 
         if (DebugPlayerManager.hasDebugEnabled(mc.player))
         {
@@ -75,12 +83,21 @@ public abstract class AbstractWindowCitizen extends AbstractWindowSkeleton
 
             registerButton("jobTab", () -> new JobWindowCitizen(citizen).open());
             registerButton("jobIcon", () -> new JobWindowCitizen(citizen).open());
-            PaneBuilders.tooltipBuilder().hoverPane(findPaneByID("jobIcon")).build().setText(Component.translatableEscape("com.minecolonies.coremod.gui.citizen.job"));
+            tipTooltip("jobIcon", "com.minecolonies.coremod.gui.citizen.job");
         }
         else
         {
             findPaneByID("jobTab").setVisible(false);
             findPaneByID("jobIcon").setVisible(false);
+        }
+    }
+
+    private void tipTooltip(final String paneId, final String key)
+    {
+        final Pane pane = findPaneByID(paneId);
+        if (pane != null)
+        {
+            PaneBuilders.tooltipBuilder().hoverPane(pane).build().setText(Component.translatableEscape(key));
         }
     }
 }

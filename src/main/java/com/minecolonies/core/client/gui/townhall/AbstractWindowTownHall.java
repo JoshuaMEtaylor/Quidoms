@@ -13,22 +13,15 @@ import static com.minecolonies.api.util.constant.WindowConstants.*;
 
 /**
  * BOWindow for the town hall.
+ * Quidoms: keep sidebar nav button visible (full chip hitbox + always-on label).
  */
 public abstract class AbstractWindowTownHall extends AbstractBuildingMainWindow<ITownHallView>
 {
-    /**
-     * Color constants for builder list.
-     */
     public static final int RED       = Color.getByName("red", 0);
     public static final int DARKGREEN = Color.getByName("darkgreen", 0);
     public static final int ORANGE    = Color.getByName("orange", 0);
     public static final int YELLOW = Color.getByName("yellow", 0);
 
-    /**
-     * Constructor for the town hall window.
-     *
-     * @param townHall {@link BuildingTownHall.View}.
-     */
     public AbstractWindowTownHall(final BuildingTownHall.View townHall, final String page)
     {
         super(townHall, new ResourceLocation(Constants.MOD_ID, "gui/townhall/").withSuffix(page));
@@ -41,16 +34,27 @@ public abstract class AbstractWindowTownHall extends AbstractBuildingMainWindow<
         registerButton(BUTTON_SETTINGS, () -> new WindowSettings(townHall).open());
         registerButton(BUTTON_ALLIANCE, () -> new WindowAlliancePage(townHall).open());
 
-        findPaneOfTypeByID(getWindowId() + "0", Image.class).hide();
-        findPaneOfTypeByID(getWindowId(), ButtonImage.class).hide();
+        final String id = getWindowId();
+        final Image marker = findPaneOfTypeByID(id + "0", Image.class);
+        if (marker != null)
+        {
+            marker.hide();
+        }
 
-        findPaneOfTypeByID(getWindowId() + "1", ButtonImage.class).show();
+        final ButtonImage nav = findPaneOfTypeByID(id, ButtonImage.class);
+        if (nav != null)
+        {
+            nav.setImage(new ResourceLocation(Constants.MOD_ID, "textures/gui/quidcraft/nav_" + id + "_sel.png"));
+            nav.show();
+        }
+
+        final ButtonImage title = findPaneOfTypeByID(id + "1", ButtonImage.class);
+        if (title != null)
+        {
+            title.show();
+        }
     }
 
-    /**
-     * Get the id that identifies the window.
-     * @return the string id.
-     */
     protected abstract String getWindowId();
 
     @Override

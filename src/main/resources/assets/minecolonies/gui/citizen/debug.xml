@@ -1,14 +1,17 @@
 <window size="400 244"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/1.20.1/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper_wide2.png" size="400 244"/>
-    <text id="citizenid" visible="true" size="70 13" pos="10 15" color="black"/>
-    <text id="colonyid" visible="true" size="70 13" pos="10 25" color="black"/>
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
+
+    <text id="citizenid" visible="true" size="70 13" pos="10 15" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text id="colonyid" visible="true" size="70 13" pos="10 25" color="#ECE8E0" textcolor="#ECE8E0"/>
     <scrollgroup id="buttonlist" pos="10 45" size="155 30">
-        <button id="aihistory" size="100% 13" pos="0 0" label="query AI History"/>
-        <button id="pathfinding" size="100% 13" pos="0 0" label="enable Pathfinding tracking"/>
+        <button id="aihistory" size="100% 13" pos="0 0" label="query AI History" color="#ECE8E0" textcolor="#ECE8E0"/>
+        <button id="pathfinding" size="100% 13" pos="0 0" label="enable Pathfinding tracking" color="#ECE8E0" textcolor="#ECE8E0"/>
     </scrollgroup>
     <scrollgroup size="380 150" pos="10 75" visible="true">
-        <text id="output" visible="true" size="100% 10000" pos="5 5" color="black" textalign="TOP_LEFT"/>
+        <text id="output" visible="true" size="100% 10000" pos="5 5" color="#ECE8E0" textalign="TOP_LEFT" textcolor="#ECE8E0"/>
     </scrollgroup>
 </window>

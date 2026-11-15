@@ -1,0 +1,27 @@
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/1.20.1/src/main/resources/assets/blockui/gui/block_ui.xsd"
+        size="420 240" lightbox="true">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="structurize:textures/gui/quidcraft/window_420x240.png" pos="0 0" size="420 240"/>
+    <image id="qcHeader" source="structurize:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="404 24"/>
+    <image id="qcContent" source="structurize:textures/gui/quidcraft/content_400x200.png" pos="10 36" size="400 190"/>
+
+    <text id="desc" size="380 14" pos="20 10" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"/>
+
+    <itemicon id="resourceIconFrom" size="17 17" pos="20 42" visible="false"/>
+    <text id="resourceNameFrom" size="140 12" pos="42 44" color="#ECE8E0" textcolor="#ECE8E0" visible="false"/>
+    <text id="to" label="->" size="20 12" pos="190 44" color="#ECE8E0" textcolor="#ECE8E0" visible="false"/>
+    <itemicon id="resourceIconTo" size="17 17" pos="220 42" visible="false"/>
+    <text id="resourceNameTo" size="140 12" pos="242 44" color="#ECE8E0" textcolor="#ECE8E0" visible="false"/>
+
+    <text id="countText" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.scan.select.stack)"
+          size="105 12" pos="250 42" color="#ECE8E0" textcolor="#ECE8E0" visible="false"/>
+    <input id="count" size="40 18" pos="360 40" maxlength="25" color="#ECE8E0" textcolor="#ECE8E0" visible="false"/>
+
+    <layout source="structurize:gui/layoutselectres.xml"/>
+
+    <button id="done" source="structurize:textures/gui/buildtool/confirm.png" size="32" pos="150 200"
+            visible="false" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="cancel" source="structurize:textures/gui/buildtool/cancel.png" size="32" pos="240 200"
+            visible="true" color="#ECE8E0" textcolor="#ECE8E0"/>
+</window>

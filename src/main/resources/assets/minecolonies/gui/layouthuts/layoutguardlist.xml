@@ -1,16 +1,15 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-    size="190 244">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
-    <text size="130 11" pos="30 14" textalign="MIDDLE" color="black"
+    size="420 260">
+    <!-- qd148:quidcraft-restyle -->
+    <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
+    <text size="130 11" pos="128 42" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.workerhuts.minerguards)"/>
-    <text id="noguardwarning" size="160 33" pos="13 29" color="black"
+    <text id="noguardwarning" size="160 33" pos="118 57" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.workerhuts.miner.noguards)"/>
-    <list id="guards" size="164 185" pos="13 29">
+    <list id="guards" size="164 185" pos="118 57">
         <box size="100% 28" linewidth="0">
-            <text id="guardName" size="92 24" pos="0 0" textalign="MIDDLE" color="black"/>
-            <button id="assignGuard" size="64 17" pos="92 4" color="black"
-                         source="minecolonies:textures/gui/builderhut/builder_button_small.png"
-                         disabled="minecolonies:textures/gui/builderhut/builder_button_small_disabled.png"/>
+            <text id="guardName" size="92 24" pos="0 0" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="assignGuard" size="64 17" pos="92 4" color="#ECE8E0" source="minecolonies:textures/gui/builderhut/builder_button_small.png" disabled="minecolonies:textures/gui/builderhut/builder_button_small_disabled.png" textcolor="#ECE8E0"/>
         </box>
     </list>
 </window>

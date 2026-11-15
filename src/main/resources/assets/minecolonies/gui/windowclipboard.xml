@@ -1,8 +1,12 @@
-<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="190 244"
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
+
     <image source="minecolonies:textures/gui/clipboard.png" pos="0 0" size="190 244"/>
 
-    <text size="158 11" pos="16 28" textalign="MIDDLE" color="black"
+    <text size="158 11" pos="16 28" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.citizen.requests)"/>
-    <button id="important" size="14 15" pos="150 23" color="red" label="!" tooltip="$(com.minecolonies.coremod.gui.request.hideshow)" source="minecolonies:textures/gui/builderhut/builder_button_mini.png"/>
+    <button id="important" size="14 15" pos="150 23" color="red" label="!" tooltip="$(com.minecolonies.coremod.gui.request.hideshow)" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" textcolor="#ECE8E0"/>
 </window>

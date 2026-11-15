@@ -1,59 +1,62 @@
-<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<!--
+  Centered absolute 420×240 parchment.
+  Background image is first (behind). Resource rows use <view> (no box/gradient overlay).
+  List visibility also depends on BlockUI Pane.scissorsStart using local coords
+  (GuiGraphics.enableScissor applies pose once — do not pre-transform).
+-->
+<window size="420 260"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         lightbox="true">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
+    <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
+    <image id="qcContent" source="minecolonies:textures/gui/quidcraft/content_288x200.png" pos="104 36" size="288 200"/>
 
-    <button id="previousStyle" size="14 15" pos="40 0" label="&lt;"
-                 source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="black"/>
+
+    <!-- Bottom-most layer only — must stay before all controls/list -->
+
+    <button id="previousStyle" size="14 15" pos="46 8" label="&lt;" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="#ECE8E0" textcolor="#ECE8E0"/>
     <dropdown id="style"
               size="129 17"
-              pos="55 0"
+              pos="62 7"
               maxContentHeight="75"
               dropDownSize="140 75"
-              source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-              color="black">
+              source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
+              color="#ECE8E0">
         <view size="100% 15">
-            <text id="id" size="100% 100%" label="" pos="0 0"/>
-            <button id="button" size="129 17" pos="0 0"
-                         source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" color="black"/>
+            <text id="id" size="100% 100%" label="" pos="0 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </dropdown>
-    <button id="nextStyle" size="14 15" pos="185 0" label="&gt;"
-                 source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="black"/>
+    <button id="nextStyle" size="14 15" pos="193 8" label="&gt;" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 
     <dropdown id="worker"
               size="129 17"
-              pos="225 0"
+              pos="220 7"
               maxContentHeight="75"
               dropDownSize="140 75"
-              source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-              color="black">
+              source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
+              color="#ECE8E0">
         <view size="100% 15">
-            <text id="id" size="100% 100%" label="" pos="0 0"/>
-            <button id="button" size="129 17" pos="0 0"
-                         source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" color="black"/>
+            <text id="id" size="100% 100%" label="" pos="0 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </dropdown>
 
-    <button id="cancel" size="14 15" pos="400 0"
-                 source="minecolonies:textures/gui/button_x.png" color="black"/>
+    <button id="cancel" size="14 15" pos="390 8" source="minecolonies:textures/gui/button_x.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <list id="resources" size="80% 80%" pos="30 20">
-        <box size="100% 30" linewidth="1">
+    <list id="resources" size="360 168" pos="30 30">
+        <view size="100% 30">
             <itemicon id="resourceIcon" size="24 24" pos="3 3"/>
-            <text id="resourceName" size="225 12" pos="33 9" color="white"/>
-            <text id="resourceQuantity" align="MIDDLE_RIGHT" size="24 12" pos="20 0" color="white"/>
-        </box>
+            <text id="resourceName" size="280 12" pos="33 9" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="resourceQuantity" size="36 12" pos="318 9" color="#ECE8E0" textalign="MIDDLE_RIGHT" textcolor="#ECE8E0"/>
+        </view>
     </list>
-    <button id="repair" align="TOP_MIDDLE" size="129 17" pos="-120 220"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                 label="$(com.minecolonies.coremod.gui.workerhuts.repair)" color="black"/>
-    <button id="build" align="TOP_MIDDLE" size="129 17" pos="10 220"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                 label="$(com.minecolonies.coremod.gui.workerhuts.upgrade)" color="black"/>
-    <button id="deconstruct" align="TOP_MIDDLE" size="129 17" pos="140 220"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                 label="$(com.minecolonies.coremod.gui.workerhuts.deconstruct)" color="black"/>
-    <button id="pickup" align="TOP_MIDDLE" size="129 17" pos="140 220"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                 label="$(com.minecolonies.coremod.gui.workerhuts.pickup)" color="black" visible="false"/>
+
+    <button id="repair" size="129 17" pos="16 214" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.repair)" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="build" size="129 17" pos="145 214" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.upgrade)" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="deconstruct" size="129 17" pos="274 214" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.deconstruct)" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="pickup" size="129 17" pos="274 214" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.pickup)" color="#ECE8E0" visible="false" textcolor="#ECE8E0"/>
 </window>
