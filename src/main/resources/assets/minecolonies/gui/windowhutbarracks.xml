@@ -1,19 +1,22 @@
-<window size="190 244" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+<window size="420 260" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
+    <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
+    <image id="qcContent" source="minecolonies:textures/gui/quidcraft/content_288x200.png" pos="104 36" size="288 200"/>
+
 
     <layout source="minecolonies:gui/layouthuts/layouthutpageactionsmin.xml"/>
-    <text size="164 11" pos="13 32" color="#F4F1EA" textalign="MIDDLE"
+    <text size="164 11" pos="13 32" color="#ECE8E0" textalign="MIDDLE"
            label="$(com.minecolonies.coremod.gui.workerhuts.barbpoints.current):"/>
-    <text id="current" size="164 11" pos="13 43" color="#F4F1EA" textalign="MIDDLE"/>
-    <text size="164 11" pos="13 54" color="#F4F1EA" textalign="MIDDLE"
+    <text id="current" size="164 11" pos="13 43" color="#ECE8E0" textalign="MIDDLE"/>
+    <text size="164 11" pos="13 54" color="#ECE8E0" textalign="MIDDLE"
            label="$(com.minecolonies.coremod.gui.workerhuts.barbpoints):"/>
     <list id="positions" size="164 45" pos="13 65">
         <box size="100% 11" linewidth="1">
-            <text id="pos" size="100% 11" color="#F4F1EA"/>
+            <text id="pos" size="100% 11" color="#ECE8E0"/>
         </box>
     </list>
 
-    <button id="hireSpies" size="129 17" pos="30 147" color="#F4F1EA"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                 label="$(com.minecolonies.coremod.gui.workerhuts.spies)"/>
+    <button id="hireSpies" size="129 17" pos="30 147" color="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.spies)" textcolor="#ECE8E0"/>
     <itemicon id="hireSpiesIcon" size="15 15" pos="130 147"/>
 </window>

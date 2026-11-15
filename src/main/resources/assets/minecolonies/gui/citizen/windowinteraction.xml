@@ -1,8 +1,10 @@
-<window size="350 170" lightbox="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+<window size="400 244" lightbox="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+
     <switch id="head" size="100% 100%" pos="0 0">
         <view id="interactionView">
             <gradient id="gradient" size="300 170" pos="20 0"/>
-            <text id="chat" size="250 100" color="white" pos="30 15"/>
+            <text id="chat" size="250 100" color="#ECE8E0" pos="30 15"/>
             <box id="responseOptions" size="270 70" pos="30 100" linewidth="0"/>
 
             <itemicon id="requestItem" size="32 32" pos="30 60"/>

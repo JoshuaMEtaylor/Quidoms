@@ -1,34 +1,50 @@
-<window size="210 244" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <button id="mainTab" size="32 26" pos="0 36"
-                 source="minecolonies:textures/gui/modules/tab_left_side1.png"/>
-    <button id="mainIcon" size="20 20" pos="5 39"
+<window size="420 260" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
+    <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
+    <image id="qcContent" source="minecolonies:textures/gui/quidcraft/content_288x200.png" pos="104 36" size="288 200"/>
+
+    <!-- Full-chip tabs (label always visible); icons overlay for existing Java handlers -->
+    <button id="mainTab" size="84 22" pos="6 40"
+                 source="minecolonies:textures/gui/quidcraft/nav_84x22.png"
+                 label="$(com.minecolonies.coremod.gui.citizen.main)"
+                 textalign="MIDDLE_LEFT" textoffset="22 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="mainIcon" size="14 14" pos="10 44"
                  source="minecolonies:textures/gui/modules/info.png"/>
 
-    <button id="requestTab" size="32 26" pos="0 64"
-                 source="minecolonies:textures/gui/modules/tab_left_side2.png"/>
-    <button id="requestIcon" size="20 20" pos="5 67"
+    <button id="requestTab" size="84 22" pos="6 66"
+                 source="minecolonies:textures/gui/quidcraft/nav_84x22.png"
+                 label="$(com.minecolonies.coremod.gui.citizen.requests)"
+                 textalign="MIDDLE_LEFT" textoffset="22 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="requestIcon" size="14 14" pos="10 70"
                  source="minecolonies:textures/gui/modules/requests.png"/>
 
-    <button id="inventoryTab" size="32 26" pos="0 92"
-                 source="minecolonies:textures/gui/modules/tab_left_side3.png"/>
-    <button id="inventoryIcon" size="20 20" pos="5 95"
+    <button id="inventoryTab" size="84 22" pos="6 92"
+                 source="minecolonies:textures/gui/quidcraft/nav_84x22.png"
+                 label="$(com.minecolonies.coremod.gui.citizen.inventory)"
+                 textalign="MIDDLE_LEFT" textoffset="22 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="inventoryIcon" size="14 14" pos="10 96"
                  source="minecolonies:textures/gui/modules/inventory.png"/>
 
-    <!-- QD-113: happiness tab removed entirely (was pos 118). Family/job shifted up. -->
-    <button id="familyTab" size="32 26" pos="0 118"
-                 source="minecolonies:textures/gui/modules/tab_left_side1.png"/>
-    <button id="familyIcon" size="20 20" pos="5 121"
+    <button id="familyTab" size="84 22" pos="6 118"
+                 source="minecolonies:textures/gui/quidcraft/nav_84x22.png"
+                 label="$(com.minecolonies.coremod.gui.citizen.family)"
+                 textalign="MIDDLE_LEFT" textoffset="22 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="familyIcon" size="14 14" pos="10 122"
                  source="minecolonies:textures/gui/modules/family.png"/>
 
-    <button id="jobTab" size="32 26" pos="0 144" visible="false"
-                 source="minecolonies:textures/gui/modules/tab_left_side3.png"/>
-    <button id="jobIcon" size="20 20" pos="5 147" visible="false"
+    <button id="jobTab" size="84 22" pos="6 144" visible="false"
+                 source="minecolonies:textures/gui/quidcraft/nav_84x22.png"
+                 label="$(com.minecolonies.coremod.gui.citizen.job)"
+                 textalign="MIDDLE_LEFT" textoffset="22 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="jobIcon" size="14 14" pos="10 148" visible="false"
                  source="minecolonies:textures/gui/modules/main.png"/>
 
-    <button id="debugTab" size="32 26" pos="0 170" visible="false"
-            source="minecolonies:textures/gui/modules/tab_left_side3.png"/>
-    <button id="debugIcon" size="20 20" pos="5 173" visible="false"
-            source="minecolonies:textures/gui/modules/settings.png"/>
-
-    <image source="minecolonies:textures/gui/citizen/colonist_paper.png" size="190 244" pos="20 0"/>
+    <button id="debugTab" size="84 22" pos="6 170" visible="false"
+                 source="minecolonies:textures/gui/quidcraft/nav_84x22.png"
+                 label="Debug"
+                 textalign="MIDDLE_LEFT" textoffset="22 0" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="debugIcon" size="14 14" pos="10 174" visible="false"
+                 source="minecolonies:textures/gui/modules/settings.png"/>
 </window>

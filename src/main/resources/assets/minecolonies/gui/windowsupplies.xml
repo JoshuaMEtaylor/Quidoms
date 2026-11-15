@@ -1,7 +1,10 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-        size="420 240">
+        size="400 244">
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
+
 
     <layout source="structurize:gui/layoutmanipulation.xml"/>
 
-    <button id="switch" source="structurize:textures/gui/buildtool/button_medium.png" label="$(structurize.gui.buildtool.switchpack)" size="86 17" pos="5 5" textcolor="#F4F1EA" texthovercolor="gray"/>
+    <button id="switch" source="structurize:textures/gui/buildtool/button_medium.png" label="$(structurize.gui.buildtool.switchpack)" size="86 17" pos="5 5" textcolor="#ECE8E0" texthovercolor="gray"/>
 </window>

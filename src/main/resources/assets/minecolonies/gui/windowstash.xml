@@ -1,3 +1,6 @@
-<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="190 244"
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
+
 </window>

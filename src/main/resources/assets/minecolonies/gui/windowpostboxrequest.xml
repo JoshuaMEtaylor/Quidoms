@@ -1,27 +1,29 @@
-<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="440 244"
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="420 260"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/1.20.1/src/main/resources/assets/blockui/gui/block_ui.xsd"
         >
-    <image source="minecolonies:textures/gui/citizen/colonist_paper.png" size="430 244" pos="10 0"/>
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
+    <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
+    <image id="qcContent" source="minecolonies:textures/gui/quidcraft/content_288x200.png" pos="104 36" size="288 200"/>
 
-    <text id="desc" size="140 11" pos="60 14" color="#F4F1EA" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.citizen.stacks)"/>
-    <input id="name" size="160 18" pos="50 30" maxlength="25" color="white"/>
+
+    <text id="desc" size="140 11" pos="60 14" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.citizen.stacks)"/>
+    <input id="name" size="160 18" pos="50 30" maxlength="25" color="#ECE8E0"/>
 
     <list id="resources" size="215 136" pos="43 50">
         <box size="100% 18" linewidth="1">
             <itemicon id="resourceIcon" size="17 17" pos="0 0"/>
-            <text id="resourceName" size="100 12" pos="20 1" color="#F4F1EA"/>
-            <input id="qty" size="25 18" pos="113 1" maxlength="25" color="white"/>
+            <text id="resourceName" size="100 12" pos="20 1" color="#ECE8E0"/>
+            <input id="qty" size="25 18" pos="113 1" maxlength="25" color="#ECE8E0"/>
 
-            <button label="$(com.minecolonies.coremod.gui.workerhuts.request)" id="request" pos="140 1" size="64 15"
-                         source="minecolonies:textures/gui/builderhut/builder_button_small.png" color="#F4F1EA"/>
+            <button label="$(com.minecolonies.coremod.gui.workerhuts.request)" id="request" pos="140 1" size="64 15" source="minecolonies:textures/gui/builderhut/builder_button_small.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
 
-    <text size="158 11" pos="246 28" textalign="MIDDLE" color="#F4F1EA"
+    <text size="158 11" pos="246 28" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.citizen.requests)"/>
 
-    <button id="deliverAvailable" pos="52 195" size="40 15"/>
-    <text id="test" pos="100 195" size="158 11" color="#F4F1EA" label="Deliver what's available"/>
-    <button id="inventory" size="86 17" pos="107 210" color="#F4F1EA" label="$(container.inventory)"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"/>
+    <button id="deliverAvailable" pos="52 195" size="40 15" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text id="test" pos="100 195" size="158 11" color="#ECE8E0" label="Deliver what's available"/>
+    <button id="inventory" size="86 17" pos="107 210" color="#ECE8E0" label="$(container.inventory)" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" textcolor="#ECE8E0"/>
 </window>

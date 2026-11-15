@@ -1,19 +1,17 @@
-<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="420 260"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <button id="map" size="34 34" pos="-10 20" color="#F4F1EA"
-            source="minecolonies:textures/gui/modules/tab_left_side1.png"
-            label="" tooltip="$(item.minecolonies.colonymap)"/>
-    <button id="mapicon" size="25 25" pos="-5 24" color="#F4F1EA"
-            source="minecolonies:textures/gui/modules/map.png"
-            label="" tooltip="$(item.minecolonies.colonymap)"/>
-    <image source="minecolonies:textures/gui/builderhut/builder_paper_wide_structure.png" pos="11 7" size="378 237"/>
-    <text id="title" size="280 13" pos="60 15" color="#F4F1EA" label="$(com.minecolonies.coremod.gui.townhall.prestige)" textalign="MIDDLE"/>
-    <button size="15 15" pos="260 12" color="#F4F1EA"
-            source="minecolonies:textures/gui/red_wax_information.png"
-            label="" tooltip="$(com.minecolonies.coremod.gui.townhall.prestige.tooltip)"/>
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
+    <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
+    <image id="qcContent" source="minecolonies:textures/gui/quidcraft/content_288x200.png" pos="104 36" size="288 200"/>
+
+    <button id="map" size="34 34" pos="-10 20" color="#ECE8E0" source="minecolonies:textures/gui/modules/tab_left_side1.png" label="" tooltip="$(item.minecolonies.colonymap)" textcolor="#ECE8E0"/>
+    <button id="mapicon" size="25 25" pos="-5 24" color="#ECE8E0" source="minecolonies:textures/gui/modules/map.png" label="" tooltip="$(item.minecolonies.colonymap)" textcolor="#ECE8E0"/>
+    <text id="title" size="280 13" pos="60 15" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.townhall.prestige)" textalign="MIDDLE"/>
+    <button size="15 15" pos="260 12" color="#ECE8E0" source="minecolonies:textures/gui/red_wax_information.png" label="" tooltip="$(com.minecolonies.coremod.gui.townhall.prestige.tooltip)" textcolor="#ECE8E0"/>
 
     <list id="colonies" size="280 180" pos="60 30">
-        <text id="desc" size="280 13" pos="0 0" color="#F4F1EA"/>
+        <text id="desc" size="280 13" pos="0 0" color="#ECE8E0"/>
     </list>
-    <button id="exit" size="14 15" pos="360 10" source="minecolonies:textures/gui/button_x.png" tooltip="close" color="#F4F1EA"/>
+    <button id="exit" size="14 15" pos="360 10" source="minecolonies:textures/gui/button_x.png" tooltip="close" color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

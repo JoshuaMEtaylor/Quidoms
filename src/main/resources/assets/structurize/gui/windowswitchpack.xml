@@ -12,9 +12,9 @@
             <box size="200 100" linewidth="0" pos="0 0"  id="box1">
                 <image id="icon1" pos="0 0" size="80 80" source="structurize:textures/item/sceptersteel.png"/>
 
-                <text id="name1" pos="81 0" size="119 17" color="white" textscale="1.2"/>
-                <text id="desc1" pos="81 20" size="119 50" color="white" textscale="0.6"/>
-                <text id="authors1" pos="90 70" size="110 30" color="white" textscale="0.8"/>
+                <text id="name1" pos="81 0" size="119 17" color="#ECE8E0" textscale="1.2"/>
+                <text id="desc1" pos="81 20" size="119 50" color="#ECE8E0" textscale="0.6"/>
+                <text id="authors1" pos="90 70" size="110 30" color="#ECE8E0" textscale="0.8"/>
 
                 <button id="select1"
                         source="structurize:textures/gui/buildtool/button_medium.png"
@@ -28,9 +28,9 @@
             <box size="200 100" linewidth="0" pos="200 0" id="box2">
                 <image id="icon2" pos="0 0" size="80 80" source="structurize:textures/item/sceptersteel.png"/>
 
-                <text id="name2" pos="81 0" size="119 17" color="white" textscale="1.2"/>
-                <text id="desc2" pos="81 20" size="119 50" color="white" textscale="0.6"/>
-                <text id="authors2" pos="90 70" size="110 30" color="white" textscale="0.9"/>
+                <text id="name2" pos="81 0" size="119 17" color="#ECE8E0" textscale="1.2"/>
+                <text id="desc2" pos="81 20" size="119 50" color="#ECE8E0" textscale="0.6"/>
+                <text id="authors2" pos="90 70" size="110 30" color="#ECE8E0" textscale="0.9"/>
 
                 <button id="select2"
                         source="structurize:textures/gui/buildtool/button_medium.png"
