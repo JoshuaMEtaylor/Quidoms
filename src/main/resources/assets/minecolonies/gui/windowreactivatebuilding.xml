@@ -1,13 +1,12 @@
-<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="190 133"
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <image source="minecolonies:textures/gui/citizen/colonist_paper.png" size="100% 100%"/>
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
 
-    <button id="cancel" size="14 15" pos="165 5"
-                 source="minecolonies:textures/gui/button_x.png" color="#F4F1EA"/>
 
-    <text id="text" size="150 75" pos="15 15" color="#F4F1EA" text="$(com.minecolonies.coremod.gui.reactivate.message)" textscale="0.75"/>
+    <button id="cancel" size="14 15" pos="165 5" source="minecolonies:textures/gui/button_x.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <button id="reactivate" size="86 17" pos="50 100" color="#F4F1EA"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium.png"
-                 label="$(com.minecolonies.coremod.gui.reactivate.button)"/>
+    <text id="text" size="150 75" pos="15 15" color="#ECE8E0" text="$(com.minecolonies.coremod.gui.reactivate.message)" textscale="0.75"/>
+
+    <button id="reactivate" size="86 17" pos="50 100" color="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" label="$(com.minecolonies.coremod.gui.reactivate.button)" textcolor="#ECE8E0"/>
 </window>

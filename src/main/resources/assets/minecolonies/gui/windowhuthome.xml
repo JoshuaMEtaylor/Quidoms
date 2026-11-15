@@ -12,9 +12,9 @@
     </list>
 
     <button id="assign" size="129 17" pos="184 120" color="#ECE8E0" textcolor="#ECE8E0"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
                  label="$(com.minecolonies.coremod.gui.home.manage)"/>
-    <button id="recall" size="129 17" pos="30 147" color="#ECE8E0" textcolor="#ECE8E0"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+    <button id="recall" size="129 17" pos="184 147" color="#ECE8E0" textcolor="#ECE8E0"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
                  label="$(com.minecolonies.coremod.gui.townhall.recall)"/>
 </window>

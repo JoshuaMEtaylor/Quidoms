@@ -1,13 +1,12 @@
-<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="190 130" type="VANILLA"
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244" type="VANILLA"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper_short.png" size="190 130"/>
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
 
-    <button id="cancel" size="14 15" pos="165 9" source="minecolonies:textures/gui/button_x.png" color="#F4F1EA"/>
 
-    <text id="text1" size="160 90" color="#F4F1EA" pos="15 15" textscale="1"/>
+    <button id="cancel" size="14 15" pos="165 9" source="minecolonies:textures/gui/button_x.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <button id="pickup" size="129 17" pos="30 100" color="#F4F1EA"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                 disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png"
-                 label="$(com.minecolonies.core.founding.pickup)"/>
+    <text id="text1" size="160 90" color="#ECE8E0" pos="15 15" textscale="1"/>
+
+    <button id="pickup" size="129 17" pos="30 100" color="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png" label="$(com.minecolonies.core.founding.pickup)" textcolor="#ECE8E0"/>
 </window>

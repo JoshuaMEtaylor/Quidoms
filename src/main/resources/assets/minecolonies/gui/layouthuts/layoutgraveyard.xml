@@ -1,22 +1,22 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-    size="190 244">
+    size="420 260">
+    <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
 
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
 
-    <text id="plotStatistics" size="164 11" pos="13 14" color="#F4F1EA" textalign="MIDDLE"/>
-    <text size="130 11" pos="30 27" color="#F4F1EA" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.workerhuts.graveyard.graves):"/>
+    <text id="plotStatistics" size="164 11" pos="13 14" color="#ECE8E0" textalign="MIDDLE"/>
+    <text size="130 11" pos="128 55" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.workerhuts.graveyard.graves):"/>
     <list id="graves" size="164 91" pos="13 41">
         <box size="100% 34" linewidth="1">
-            <text id="name" color="#F4F1EA" pos="20 2" size="130 9"/>
-            <text id="dist" color="#F4F1EA" pos="20 12" size="65 9"/>
-            <text id="dir" color="#F4F1EA" pos="20 22" size="65 9"/>
+            <text id="name" color="#ECE8E0" pos="20 2" size="130 9"/>
+            <text id="dist" color="#ECE8E0" pos="20 12" size="65 9"/>
+            <text id="dir" color="#ECE8E0" pos="20 22" size="65 9"/>
         </box>
     </list>
 
-    <text size="130 11" pos="30 134" color="#F4F1EA" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.workerhuts.graveyard.rip):"/>
+    <text size="130 11" pos="128 162" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.workerhuts.graveyard.rip):"/>
     <list id="citizen" size="164 60" pos="13 145">
         <box size="100% 12" linewidth="1">
-            <text id="citizenName" color="#F4F1EA" pos="20 2" size="130 9"/>
+            <text id="citizenName" color="#ECE8E0" pos="20 2" size="130 9"/>
         </box>
     </list>
 

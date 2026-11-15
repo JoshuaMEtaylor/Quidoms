@@ -8,11 +8,11 @@
 
     <text id="name" size="260 11" pos="118 14" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"/>
     <button id="editName" size="15 15" pos="372 12" source="minecolonies:textures/gui/builderhut/edit.png"
-            tooltip="$(com.minecolonies.gui.edit)"/>
+            tooltip="$(com.minecolonies.gui.edit)" color="#ECE8E0" textcolor="#ECE8E0"/>
 
     <button id="build" size="129 17" pos="184 120" color="#ECE8E0" textcolor="#ECE8E0"
             source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
             label="$(com.minecolonies.coremod.gui.workerhuts.buildrepair)"/>
     <button id="info" size="17 17" pos="112 228"
-            source="minecolonies:textures/gui/red_wax_information.png" tooltip="$(com.minecolonies.core.building.help)"/>
+            source="minecolonies:textures/gui/red_wax_information.png" tooltip="$(com.minecolonies.core.building.help)" color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

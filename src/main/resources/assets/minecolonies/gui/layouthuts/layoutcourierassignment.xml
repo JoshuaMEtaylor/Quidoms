@@ -1,21 +1,21 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-    size="190 244">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
-    <text size="164 11" pos="13 22" textalign="MIDDLE" color="#F4F1EA"
+    size="420 260">
+    <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
+    <text size="164 11" pos="13 22" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.workerhuts.workerassigned)"/>
 
     <list id="workers" size="164 110" pos="13 43">
         <view size="100% 11">
             <box size="100% 11" linewidth="0">
-                <text id="workerName" size="100% 11" pos="0 0" textalign="MIDDLE" color="#F4F1EA"/>
+                <text id="workerName" size="100% 11" pos="0 0" textalign="MIDDLE" color="#ECE8E0"/>
             </box>
         </view>
     </list>
 
-    <button id="hire" size="129 17" pos="30 154" textcolor="#F4F1EA"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+    <button id="hire" size="129 17" pos="128 182" textcolor="#ECE8E0"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
                  label="$(com.minecolonies.coremod.gui.workerhuts.manage)"/>
-    <button id="recall" size="129 17" pos="30 172" textcolor="#F4F1EA"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+    <button id="recall" size="129 17" pos="128 200" textcolor="#ECE8E0"
+                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
                  label="$(com.minecolonies.coremod.gui.workerhuts.recall)"/>
 </window>

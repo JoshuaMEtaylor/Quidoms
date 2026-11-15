@@ -14,20 +14,20 @@
     </list>
 
     <button id="hire" size="129 17" pos="184 100" color="#ECE8E0" textcolor="#ECE8E0"
-            source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+            source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
             label="$(com.minecolonies.coremod.gui.workerhuts.manage)"/>
     <button id="recall" size="129 17" pos="184 120" color="#ECE8E0" textcolor="#ECE8E0"
-            source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+            source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
             label="$(com.minecolonies.coremod.gui.workerhuts.recall)"/>
 
-    <text id="prioValue" size="95 15" pos="30 148" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text id="prioValue" size="95 15" pos="118 148" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <button id="deliveryPrioDown" size="14 15" pos="127 148" color="#ECE8E0" textcolor="#ECE8E0"
+    <button id="deliveryPrioDown" size="14 15" pos="215 148" color="#ECE8E0" textcolor="#ECE8E0"
             source="minecolonies:textures/gui/builderhut/builder_button_mini.png" label="-"/>
-    <button id="deliveryPrioUp" size="14 15" pos="144 148" color="#ECE8E0" textcolor="#ECE8E0"
+    <button id="deliveryPrioUp" size="14 15" pos="232 148" color="#ECE8E0" textcolor="#ECE8E0"
             source="minecolonies:textures/gui/builderhut/builder_button_mini.png" label="+"/>
 
-    <button id="forcePickup" size="129 17" pos="30 167" color="#ECE8E0" textcolor="#ECE8E0"
-            source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
+    <button id="forcePickup" size="129 17" pos="184 167" color="#ECE8E0" textcolor="#ECE8E0"
+            source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
             label="$(com.minecolonies.coremod.gui.workerhuts.forcepickup)"/>
 </window>

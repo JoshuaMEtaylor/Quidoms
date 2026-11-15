@@ -1,7 +1,7 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-    size="190 244">
-    <image source="minecolonies:textures/gui/builderhut/builder_paper.png" size="190 244"/>
-    <text size="130 11" pos="30 14" textalign="MIDDLE" color="#F4F1EA"
+    size="420 260">
+    <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
+    <text size="130 11" pos="128 42" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.core.gui.modules.stats)"/>
     <view size="200 243" pos="0 0">
         <dropdown id="intervals"
@@ -9,18 +9,18 @@
                   pos="30 30"
                   maxContentHeight="75"
                   dropDownSize="140 75"
-                  source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"
-                  color="#F4F1EA">
-            <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" color="#F4F1EA"
-                         label="$(com.minecolonies.coremod.gui.interval.yesterday)"/>
+                  source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
+                  color="#ECE8E0">
+            <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0"
+                         label="$(com.minecolonies.coremod.gui.interval.yesterday)" textcolor="#ECE8E0"/>
         </dropdown>
-        <list id="stats" size="160 160" pos="20 55" emptytext="$(com.minecolonies.core.gui.modules.stats.empty)" emptycolor="black">
-            <text id="desc" size="160 13" pos="0 0" color="#F4F1EA" wrap="true"/>
+        <list id="stats" size="160 160" pos="20 55" emptytext="$(com.minecolonies.core.gui.modules.stats.empty)" emptycolor="#ECE8E0">
+            <text id="desc" size="160 13" pos="0 0" color="#ECE8E0" wrap="true"/>
         </list>
-        <text size="105 11" pos="20 220" textalign="MIDDLE_RIGHT" color="#F4F1EA"
+        <text size="105 11" pos="20 220" textalign="MIDDLE_RIGHT" color="#ECE8E0"
             label="$(com.minecolonies.core.gui.modules.stats.hidezerolabel)"/>
         <button id="hidezero" pos="127 218" size="14 15"
                         source="minecolonies:textures/gui/builderhut/builder_button_mini_check.png"
-                        disabled="minecolonies:textures/gui/builderhut/builder_button_mini_disabled.png"/>
+                        disabled="minecolonies:textures/gui/builderhut/builder_button_mini_disabled.png" color="#ECE8E0" textcolor="#ECE8E0"/>
     </view>
 </window>

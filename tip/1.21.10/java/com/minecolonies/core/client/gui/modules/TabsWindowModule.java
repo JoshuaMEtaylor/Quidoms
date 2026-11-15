@@ -1,5 +1,6 @@
 package com.minecolonies.core.client.gui.modules;
 
+import com.ldtteam.blockui.Alignment;
 import com.ldtteam.blockui.PaneBuilders;
 import com.ldtteam.blockui.controls.ButtonHandler;
 import com.ldtteam.blockui.controls.ButtonImage;
@@ -14,90 +15,51 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 import java.util.function.BiFunction;
 
+/**
+ * Quidoms: QuidCraft sidebar module tabs — full 84×22 chips with always-visible cream labels.
+ */
 public class TabsWindowModule implements IWindowModule
 {
-    /**
-     * Render sizes
-     */
-    private static final int TAB_X_OFFSET      = 40; // Quidoms: tabs inside QuidCraft sidebar
-    private static final int TAB_Y_OFFSET      = 36; // Quidoms: below chrome header
-    private static final int TAB_WIDTH         = 32;
-    private static final int TAB_HEIGHT        = 26;
-    private static final int TAB_Y_SPACING     = 2;
-    private static final int TAB_ICON_WIDTH    = 20;
-    private static final int TAB_ICON_HEIGHT   = 20;
-    private static final int TAB_ICON_OFFSET_X = 5;
-    private static final int TAB_ICON_OFFSET_Y = 3;
+    private static final int TAB_X_OFFSET      = 6;  // inside QuidCraft sidebar
+    private static final int TAB_Y_OFFSET      = 36; // below chrome header
+    private static final int TAB_WIDTH         = 84;
+    private static final int TAB_HEIGHT        = 22;
+    private static final int TAB_Y_SPACING     = 4;
+    private static final int TAB_ICON_WIDTH    = 14;
+    private static final int TAB_ICON_HEIGHT   = 14;
+    private static final int TAB_ICON_OFFSET_X = 4;
+    private static final int TAB_ICON_OFFSET_Y = 4;
+    private static final int CREAM             = 0xFFECE8E0;
+    private static final int CREAM_MUTED       = 0xFFB7B1A8;
 
-    /**
-     * The window this module is attached to.
-     */
     private final AbstractWindowSkeleton parent;
-
-    /**
-     * The random generator for creating the icons, should use a consistent seed upon reload so it generates the same icons each time it's opened.
-     */
     private final Random iconRandom;
 
-    /**
-     * The defined tab X offset.
-     */
     private int tabXOffset = TAB_X_OFFSET;
-
-    /**
-     * The defined tab Y offset.
-     */
     private int tabYOffset = TAB_Y_OFFSET;
-
-    /**
-     * The defined tab Y spacing.
-     */
     private int tabYSpacing = TAB_Y_SPACING;
 
-    /**
-     * Constructor to initiate the tab window module.
-     *
-     * @param parent     the parenting window.
-     * @param iconRandom the random generator for creating the icons, should use a consistent seed upon reload so it generates the same icons each time it's opened.
-     */
     public TabsWindowModule(final AbstractWindowSkeleton parent, final Random iconRandom)
     {
         this.parent = parent;
         this.iconRandom = iconRandom;
     }
 
-    /**
-     * Override the tab X offset.
-     */
     public void setTabXOffset(final int tabXOffset)
     {
         this.tabXOffset = tabXOffset;
     }
 
-    /**
-     * Override the tab Y offset.
-     */
     public void setTabYOffset(final int tabYOffset)
     {
         this.tabYOffset = tabYOffset;
     }
 
-    /**
-     * Override the tab Y spacing.
-     */
     public void setTabYSpacing(final int tabYSpacing)
     {
         this.tabYSpacing = tabYSpacing;
     }
 
-    /**
-     * Render a tab button at the given position, with an icon and a button handler.
-     *
-     * @param index   the numeric index on the side.
-     * @param side    which side to render the tab on.
-     * @param icon    the icon to render in the tab.
-     * @param handler the button handler.
-     */
     public void renderTabButton(int index, final TabImageSide side, final ResourceLocation icon, @Nullable final MutableComponent hoverText, final ButtonHandler handler)
     {
         final View view = new View();
@@ -105,10 +67,17 @@ public class TabsWindowModule implements IWindowModule
         view.setPosition(side.getXPosition.apply(parent, tabXOffset), tabYOffset + ((TAB_HEIGHT + tabYSpacing) * index));
         view.setSize(TAB_WIDTH, TAB_HEIGHT);
 
-        final ButtonImage image = new ButtonImage();
-        image.setImage(side.getImage(iconRandom));
-        image.setSize(TAB_WIDTH, TAB_HEIGHT);
-        image.setHandler(handler);
+        final ButtonImage chip = new ButtonImage();
+        chip.setImage(side.getImage(iconRandom));
+        chip.setSize(TAB_WIDTH, TAB_HEIGHT);
+        chip.setHandler(handler);
+        chip.setTextAlignment(Alignment.MIDDLE_LEFT);
+        chip.setTextOffset(22, 0);
+        chip.setColors(CREAM, CREAM, CREAM_MUTED);
+        if (hoverText != null)
+        {
+            chip.setText(hoverText);
+        }
 
         final ButtonImage iconImage = new ButtonImage();
         iconImage.setID(icon.getPath());
@@ -118,7 +87,7 @@ public class TabsWindowModule implements IWindowModule
         iconImage.setHandler(handler);
 
         parent.addChild(view);
-        view.addChild(image);
+        view.addChild(chip);
         view.addChild(iconImage);
 
         if (hoverText != null)
@@ -127,35 +96,16 @@ public class TabsWindowModule implements IWindowModule
         }
     }
 
-    /**
-     * Image side definitions.
-     */
     public enum TabImageSide
     {
-        LEFT("left", 4, (v, tabXOffset) -> -(TAB_WIDTH - tabXOffset)),
+        // Quidoms: LEFT tabs sit inside the 96px sidebar (absolute x = tabXOffset).
+        LEFT("left", 4, (v, tabXOffset) -> tabXOffset),
         RIGHT("right", 4, (v, tabXOffset) -> v.getWidth() - tabXOffset);
 
-        /**
-         * The file part indicating which side to load.
-         */
         private final String side;
-
-        /**
-         * How many images exist for this given side.
-         */
         private final int imageCount;
-
-        /**
-         * Function for calculating the X offset.
-         */
         private final BiFunction<BOWindow, Integer, Integer> getXPosition;
 
-        /**
-         * Internal constructor.
-         *
-         * @param side       the file part indicating which side to load.
-         * @param imageCount how many images exist for this given side.
-         */
         TabImageSide(final String side, final int imageCount, final BiFunction<BOWindow, Integer, Integer> getXPosition)
         {
             this.side = side;
@@ -163,15 +113,10 @@ public class TabsWindowModule implements IWindowModule
             this.getXPosition = getXPosition;
         }
 
-        /**
-         * Get a random image for this given side.
-         *
-         * @param random the random number generator instance.
-         * @return the chosen resource location.
-         */
         public ResourceLocation getImage(final Random random)
         {
-            return ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, String.format("textures/gui/modules/tab_%s_side%s.png", side, random.nextInt(imageCount) + 1));
+            // QuidCraft nav chip (full hitbox); keep legacy wax as unused fallback path unused.
+            return ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/quidcraft/nav_84x22.png");
         }
     }
 }

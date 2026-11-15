@@ -2,18 +2,18 @@
     <text id="id" size="0 0" pos="0 0" visible="false"/>
     <text id="desc" size="100% 15" pos="5 5" color="#F4F1EA" textalign="MIDDLE_LEFT" wrap="true"/>
 
-    <button id="trigger" pos="5 25" size="145 17" source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="#F4F1EA"/>
+    <button id="trigger" pos="5 25" size="145 17" source="minecolonies:textures/gui/builderhut/builder_button_medium.png" color="#F4F1EA" textcolor="#ECE8E0"/>
     <button id="setPositions"
                  label="$(com.minecolonies.coremod.gui.workerhuts.targetpatrol)"
                  color="#F4F1EA"
                  pos="70 25"
                  size="80 17"
-                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png"/>
+                 source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" textcolor="#ECE8E0"/>
     <button id="helpButton"
                  label="?"
                  textalign="MIDDLE"
                  color="red"
                  pos="135 25"
                  size="15 15"
-                 source="minecolonies:textures/gui/builderhut/builder_button_mini.png"/>
+                 source="minecolonies:textures/gui/builderhut/builder_button_mini.png" textcolor="#ECE8E0"/>
 </window>
