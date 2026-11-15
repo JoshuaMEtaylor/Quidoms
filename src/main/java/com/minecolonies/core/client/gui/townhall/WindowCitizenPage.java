@@ -122,32 +122,58 @@ public class WindowCitizenPage extends AbstractWindowTownHall
      */
     private void fillCitizenInfo()
     {
+        final Image gender = findPaneOfTypeByID(WINDOW_ID_GENDER, Image.class);
+        final Text health = findPaneOfTypeByID(HEALTH_SHORT_LABEL, Text.class);
+        final Text saturation = findPaneOfTypeByID(SATURATION_SHORT_LABEL, Text.class);
+        final Image healthIcon = findPaneOfTypeByID("healthIcon", Image.class);
+        final Image foodIcon = findPaneOfTypeByID("foodIcon", Image.class);
+        final EntityIcon entityIcon = findPaneOfTypeByID(ENTITY_ICON, EntityIcon.class);
+
         if (selectedCitizen == null)
         {
+            // Quidoms: never leave orphan heart/food icons floating in an empty well.
+            if (gender != null) gender.hide();
+            if (health != null) health.hide();
+            if (saturation != null) saturation.hide();
+            if (healthIcon != null) healthIcon.hide();
+            if (foodIcon != null) foodIcon.hide();
+            if (entityIcon != null) entityIcon.hide();
+            findPaneOfTypeByID(JOB_LABEL, Text.class).clearText();
             return;
         }
 
         if (selectedCitizen.isFemale())
         {
-            findPaneOfTypeByID(WINDOW_ID_GENDER, Image.class).setImage(ResourceLocation.parse(FEMALE_SOURCE), false);
+            gender.setImage(ResourceLocation.parse(FEMALE_SOURCE), false);
         }
         else
         {
-            findPaneOfTypeByID(WINDOW_ID_GENDER, Image.class).setImage(ResourceLocation.parse(MALE_SOURCE), false);
+            gender.setImage(ResourceLocation.parse(MALE_SOURCE), false);
         }
+        gender.show();
 
         findPaneOfTypeByID(JOB_LABEL, Text.class).setText(selectedCitizen.getJobComponent().withStyle(ChatFormatting.BOLD));
 
-        findPaneOfTypeByID(HEALTH_SHORT_LABEL, Text.class).setText(Component.literal((int)selectedCitizen.getHealth() + "/" + (int) selectedCitizen.getMaxHealth()));
-        findPaneOfTypeByID(HAPPINESS_SHORT_LABEL, Text.class).setText(Component.literal((int) selectedCitizen.getHappiness() + "/" + 10));
-        findPaneOfTypeByID(SATURATION_SHORT_LABEL, Text.class).setText(Component.literal((int)selectedCitizen.getSaturation() + "/" + 20));
+        health.setText(Component.literal((int) selectedCitizen.getHealth() + "/" + (int) selectedCitizen.getMaxHealth()));
+        health.show();
+        if (healthIcon != null) healthIcon.show();
+
+        findPaneOfTypeByID(HAPPINESS_SHORT_LABEL, Text.class)
+          .setText(Component.literal((int) selectedCitizen.getHappiness() + "/" + 10));
+
+        saturation.setText(Component.literal((int) selectedCitizen.getSaturation() + "/" + 20));
+        saturation.show();
+        if (foodIcon != null) foodIcon.show();
 
         selectedEntity = Minecraft.getInstance().level.getEntity(selectedCitizen.getEntityId());
-        if (selectedEntity != null && selectedEntity.getPose() == Pose.SLEEPING)
+        if (selectedEntity != null && selectedEntity.getPose() != Pose.SLEEPING)
         {
-            final EntityIcon entityIcon = findPaneOfTypeByID(ENTITY_ICON, EntityIcon.class);
             entityIcon.setEntity(selectedEntity);
             entityIcon.show();
+        }
+        else if (entityIcon != null)
+        {
+            entityIcon.hide();
         }
     }
 
@@ -278,13 +304,19 @@ public class WindowCitizenPage extends AbstractWindowTownHall
         super.onUpdate();
         updateCitizens();
         final EntityIcon entityIcon = findPaneOfTypeByID(ENTITY_ICON, EntityIcon.class);
-        if (selectedEntity != null && selectedEntity.getPose() == Pose.SLEEPING)
+        if (entityIcon == null)
         {
-            entityIcon.hide();
+            return;
+        }
+        // Quidoms: only show the entity preview when a waking citizen is selected.
+        if (selectedCitizen != null && selectedEntity != null && selectedEntity.getPose() != Pose.SLEEPING)
+        {
+            entityIcon.setEntity(selectedEntity);
+            entityIcon.show();
         }
         else
         {
-            entityIcon.show();
+            entityIcon.hide();
         }
     }
 

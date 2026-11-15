@@ -8,6 +8,7 @@ import com.minecolonies.core.client.gui.modules.TabsWindowModule;
 import com.minecolonies.core.colony.buildings.views.AbstractBuildingView;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
@@ -72,10 +73,14 @@ public abstract class AbstractBuildingWindow<B extends IBuildingView> extends Ab
                     continue;
                 }
 
+                // Quidoms: never pass null label — TabsWindowModule always paints cream text.
+                final MutableComponent tabLabel = Optional.ofNullable(view.getDesc())
+                    .map(Component::copy)
+                    .orElseGet(() -> Component.literal("Module").copy());
                 tabsWindowModule.renderTabButton(nextTabIndex++,
                     TabsWindowModule.TabImageSide.LEFT,
                     view.getIconResourceLocation(),
-                    Optional.ofNullable(view.getDesc()).map(Component::copy).orElse(null),
+                    tabLabel,
                     button -> {
                         mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BOOK_PAGE_TURN, 1.0F));
                         view.getWindow().open();

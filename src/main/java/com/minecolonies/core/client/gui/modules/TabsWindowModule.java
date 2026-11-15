@@ -4,10 +4,12 @@ import com.ldtteam.blockui.Alignment;
 import com.ldtteam.blockui.PaneBuilders;
 import com.ldtteam.blockui.controls.ButtonHandler;
 import com.ldtteam.blockui.controls.ButtonImage;
+import com.ldtteam.blockui.controls.Text;
 import com.ldtteam.blockui.views.BOWindow;
 import com.ldtteam.blockui.views.View;
 import com.minecolonies.api.util.constant.Constants;
 import com.minecolonies.core.client.gui.AbstractWindowSkeleton;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +19,7 @@ import java.util.function.BiFunction;
 
 /**
  * Quidoms: QuidCraft sidebar module tabs — full 84×22 chips with always-visible cream labels.
+ * Label is a dedicated {@link Text} child (not ButtonImage text) so it cannot render invisible.
  */
 public class TabsWindowModule implements IWindowModule
 {
@@ -29,6 +32,8 @@ public class TabsWindowModule implements IWindowModule
     private static final int TAB_ICON_HEIGHT   = 14;
     private static final int TAB_ICON_OFFSET_X = 4;
     private static final int TAB_ICON_OFFSET_Y = 4;
+    private static final int TAB_LABEL_X       = 22;
+    private static final int TAB_LABEL_W       = 58;
     private static final int CREAM             = 0xFFECE8E0;
     private static final int CREAM_MUTED       = 0xFFB7B1A8;
 
@@ -60,7 +65,12 @@ public class TabsWindowModule implements IWindowModule
         this.tabYSpacing = tabYSpacing;
     }
 
-    public void renderTabButton(int index, final TabImageSide side, final ResourceLocation icon, @Nullable final MutableComponent hoverText, final ButtonHandler handler)
+    public void renderTabButton(
+      final int index,
+      final TabImageSide side,
+      final ResourceLocation icon,
+      @Nullable final MutableComponent hoverText,
+      final ButtonHandler handler)
     {
         final View view = new View();
         view.setID(icon.getPath() + "_view");
@@ -71,13 +81,19 @@ public class TabsWindowModule implements IWindowModule
         chip.setImage(side.getImage(iconRandom));
         chip.setSize(TAB_WIDTH, TAB_HEIGHT);
         chip.setHandler(handler);
-        chip.setTextAlignment(Alignment.MIDDLE_LEFT);
-        chip.setTextOffset(22, 0);
         chip.setColors(CREAM, CREAM, CREAM_MUTED);
-        if (hoverText != null)
-        {
-            chip.setText(hoverText);
-        }
+        chip.setTextColor(CREAM);
+        chip.setTextHoverColor(CREAM);
+        chip.setTextDisabledColor(CREAM_MUTED);
+
+        final MutableComponent labelText = hoverText != null
+                                             ? hoverText
+                                             : Component.literal(fallbackLabel(icon)).copy();
+        // Keep ButtonImage text as backup; primary visible label is the Text child below.
+        chip.setText(labelText);
+        chip.setTextAlignment(Alignment.MIDDLE_LEFT);
+        chip.setTextOffset(TAB_LABEL_X, 0);
+        chip.setTextRenderBox(TAB_LABEL_W, TAB_HEIGHT);
 
         final ButtonImage iconImage = new ButtonImage();
         iconImage.setID(icon.getPath());
@@ -86,21 +102,43 @@ public class TabsWindowModule implements IWindowModule
         iconImage.setPosition(TAB_ICON_OFFSET_X, TAB_ICON_OFFSET_Y);
         iconImage.setHandler(handler);
 
+        final Text label = new Text();
+        label.setSize(TAB_LABEL_W, TAB_HEIGHT);
+        label.setPosition(TAB_LABEL_X, 0);
+        label.setTextAlignment(Alignment.MIDDLE_LEFT);
+        label.setColors(CREAM, CREAM, CREAM_MUTED);
+        label.setTextColor(CREAM);
+        label.setText(labelText);
+        label.setTextScale(0.85);
+
         parent.addChild(view);
         view.addChild(chip);
         view.addChild(iconImage);
+        view.addChild(label);
 
-        if (hoverText != null)
+        PaneBuilders.tooltipBuilder().append(labelText).hoverPane(view).build();
+    }
+
+    private static String fallbackLabel(final ResourceLocation icon)
+    {
+        final String path = icon.getPath();
+        final int slash = path.lastIndexOf('/');
+        final String leaf = slash >= 0 ? path.substring(slash + 1) : path;
+        final int dot = leaf.lastIndexOf('.');
+        final String name = dot > 0 ? leaf.substring(0, dot) : leaf;
+        if (name.isEmpty())
         {
-            PaneBuilders.tooltipBuilder().append(hoverText).hoverPane(view).build();
+            return "Tab";
         }
+        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
     public enum TabImageSide
     {
         // Quidoms: LEFT tabs sit inside the 96px sidebar (absolute x = tabXOffset).
         LEFT("left", 4, (v, tabXOffset) -> tabXOffset),
-        RIGHT("right", 4, (v, tabXOffset) -> v.getWidth() - tabXOffset);
+        // RIGHT: chip must stay fully inside the window (width - offset - chipWidth).
+        RIGHT("right", 4, (v, tabXOffset) -> Math.max(0, v.getWidth() - tabXOffset - TAB_WIDTH));
 
         private final String side;
         private final int imageCount;
@@ -115,7 +153,6 @@ public class TabsWindowModule implements IWindowModule
 
         public ResourceLocation getImage(final Random random)
         {
-            // QuidCraft nav chip (full hitbox); keep legacy wax as unused fallback path unused.
             return new ResourceLocation(Constants.MOD_ID, "textures/gui/quidcraft/nav_84x22.png");
         }
     }

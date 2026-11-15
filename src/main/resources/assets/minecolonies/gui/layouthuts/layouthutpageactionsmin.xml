@@ -1,10 +1,12 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
     <layout source="minecolonies:gui/layouthuts/layouthutpageactionsminwoinv.xml"/>
-    <button id="inventory" size="86 17" pos="184 228" color="#ECE8E0" textcolor="#ECE8E0"
+
+    <!-- Inventory + chest in footer strip — inside window, clear of content frame -->
+    <button id="inventory" size="86 17" pos="184 240" color="#ECE8E0" textcolor="#ECE8E0"
             source="minecolonies:textures/gui/quidcraft/btn_86x17.png"
             label="$(container.inventory)"/>
-    <button id="allinventory" size="17 17" pos="278 228" color="#ECE8E0" textcolor="#ECE8E0"
+    <button id="allinventory" size="17 17" pos="278 240" color="#ECE8E0" textcolor="#ECE8E0"
             source="minecolonies:textures/gui/chest.png"
             label="" tooltip="$(com.minecolonies.core.building.inv_sum)"/>
 </window>

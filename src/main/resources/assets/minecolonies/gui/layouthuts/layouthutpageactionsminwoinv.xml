@@ -1,18 +1,23 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         size="420 260">
+    <!-- QuidCraft shell: content well 104,36 → 392,236; footer strip below well -->
     <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
     <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
     <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
     <image id="qcContent" source="minecolonies:textures/gui/quidcraft/content_288x200.png" pos="104 36" size="288 200"/>
 
-    <text id="name" size="260 11" pos="118 14" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"/>
-    <button id="editName" size="15 15" pos="372 12" source="minecolonies:textures/gui/builderhut/edit.png"
+    <text id="name" size="248 11" pos="118 14" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="editName" size="15 15" pos="368 12" source="minecolonies:textures/gui/builderhut/edit.png"
             tooltip="$(com.minecolonies.gui.edit)" color="#ECE8E0" textcolor="#ECE8E0"/>
 
+    <!-- Build CTA centered in content well -->
     <button id="build" size="129 17" pos="184 120" color="#ECE8E0" textcolor="#ECE8E0"
             source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
             label="$(com.minecolonies.coremod.gui.workerhuts.buildrepair)"/>
-    <button id="info" size="17 17" pos="112 228"
-            source="minecolonies:textures/gui/red_wax_information.png" tooltip="$(com.minecolonies.core.building.help)" color="#ECE8E0" textcolor="#ECE8E0"/>
+
+    <!-- Footer strip below content well (y≥240), fully inside 420×260 — no border bleed -->
+    <button id="info" size="17 17" pos="118 240"
+            source="minecolonies:textures/gui/red_wax_information.png" tooltip="$(com.minecolonies.core.building.help)"
+            color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>
