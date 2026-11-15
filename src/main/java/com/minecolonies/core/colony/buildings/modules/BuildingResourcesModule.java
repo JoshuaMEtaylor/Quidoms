@@ -53,11 +53,24 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     private int totalStages  = 0;
     private int currentStage = 0;
 
+    /** Quidoms: schematic shortage counters (placed/total), locked at BOM finalize. */
+    private static final String TAG_BOM_FINALIZED = "quidBomFinalized";
+    private static final String TAG_SCHEM_TOTAL = "quidSchemBlocksTotal";
+    private static final String TAG_SCHEM_REMAINING = "quidSchemBlocksRemaining";
+    private boolean bomFinalized = false;
+    private int schematicBlocksTotal = 0;
+    private int schematicBlocksRemaining = 0;
+
     @Override
     public void deserializeNBT(@NotNull final HolderLookup.Provider provider, final CompoundTag compound)
     {
         currentStage = compound.getInt(TAG_CURR_STAGE);
         totalStages = compound.getInt(TAG_TOTAL_STAGES);
+        bomFinalized = compound.getBoolean(TAG_BOM_FINALIZED);
+        schematicBlocksTotal = compound.getInt(TAG_SCHEM_TOTAL);
+        schematicBlocksRemaining = compound.contains(TAG_SCHEM_REMAINING)
+                                     ? compound.getInt(TAG_SCHEM_REMAINING)
+                                     : schematicBlocksTotal;
     }
 
     @Override
@@ -65,6 +78,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         compound.putInt(TAG_TOTAL_STAGES, totalStages);
         compound.putInt(TAG_CURR_STAGE, currentStage);
+        compound.putBoolean(TAG_BOM_FINALIZED, bomFinalized);
+        compound.putInt(TAG_SCHEM_TOTAL, schematicBlocksTotal);
+        compound.putInt(TAG_SCHEM_REMAINING, schematicBlocksRemaining);
     }
 
     /**
@@ -77,13 +93,11 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         updateAvailableResources();
         buf.writeInt(neededResources.size());
-        double qty = 0;
         for (@NotNull final BuildingBuilderResource resource : neededResources.values())
         {
             Utils.serializeCodecMess(buf, resource.getItemStack());
             buf.writeInt(resource.getAvailable());
             buf.writeInt(resource.getAmount());
-            qty += resource.getAmount();
         }
 
         final Set<ICitizenData> set = building.getAllAssignedCitizen();
@@ -94,15 +108,23 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
             if (workOrder != null)
             {
                 buf.writeInt(workOrder.getID());
-                buf.writeDouble(workOrder.getAmountOfResources() == 0 ? 0 : qty / workOrder.getAmountOfResources());
+                // Quidoms: remaining/total schematic shortage (0 when unknown — never pretend 100%).
+                final double remainingRatio = schematicBlocksTotal <= 0
+                                                ? 1.0
+                                                : Math.max(0.0, Math.min(1.0, (double) schematicBlocksRemaining / (double) schematicBlocksTotal));
+                buf.writeDouble(remainingRatio);
                 buf.writeInt(totalStages);
                 buf.writeInt(currentStage);
+                buf.writeInt(schematicBlocksTotal);
+                buf.writeInt(schematicBlocksRemaining);
                 return;
             }
         }
 
         buf.writeInt(-1);
-        buf.writeDouble(0.0);
+        buf.writeDouble(1.0);
+        buf.writeInt(0);
+        buf.writeInt(0);
         buf.writeInt(0);
         buf.writeInt(0);
     }
@@ -269,8 +291,52 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
      * @param res    the resource.
      * @param amount the amount.
      */
+    /**
+     * Lock schematic block counters from the current needed list (item shortage ≈ blocks to place).
+     * Called once when BOM requestMaterials finishes.
+     */
+    public void finalizeBomOnce()
+    {
+        if (bomFinalized)
+        {
+            return;
+        }
+        int total = 0;
+        for (final BuildingBuilderResource resource : neededResources.values())
+        {
+            total += Math.max(0, resource.getAmount());
+        }
+        schematicBlocksTotal = total;
+        schematicBlocksRemaining = total;
+        bomFinalized = true;
+        this.markDirty();
+    }
+
+    public boolean isBomFinalized()
+    {
+        return bomFinalized;
+    }
+
+    public int getSchematicBlocksTotal()
+    {
+        return schematicBlocksTotal;
+    }
+
+    public int getSchematicBlocksRemaining()
+    {
+        return schematicBlocksRemaining;
+    }
+
     public void reduceNeededResource(final ItemStack res, final int amount)
     {
+        if (ItemStackUtils.isEmpty(res) || amount <= 0)
+        {
+            return;
+        }
+        if (schematicBlocksTotal > 0 && schematicBlocksRemaining > 0)
+        {
+            schematicBlocksRemaining = Math.max(0, schematicBlocksRemaining - amount);
+        }
         final int hashCode = res.getComponentsPatch().hashCode();
         final String name = res.getDescriptionId() + "-" + hashCode;
 
@@ -322,6 +388,9 @@ public class BuildingResourcesModule extends AbstractBuildingModule implements I
     {
         neededResources = new HashMap<>();
         buckets.clear();
+        bomFinalized = false;
+        schematicBlocksTotal = 0;
+        schematicBlocksRemaining = 0;
         this.markDirty();
     }
 

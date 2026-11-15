@@ -204,6 +204,9 @@ public abstract class AbstractEntityAIStructureWithWorkOrder<J extends AbstractJ
         final AbstractBuildingStructureBuilder buildingWorker = building;
         if (requestMaterials())
         {
+            // Quidoms: lock schematic shortage counters for progress (placed/total).
+            building.getFirstModuleOccurance(com.minecolonies.core.colony.buildings.modules.BuildingResourcesModule.class)
+              .finalizeBomOnce();
             building.getWorkOrder().setRequested(true);
         }
         int newQuantity = buildingWorker.getNeededResources().values().stream().mapToInt(ItemStorage::getAmount).sum();

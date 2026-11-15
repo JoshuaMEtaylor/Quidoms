@@ -557,7 +557,26 @@ public abstract class AbstractBuildingStructureBuilder extends AbstractBuilding
      */
     public void complete(ICitizenData citizen)
     {
-        getWorkOrder().onCompleted(colony, citizen);
+        final IBuilderWorkOrder order = getWorkOrder();
+        if (order == null)
+        {
+            return;
+        }
+        if (order.getWorkOrderType() == com.minecolonies.api.colony.workorders.WorkOrderType.UPGRADE
+              && hasModule(BuildingResourcesModule.class))
+        {
+            final BuildingResourcesModule resources = getFirstModuleOccurance(BuildingResourcesModule.class);
+            // Quidoms: refuse upgrade autocomplete when BOM locked with zero shortage —
+            // usually means the WO bound the already-built schematic (wrong level).
+            if (resources.isBomFinalized() && resources.getSchematicBlocksTotal() == 0)
+            {
+                com.minecolonies.api.util.Log.getLogger().warn(
+                  "[QuidomsBuilder] Refusing upgrade complete at {} — schematicBlocksTotal=0 (wrong blueprint?). WO id={}",
+                  getID(), order.getID());
+                return;
+            }
+        }
+        order.onCompleted(colony, citizen);
         setWorkOrder(null);
     }
 

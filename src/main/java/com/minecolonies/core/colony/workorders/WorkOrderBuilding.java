@@ -62,10 +62,17 @@ public class WorkOrderBuilding extends AbstractWorkOrder
         }
 
         final int targetSchematicLevel = type == WorkOrderType.REMOVE ? building.getBuildingLevel() : targetLevel;
-        String schemPath = building.getBlueprintPath().replace(".blueprint", "");
-        schemPath = schemPath.substring(0, schemPath.length() - 1) + targetSchematicLevel + ".blueprint";
+        final int resolveLevel = Math.max(1, type == WorkOrderType.REMOVE ? building.getBuildingLevel() : targetSchematicLevel);
+        // Quidoms: resolve target-level schematic (never prefer current L path over L+1).
+        final com.minecolonies.core.util.HutBlueprintResolver.Resolved resolved =
+          com.minecolonies.core.util.HutBlueprintResolver.ensure(building, resolveLevel);
+        final String pack = resolved != null ? resolved.pack()
+          : (building.getStructurePack() == null || building.getStructurePack().isEmpty()
+               ? (building.getColony() == null ? "" : building.getColony().getStructurePack())
+               : building.getStructurePack());
+        final String schemPath = resolved != null ? resolved.path() : fallbackSchematicPath(building, resolveLevel);
         WorkOrderBuilding wo = new WorkOrderBuilding(
-          building.getStructurePack(),
+          pack,
           schemPath,
           building.getBuildingType().getTranslationKey(),
           type,
@@ -75,6 +82,28 @@ public class WorkOrderBuilding extends AbstractWorkOrder
           targetLevel);
         wo.setCustomName(building);
         return wo;
+    }
+
+    @NotNull
+    private static String fallbackSchematicPath(@NotNull final IBuilding building, final int level)
+    {
+        String hut = "builder";
+        try
+        {
+            if (building.getBuildingType() != null && building.getBuildingType().getRegistryName() != null)
+            {
+                hut = building.getBuildingType().getRegistryName().getPath();
+            }
+        }
+        catch (final Exception ignored)
+        {
+        }
+        String mapped = com.minecolonies.api.compatibility.newstruct.BlueprintMapping.getPathMapping("", hut);
+        if (mapped == null || mapped.isEmpty())
+        {
+            mapped = "fundamentals/" + hut;
+        }
+        return mapped + level + ".blueprint";
     }
 
     /**

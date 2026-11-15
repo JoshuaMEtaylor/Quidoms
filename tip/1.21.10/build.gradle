@@ -155,12 +155,19 @@ public class ModList {
         // Empty extension interfaces referenced by MC 1.21.10 class signatures
         def extIfaces = [
             'IPlayerExtension', 'IEntityExtension', 'ILivingEntityExtension',
-            'IBlockEntityExtension', 'IFriendlyByteBufExtension', 'IMenuProviderExtension'
+            'IBlockEntityExtension', 'IFriendlyByteBufExtension', 'IMenuProviderExtension',
+            'IItemExtension', 'IItemStackExtension', 'IDataComponentHolderExtension'
         ]
         extIfaces.each { name ->
             new File(stubSrc, "net/neoforged/neoforge/common/extensions/${name}.java").text =
                 "package net.neoforged.neoforge.common.extensions;\npublic interface ${name} {}\n"
         }
+        new File(stubSrc, 'net/neoforged/neoforge/common/MutableDataComponentHolder.java').text =
+            'package net.neoforged.neoforge.common;\npublic interface MutableDataComponentHolder {}\n'
+        new File(stubSrc, 'net/neoforged/neoforge/registries').mkdirs()
+        new File(stubSrc, 'net/neoforged/neoforge/registries/DeferredHolder.java').text =
+            'package net.neoforged.neoforge.registries;\npublic class DeferredHolder<R, T extends R> implements java.util.function.Supplier<T> { public T get() { return null; } }\n'
+
         new File(stubSrc, 'net/neoforged/neoforge/client/extensions').mkdirs()
         new File(stubSrc, 'net/neoforged/neoforge/client/extensions/IMinecraftExtension.java').text =
             'package net.neoforged.neoforge.client.extensions;\npublic interface IMinecraftExtension {}\n'
