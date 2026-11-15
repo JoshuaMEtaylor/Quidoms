@@ -19,8 +19,8 @@ public class TabsWindowModule implements IWindowModule
     /**
      * Render sizes
      */
-    private static final int TAB_X_OFFSET      = 12;
-    private static final int TAB_Y_OFFSET      = 10;
+    private static final int TAB_X_OFFSET      = 40; // Quidoms: tabs inside QuidCraft sidebar
+    private static final int TAB_Y_OFFSET      = 36; // Quidoms: below chrome header
     private static final int TAB_WIDTH         = 32;
     private static final int TAB_HEIGHT        = 26;
     private static final int TAB_Y_SPACING     = 2;
