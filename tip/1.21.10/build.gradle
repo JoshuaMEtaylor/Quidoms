@@ -46,6 +46,8 @@ def brigadierJar = cacheJar('**/brigadier-1.3.10.jar')
 dependencies {
     compileOnly 'org.jetbrains:annotations:24.1.0'
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    // BOScreen tip overlay uses GuiGraphics.pose() → Matrix3x2fStack
+    compileOnly 'org.joml:joml:1.10.8'
     if (guavaJar != null) {
         compileOnly files(guavaJar)
     } else {
@@ -171,6 +173,9 @@ public class ModList {
         new File(stubSrc, 'net/neoforged/neoforge/client/extensions').mkdirs()
         new File(stubSrc, 'net/neoforged/neoforge/client/extensions/IMinecraftExtension.java').text =
             'package net.neoforged.neoforge.client.extensions;\npublic interface IMinecraftExtension {}\n'
+        // Needed when tip-overlaying BOScreen (GuiGraphics.fillGradient / pose stack).
+        new File(stubSrc, 'net/neoforged/neoforge/client/extensions/IGuiGraphicsExtension.java').text =
+            'package net.neoforged.neoforge.client.extensions;\npublic interface IGuiGraphicsExtension {}\n'
         new File(stubSrc, 'net/neoforged/neoforge/resource').mkdirs()
         new File(stubSrc, 'net/neoforged/neoforge/resource/ContextAwareReloadListener.java').text =
             'package net.neoforged.neoforge.resource;\npublic abstract class ContextAwareReloadListener {}\n'
