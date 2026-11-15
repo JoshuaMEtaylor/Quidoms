@@ -1,0 +1,15 @@
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="block_ui.xsd" size="200 220">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_200x220.png" pos="0 0" size="200 220"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_184x22.png" pos="8 6" size="184 22"/>
+
+    <text id="note" size="184 18" pos="8 8" color="#ECE8E0" textcolor="#ECE8E0" textalign="MIDDLE"/>
+    <input id="filter" pos="8 36" size="184 18" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <list id="items" pos="8 58" size="184 152">
+        <box linewidth="1" size="184 18">
+            <itemicon id="icon" size="16 16" pos="1 1"/>
+            <text id="name" size="128 16" pos="20 1" color="#ECE8E0" textcolor="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text id="quantity" size="30 16" pos="150 1" color="#ECE8E0" textcolor="#ECE8E0" textalign="MIDDLE_RIGHT"/>
+        </box>
+    </list>
+</window>

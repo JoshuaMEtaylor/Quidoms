@@ -1,5 +1,6 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="420 260"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <!-- qd148:quidcraft-restyle -->
     <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
     <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
     <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
@@ -8,7 +9,7 @@
     <image source="minecolonies:textures/gui/builderhut/builder_sketch_left.png" size="6 15" pos="44 12"/>
     <image source="minecolonies:textures/gui/builderhut/builder_sketch_center.png" size="90 15" pos="50 12"/>
     <image source="minecolonies:textures/gui/builderhut/builder_sketch_right.png" size="6 15" pos="140 12"/>
-    <text size="130 11" pos="30 14" color="red" textalign="MIDDLE" label="$(block.minecolonies.blockhutplantationfield)"/>
+    <text size="130 11" pos="30 14" color="red" textalign="MIDDLE" label="$(block.minecolonies.blockhutplantationfield)" textcolor="#ECE8E0"/>
 
     <text id="not-in-colony" size="164 11" pos="13 55" color="#ECE8E0" textalign="MIDDLE"
            label="$(com.minecolonies.coremod.gui.workerhuts.fields.notincolony)"/>

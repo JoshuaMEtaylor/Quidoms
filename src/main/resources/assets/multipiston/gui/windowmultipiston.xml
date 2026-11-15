@@ -1,12 +1,13 @@
 <window size="200 220" type="VANILLA" pause="false" lightbox="false"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <!-- qd148:quidcraft-restyle -->
     <image id="qcShell" source="multipiston:textures/gui/quidcraft/window_200x220.png" pos="0 0" size="200 220"/>
     <image id="qcHeader" source="multipiston:textures/gui/quidcraft/header_184x22.png" pos="8 6" size="184 22"/>
 
-    <text size="180 14" pos="10 10" color="#ECE8E0" textalign="MIDDLE" label="Multi-Piston"/>
+    <text size="180 14" pos="10 10" color="#ECE8E0" textalign="MIDDLE" label="Multi-Piston" textcolor="#ECE8E0"/>
 
-    <text size="50 16" pos="12 48" color="#ECE8E0" label="Input:"/>
+    <text size="50 16" pos="12 48" color="#ECE8E0" label="Input:" textcolor="#ECE8E0"/>
     <dropdown id="input"
               size="86 17"
               pos="70 48"
@@ -20,7 +21,7 @@
         </view>
     </dropdown>
 
-    <text size="50 16" pos="12 72" color="#ECE8E0" label="Output:"/>
+    <text size="50 16" pos="12 72" color="#ECE8E0" label="Output:" textcolor="#ECE8E0"/>
     <dropdown id="output"
               size="86 17"
               pos="70 72"
@@ -34,9 +35,9 @@
         </view>
     </dropdown>
 
-    <text size="50 16" pos="12 96" color="#ECE8E0" label="Range:"/>
+    <text size="50 16" pos="12 96" color="#ECE8E0" label="Range:" textcolor="#ECE8E0"/>
     <input id="range" size="40 18" pos="70 96" maxlength="2" color="#ECE8E0"/>
-    <text size="50 16" pos="12 120" color="#ECE8E0" label="Speed:"/>
+    <text size="50 16" pos="12 120" color="#ECE8E0" label="Speed:" textcolor="#ECE8E0"/>
     <input id="speed" size="40 18" pos="70 120" maxlength="1" color="#ECE8E0"/>
 
     <button id="confirm" size="129 17" pos="35 180"

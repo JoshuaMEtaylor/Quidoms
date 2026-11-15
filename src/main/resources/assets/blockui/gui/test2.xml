@@ -1,0 +1,15 @@
+<window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="block_ui.xsd" size="320 240">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_200x220.png" pos="0 0" size="320 240"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="0 192" size="64 64"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="0 128" size="64 64"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="0 64" size="64 64"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="0 0" size="64 64"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="64 0" size="64 64"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="128 0" size="64 64"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="192 0" size="64 64"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="256 0" size="64 64"/>
+    <itemicon item="minecraft:diamond_pickaxe" pos="256 192" size="64 64"/>
+    <itemicon item="minecraft:brush" pos="128 128" size="64 64"/>
+    <text pos="64 64" size="300 20" textscale="1.4" text="1.4 textscale normal gui test" color="#ECE8E0" textcolor="#ECE8E0"/>
+</window>

@@ -1,5 +1,6 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
 
     <text id="title" size="260 11" pos="118 12" color="#ECE8E0" textcolor="#ECE8E0" textalign="MIDDLE"

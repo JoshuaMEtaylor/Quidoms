@@ -1,39 +1,39 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="630 480" pause="false" lightbox="true">
+    <!-- qd148:quidcraft-restyle — wide contents browser; ink shell tiled via largest panel -->
     <image id="qcShell" source="structurize:textures/gui/quidcraft/window_420x240.png" pos="0 0" size="630 480"/>
 
-
-    <text size="150 10" pos="0 0" text="$(structurize.gui.content.blocks)"/>
-    <list id="blocks" size="150 470" pos="0 10" childspacing="-1">
+    <text size="140 12" pos="10 8" color="#ECE8E0" textcolor="#ECE8E0" text="$(structurize.gui.content.blocks)"/>
+    <list id="blocks" size="145 450" pos="10 24" childspacing="-1">
         <box size="100% 20" linewidth="1">
             <itemicon id="icon" size="16 16" pos="1 2"/>
-            <text id="registry_key" size="120 9" pos="19 1" wrap="true"/>
-            <text id="amount" size="120 9" pos="19 11"/>
+            <text id="registry_key" size="110 9" pos="20 1" wrap="true" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="amount" size="110 9" pos="20 11" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
-    <text size="150 10" pos="160 0" text="$(structurize.gui.content.blocks_content)"/>
-    <list id="block_item_handlers" size="150 470" pos="160 10" childspacing="-1">
+    <text size="140 12" pos="165 8" color="#ECE8E0" textcolor="#ECE8E0" text="$(structurize.gui.content.blocks_content)"/>
+    <list id="block_item_handlers" size="145 450" pos="165 24" childspacing="-1">
         <box size="100% 20" linewidth="1">
             <itemicon id="icon" size="16 16" pos="1 2"/>
-            <text id="registry_key" size="120 9" pos="19 1" wrap="true"/>
-            <text id="amount" size="120 9" pos="19 11"/>
+            <text id="registry_key" size="110 9" pos="20 1" wrap="true" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="amount" size="110 9" pos="20 11" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
-    <text size="150 10" pos="320 0" text="$(structurize.gui.content.entities)"/>
-    <list id="entities" size="150 470" pos="320 10" childspacing="-1">
+    <text size="140 12" pos="320 8" color="#ECE8E0" textcolor="#ECE8E0" text="$(structurize.gui.content.entities)"/>
+    <list id="entities" size="145 450" pos="320 24" childspacing="-1">
         <box size="100% 20" linewidth="1">
             <itemicon id="icon" size="16 16" pos="1 2"/>
-            <text id="registry_key" size="120 9" pos="19 1" wrap="true"/>
-            <text id="amount" size="120 9" pos="19 11"/>
+            <text id="registry_key" size="110 9" pos="20 1" wrap="true" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="amount" size="110 9" pos="20 11" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
-    <text size="150 10" pos="480 0" text="$(structurize.gui.content.entities_content)"/>
-    <list id="entity_item_handlers" size="150 470" pos="480 10" childspacing="-1">
+    <text size="140 12" pos="475 8" color="#ECE8E0" textcolor="#ECE8E0" text="$(structurize.gui.content.entities_content)"/>
+    <list id="entity_item_handlers" size="145 450" pos="475 24" childspacing="-1">
         <box size="100% 20" linewidth="1">
             <itemicon id="icon" size="16 16" pos="1 2"/>
-            <text id="registry_key" size="120 9" pos="19 1" wrap="true"/>
-            <text id="amount" size="120 9" pos="19 11"/>
+            <text id="registry_key" size="110 9" pos="20 1" wrap="true" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="amount" size="110 9" pos="20 11" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
 </window>

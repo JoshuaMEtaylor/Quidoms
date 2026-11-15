@@ -1,4 +1,6 @@
 <window size="420 260" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <!-- qd148:quidcraft-restyle -->
+    <text id="qcCreamProbe" size="1 1" pos="0 0" visible="false" color="#ECE8E0" textcolor="#ECE8E0"/>
     <!-- QD-113: happiness UI removed — shell kept so old links redirect via HappinessWindowCitizen. -->
     <layout source="minecolonies:gui/citizen/nav.xml"/>
 </window>

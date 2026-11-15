@@ -1,4 +1,5 @@
 <window size="520 280">
+    <!-- qd148:quidcraft-restyle -->
 
     <layout source="minecolonies:gui/townhall/windowtownhall.xml"/>
 
@@ -7,14 +8,14 @@
 
     <list id="eventsList" size="148 140" pos="120 64">
         <box size="100% 36" linewidth="1">
-            <text id="action" size="135 12" pos="2 1" color="#ECE8E0"/>
-            <text id="name" size="135 12" pos="2 12" color="blue"/>
-            <text id="pos" size="110 12" pos="2 24" color="#ECE8E0"/>
-            <button id="addfakeplayer" size="35 14" label="$(com.minecolonies.coremod.gui.townhall.add)" pos="105 10"/>
+            <text id="action" size="135 12" pos="2 1" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="name" size="135 12" pos="2 12" color="blue" textcolor="#ECE8E0"/>
+            <text id="pos" size="110 12" pos="2 24" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="addfakeplayer" size="35 14" label="$(com.minecolonies.coremod.gui.townhall.add)" pos="105 10" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
 
-    <text size="148 11" pos="276 42" textalign="MIDDLE" label="§n§4$(com.minecolonies.coremod.gui.townhall.workorders):"/>
+    <text size="148 11" pos="276 42" textalign="MIDDLE" label="§n§4$(com.minecolonies.coremod.gui.townhall.workorders):" color="#ECE8E0" textcolor="#ECE8E0"/>
 
     <list id="workOrderList" size="148 166" pos="276 50">
         <view size="100% 30">
@@ -23,12 +24,12 @@
                              source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="#ECE8E0" textcolor="#ECE8E0"/>
                 <button id="minus" label="↧" pos="0 15" size="14 15"
                              source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="#ECE8E0" textcolor="#ECE8E0"/>
-                <text id="assignee" size="80 8" pos="25 20" textalign="MIDDLE_LEFT" color="gray"/>
+                <text id="assignee" size="80 8" pos="25 20" textalign="MIDDLE_LEFT" color="gray" textcolor="#ECE8E0"/>
 
-                <text id="work" size="105 17" pos="17 2" textalign="MIDDLE_LEFT" color="#ECE8E0"/>
+                <text id="work" size="105 17" pos="17 2" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
                 <button id="delete" label="X" pos="122 8" size="14 15"
                              source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="#ECE8E0" textcolor="#ECE8E0"/>
-                <text id="hiddenId" size="1 1" pos="100 100"/>
+                <text id="hiddenId" size="1 1" pos="100 100" color="#ECE8E0" textcolor="#ECE8E0"/>
             </box>
         </view>
     </list>

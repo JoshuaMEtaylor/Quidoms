@@ -1,113 +1,114 @@
 <window size="420 260" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd" lightbox="false">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/citizen/nav.xml"/>
 
-    <text id="name" size="164 11" color="#ECE8E0" pos="118 42" textalign="MIDDLE"/>
+    <text id="name" size="164 11" color="#ECE8E0" pos="118 42" textalign="MIDDLE" textcolor="#ECE8E0"/>
     <image id="deco1" size="82 16" source="minecolonies:textures/gui/citizen/colonist_text_decor_down.png" pos="159 57"/>
 
     <view id="healthBar" size="120 11" pos="140 70">
-        <text id="healthLabel" size="30 11" color="#ECE8E0" pos="135 10" text="44"/>
+        <text id="healthLabel" size="30 11" color="#ECE8E0" pos="135 10" text="44" textcolor="#ECE8E0"/>
     </view>
     <view id="saturationBar" size="120 12" pos="140 81"/>
     <view id="happinessBar" size="120 11" pos="140 91" visible="false"/>
 
     <scrollgroup pos="140 118" size="105 143">
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.athletics)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.athletics)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="athletics_bts" source="minecolonies:textures/entity/skills/small/athletics.png"/>
-            <text pos="82 1" size="15 12" id="athletics" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="athletics" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="athletics_bts" enabled="false" visible="false">
-                <button id="plus_athletics" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_athletics" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_athletics" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_athletics" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 10" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.dexterity)"/>
+            <text pos="0 1" size="68 10" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.dexterity)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="dexterity_bts" source="minecolonies:textures/entity/skills/small/dexterity.png"/>
-            <text pos="82 1" size="15 12" id="dexterity" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="dexterity" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="dexterity_bts" enabled="false" visible="false">
-                <button id="plus_dexterity" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_dexterity" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_dexterity" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_dexterity" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.strength)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.strength)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="strength_bts" source="minecolonies:textures/entity/skills/small/strength.png"/>
-            <text pos="82 1" size="15 12" id="strength" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="strength" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="strength_bts" enabled="false" visible="false">
-                <button id="plus_strength" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_strength" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_strength" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_strength" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.agility)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.agility)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="agility_bts" source="minecolonies:textures/entity/skills/small/agility.png"/>
-            <text pos="82 1" size="15 12" id="agility" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="agility" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="agility_bts" enabled="false" visible="false">
-                <button id="plus_agility" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_agility" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_agility" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_agility" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.stamina)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.stamina)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="stamina_bts" source="minecolonies:textures/entity/skills/small/stamina.png"/>
-            <text pos="82 1" size="15 12" id="stamina" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="stamina" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="stamina_bts" enabled="false" visible="false">
-                <button id="plus_stamina" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_stamina" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_stamina" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_stamina" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.mana)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.mana)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="mana_bts" source="minecolonies:textures/entity/skills/small/mana.png"/>
-            <text pos="82 1" size="15 12" id="mana" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="mana" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="mana_bts" enabled="false" visible="false">
-                <button id="plus_mana" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_mana" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_mana" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_mana" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.adaptability)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.adaptability)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="adaptability_bts" source="minecolonies:textures/entity/skills/small/adaptability.png"/>
-            <text pos="82 1" size="15 12" id="adaptability" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="adaptability" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="adaptability_bts" enabled="false" visible="false">
-                <button id="plus_adaptability" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_adaptability" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_adaptability" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_adaptability" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.focus)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.focus)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="focus_bts" source="minecolonies:textures/entity/skills/small/focus.png"/>
-            <text pos="82 1" size="15 12" id="focus" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="focus" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="focus_bts" enabled="false" visible="false">
-                <button id="plus_focus" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_focus" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_focus" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_focus" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.creativity)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.creativity)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="creativity_bts" source="minecolonies:textures/entity/skills/small/creativity.png"/>
-            <text pos="82 1" size="15 12" id="creativity" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="creativity" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="creativity_bts" enabled="false" visible="false">
-                <button id="plus_creativity" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_creativity" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_creativity" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_creativity" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.knowledge)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.knowledge)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="knowledge_bts" source="minecolonies:textures/entity/skills/small/knowledge.png"/>
-            <text pos="82 1" size="15 12" id="knowledge" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="knowledge" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="knowledge_bts" enabled="false" visible="false">
-                <button id="plus_knowledge" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_knowledge" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_knowledge" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_knowledge" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
         <view size="100% 13">
-            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.intelligence)"/>
+            <text pos="0 1" size="68 12" color="#ECE8E0" textalign="MIDDLE_RIGHT" label="$(com.minecolonies.coremod.gui.citizen.skills.intelligence)" textcolor="#ECE8E0"/>
             <image pos="70 2" size="9 9" onHoverId="intelligence_bts" source="minecolonies:textures/entity/skills/small/intelligence.png"/>
-            <text pos="82 1" size="15 12" id="intelligence" color="#ECE8E0" textalign="MIDDLE_LEFT"/>
+            <text pos="82 1" size="15 12" id="intelligence" color="#ECE8E0" textalign="MIDDLE_LEFT" textcolor="#ECE8E0"/>
             <view pos="56 0" size="24 13" id="intelligence_bts" enabled="false" visible="false">
-                <button id="plus_intelligence" size="12 13" pos="0 0" label="+"/>
-                <button id="minus_intelligence" size="12 13" pos="12 0" label="-"/>
+                <button id="plus_intelligence" size="12 13" pos="0 0" label="+" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <button id="minus_intelligence" size="12 13" pos="12 0" label="-" color="#ECE8E0" textcolor="#ECE8E0"/>
             </view>
         </view>
     </scrollgroup>

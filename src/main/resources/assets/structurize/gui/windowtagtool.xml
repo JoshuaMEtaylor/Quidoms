@@ -1,28 +1,39 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
-        pause="false" lightbox="true">
-    <text size="100% 9" pos="0 25" textalign="MIDDLE" color="#ECE8E0"
+        size="420 240" pause="false" lightbox="true">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="structurize:textures/gui/quidcraft/window_420x240.png" pos="0 0" size="420 240"/>
+    <image id="qcHeader" source="structurize:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="404 24"/>
+    <image id="qcContent" source="structurize:textures/gui/quidcraft/content_400x200.png" pos="10 36" size="400 190"/>
+
+    <text size="280 14" pos="14 10" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"
            label="$(com.ldtteam.structurize.gui.tagtool.currenttag)"/>
-    <input id="currentTag" size="150 18" pos="135 40" maxlength="30"/>
+    <input id="currentTag" size="150 18" pos="250 8" maxlength="30" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <text id="taglistname" size="230 12" pos="135 65" color="#ECE8E0" label="$(com.ldtteam.structurize.gui.taglist.title)"/>
-
-    <list id="tagposlist" size="230 120" pos="135 80" childspacing="-1">
+    <text id="taglistname" size="230 12" pos="140 44" color="#ECE8E0" textcolor="#ECE8E0"
+          label="$(com.ldtteam.structurize.gui.taglist.title)"/>
+    <list id="tagposlist" size="250 150" pos="140 60" childspacing="-1">
         <box size="100% 17" linewidth="1">
             <itemicon id="posblock" size="17 17" pos="0 1"/>
-            <text id="tagnames" size="190 25" pos="30 5" textalign="TOP_LEFT" color="#ECE8E0"/>
-            <button id="removeTag" pos="207 1" size="15 15" source="structurize:textures/gui/builderhut/button_x.png" textcolor="#ECE8E0"/>
+            <text id="tagnames" size="190 15" pos="22 1" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="removeTag" pos="220 1" size="15 15"
+                    source="structurize:textures/gui/builderhut/button_x.png" textcolor="#ECE8E0" color="#ECE8E0"/>
         </box>
     </list>
 
-    <text id="taglistname" size="130 12" pos="0 65" color="#ECE8E0" label="$(com.ldtteam.structurize.gui.tagoptions.title)"/>
-    <list id="tagoptionlist" size="130 120" pos="0 80" childspacing="-1">
+    <text size="120 12" pos="14 44" color="#ECE8E0" textcolor="#ECE8E0"
+          label="$(com.ldtteam.structurize.gui.tagoptions.title)"/>
+    <list id="tagoptionlist" size="120 150" pos="14 60" childspacing="-1">
         <box size="100% 17" linewidth="1">
-            <text id="tagnames" size="190 25" pos="5 5" textalign="TOP_LEFT" color="#ECE8E0"/>
-            <button id="select" pos="104 1" size="16 16" source="structurize:textures/gui/builderhut/checkbox_empty.png" textcolor="#ECE8E0" disabled="structurize:textures/gui/builderhut/checkbox_checked.png"/>
+            <text id="tagnames" size="90 15" pos="4 1" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="select" pos="98 1" size="16 16"
+                    source="structurize:textures/gui/builderhut/checkbox_empty.png"
+                    textcolor="#ECE8E0" color="#ECE8E0"
+                    disabled="structurize:textures/gui/builderhut/checkbox_checked.png"/>
         </box>
     </list>
 
-    <button label="$(com.ldtteam.structurize.gui.tagtool.close)" id="closeUI" pos="300 205" size="86 17" source="structurize:textures/gui/quidcraft/btn_86x17.png" textcolor="#ECE8E0"/>
-
-    <button id="cancel" source="structurize:textures/gui/builderhut/button_x.png" size="13 16" pos="325 5" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button label="$(com.ldtteam.structurize.gui.tagtool.close)" id="closeUI" pos="300 212" size="86 17"
+            source="structurize:textures/gui/quidcraft/btn_86x17.png" textcolor="#ECE8E0" color="#ECE8E0"/>
+    <button id="cancel" source="structurize:textures/gui/builderhut/button_x.png" size="14 15" pos="396 8"
+            color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

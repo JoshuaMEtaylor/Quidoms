@@ -1,6 +1,7 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
-    <text id="id" size="0 0" pos="0 0" visible="false"/>
-    <text id="desc" size="100% 15" pos="5 5" color="#F4F1EA" textalign="MIDDLE_LEFT" wrap="true"/>
+    <!-- qd148:quidcraft-restyle -->
+    <text id="id" size="0 0" pos="0 0" visible="false" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text id="desc" size="100% 15" pos="5 5" color="#ECE8E0" textalign="MIDDLE_LEFT" wrap="true" textcolor="#ECE8E0"/>
 
-    <button id="trigger" pos="5 25" size="145 17" source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" color="#F4F1EA" textcolor="#ECE8E0"/>
+    <button id="trigger" pos="5 25" size="145 17" source="minecolonies:textures/gui/builderhut/builder_button_medium_large.png" color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

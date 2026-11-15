@@ -8,6 +8,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         lightbox="true">
+    <!-- qd148:quidcraft-restyle -->
     <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
     <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
     <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
@@ -25,7 +26,7 @@
               source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
               color="#ECE8E0">
         <view size="100% 15">
-            <text id="id" size="100% 100%" label="" pos="0 0"/>
+            <text id="id" size="100% 100%" label="" pos="0 0" color="#ECE8E0" textcolor="#ECE8E0"/>
             <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </dropdown>
@@ -39,7 +40,7 @@
               source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
               color="#ECE8E0">
         <view size="100% 15">
-            <text id="id" size="100% 100%" label="" pos="0 0"/>
+            <text id="id" size="100% 100%" label="" pos="0 0" color="#ECE8E0" textcolor="#ECE8E0"/>
             <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </dropdown>
@@ -49,8 +50,8 @@
     <list id="resources" size="360 168" pos="30 30">
         <view size="100% 30">
             <itemicon id="resourceIcon" size="24 24" pos="3 3"/>
-            <text id="resourceName" size="280 12" pos="33 9" color="#ECE8E0"/>
-            <text id="resourceQuantity" size="36 12" pos="318 9" color="#ECE8E0" textalign="MIDDLE_RIGHT"/>
+            <text id="resourceName" size="280 12" pos="33 9" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="resourceQuantity" size="36 12" pos="318 9" color="#ECE8E0" textalign="MIDDLE_RIGHT" textcolor="#ECE8E0"/>
         </view>
     </list>
 

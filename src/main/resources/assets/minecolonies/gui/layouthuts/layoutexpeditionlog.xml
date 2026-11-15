@@ -1,12 +1,13 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
-    <text id="desc" size="130 11" pos="128 42" label="$(com.minecolonies.gui.workerhuts.expeditionlog)" color="#ECE8E0" textalign="MIDDLE"/>
+    <text id="desc" size="130 11" pos="128 42" label="$(com.minecolonies.gui.workerhuts.expeditionlog)" color="#ECE8E0" textalign="MIDDLE" textcolor="#ECE8E0"/>
 
-    <text id="name" size="164 11" color="#ECE8E0" pos="118 56" textalign="MIDDLE"/>
-    <text id="status" size="164 11" color="#ECE8E0" pos="118 39" textalign="MIDDLE"/>
+    <text id="name" size="164 11" color="#ECE8E0" pos="118 56" textalign="MIDDLE" textcolor="#ECE8E0"/>
+    <text id="status" size="164 11" color="#ECE8E0" pos="118 39" textalign="MIDDLE" textcolor="#ECE8E0"/>
     <view id="healthBar" size="120 11" pos="133 76">
-        <text id="healthLabel" size="30 11" color="#ECE8E0" pos="135 10" text="44"/>
+        <text id="healthLabel" size="30 11" color="#ECE8E0" pos="135 10" text="44" textcolor="#ECE8E0"/>
     </view>
     <view id="saturationBar" size="120 22" pos="133 88"/>
 

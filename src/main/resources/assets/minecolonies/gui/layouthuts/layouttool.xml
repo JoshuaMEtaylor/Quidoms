@@ -1,6 +1,7 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
-    <text id="desc" size="120 100" pos="128 38" color="#ECE8E0" textscale="1.0"/>
+    <text id="desc" size="120 100" pos="128 38" color="#ECE8E0" textscale="1.0" textcolor="#ECE8E0"/>
     <button id="giveTool" pos="123 148" size="129 17" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.givetool)" textcolor="#ECE8E0"/>
 </window>

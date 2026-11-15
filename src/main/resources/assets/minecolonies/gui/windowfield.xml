@@ -1,5 +1,6 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="420 260"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <!-- qd148:quidcraft-restyle -->
     <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x260.png" pos="0 0" size="420 260"/>
     <image id="qcSidebar" source="minecolonies:textures/gui/quidcraft/sidebar_96x260.png" pos="0 0" size="96 260"/>
     <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_288x24.png" pos="104 8" size="288 24"/>
@@ -8,11 +9,11 @@
     <image source="minecolonies:textures/gui/builderhut/builder_sketch_left.png" size="6 15" pos="44 12"/>
     <image source="minecolonies:textures/gui/builderhut/builder_sketch_center.png" size="90 15" pos="50 12"/>
     <image source="minecolonies:textures/gui/builderhut/builder_sketch_right.png" size="6 15" pos="140 12"/>
-    <text size="130 11" pos="30 14" color="red" textalign="MIDDLE" label="$(block.minecolonies.blockhutfield)"/>
+    <text size="130 11" pos="30 14" color="red" textalign="MIDDLE" label="$(block.minecolonies.blockhutfield)" textcolor="#ECE8E0"/>
 
-    <text id="current-farmer" size="164 11" pos="13 30" color="#ECE8E0"/>
-    <text id="biome" size="164 11" pos="13 43" color="#ECE8E0"/>
-    <text id="climate" size="164 11" pos="13 56" color="#ECE8E0"/>
+    <text id="current-farmer" size="164 11" pos="13 30" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text id="biome" size="164 11" pos="13 43" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text id="climate" size="164 11" pos="13 56" color="#ECE8E0" textcolor="#ECE8E0"/>
 
     <button id="select-seed" size="86 17" pos="13 72" color="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" label="$(com.minecolonies.coremod.gui.field.selectseed)" textcolor="#ECE8E0"/>
     <itemicon id="current-seed" size="16 16" pos="13 92"/>

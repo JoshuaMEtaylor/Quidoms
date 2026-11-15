@@ -1,25 +1,35 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         size="420 240">
+    <!-- qd148:quidcraft-restyle -->
+    <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_420x240.png" pos="0 0" size="420 240"/>
+    <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="404 24"/>
+    <image id="qcContent" source="minecolonies:textures/gui/quidcraft/content_400x200.png" pos="10 36" size="400 190"/>
 
-    <button id="selectleft" size="14 30" pos="1 1" color="#ECE8E0" label="&lt;" textcolor="#ECE8E0"/>
-    <button id="selectright" size="14 30" pos="126 1" color="#ECE8E0" label="&gt;" textcolor="#ECE8E0"/>
-    <button id="viewschem" text="none" size="111 30" pos="15 1" color="#ECE8E0" textcolor="#ECE8E0"/>
-    <button id="selectschematic" size="111 15" pos="15 30" label="$(com.minecolonies.coremod.gui.analyzer.select)" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="selectleft" size="14 22" pos="12 8" color="#ECE8E0" textcolor="#ECE8E0" label="&lt;"
+            source="minecolonies:textures/gui/builderhut/builder_button_mini.png"/>
+    <button id="viewschem" text="none" size="129 17" pos="30 10" color="#ECE8E0" textcolor="#ECE8E0"
+            source="minecolonies:textures/gui/quidcraft/btn_129x17.png"/>
+    <button id="selectright" size="14 22" pos="163 8" color="#ECE8E0" textcolor="#ECE8E0" label="&gt;"
+            source="minecolonies:textures/gui/builderhut/builder_button_mini.png"/>
+    <button id="selectschematic" size="129 17" pos="184 10" label="$(com.minecolonies.coremod.gui.analyzer.select)"
+            color="#ECE8E0" textcolor="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png"/>
 
-    <box id="results" size="100% 165" pos="1 45" linewidth="1">
-        <text id="score" size="100% 14" pos="3 1" color="#ECE8E0"/>
-        <text id="size" size="100% 14" pos="3 15" color="#ECE8E0"/>
-        <text id="blockcounts" size="100% 14" pos="3 29" color="#ECE8E0"/>
-        <text id="buildings" size="100% 14" pos="3 43" color="#ECE8E0"/>
-        <button label="$(com.ldtteam.structurize.gui.scantool.showres)" id="showresources" pos="3 57" size="86 20" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
-        <list id="resources" size="100% 120" pos="0 57" childspacing="-1" visible="false">
+    <box id="results" size="392 180" pos="14 42" linewidth="0">
+        <text id="score" size="380 14" pos="6 4" color="#ECE8E0" textcolor="#ECE8E0"/>
+        <text id="size" size="380 14" pos="6 20" color="#ECE8E0" textcolor="#ECE8E0"/>
+        <text id="blockcounts" size="380 14" pos="6 36" color="#ECE8E0" textcolor="#ECE8E0"/>
+        <text id="buildings" size="380 14" pos="6 52" color="#ECE8E0" textcolor="#ECE8E0"/>
+        <button label="$(com.ldtteam.structurize.gui.scantool.showres)" id="showresources" pos="6 72" size="86 17"
+                source="minecolonies:textures/gui/quidcraft/btn_86x17.png" color="#ECE8E0" textcolor="#ECE8E0"/>
+        <list id="resources" size="380 90" pos="6 72" childspacing="-1" visible="false">
             <box size="100% 19" linewidth="1">
                 <itemicon id="resourceIcon" size="16 16" pos="1 1"/>
-                <text id="resourceName" size="86 12" pos="19 1" color="#ECE8E0" wrap="true"/>
-                <text id="resourceCount" size="30 12" pos="105 1" color="#ECE8E0" wrap="true"/>
+                <text id="resourceName" size="300 12" pos="22 3" color="#ECE8E0" textcolor="#ECE8E0" wrap="true"/>
+                <text id="resourceCount" size="40 12" pos="330 3" color="#ECE8E0" textcolor="#ECE8E0" wrap="true"/>
             </box>
         </list>
     </box>
 
-    <button id="cancel" source="minecolonies:textures/gui/button_x.png" size="32" pos="235 250" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="cancel" source="minecolonies:textures/gui/button_x.png" size="14 15" pos="396 8"
+            color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

@@ -1,5 +1,6 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
     <text size="130 11" pos="128 42" color="#ECE8E0" textalign="MIDDLE"
            label="$(com.minecolonies.coremod.gui.workerhuts.fields)"/>
@@ -12,8 +13,8 @@
     <list id="fields" size="164 145" pos="118 82">
         <box size="100% 30" linewidth="1">
             <itemicon id="icon" size="16 16" pos="4 4"/>
-            <text id="dist" color="#ECE8E0" pos="25 4" size="108 9"/>
-            <text id="nextstagetext" color="#ECE8E0" pos="25 17" size="35 9"/>
+            <text id="dist" color="#ECE8E0" pos="25 4" size="108 9" textcolor="#ECE8E0"/>
+            <text id="nextstagetext" color="#ECE8E0" pos="25 17" size="35 9" textcolor="#ECE8E0"/>
             <image id="nextstageicon" color="#ECE8E0" pos="60 13" size="16 16"/>
             <button id="assign" pos="137 4" size="14 15" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" disabled="minecolonies:textures/gui/builderhut/builder_button_mini_disabled.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>

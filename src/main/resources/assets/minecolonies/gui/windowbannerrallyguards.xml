@@ -1,5 +1,6 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <!-- qd148:quidcraft-restyle -->
     <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
     <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
 
@@ -12,8 +13,8 @@
                 <!--Item icon -->
                 <itemicon id="guardicon" size="16 16" pos="1 3"/>
                 <!--Request name-->
-                <text id="guardtype" size="130 12" pos="20 1" color="#ECE8E0"/>
-                <text id="position" size="130 12" pos="20 13" color="#ECE8E0"/>
+                <text id="guardtype" size="130 12" pos="20 1" color="#ECE8E0" textcolor="#ECE8E0"/>
+                <text id="position" size="130 12" pos="20 13" color="#ECE8E0" textcolor="#ECE8E0"/>
                 <!-- button to cancel the request-->
                 <button id="remove" size="74 16" pos="74 25" color="#ECE8E0" label="$(com.minecolonies.coremod.item.bannerrallyguards.gui.remove)" source="minecolonies:textures/gui/citizen/colonist_button_medium.png" textcolor="#ECE8E0"/>
             </box>

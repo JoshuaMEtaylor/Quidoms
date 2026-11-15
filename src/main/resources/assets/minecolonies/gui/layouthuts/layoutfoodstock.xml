@@ -1,17 +1,18 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         size="420 260">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
 
     <!-- Left column in content well -->
-    <text id="title" size="140 11" pos="118 42" textalign="MIDDLE" color="#ECE8E0" label="$(com.minecolonies.core.menu.title)"/>
-    <text id="poorwarning" size="140 20" pos="118 56" color="red" textalign="MIDDLE" label="$(com.minecolonies.core.poor.menu.warning)" visible="false"/>
-    <text id="warning" size="140 22" pos="118 56" color="#B7B1A8" textalign="MIDDLE" label="$(com.minecolonies.core.menu.warning)"/>
+    <text id="title" size="140 11" pos="118 42" textalign="MIDDLE" color="#ECE8E0" label="$(com.minecolonies.core.menu.title)" textcolor="#ECE8E0"/>
+    <text id="poorwarning" size="140 20" pos="118 56" color="red" textalign="MIDDLE" label="$(com.minecolonies.core.poor.menu.warning)" visible="false" textcolor="#ECE8E0"/>
+    <text id="warning" size="140 22" pos="118 56" color="#B7B1A8" textalign="MIDDLE" label="$(com.minecolonies.core.menu.warning)" textcolor="#ECE8E0"/>
 
     <list id="resourcesstock" size="148 80" pos="118 82">
         <box size="100% 17" linewidth="1">
             <gradient id="gradient" size="146 15" pos="1 1"/>
             <itemicon id="resourceIcon" size="16 16" pos="0 0"/>
-            <text id="resourceName" size="95 12" pos="20 1" color="#ECE8E0"/>
+            <text id="resourceName" size="95 12" pos="20 1" color="#ECE8E0" textcolor="#ECE8E0"/>
             <button label="X" id="removeStock" pos="118 1" size="29 15"
                     source="minecolonies:textures/gui/builderhut/builder_button_very_small.png" textcolor="red" color="#ECE8E0"/>
         </box>
@@ -22,19 +23,19 @@
     <list id="ingredientslist" size="148 60" pos="118 182">
         <box size="100% 17" linewidth="1">
             <itemicon id="resourceIcon" size="16 16" pos="0 0"/>
-            <text id="resourceName" size="120 12" pos="20 1" color="#ECE8E0"/>
+            <text id="resourceName" size="120 12" pos="20 1" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
 
     <!-- Right column -->
-    <text id="desc" size="140 11" pos="278 42" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.core.food_list.title)"/>
+    <text id="desc" size="140 11" pos="278 42" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.core.food_list.title)" textcolor="#ECE8E0"/>
     <input id="input" size="140 18" pos="278 56" maxlength="25" color="#ECE8E0"/>
 
     <list id="resources" size="148 170" pos="278 78">
         <box size="100% 17" linewidth="1">
             <gradient id="gradient" size="146 15" pos="1 1"/>
             <itemicon id="resourceIcon" size="16 16" pos="20 0"/>
-            <text id="resourceName" size="90 12" pos="40 3" color="#ECE8E0"/>
+            <text id="resourceName" size="90 12" pos="40 3" color="#ECE8E0" textcolor="#ECE8E0"/>
             <button label="&lt;&lt;" id="switch" pos="3 1" size="14 15"
                     source="minecolonies:textures/gui/builderhut/builder_button_mini.png" textcolor="#ECE8E0" color="#ECE8E0"/>
         </box>

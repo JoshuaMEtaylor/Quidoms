@@ -1,6 +1,7 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         size="400 244" type="FULLSCREEN_VANILLA" lightbox="true"
         >
+    <!-- qd148:quidcraft-restyle -->
     <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
     <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
 
@@ -9,7 +10,7 @@
     <!-- Vanilla AbstractButton sprites resolve as magenta via BlockUI Image.resolveBlit;
          use the packaged guide button tile instead (stretched to vanilla 200×20). -->
     <button id="confirm" size="200 20" pos="380 455" source="minecolonies:textures/gui/guide/button.png" label="$(com.minecolonies.coremod.gui.workerhuts.guide.confirm)" color="#ECE8E0" textcolor="#ECE8E0"/>
-    <text id="questionmark" size="210 75" color="#ECE8E0" pos="80 363" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.questionmark)"/>
-    <text id="arrow" size="210 75" color="#ECE8E0" pos="637 22" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.arrow)"/>
-    <text id="chest" size="210 75" color="#ECE8E0" pos="646 363" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.chest)"/>
+    <text id="questionmark" size="210 75" color="#ECE8E0" pos="80 363" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.questionmark)" textcolor="#ECE8E0"/>
+    <text id="arrow" size="210 75" color="#ECE8E0" pos="637 22" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.arrow)" textcolor="#ECE8E0"/>
+    <text id="chest" size="210 75" color="#ECE8E0" pos="646 363" textalign="MIDDLE" text="$(com.minecolonies.coremod.gui.workerhuts.guide.chest)" textcolor="#ECE8E0"/>
 </window>

@@ -1,5 +1,6 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
     <text size="164 11" pos="118 60" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.workerhuts.workerassigned)"/>
@@ -7,12 +8,12 @@
     <list id="workers" size="164 30" pos="118 43">
         <view size="100% 11">
             <box size="100% 11" linewidth="0">
-                <text id="workerName" size="100% 11" pos="0 0" textalign="MIDDLE" color="#ECE8E0"/>
+                <text id="workerName" size="100% 11" pos="0 0" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"/>
             </box>
         </view>
     </list>
 
     <button id="hire" size="129 17" pos="128 102" color="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.manage)" textcolor="#ECE8E0"/>
     <button id="recall" size="129 17" pos="128 120" color="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.recall)" textcolor="#ECE8E0"/>
-    <text id="text" size="150 45" pos="128 148" color="#ECE8E0" text="$(com.minecolonies.coremod.gui.quarry.desc)"/>
+    <text id="text" size="150 45" pos="128 148" color="#ECE8E0" text="$(com.minecolonies.coremod.gui.quarry.desc)" textcolor="#ECE8E0"/>
 </window>

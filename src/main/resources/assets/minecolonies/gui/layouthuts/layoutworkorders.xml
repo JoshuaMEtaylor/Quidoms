@@ -1,13 +1,14 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
-    <text id="desc" size="130 11" pos="128 42" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.townhall.workorders)"/>
+    <text id="desc" size="130 11" pos="128 42" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.townhall.workorders)" textcolor="#ECE8E0"/>
 
     <text size="148 11" pos="299 56" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.townhall.workorders)" color="#ECE8E0" textcolor="#ECE8E0"/>
     <list id="workOrders" size="164 154" pos="118 63" emptytext="$(com.minecolonies.coremod.gui.townhall.workorders.empty)" emptycolor="#ECE8E0">
         <box id="workOrderBox" size="100% 30" linewidth="1">
-            <text id="buildingName" size="150 12" pos="2 2" color="#ECE8E0"/>
-            <text id="buildingPos" size="50 12" pos="2 17" color="blue"/>
+            <text id="buildingName" size="150 12" pos="2 2" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="buildingPos" size="50 12" pos="2 17" color="blue" textcolor="#ECE8E0"/>
             <button id="manage" size="64 17" pos="80 13" color="#ECE8E0" source="minecolonies:textures/gui/builderhut/builder_button_small.png" textcolor="#ECE8E0"/>
         </box>
     </list>

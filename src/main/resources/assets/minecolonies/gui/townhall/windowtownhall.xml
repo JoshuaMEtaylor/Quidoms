@@ -1,6 +1,7 @@
 <window size="520 280"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <!-- qd148:quidcraft-restyle -->
 
     <!-- QuidCraft shell — single full-bleed at 0,0 -->
     <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_520x280.png" pos="0 0" size="520 280"/>

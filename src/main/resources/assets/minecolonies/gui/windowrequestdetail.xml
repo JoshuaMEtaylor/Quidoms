@@ -1,20 +1,21 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" size="400 244"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd">
+    <!-- qd148:quidcraft-restyle -->
     <image id="qcShell" source="minecolonies:textures/gui/quidcraft/window_400x244.png" pos="0 0" size="400 244"/>
     <image id="qcHeader" source="minecolonies:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="384 24"/>
 
 
 
-    <text size="190 11" pos="0 13" textalign="MIDDLE" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.citizen.requests)"/>
+    <text size="190 11" pos="0 13" textalign="MIDDLE" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.citizen.requests)" textcolor="#ECE8E0"/>
 
     <itemicon id="requestStack" size="24 24" pos="12 30"/>
     <image id="deliveryImage" source="minecraft:textures/misc/shadow.png" size="24 24" pos="12 30" visible="false"/>
 
-    <text id="requester" size="135 9" pos="40 30" color="#ECE8E0"/>
-    <text id="targetLocation" size="135 9" pos="40 40" color="#ECE8E0"/>
-    <text id="resolver" size="135 9" pos="40 50" color="#ECE8E0"/>
+    <text id="requester" size="135 9" pos="40 30" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text id="targetLocation" size="135 9" pos="40 40" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text id="resolver" size="135 9" pos="40 50" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <text id="shortDetail" size="170 40" pos="12 60" color="#ECE8E0"/>
+    <text id="shortDetail" size="170 40" pos="12 60" color="#ECE8E0" textcolor="#ECE8E0"/>
     <itemicon id="detailIcon" size="9 9" pos="80 75"/>
 
     <button id="back" size="37 16" pos="35 105" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.back)" source="minecolonies:textures/gui/citizen/colonist_button_small.png" textcolor="#ECE8E0"/>

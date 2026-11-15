@@ -1,7 +1,8 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         size="420 240" pause="false" type="OVERSIZED_VANILLA" lightbox="false">
+    <!-- qd148:quidcraft-restyle -->
 
-    <text id="tip" size="200 50" pos="150 100" color="#ECE8E0" label="$(structurize.gui.manipulation.info)" visible="false"/>
+    <text id="tip" size="200 50" pos="150 100" color="#ECE8E0" label="$(structurize.gui.manipulation.info)" visible="false" textcolor="#ECE8E0"/>
 
     <view size="48 64" pos="370 100" id="manipulator">
         <button id="rotateLeft" source="structurize:textures/gui/buildtool/rotateleft.png" size="16" pos="0 0" color="#ECE8E0" textcolor="#ECE8E0"/>
@@ -18,9 +19,9 @@
 
     <list size="188 100" pos="5 113" id="settinglist" visible="false">
         <view size="100% 20">
-            <text size="150 17" pos="0 0" id="label"/>
+            <text size="150 17" pos="0 0" id="label" color="#ECE8E0" textcolor="#ECE8E0"/>
             <button id="switch" source="structurize:textures/gui/builderhut/builder_button_very_small.png" size="29 15" pos="150 0" textcolor="#ECE8E0" texthovercolor="gray"/>
-            <input id="set_input" size="29 15" pos="150 0"/>
+            <input id="set_input" size="29 15" pos="150 0" color="#ECE8E0" textcolor="#ECE8E0"/>
         </view>
     </list>
 

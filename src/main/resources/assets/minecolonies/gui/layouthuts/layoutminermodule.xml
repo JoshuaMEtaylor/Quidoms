@@ -1,14 +1,15 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         size="420 260">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
     <text size="130 11" pos="128 42" textalign="MIDDLE" color="#ECE8E0"
           label="$(com.minecolonies.coremod.gui.workerhuts.minernodelist)"/>
     <list id="levels" size="164 185" pos="118 57" emptytext="$(com.minecolonies.coremod.gui.workerhuts.minernolevels)" emptycolor="#ECE8E0">
         <box size="100% 28" linewidth="1">
-            <text id="level" size="17 12" pos="3 2" textalign="MIDDLE_LEFT" color="#ECE8E0"/>
-            <text id="depth" size="60 12" pos="23 2" textalign="MIDDLE_LEFT" color="#ECE8E0"/>
-            <text id="nodes" size="60 12" pos="23 15" textalign="MIDDLE_LEFT" color="#ECE8E0"/>
+            <text id="level" size="17 12" pos="3 2" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="depth" size="60 12" pos="23 2" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="nodes" size="60 12" pos="23 15" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
 
             <button id="repair" size="44 17" pos="88 6" label="$(com.minecolonies.coremod.gui.workerhuts.minerrepairnode)" color="#ECE8E0" source="minecolonies:textures/gui/builderhut/builder_button_quite_small.png" disabled="minecolonies:textures/gui/builderhut/builder_button_quite_small_disabled.png" textcolor="#ECE8E0"/>
             <button id="mine" size="17 17" pos="135 6" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" disabled="minecolonies:textures/gui/builderhut/builder_button_mini_check.png" color="#ECE8E0" textcolor="#ECE8E0"/>

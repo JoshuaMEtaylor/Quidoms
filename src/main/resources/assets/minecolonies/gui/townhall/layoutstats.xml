@@ -1,10 +1,11 @@
 <window size="520 280">
+    <!-- qd148:quidcraft-restyle -->
     <layout source="minecolonies:gui/townhall/windowtownhall.xml"/>
-    <text size="110 11" pos="120 48" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.townhall.population.totalcitizens)"/>
-    <text id="totalCitizens" size="50 11" pos="235 48" color="#ECE8E0"/>
+    <text size="110 11" pos="120 48" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.townhall.population.totalcitizens)" textcolor="#ECE8E0"/>
+    <text id="totalCitizens" size="50 11" pos="235 48" color="#ECE8E0" textcolor="#ECE8E0"/>
     <list id="citizen-stats" size="148 136" pos="120 66">
         <box size="100% 11" linewidth="0">
-            <text id="citizensAmount" size="100% 11" color="#ECE8E0"/>
+            <text id="citizensAmount" size="100% 11" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
 
@@ -19,7 +20,7 @@
             <button id="button" size="129 17" pos="0 0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.interval.yesterday)" textcolor="#ECE8E0"/>
         </dropdown>
         <list id="stats" size="160 135" pos="20 65">
-           <text id="desc" size="160 13" pos="0 0" color="#ECE8E0"/>
+           <text id="desc" size="160 13" pos="0 0" color="#ECE8E0" textcolor="#ECE8E0"/>
         </list>
     </view>
 </window>
