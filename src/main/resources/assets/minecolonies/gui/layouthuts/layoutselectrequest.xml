@@ -6,7 +6,7 @@
     <button id="cancel" label="X" color="red" pos="258 39" size="14 15"
                  source="minecolonies:textures/gui/builderhut/builder_button_mini.png" textcolor="#ECE8E0"/>
 
-    <list id="requests" size="170 170" pos="13 30">
+    <list id="requests" size="170 170" pos="118 58">
         <box id="requestx" size="100% 40" linewidth="1">
             <!--Item icon -->
             <itemicon id="requestStack" size="16 16" pos="1 3"/>

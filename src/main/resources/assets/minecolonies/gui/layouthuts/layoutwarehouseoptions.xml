@@ -3,7 +3,7 @@
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
     <text size="130 11" pos="128 42" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.warehouse.upgrade)"/>
-    <box size="164 30" linewidth="1" pos="13 29">
+    <box size="164 30" linewidth="1" pos="118 57">
         <itemicon id="resourceIcon" size="16 16" pos="1 1"/>
         <text id="resourceName" size="125 9" pos="18 2" color="#ECE8E0"/>
         <button id="resourceAdd" size="16 16" label="↥" pos="145 2" color="#ECE8E0" textcolor="#ECE8E0"/>

@@ -18,7 +18,7 @@
                  source="minecolonies:textures/gui/citizen/detail_button.png"
                  tooltip="$(com.minecolonies.coremod.gui.citizen.requesttitle)" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <list id="resourcesstock" size="170 100" pos="13 100">
+    <list id="resourcesstock" size="170 100" pos="118 100">
         <box size="100% 17" linewidth="1">
             <itemicon id="resourceIcon" size="17 17" pos="0 0"/>
             <text id="resourceName" size="90 12" pos="20 1" color="#ECE8E0"/>

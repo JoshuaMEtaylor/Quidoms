@@ -3,9 +3,9 @@
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
 
 
-    <text id="plotStatistics" size="164 11" pos="13 14" color="#ECE8E0" textalign="MIDDLE"/>
+    <text id="plotStatistics" size="164 11" pos="118 42" color="#ECE8E0" textalign="MIDDLE"/>
     <text size="130 11" pos="128 55" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.workerhuts.graveyard.graves):"/>
-    <list id="graves" size="164 91" pos="13 41">
+    <list id="graves" size="164 91" pos="118 41">
         <box size="100% 34" linewidth="1">
             <text id="name" color="#ECE8E0" pos="20 2" size="130 9"/>
             <text id="dist" color="#ECE8E0" pos="20 12" size="65 9"/>
@@ -14,7 +14,7 @@
     </list>
 
     <text size="130 11" pos="128 162" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.workerhuts.graveyard.rip):"/>
-    <list id="citizen" size="164 60" pos="13 145">
+    <list id="citizen" size="164 60" pos="118 145">
         <box size="100% 12" linewidth="1">
             <text id="citizenName" color="#ECE8E0" pos="20 2" size="130 9"/>
         </box>

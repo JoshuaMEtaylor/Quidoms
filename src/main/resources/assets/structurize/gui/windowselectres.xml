@@ -14,6 +14,6 @@
 
     <layout source="structurize:gui/layoutselectres.xml"/>
 
-    <button id="done" source="structurize:textures/gui/buildtool/confirm.png" size="32" pos="125 185" visible="false"/>
-    <button id="cancel" source="structurize:textures/gui/buildtool/cancel.png" size="32" pos="215 185" visible="true"/>
+    <button id="done" source="structurize:textures/gui/buildtool/confirm.png" size="32" pos="125 185" visible="false" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="cancel" source="structurize:textures/gui/buildtool/cancel.png" size="32" pos="215 185" visible="true" color="#ECE8E0" textcolor="#ECE8E0"/>
 </window>

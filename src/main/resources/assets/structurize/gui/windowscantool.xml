@@ -1,5 +1,8 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         size="420 240" pause="false" lightbox="false">
+    <image id="qcShell" source="structurize:textures/gui/quidcraft/window_420x240.png" pos="0 0" size="420 240"/>
+    <image id="qcHeader" source="structurize:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="404 24"/>
+
 
     <text size="50 11" pos="60 10" color="#ECE8E0" label="$(com.ldtteam.structurize.gui.scantool.from)"/>
     <input id="pos1x" size="36 18" pos="90 5" maxlength="10"/>
@@ -17,14 +20,12 @@
     <text size="30 11" pos="355 35" color="#ECE8E0" label="$(com.ldtteam.structurize.gui.scantool.slot)" textalign="MIDDLE_RIGHT"/>
     <input id="slot" size="18 18" pos="390 30" maxlength="2" enabled="false"/>
 
-    <button id="confirm" source="structurize:textures/gui/buildtool/confirm.png" size="32" pos="105 50"/>
-    <button id="cancel" source="structurize:textures/gui/buildtool/cancel.png" size="32" pos="275 50"/>
+    <button id="confirm" source="structurize:textures/gui/buildtool/confirm.png" size="32" pos="105 50" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <button id="cancel" source="structurize:textures/gui/buildtool/cancel.png" size="32" pos="275 50" color="#ECE8E0" textcolor="#ECE8E0"/>
 
-    <button label="$(com.ldtteam.structurize.gui.scantool.showres)" id="showRes" pos="140 58" size="129 17"
-                 source="structurize:textures/gui/builderhut/builder_button_medium_large.png" textcolor="#F4F1EA"/>
+    <button label="$(com.ldtteam.structurize.gui.scantool.showres)" id="showRes" pos="140 58" size="129 17" source="structurize:textures/gui/quidcraft/btn_129x17.png" textcolor="#ECE8E0"/>
 
-    <button id="fillplaceholders" pos="320 31" size="17 17"
-                 source="structurize:textures/gui/buildtool/default.png" tooltip="$(com.ldtteam.structurize.gui.scantool.fillplacerholder.tooltip)" textcolor="#F4F1EA"/>
+    <button id="fillplaceholders" pos="320 31" size="17 17" source="structurize:textures/gui/buildtool/default.png" tooltip="$(com.ldtteam.structurize.gui.scantool.fillplacerholder.tooltip)" textcolor="#ECE8E0"/>
     <view id="fillplaceholdersui" size="95 95" pos="290 55" visible="false">
         <layout source="structurize:gui/windowplaceholderfill.xml"/>
     </view>
@@ -36,11 +37,9 @@
             <itemicon id="resourceIcon" size="16 16" pos="1 1"/>
             <text id="resourceName" size="142 12" pos="19 1" color="#ECE8E0" wrap="true"/>
             <text id="resourceQuantity" size="30 12" pos="160 1" color="#ECE8E0" textalign="MIDDLE_RIGHT"/>
-            <button label="$(com.ldtteam.structurize.gui.scantool.remove)" id="removeBlock" pos="19 13" size="86 17"
-                         source="structurize:textures/gui/builderhut/builder_button_medium.png" textcolor="#F4F1EA"/>
-            <button label="$(com.ldtteam.structurize.gui.scantool.replace)" id="replaceBlock" pos="104 13" size="86 17"
-                         source="structurize:textures/gui/builderhut/builder_button_medium.png" textcolor="#F4F1EA"/>
-            <button id="showBlock" source="structurize:textures/gui/transparent.png" pos="1 1" size="86 16"/>
+            <button label="$(com.ldtteam.structurize.gui.scantool.remove)" id="removeBlock" pos="19 13" size="86 17" source="structurize:textures/gui/quidcraft/btn_86x17.png" textcolor="#ECE8E0"/>
+            <button label="$(com.ldtteam.structurize.gui.scantool.replace)" id="replaceBlock" pos="104 13" size="86 17" source="structurize:textures/gui/quidcraft/btn_86x17.png" textcolor="#ECE8E0"/>
+            <button id="showBlock" source="structurize:textures/gui/transparent.png" pos="1 1" size="86 16" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
 
@@ -48,20 +47,12 @@
         <box size="100% 30" linewidth="1">
             <itemicon id="resourceIcon" size="16 16" pos="1 1"/>
             <text id="resourceName" size="172 12" pos="19 1" color="#ECE8E0" wrap="true"/>
-            <button label="$(com.ldtteam.structurize.gui.scantool.remove)" id="removeEntity" pos="19 13" size="86 17"
-                         source="structurize:textures/gui/builderhut/builder_button_medium.png" textcolor="#F4F1EA"/>
+            <button label="$(com.ldtteam.structurize.gui.scantool.remove)" id="removeEntity" pos="19 13" size="86 17" source="structurize:textures/gui/quidcraft/btn_86x17.png" textcolor="#ECE8E0"/>
             <text id="resourceQuantity" size="30 12" pos="160 1" color="#ECE8E0" textalign="MIDDLE_RIGHT"/>
         </box>
     </list>
 
-    <button id="undoredo"
-                 tooltip="$(structurize.gui.undoredo)"
-                 source="structurize:textures/gui/buildtool/undoredo.png"
-                 visible="true"
-                 size="32 32"
-                 pos="395 210"
-                 textcolor="#F4F1EA"
-                 texthovercolor="White"/>
+    <button id="undoredo" tooltip="$(structurize.gui.undoredo)" source="structurize:textures/gui/buildtool/undoredo.png" visible="true" size="32 32" pos="395 210" textcolor="#ECE8E0" texthovercolor="White"/>
 
     <text id="chestwarning" size="140 11" pos="140 75" textscale="0.5" visible="false"
            label="$(com.ldtteam.structurize.gui.scantool.chests)"/>
@@ -69,13 +60,12 @@
     <checkbox id="showvisisble" pos="60 83" size="16 16" visible="false"
               source="structurize:textures/gui/builderhut/checkbox_empty.png"
               checkmark="structurize:textures/gui/builderhut/checkbox_checked.png"
-              tooltip="$(com.ldtteam.structurize.gui.scantool.show_visible)" textcolor="#F4F1EA"/>
+              tooltip="$(com.ldtteam.structurize.gui.scantool.show_visible)" textcolor="#ECE8E0"/>
 
     <checkbox id="showhidden" pos="40 83" size="16 16" visible="false"
               source="structurize:textures/gui/builderhut/checkbox_empty.png"
               checkmark="structurize:textures/gui/builderhut/checkbox_checked.png"
-              tooltip="$(com.ldtteam.structurize.gui.scantool.show_hidden)" textcolor="#F4F1EA"/>
+              tooltip="$(com.ldtteam.structurize.gui.scantool.show_hidden)" textcolor="#ECE8E0"/>
 
-    <button label="$(com.ldtteam.structurize.gui.scantool.remove_filtered)" id="removefiltered" pos="80 83" size="86 17"
-                 source="structurize:textures/gui/builderhut/builder_button_medium.png" textcolor="#F4F1EA" visible="false"/>
+    <button label="$(com.ldtteam.structurize.gui.scantool.remove_filtered)" id="removefiltered" pos="80 83" size="86 17" source="structurize:textures/gui/quidcraft/btn_86x17.png" textcolor="#ECE8E0" visible="false"/>
 </window>

@@ -1,7 +1,10 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
         size="420 240" pause="false" type="OVERSIZED_VANILLA" lightbox="true">
+    <image id="qcShell" source="structurize:textures/gui/quidcraft/window_420x240.png" pos="0 0" size="420 240"/>
+    <image id="qcHeader" source="structurize:textures/gui/quidcraft/header_408x24.png" pos="8 6" size="404 24"/>
 
-    <button id="cancel" source="structurize:textures/gui/buildtool/button_medium.png" label="$(structurize.gui.buildtool.cancel)" size="86 17" pos="3 3" textcolor="#F4F1EA" texthovercolor="gray"/>
+
+    <button id="cancel" source="structurize:textures/gui/quidcraft/btn_86x17.png" label="$(structurize.gui.buildtool.cancel)" size="86 17" pos="3 3" textcolor="#ECE8E0" texthovercolor="gray"/>
     <input id="filter" size="129 17" pos="150 3" maxlength="25" visible="true"/>
 
     <list size="420 200" pos="0 40" id="packs" visible="false" emptytext="$(com.ldtteam.structurize.gui.switchpack.list.empty)">
@@ -16,14 +19,7 @@
                 <text id="desc1" pos="81 20" size="119 50" color="#ECE8E0" textscale="0.6"/>
                 <text id="authors1" pos="90 70" size="110 30" color="#ECE8E0" textscale="0.8"/>
 
-                <button id="select1"
-                        source="structurize:textures/gui/buildtool/button_medium.png"
-                        disabled="structurize:textures/gui/buildtool/button_medium_disabled.png"
-                        text="$(structurize.gui.switchpack.select)"
-                        size="86 17"
-                        pos="0 80"
-                        textcolor="#F4F1EA"
-                        texthovercolor="gray"/>
+                <button id="select1" source="structurize:textures/gui/quidcraft/btn_86x17.png" disabled="structurize:textures/gui/buildtool/button_medium_disabled.png" text="$(structurize.gui.switchpack.select)" size="86 17" pos="0 80" textcolor="#ECE8E0" texthovercolor="gray"/>
             </box>
             <box size="200 100" linewidth="0" pos="200 0" id="box2">
                 <image id="icon2" pos="0 0" size="80 80" source="structurize:textures/item/sceptersteel.png"/>
@@ -32,14 +28,7 @@
                 <text id="desc2" pos="81 20" size="119 50" color="#ECE8E0" textscale="0.6"/>
                 <text id="authors2" pos="90 70" size="110 30" color="#ECE8E0" textscale="0.9"/>
 
-                <button id="select2"
-                        source="structurize:textures/gui/buildtool/button_medium.png"
-                        disabled="structurize:textures/gui/buildtool/button_medium_disabled.png"
-                        text="$(structurize.gui.switchpack.select)"
-                        size="86 17"
-                        pos="0 80"
-                        textcolor="#F4F1EA"
-                        texthovercolor="gray"/>
+                <button id="select2" source="structurize:textures/gui/quidcraft/btn_86x17.png" disabled="structurize:textures/gui/buildtool/button_medium_disabled.png" text="$(structurize.gui.switchpack.select)" size="86 17" pos="0 80" textcolor="#ECE8E0" texthovercolor="gray"/>
             </box>
         </box>
     </list>

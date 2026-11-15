@@ -7,9 +7,8 @@
         <list id="resources" size="270 120" pos="0 30" childspacing="-1">
             <box size="100% 18" linewidth="1">
                 <itemicon id="resourceIcon" size="16 16" pos="1 1"/>
-                <text id="resourceName" size="135 18" pos="20 0" color="white" wrap="true"/>
-                <button label="$(com.ldtteam.structurize.gui.scantool.select)" id="select" pos="160 1" size="86 17"
-                        source="structurize:textures/gui/builderhut/builder_button_medium.png" textcolor="#F4F1EA"/>
+                <text id="resourceName" size="135 18" pos="20 0" color="#ECE8E0" wrap="true"/>
+                <button label="$(com.ldtteam.structurize.gui.scantool.select)" id="select" pos="160 1" size="86 17" source="structurize:textures/gui/quidcraft/btn_86x17.png" textcolor="#ECE8E0"/>
             </box>
         </list>
     </view>

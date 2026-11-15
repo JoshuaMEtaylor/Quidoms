@@ -3,8 +3,8 @@
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
 
     <text id="title" size="130 11" pos="128 41" color="#ECE8E0" textalign="MIDDLE" label="$(com.minecolonies.coremod.gui.research.title)"/>
-    <text id="maxresearchwarn" size="180 10" pos="10 28" color="#ECE8E0" textalign="MIDDLE"/>
-    <list id="researches" size="164 175" pos="10 40">
+    <text id="maxresearchwarn" size="180 10" pos="115 56" color="#ECE8E0" textalign="MIDDLE"/>
+    <list id="researches" size="164 175" pos="115 40">
         <box size="100% 28" linewidth="0">
             <button id="name" size="129 17" pos="2 10" align="MIDDLE" color="#ECE8E0"
                          source="minecolonies:textures/gui/quidcraft/btn_129x17.png"

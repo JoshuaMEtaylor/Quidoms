@@ -3,9 +3,9 @@
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
     <text size="130 11" pos="128 42" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.workerhuts.minerguards)"/>
-    <text id="noguardwarning" size="160 33" pos="13 29" color="#ECE8E0"
+    <text id="noguardwarning" size="160 33" pos="118 57" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.workerhuts.miner.noguards)"/>
-    <list id="guards" size="164 185" pos="13 29">
+    <list id="guards" size="164 185" pos="118 57">
         <box size="100% 28" linewidth="0">
             <text id="guardName" size="92 24" pos="0 0" textalign="MIDDLE" color="#ECE8E0"/>
             <button id="assignGuard" size="64 17" pos="92 4" color="#ECE8E0"

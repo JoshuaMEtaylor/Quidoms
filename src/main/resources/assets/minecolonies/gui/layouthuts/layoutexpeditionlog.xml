@@ -3,20 +3,20 @@
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
     <text id="desc" size="130 11" pos="128 42" label="$(com.minecolonies.gui.workerhuts.expeditionlog)" color="#ECE8E0" textalign="MIDDLE"/>
 
-    <text id="name" size="164 11" color="#ECE8E0" pos="13 28" textalign="MIDDLE"/>
-    <text id="status" size="164 11" color="#ECE8E0" pos="13 39" textalign="MIDDLE"/>
+    <text id="name" size="164 11" color="#ECE8E0" pos="118 56" textalign="MIDDLE"/>
+    <text id="status" size="164 11" color="#ECE8E0" pos="118 39" textalign="MIDDLE"/>
     <view id="healthBar" size="120 11" pos="133 76">
         <text id="healthLabel" size="30 11" color="#ECE8E0" pos="135 10" text="44"/>
     </view>
     <view id="saturationBar" size="120 22" pos="133 88"/>
 
-    <view id="equipment" size="164 16" pos="13 90"/>
-    <gradient size="164 36" pos="13 110" gradientstart="4292072403" gradientend="4289309097"/>
-    <gradient id="resourcesbg" size="164 80" pos="13 150" gradientstart="4292072403" gradientend="4289309097"/>
-    <box size="164 36" pos="13 110" linewidth="2">
+    <view id="equipment" size="164 16" pos="118 90"/>
+    <gradient size="164 36" pos="118 110" gradientstart="4292072403" gradientend="4289309097"/>
+    <gradient id="resourcesbg" size="164 80" pos="118 150" gradientstart="4292072403" gradientend="4289309097"/>
+    <box size="164 36" pos="118 110" linewidth="2">
         <view id="mobs" size="100% 100%"/>
     </box>
-    <box size="164 80" pos="13 150" linewidth="2">
+    <box size="164 80" pos="118 150" linewidth="2">
         <view id="resources" size="100% 100%"/>
     </box>
     <image id="rip" source="minecolonies:textures/icons/grave_icon.png" size="8 8" pos="264 181"

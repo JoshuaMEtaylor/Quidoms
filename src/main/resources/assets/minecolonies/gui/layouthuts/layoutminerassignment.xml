@@ -1,10 +1,10 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260">
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
-    <text size="164 11" pos="13 32" textalign="MIDDLE" color="#ECE8E0"
+    <text size="164 11" pos="118 60" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.workerhuts.workerassigned)"/>
 
-    <list id="workers" size="164 30" pos="13 43">
+    <list id="workers" size="164 30" pos="118 43">
         <view size="100% 11">
             <box size="100% 11" linewidth="0">
                 <text id="workerName" size="100% 11" pos="0 0" textalign="MIDDLE" color="#ECE8E0"/>

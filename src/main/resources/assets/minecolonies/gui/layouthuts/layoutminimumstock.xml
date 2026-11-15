@@ -3,7 +3,7 @@
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
             <text size="130 11" pos="30 14" textalign="MIDDLE" color="#ECE8E0"
                    label="$(com.minecolonies.coremod.gui.warehouse.stock)"/>
-    <list id="resourcesstock" size="170 180" pos="13 50" emptytext="$(com.minecolonies.coremod.gui.warehouse.stock.empty)" emptycolor="#ECE8E0">
+    <list id="resourcesstock" size="170 180" pos="118 50" emptytext="$(com.minecolonies.coremod.gui.warehouse.stock.empty)" emptycolor="#ECE8E0">
                 <box size="100% 17" linewidth="1">
                     <itemicon id="resourceIcon" size="17 17" pos="0 0"/>
                     <text id="resourceName" size="90 12" pos="20 1" color="#ECE8E0"/>
