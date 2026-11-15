@@ -1,27 +1,25 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/1.20.1/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260" >
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
-    <text id="desc" size="170 10" textalign="MIDDLE" pos="115 43" color="#ECE8E0" textscale="1.0" label="$(com.minecolonies.core.gui.colonylist.direct.desc)"/>
+    <text id="desc" size="170 10" textalign="MIDDLE" pos="118 43" color="#ECE8E0" textscale="1.0" label="$(com.minecolonies.core.gui.colonylist.direct.desc)"/>
     <list id="directcolonylist" size="164 80" pos="118 53">
         <box size="100% 40" linewidth="1">
             <text id="name" size="140 12" pos="2 1" color="#ECE8E0"/>
             <text id="distance" size="80 12" pos="70 10" color="#ECE8E0"/>
             <text id="state" size="100% 12" pos="2 10" color="#ECE8E0"/>
 
-            <button id="travel" size="86 17" label="$(com.minecolonies.core.gui.colonylist.travel)" pos="32 22"
-                    source="minecolonies:textures/gui/quidcraft/btn_86x17.png" color="#ECE8E0" tooltip="$(com.minecolonies.core.gui.colonylist.travel.tooltip)" textcolor="#ECE8E0"/>
+            <button id="travel" size="86 17" label="$(com.minecolonies.core.gui.colonylist.travel)" pos="32 22" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" color="#ECE8E0" tooltip="$(com.minecolonies.core.gui.colonylist.travel.tooltip)" textcolor="#ECE8E0"/>
             <itemicon id="icon" size="16 16" pos="100 22"/>
         </box>
     </list>
-    <text id="desc" size="170 10" textalign="MIDDLE" pos="115 110" color="#ECE8E0" textscale="1.0" label="$(com.minecolonies.core.gui.colonylist.indirect.desc)"/>
+    <text id="desc" size="170 10" textalign="MIDDLE" pos="118 110" color="#ECE8E0" textscale="1.0" label="$(com.minecolonies.core.gui.colonylist.indirect.desc)"/>
     <list id="indirectcolonylist" size="164 80" pos="118 125">
         <box size="100% 40" linewidth="1">
             <text id="name" size="140 12" pos="2 1" color="#ECE8E0"/>
             <text id="distance" size="80 12" pos="70 10" color="#ECE8E0"/>
             <text id="state" size="100% 12" pos="2 10" color="#ECE8E0"/>
 
-            <button id="travel" size="86 17" label="$(com.minecolonies.core.gui.colonylist.travel)" pos="32 22"
-                    source="minecolonies:textures/gui/quidcraft/btn_86x17.png" color="#ECE8E0" tooltip="$(com.minecolonies.core.gui.colonylist.travel.tooltip)" textcolor="#ECE8E0"/>
+            <button id="travel" size="86 17" label="$(com.minecolonies.core.gui.colonylist.travel)" pos="32 22" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" color="#ECE8E0" tooltip="$(com.minecolonies.core.gui.colonylist.travel.tooltip)" textcolor="#ECE8E0"/>
             <itemicon id="icon" size="16 16" pos="100 22"/>
         </box>
     </list>

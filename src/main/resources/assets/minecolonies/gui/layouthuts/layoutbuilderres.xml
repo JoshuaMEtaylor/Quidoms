@@ -1,26 +1,27 @@
 <window xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ldtteam/BlockUI/version/main/src/main/resources/assets/blockui/gui/block_ui.xsd"
     size="420 260">
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
-    <text id="desc" size="130 11" pos="128 42" color="#ECE8E0" textalign="MIDDLE"/>
 
-    <text size="164 11" pos="118 57" id="constructionName" textalign="MIDDLE" label="" color="#ECE8E0"/>
-    <text size="164 11" pos="118 40" id="stepprogress" textalign="MIDDLE" label="" color="#ECE8E0"/>
-    <text size="164 11" pos="118 51" id="blocksremaining" textalign="MIDDLE" label="" color="#ECE8E0"/>
-    <gradient id="progressbarbg" size="164 6" pos="118 63" gradientstart="4286545791" gradientend="4286545791"/>
-    <gradient id="progressbar" size="0 6" pos="118 63" gradientstart="4283215695" gradientend="4283215695"/>
-    <text size="164 11" pos="118 71" id="progress" textalign="MIDDLE" label="" color="#ECE8E0"/>
-    <list id="resources" size="164 148" pos="118 84">
-    <box size="100% 30" linewidth="1">
+    <text id="desc" size="260 11" pos="118 12" color="#ECE8E0" textcolor="#ECE8E0" textalign="MIDDLE"/>
+
+    <text size="270 11" pos="118 48" id="constructionName" textalign="MIDDLE" label="" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text size="270 11" pos="118 60" id="stepprogress" textalign="MIDDLE" label="" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <text size="270 11" pos="118 72" id="blocksremaining" textalign="MIDDLE" label="" color="#ECE8E0" textcolor="#ECE8E0"/>
+    <gradient id="progressbarbg" size="270 6" pos="118 86" gradientstart="4286545791" gradientend="4286545791"/>
+    <gradient id="progressbar" size="0 6" pos="118 86" gradientstart="4283215695" gradientend="4283215695"/>
+    <text size="270 11" pos="118 94" id="progress" textalign="MIDDLE" label="" color="#ECE8E0" textcolor="#ECE8E0"/>
+
+    <list id="resources" size="270 120" pos="118 110">
+        <box size="100% 30" linewidth="1">
             <itemicon id="resourceIcon" size="16 16" pos="1 1"/>
-            <text id="resourceName" size="100 12" pos="20 3" textalign="MIDDLE_LEFT" color="#ECE8E0"/>
-            <text id="resourceMissing" size="50 12" pos="2 18" textalign="MIDDLE_LEFT" color="#ECE8E0"/>
-            <text id="resourceAvailableNeeded" size="100% 12" pos="0 18" textalign="MIDDLE" color="#ECE8E0"/>
-
-            <button id="resourceAdd" size="14 15" label="↥" pos="100 12"
-                         source="minecolonies:textures/gui/builderhut/builder_button_mini.png" color="#ECE8E0" textcolor="#ECE8E0"/>
-
-            <text id="resourceId" size="1 1" pos="100 100"/>
-            <text id="resourceQuantity" size="1 1" pos="100 100"/>
+            <text id="resourceName" size="180 12" pos="20 3" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="resourceMissing" size="80 12" pos="20 16" textalign="MIDDLE_LEFT" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="resourceAvailableNeeded" size="100 12" pos="110 16" textalign="MIDDLE" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="resourceAdd" size="14 15" label="↥" pos="250 8"
+                         source="minecolonies:textures/gui/builderhut/builder_button_mini.png"
+                         color="#ECE8E0" textcolor="#ECE8E0"/>
+            <text id="resourceId" size="1 1" pos="0 0" visible="false"/>
+            <text id="resourceQuantity" size="1 1" pos="0 0" visible="false"/>
         </box>
     </list>
 </window>

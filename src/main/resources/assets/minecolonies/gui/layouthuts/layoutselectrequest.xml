@@ -3,8 +3,7 @@
     <layout source="minecolonies:gui/layouthuts/layouthutshell.xml"/>
     <text size="120 11" pos="128 42" textalign="MIDDLE" color="#ECE8E0"
            label="$(com.minecolonies.coremod.gui.citizen.requests)"/>
-    <button id="cancel" label="X" color="red" pos="258 39" size="14 15"
-                 source="minecolonies:textures/gui/builderhut/builder_button_mini.png" textcolor="#ECE8E0"/>
+    <button id="cancel" label="X" color="red" pos="258 39" size="14 15" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" textcolor="#ECE8E0"/>
 
     <list id="requests" size="170 170" pos="118 58">
         <box id="requestx" size="100% 40" linewidth="1">
@@ -16,9 +15,7 @@
             <text id="shortDetail" size="130 12" pos="20 1" color="#ECE8E0"/>
             <text id="requester" size="130 12" pos="20 13" color="#ECE8E0"/>
 
-            <button id="select" size="37 16" pos="20 23" color="#ECE8E0"
-                         label="$(com.minecolonies.coremod.gui.scantool.select)"
-                         source="minecolonies:textures/gui/builderhut/builder_button_small.png" textcolor="#ECE8E0"/>
+            <button id="select" size="37 16" pos="20 23" color="#ECE8E0" label="$(com.minecolonies.coremod.gui.scantool.select)" source="minecolonies:textures/gui/builderhut/builder_button_small.png" textcolor="#ECE8E0"/>
         </box>
     </list>
 </window>

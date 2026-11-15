@@ -12,10 +12,6 @@
         </view>
     </list>
 
-    <button id="hire" size="129 17" pos="128 182" textcolor="#ECE8E0"
-                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
-                 label="$(com.minecolonies.coremod.gui.workerhuts.manage)"/>
-    <button id="recall" size="129 17" pos="128 200" textcolor="#ECE8E0"
-                 source="minecolonies:textures/gui/quidcraft/btn_129x17.png"
-                 label="$(com.minecolonies.coremod.gui.workerhuts.recall)"/>
+    <button id="hire" size="129 17" pos="128 182" textcolor="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.manage)"/>
+    <button id="recall" size="129 17" pos="128 200" textcolor="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_129x17.png" label="$(com.minecolonies.coremod.gui.workerhuts.recall)"/>
 </window>

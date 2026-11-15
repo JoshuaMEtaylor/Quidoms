@@ -14,8 +14,5 @@
         <text id="resourceId" size="1 1" pos="100 100"/>
         <text id="resourceQuantity" size="1 1" pos="100 100"/>
     </box>
-    <button id="sort" size="86 17" pos="148 98" color="#ECE8E0"
-                 source="minecolonies:textures/gui/quidcraft/btn_86x17.png"
-                 disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png"
-                 label="$(com.minecolonies.coremod.gui.warehouse.sort)" textcolor="#ECE8E0"/>
+    <button id="sort" size="86 17" pos="148 98" color="#ECE8E0" source="minecolonies:textures/gui/quidcraft/btn_86x17.png" disabled="minecolonies:textures/gui/builderhut/builder_button_medium_large_disabled.png" label="$(com.minecolonies.coremod.gui.warehouse.sort)" textcolor="#ECE8E0"/>
 </window>

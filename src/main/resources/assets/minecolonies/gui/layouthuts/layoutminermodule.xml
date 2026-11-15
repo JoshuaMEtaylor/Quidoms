@@ -10,14 +10,8 @@
             <text id="depth" size="60 12" pos="23 2" textalign="MIDDLE_LEFT" color="#ECE8E0"/>
             <text id="nodes" size="60 12" pos="23 15" textalign="MIDDLE_LEFT" color="#ECE8E0"/>
 
-            <button id="repair" size="44 17" pos="88 6"
-                    label="$(com.minecolonies.coremod.gui.workerhuts.minerrepairnode)"
-                    color="#ECE8E0"
-                    source="minecolonies:textures/gui/builderhut/builder_button_quite_small.png"
-                    disabled="minecolonies:textures/gui/builderhut/builder_button_quite_small_disabled.png" textcolor="#ECE8E0"/>
-            <button id="mine" size="17 17" pos="135 6"
-                    source="minecolonies:textures/gui/builderhut/builder_button_mini.png"
-                    disabled="minecolonies:textures/gui/builderhut/builder_button_mini_check.png" color="#ECE8E0" textcolor="#ECE8E0"/>
+            <button id="repair" size="44 17" pos="88 6" label="$(com.minecolonies.coremod.gui.workerhuts.minerrepairnode)" color="#ECE8E0" source="minecolonies:textures/gui/builderhut/builder_button_quite_small.png" disabled="minecolonies:textures/gui/builderhut/builder_button_quite_small_disabled.png" textcolor="#ECE8E0"/>
+            <button id="mine" size="17 17" pos="135 6" source="minecolonies:textures/gui/builderhut/builder_button_mini.png" disabled="minecolonies:textures/gui/builderhut/builder_button_mini_check.png" color="#ECE8E0" textcolor="#ECE8E0"/>
         </box>
     </list>
 </window>
